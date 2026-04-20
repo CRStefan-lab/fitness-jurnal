@@ -13,12 +13,16 @@
 :root{--bg:#0a0a0a;--s1:#1a1a1a;--s2:#222;--bd:#2e2e2e;--acc:#e8632a;--acc2:#f5a623;--blue:#3a7bd5;--green:#2ecc71;--red:#e05555;--purple:#6366f1;--text:#f0f0f0;--muted:#777;--r:13px}
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif;font-size:15px;padding-bottom:calc(90px + env(safe-area-inset-bottom))}
-.hdr{background:#111;padding:calc(env(safe-area-inset-top) + 14px) 16px 14px;border-bottom:1px solid var(--bd)}
+.hdr{background:#111;padding:calc(env(safe-area-inset-top) + 14px) 64px 14px 16px;border-bottom:1px solid var(--bd)}
 .hdr-lbl{font-size:10px;letter-spacing:3px;color:var(--acc);margin-bottom:4px;font-weight:700;text-transform:uppercase}
 .hdr-title{font-size:24px;font-weight:900;line-height:1.1}
 .hdr-sub{font-size:12px;color:var(--muted);margin-top:4px}
 .hdr-date{font-size:11px;color:var(--acc2);margin-top:6px;font-weight:600}
-.sync-badge{display:inline-block;font-size:9px;padding:2px 6px;border-radius:4px;margin-left:6px;font-weight:700;letter-spacing:.5px;vertical-align:middle}
+.sync-badge{display:inline-block;font-size:9px;padding:3px 7px;border-radius:4px;margin-left:6px;font-weight:700;letter-spacing:.5px;vertical-align:middle;cursor:pointer;border:1px solid transparent}
+.sync-badge:active{opacity:.7}
+.settings-gear{position:absolute;top:calc(env(safe-area-inset-top) + 14px);right:14px;background:var(--s2);border:1px solid var(--bd);border-radius:10px;width:38px;height:38px;display:flex;align-items:center;justify-content:center;font-size:18px;cursor:pointer;color:var(--text)}
+.settings-gear:active{background:var(--bd)}
+.hdr{position:relative}
 .sb-on{background:rgba(46,204,113,.15);color:var(--green)}
 .sb-off{background:rgba(119,119,119,.15);color:var(--muted)}
 .sb-err{background:rgba(224,85,85,.15);color:var(--red)}
@@ -200,10 +204,11 @@ input:checked + .slider:before{transform:translateX(20px);background:var(--acc)}
 </head>
 <body>
 <div class="hdr">
-  <div class="hdr-lbl">FITNESS JURNAL · 8 SĂPTĂMÂNI <span id="syncBadge" class="sync-badge sb-off">LOCAL</span></div>
+  <div class="hdr-lbl">FITNESS JURNAL · 8 SĂPTĂMÂNI <span id="syncBadge" class="sync-badge sb-off" onclick="showTab('setari')" title="Setări & Sync">LOCAL</span></div>
   <div class="hdr-title" id="hdrTitle">BLOC FRIENDLY</div>
   <div class="hdr-sub">Bancă · Gantere · Bară · Fără zgomot</div>
   <div class="hdr-date" id="hdrDate"></div>
+  <div class="settings-gear" onclick="showTab('setari')" title="Setări">⚙️</div>
 </div>
 
 <div class="install-hint" id="installHint">
@@ -268,34 +273,8 @@ input:checked + .slider:before{transform:translateX(20px);background:var(--acc)}
     <div class="chart-stats" id="exerStats"></div>
   </div>
 
-  <div class="stitle">🔔 Notificări</div>
-  <div class="notif-row">
-    <div style="flex:1">
-      <div class="notif-lbl">Reminder zilnic</div>
-      <div class="notif-sub" id="notifStatus">Dezactivat</div>
-    </div>
-    <label class="sw"><input type="checkbox" id="notifToggle" onchange="toggleNotif()"><span class="slider"></span></label>
-  </div>
-  <div id="notifConfig" style="display:none">
-    <div class="notif-row">
-      <div style="flex:1">
-        <div class="notif-lbl">Oră</div>
-        <div class="notif-sub">Când îți amintim</div>
-      </div>
-      <input type="time" class="time-input" id="notifTime" value="19:00" onchange="updateNotifCfg()">
-    </div>
-    <div class="notif-row" style="flex-direction:column;align-items:stretch">
-      <div class="notif-lbl">Zile</div>
-      <div class="days-pick" id="notifDays"></div>
-    </div>
-    <div class="notif-row" style="flex-direction:column;align-items:stretch;gap:6px">
-      <div class="notif-lbl">Mesaj</div>
-      <div class="notif-sub" id="notifMsgPreview">—</div>
-      <button class="btn btn-ghost" style="margin:4px 0 0" onclick="testNotif()">🔔 Trimite notificare test</button>
-    </div>
-  </div>
-  <p style="font-size:11px;color:var(--muted);margin-top:8px;line-height:1.5">
-    ⚠️ Notificările merg când app-ul e deschis sau instalat ca PWA. Pe iOS trebuie neapărat instalat pe Home Screen pentru a primi notificări.
+  <p style="font-size:11px;color:var(--muted);margin-top:16px;line-height:1.5;text-align:center">
+    🔔 Notificări · ☁️ Sync · 💾 Backup — găsești toate în <a onclick="showTab('setari')" style="color:var(--acc);cursor:pointer;text-decoration:underline">Setări ⚙️</a>
   </p>
 </div>
 
@@ -362,6 +341,14 @@ input:checked + .slider:before{transform:translateX(20px);background:var(--acc)}
   <button class="btn btn-acc" onclick="doExport()">📤 Generează rezumat</button>
   <button class="btn btn-ghost" onclick="copyExport()">📋 Copiază</button>
 
+  <p style="font-size:11px;color:var(--muted);margin-top:20px;text-align:center">
+    💾 Backup · ☁️ Sync · ⚡ Share → <a onclick="showTab('setari')" style="color:var(--acc);cursor:pointer;text-decoration:underline">Setări ⚙️</a>
+  </p>
+</div>
+
+<div id="tab-setari" class="sec">
+  <div class="stitle">⚙️ Setări & sync</div>
+
   <div class="stitle">⚡ Share backup rapid</div>
   <p style="font-size:12px;color:var(--muted);margin-bottom:10px;line-height:1.5">
     Un tap → meniul de share al telefonului → trimite datele către Drive, Mail, Telegram, orice. Zero setup.
@@ -392,6 +379,36 @@ input:checked + .slider:before{transform:translateX(20px);background:var(--acc)}
     </div>
   </div>
 
+  <div class="stitle">🔔 Notificări</div>
+  <div class="notif-row">
+    <div style="flex:1">
+      <div class="notif-lbl">Reminder zilnic</div>
+      <div class="notif-sub" id="notifStatus">Dezactivat</div>
+    </div>
+    <label class="sw"><input type="checkbox" id="notifToggle" onchange="toggleNotif()"><span class="slider"></span></label>
+  </div>
+  <div id="notifConfig" style="display:none">
+    <div class="notif-row">
+      <div style="flex:1">
+        <div class="notif-lbl">Oră</div>
+        <div class="notif-sub">Când îți amintim</div>
+      </div>
+      <input type="time" class="time-input" id="notifTime" value="19:00" onchange="updateNotifCfg()">
+    </div>
+    <div class="notif-row" style="flex-direction:column;align-items:stretch">
+      <div class="notif-lbl">Zile</div>
+      <div class="days-pick" id="notifDays"></div>
+    </div>
+    <div class="notif-row" style="flex-direction:column;align-items:stretch;gap:6px">
+      <div class="notif-lbl">Mesaj</div>
+      <div class="notif-sub" id="notifMsgPreview">—</div>
+      <button class="btn btn-ghost" style="margin:4px 0 0" onclick="testNotif()">🔔 Trimite notificare test</button>
+    </div>
+  </div>
+  <p style="font-size:11px;color:var(--muted);margin-top:8px;line-height:1.5">
+    ⚠️ Notificările merg când app-ul e deschis sau instalat ca PWA. Pe iOS trebuie neapărat instalat pe Home Screen.
+  </p>
+
   <div class="stitle">💾 Backup local (fișier)</div>
   <p style="font-size:12px;color:var(--muted);margin-bottom:10px;line-height:1.5">
     Download / upload manual al fișierului JSON.
@@ -401,10 +418,22 @@ input:checked + .slider:before{transform:translateX(20px);background:var(--acc)}
     <button class="btn btn-ghost" onclick="document.getElementById('fileImport').click()">⬆️ Importă</button>
   </div>
   <input type="file" id="fileImport" accept="application/json" style="display:none" onchange="importJSON(event)">
+
+  <div class="stitle">⚠️ Zona periculoasă</div>
   <button class="btn btn-danger" onclick="resetAll()">🗑️ Șterge toate datele</button>
-  <p style="font-size:11px;color:var(--muted);margin-top:20px;text-align:center">
+  <p style="font-size:11px;color:var(--muted);margin-top:14px;text-align:center">
     <span id="storageInfo"></span>
   </p>
+
+  <div class="stitle">ℹ️ Info</div>
+  <div class="rules-box">
+    <div class="rule-row">📱 PWA instalat: <strong id="infoPwa" style="color:var(--text)">verific...</strong></div>
+    <div class="rule-row">🔔 Notificări: <strong id="infoNotif" style="color:var(--text)">verific...</strong></div>
+    <div class="rule-row">☁️ Sync: <strong id="infoSync" style="color:var(--text)">verific...</strong></div>
+    <div class="rule-row">📊 Înregistrări: <strong id="infoRows" style="color:var(--text)">—</strong></div>
+    <div class="rule-row">📦 Cache SW: <strong id="infoSw" style="color:var(--text)">—</strong></div>
+    <div class="rule-row">🔗 <a href="https://github.com/CRStefan-lab/fitness-jurnal" target="_blank" style="color:var(--blue)">github.com/CRStefan-lab/fitness-jurnal</a></div>
+  </div>
 </div>
 
 <div id="tab-ghid" class="sec">
@@ -680,13 +709,16 @@ function showTab(name,btn){
   if(name==='istoric'){
     renderHistoric();
     renderMeasurements();
-    updateStorageInfo();
-    updateGistUI();
   }
   if(name==='progres'){
     renderBodyChart();
     renderExerciseChart();
+  }
+  if(name==='setari'){
+    updateGistUI();
     initNotifUI();
+    updateStorageInfo();
+    updateInfo();
   }
   window.scrollTo(0,0);
 }
@@ -1144,7 +1176,28 @@ function updateStorageInfo(){
   var s=loadStore();
   var size=new Blob([JSON.stringify(s)]).size;
   var kb=(size/1024).toFixed(1);
-  document.getElementById('storageInfo').textContent=s.rows.length+' înregistrări · '+kb+' KB';
+  var el=document.getElementById('storageInfo');
+  if(el)el.textContent=s.rows.length+' înregistrări · '+kb+' KB';
+}
+
+function updateInfo(){
+  var isPwa=window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone;
+  var set=function(id,val){var el=document.getElementById(id);if(el)el.innerHTML=val;};
+  set('infoPwa',isPwa?'<span style="color:var(--green)">DA</span>':'<span style="color:var(--acc2)">NU (deschide din browser)</span>');
+  var notifState='Browser nu suportă';
+  if('Notification' in window){
+    var cfg=getNotifCfg();
+    notifState=Notification.permission==='granted'
+      ?(cfg.enabled?'<span style="color:var(--green)">Activ</span>':'Permise, dar OFF')
+      :Notification.permission==='denied'?'<span style="color:var(--red)">Blocate</span>':'Neautorizate';
+  }
+  set('infoNotif',notifState);
+  set('infoSync',gistState.token?'<span style="color:var(--green)">GitHub Gist conectat</span>':'<span style="color:var(--muted)">Doar local</span>');
+  var rows=loadStore().rows.length;
+  set('infoRows',rows);
+  if('serviceWorker' in navigator){
+    caches.keys().then(function(keys){set('infoSw',keys.join(', ')||'niciunul');});
+  }else{set('infoSw','nu e disponibil');}
 }
 
 // ═══════════════════════════════════════════════════════════════

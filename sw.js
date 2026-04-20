@@ -1,5 +1,5 @@
 // Service Worker — cache-first pentru offline
-const CACHE = 'fitness-v6';
+const CACHE = 'fitness-v7';
 const ASSETS = ['./', './index.html', './manifest.json'];
 
 self.addEventListener('install', e => {
