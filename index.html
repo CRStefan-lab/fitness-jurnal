@@ -18,6 +18,10 @@ body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSy
 .hdr-title{font-size:24px;font-weight:900;line-height:1.1}
 .hdr-sub{font-size:12px;color:var(--muted);margin-top:4px}
 .hdr-date{font-size:11px;color:var(--acc2);margin-top:6px;font-weight:600}
+.sync-badge{display:inline-block;font-size:9px;padding:2px 6px;border-radius:4px;margin-left:6px;font-weight:700;letter-spacing:.5px;vertical-align:middle}
+.sb-on{background:rgba(46,204,113,.15);color:var(--green)}
+.sb-off{background:rgba(119,119,119,.15);color:var(--muted)}
+.sb-err{background:rgba(224,85,85,.15);color:var(--red)}
 .bnav{position:fixed;bottom:0;left:0;right:0;background:#111;border-top:1px solid var(--bd);display:flex;z-index:200;padding-bottom:env(safe-area-inset-bottom)}
 .nb{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;padding:10px 2px 12px;background:none;border:none;color:var(--muted);font-size:10px;font-weight:600;cursor:pointer;font-family:inherit}
 .nb .ico{font-size:20px}
@@ -118,18 +122,48 @@ body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSy
 .install-hint{background:rgba(232,99,42,.1);border:1px solid rgba(232,99,42,.3);border-radius:10px;padding:10px 12px;margin:14px;font-size:12px;color:var(--acc);line-height:1.5;display:none}
 .install-hint.show{display:block}
 .install-hint button{background:none;border:none;color:var(--muted);float:right;cursor:pointer;font-size:18px;margin-top:-4px}
+.week-nav{display:flex;align-items:center;gap:8px;background:var(--s1);border:1px solid var(--bd);border-radius:var(--r);padding:8px;margin-bottom:10px}
+.week-nav-btn{background:var(--s2);border:1px solid var(--bd);color:var(--text);width:40px;height:40px;border-radius:10px;font-size:18px;font-weight:900;cursor:pointer;font-family:inherit;flex-shrink:0}
+.week-nav-btn:disabled{opacity:.3;cursor:not-allowed}
+.week-nav-title{flex:1;text-align:center;font-size:13px;font-weight:700}
+.week-nav-sub{font-size:10px;color:var(--muted);margin-top:2px}
+.meas-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px}
+.meas-field{background:var(--s2);border:1px solid var(--bd);border-radius:10px;padding:8px 10px}
+.meas-lbl{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;font-weight:700;margin-bottom:4px}
+.meas-input-row{display:flex;align-items:center;gap:4px}
+.meas-in{flex:1;background:var(--bg);border:1px solid var(--bd);border-radius:6px;color:var(--text);font-size:16px;font-weight:700;padding:6px 8px;font-family:inherit;width:100%;min-width:0}
+.meas-in:focus{outline:none;border-color:var(--acc)}
+.meas-unit{font-size:11px;color:var(--muted);font-weight:600}
+.meas-date{background:var(--s1);border:1px solid var(--acc);border-radius:10px;padding:10px 12px;margin-bottom:10px}
+.meas-history{background:var(--s1);border:1px solid var(--bd);border-radius:var(--r);overflow:hidden}
+.meas-hist-row{padding:10px 12px;border-bottom:1px solid var(--bd);display:flex;flex-direction:column;gap:4px}
+.meas-hist-row:last-child{border-bottom:none}
+.meas-hist-date{font-size:12px;font-weight:700;color:var(--acc)}
+.meas-hist-vals{display:flex;flex-wrap:wrap;gap:4px;font-size:11px}
+.meas-v{background:var(--s2);padding:2px 7px;border-radius:6px;color:var(--text)}
+.meas-v .delta-up{color:var(--green);font-weight:700}
+.meas-v .delta-down{color:var(--red);font-weight:700}
+.meas-v .delta-neu{color:var(--muted)}
+.drive-card{background:linear-gradient(135deg,rgba(58,123,213,.1),rgba(99,102,241,.08));border:1px solid rgba(99,102,241,.3);border-radius:var(--r);padding:14px;margin-bottom:10px}
+.drive-status{font-size:13px;font-weight:700;margin-bottom:6px;display:flex;align-items:center;gap:6px}
+.drive-sub{font-size:11px;color:var(--muted);margin-bottom:10px;line-height:1.5}
+.setup-link{color:var(--blue);font-size:12px;font-weight:600;text-decoration:underline;cursor:pointer;display:inline-block;margin-top:4px}
+.setup-box{background:var(--s2);border:1px solid var(--bd);border-radius:10px;padding:12px;margin-top:10px;font-size:12px;line-height:1.6;display:none}
+.setup-box.show{display:block}
+.setup-box ol{margin-left:16px;margin-top:6px}
+.setup-box code{background:var(--bg);padding:1px 4px;border-radius:3px;font-size:11px;color:var(--acc);font-family:ui-monospace,Menlo,Consolas,monospace}
 </style>
 </head>
 <body>
 <div class="hdr">
-  <div class="hdr-lbl">FITNESS JURNAL · 8 SĂPTĂMÂNI</div>
+  <div class="hdr-lbl">FITNESS JURNAL · 8 SĂPTĂMÂNI <span id="syncBadge" class="sync-badge sb-off">LOCAL</span></div>
   <div class="hdr-title" id="hdrTitle">BLOC FRIENDLY</div>
   <div class="hdr-sub">Bancă · Gantere · Bară · Fără zgomot</div>
   <div class="hdr-date" id="hdrDate"></div>
 </div>
 
 <div class="install-hint" id="installHint">
-  <button onclick="document.getElementById('installHint').classList.remove('show')">×</button>
+  <button onclick="dismissInstallHint()">×</button>
   💡 <strong>Adaugă pe telefon:</strong> Share → "Add to Home Screen" (iOS) sau meniu → "Install app" (Android)
 </div>
 
@@ -162,21 +196,103 @@ body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSy
 <div id="tab-program" class="sec"><div id="prog-content"></div></div>
 
 <div id="tab-istoric" class="sec">
-  <div class="stitle">Săptămâna curentă</div>
+  <div class="stitle">📏 Măsurători corp</div>
+  <div class="meas-date">
+    <div class="meas-lbl">DATA</div>
+    <input class="meas-in" type="date" id="measDate">
+  </div>
+  <div class="meas-grid">
+    <div class="meas-field">
+      <div class="meas-lbl">⚖️ Greutate</div>
+      <div class="meas-input-row"><input class="meas-in" type="number" step="0.1" inputmode="decimal" id="mWeight" placeholder="kg"><span class="meas-unit">kg</span></div>
+    </div>
+    <div class="meas-field">
+      <div class="meas-lbl">Talie</div>
+      <div class="meas-input-row"><input class="meas-in" type="number" step="0.5" inputmode="decimal" id="mWaist" placeholder="cm"><span class="meas-unit">cm</span></div>
+    </div>
+    <div class="meas-field">
+      <div class="meas-lbl">Piept</div>
+      <div class="meas-input-row"><input class="meas-in" type="number" step="0.5" inputmode="decimal" id="mChest" placeholder="cm"><span class="meas-unit">cm</span></div>
+    </div>
+    <div class="meas-field">
+      <div class="meas-lbl">Braț (contractat)</div>
+      <div class="meas-input-row"><input class="meas-in" type="number" step="0.5" inputmode="decimal" id="mBiceps" placeholder="cm"><span class="meas-unit">cm</span></div>
+    </div>
+    <div class="meas-field">
+      <div class="meas-lbl">Coapsă</div>
+      <div class="meas-input-row"><input class="meas-in" type="number" step="0.5" inputmode="decimal" id="mThigh" placeholder="cm"><span class="meas-unit">cm</span></div>
+    </div>
+    <div class="meas-field">
+      <div class="meas-lbl">Șolduri</div>
+      <div class="meas-input-row"><input class="meas-in" type="number" step="0.5" inputmode="decimal" id="mHip" placeholder="cm"><span class="meas-unit">cm</span></div>
+    </div>
+    <div class="meas-field">
+      <div class="meas-lbl">Gât</div>
+      <div class="meas-input-row"><input class="meas-in" type="number" step="0.5" inputmode="decimal" id="mNeck" placeholder="cm"><span class="meas-unit">cm</span></div>
+    </div>
+    <div class="meas-field">
+      <div class="meas-lbl">Gambă</div>
+      <div class="meas-input-row"><input class="meas-in" type="number" step="0.5" inputmode="decimal" id="mCalf" placeholder="cm"><span class="meas-unit">cm</span></div>
+    </div>
+  </div>
+  <div class="meas-field" style="margin-bottom:10px">
+    <div class="meas-lbl">Notă (opțional)</div>
+    <input class="meas-in" type="text" id="mNote" placeholder="ex: după antrenament, dimineața, etc.">
+  </div>
+  <button class="btn btn-acc" onclick="saveMeasurement()">💾 Salvează măsurătorile</button>
+  <div id="measHistory"></div>
+
+  <div class="stitle">📊 Antrenament</div>
+  <div class="week-nav">
+    <button class="week-nav-btn" id="weekPrev" onclick="changeWeek(-1)">‹</button>
+    <div class="week-nav-title">
+      <div id="weekTitle">Săptămâna curentă</div>
+      <div class="week-nav-sub" id="weekRange"></div>
+    </div>
+    <button class="week-nav-btn" id="weekNext" onclick="changeWeek(1)">›</button>
+  </div>
   <div id="hist-content"></div>
 
-  <div class="stitle">Export pentru Claude</div>
-  <div class="export-box" id="exportBox">Apasă butonul pentru a genera rezumatul săptămânii.</div>
-  <button class="btn btn-acc" onclick="doExport()">📤 Generează Rezumat</button>
-  <button class="btn btn-ghost" onclick="copyExport()">📋 Copiază rezumatul</button>
+  <div class="stitle">📤 Export pentru Claude</div>
+  <div class="export-box" id="exportBox">Apasă butonul pentru a genera rezumatul.</div>
+  <button class="btn btn-acc" onclick="doExport()">📤 Generează rezumat</button>
+  <button class="btn btn-ghost" onclick="copyExport()">📋 Copiază</button>
 
-  <div class="stitle">Backup & Restore</div>
+  <div class="stitle">☁️ Sincronizare Google Drive</div>
+  <div class="drive-card">
+    <div class="drive-status" id="driveStatus">
+      <span id="driveStatusDot">⚪</span>
+      <span id="driveStatusText">Nu este configurat</span>
+    </div>
+    <div class="drive-sub" id="driveSub">
+      Datele rămân doar pe telefon. Configurează Google Drive pentru backup automat și sincronizare între device-uri.
+    </div>
+    <div id="driveActions"></div>
+    <a class="setup-link" onclick="toggleSetup()">Cum obțin Client ID? ▾</a>
+    <div class="setup-box" id="setupBox">
+      <strong>Pașii pentru Google OAuth Client ID:</strong>
+      <ol>
+        <li>Deschide <a href="https://console.cloud.google.com/" target="_blank" style="color:var(--blue)">console.cloud.google.com</a></li>
+        <li>Create Project → nume liber (ex: "Fitness Jurnal")</li>
+        <li>În meniu: APIs &amp; Services → <strong>Enabled APIs</strong> → Enable "Google Drive API"</li>
+        <li>APIs &amp; Services → <strong>OAuth consent screen</strong> → External → completează doar numele app-ului și email-ul tău → Save</li>
+        <li>La pasul "Audience/Test users" adaugă email-ul tău</li>
+        <li>APIs &amp; Services → <strong>Credentials</strong> → Create Credentials → OAuth client ID → Web application</li>
+        <li>La "Authorized JavaScript origins" adaugă: <code>https://crstefan-lab.github.io</code></li>
+        <li>Create → copiază <strong>Client ID</strong>-ul (format: <code>...apps.googleusercontent.com</code>)</li>
+        <li>Deschide <code>index.html</code>, la începutul scriptului pune:<br><code>const GOOGLE_CLIENT_ID = 'TOKEN_AICI.apps.googleusercontent.com';</code></li>
+        <li>Push pe GitHub, reîncarcă app-ul, apasă "Conectează Drive"</li>
+      </ol>
+    </div>
+  </div>
+
+  <div class="stitle">💾 Backup local</div>
   <p style="font-size:12px;color:var(--muted);margin-bottom:10px;line-height:1.5">
-    Toate datele stau pe telefonul tău (localStorage). Fă backup regulat pentru siguranță.
+    Backup manual în fișier JSON (alternativă la Drive).
   </p>
   <div class="btn-row">
-    <button class="btn btn-ghost" onclick="downloadJSON()">⬇️ Descarcă JSON</button>
-    <button class="btn btn-ghost" onclick="document.getElementById('fileImport').click()">⬆️ Importă JSON</button>
+    <button class="btn btn-ghost" onclick="downloadJSON()">⬇️ Descarcă</button>
+    <button class="btn btn-ghost" onclick="document.getElementById('fileImport').click()">⬆️ Importă</button>
   </div>
   <input type="file" id="fileImport" accept="application/json" style="display:none" onchange="importJSON(event)">
   <button class="btn btn-danger" onclick="resetAll()">🗑️ Șterge toate datele</button>
@@ -195,7 +311,12 @@ body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSy
 
 <script>
 // ═══════════════════════════════════════════════════════════════
-// DATE STATICE (program, nutriție, ghid)
+// CONFIGURARE DRIVE SYNC (completează după ce obții Client ID)
+// ═══════════════════════════════════════════════════════════════
+const GOOGLE_CLIENT_ID = ''; // ex: '1234...apps.googleusercontent.com'
+
+// ═══════════════════════════════════════════════════════════════
+// DATE STATICE
 // ═══════════════════════════════════════════════════════════════
 var schedule=[
   {day:'LUNI',nutType:'tuna',exDay:'luni'},
@@ -281,9 +402,19 @@ var checkItems=[
   {id:'somn',lbl:'😴 Somn 7+ ore'}
 ];
 
+var MEAS_FIELDS=[
+  {id:'weight',el:'mWeight',label:'Greutate',unit:'kg',icon:'⚖️'},
+  {id:'waist',el:'mWaist',label:'Talie',unit:'cm'},
+  {id:'chest',el:'mChest',label:'Piept',unit:'cm'},
+  {id:'biceps',el:'mBiceps',label:'Braț',unit:'cm'},
+  {id:'thigh',el:'mThigh',label:'Coapsă',unit:'cm'},
+  {id:'hip',el:'mHip',label:'Șolduri',unit:'cm'},
+  {id:'neck',el:'mNeck',label:'Gât',unit:'cm'},
+  {id:'calf',el:'mCalf',label:'Gambă',unit:'cm'}
+];
+
 // ═══════════════════════════════════════════════════════════════
-// STORAGE (localStorage)
-// Schema: { version:1, rows:[{date, day, type, exercise, set, reps, kg, note, ts}] }
+// STORAGE
 // ═══════════════════════════════════════════════════════════════
 var STORAGE_KEY='fitness_jurnal_v1';
 
@@ -314,7 +445,6 @@ function saveStore(obj){
 function addRow(row){
   var s=loadStore();
   row.ts=Date.now();
-  // Dacă există deja același set pentru aceeași zi+exercițiu, îl înlocuim (nu dublăm)
   if(row.type==='antrenament'){
     s.rows=s.rows.filter(function(r){
       return !(r.type==='antrenament' && r.date===row.date && r.exercise===row.exercise && r.set===row.set);
@@ -325,42 +455,94 @@ function addRow(row){
       return !(r.type==='checklist' && r.date===row.date && r.exercise===row.exercise);
     });
   }
+  if(row.type==='masuratoare'){
+    // o măsurătoare per zi — suprascriem
+    s.rows=s.rows.filter(function(r){
+      return !(r.type==='masuratoare' && r.date===row.date);
+    });
+  }
   s.rows.push(row);
-  return saveStore(s);
+  var ok=saveStore(s);
+  if(ok) scheduleDriveSync();
+  return ok;
 }
 
 function getRowsForDate(dateStr){
   return loadStore().rows.filter(function(r){return r.date===dateStr;});
 }
 
-function getRowsForWeek(){
+function getWeekBounds(offset){
+  // offset: 0 = săpt. curentă, -1 = anterioară, +1 = următoare
+  offset=offset||0;
   var now=new Date();
   var dow=now.getDay();
   var diff=(dow===0)?-6:1-dow;
-  var monday=new Date(now);monday.setDate(now.getDate()+diff);monday.setHours(0,0,0,0);
-  var sunday=new Date(monday);sunday.setDate(monday.getDate()+7);
+  var monday=new Date(now);
+  monday.setDate(now.getDate()+diff+(offset*7));
+  monday.setHours(0,0,0,0);
+  var sunday=new Date(monday);
+  sunday.setDate(monday.getDate()+7);
+  return {monday:monday,sunday:sunday};
+}
+
+function getRowsForWeek(offset){
+  var b=getWeekBounds(offset);
   return loadStore().rows.filter(function(r){
     var d=parseRoDate(r.date);
-    return d && d>=monday && d<sunday;
+    return d && d>=b.monday && d<b.sunday;
   });
 }
 
+function getMeasurements(){
+  return loadStore().rows.filter(function(r){return r.type==='masuratoare';})
+    .sort(function(a,b){
+      var da=parseRoDate(a.date),db=parseRoDate(b.date);
+      return (db?db.getTime():0)-(da?da.getTime():0);
+    });
+}
+
 function parseRoDate(s){
-  // ro-RO: "dd.mm.yyyy"
   if(!s) return null;
+  // Format ISO (yyyy-mm-dd) - din input type="date"
+  if(/^\d{4}-\d{2}-\d{2}/.test(s)){
+    var d=new Date(s);return isNaN(d.getTime())?null:d;
+  }
+  // Format ro-RO: "dd.mm.yyyy"
   var parts=String(s).split('.');
   if(parts.length!==3) return null;
-  var d=new Date(parseInt(parts[2]),parseInt(parts[1])-1,parseInt(parts[0]));
-  return isNaN(d.getTime())?null:d;
+  var d2=new Date(parseInt(parts[2]),parseInt(parts[1])-1,parseInt(parts[0]));
+  return isNaN(d2.getTime())?null:d2;
+}
+
+function formatRoDate(d){
+  return d.toLocaleDateString('ro-RO');
+}
+
+function isoToRo(iso){
+  if(!iso) return iso;
+  var p=iso.split('-');
+  if(p.length!==3) return iso;
+  return p[2]+'.'+p[1]+'.'+p[0];
+}
+
+function roToIso(ro){
+  if(!ro) return '';
+  var p=ro.split('.');
+  if(p.length!==3) return ro;
+  return p[2]+'-'+p[1].padStart(2,'0')+'-'+p[0].padStart(2,'0');
 }
 
 // ═══════════════════════════════════════════════════════════════
 // STATE
 // ═══════════════════════════════════════════════════════════════
-var setData={},checkData={},currentNutDay=0;
+var setData={},checkData={},currentNutDay=0,currentWeekOffset=0;
 
 function today(){return new Date().toLocaleDateString('ro-RO');}
 function todayIdx(){var d=new Date().getDay();return d===0?6:d-1;}
+function todayISO(){
+  var d=new Date();
+  return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+}
 
 function showToast(msg,color){
   var t=document.getElementById('toast');
@@ -376,7 +558,12 @@ function showTab(name,btn){
   document.querySelectorAll('.nb').forEach(function(b){b.classList.remove('act');});
   document.getElementById('tab-'+name).classList.add('act');
   if(btn) btn.classList.add('act');
-  if(name==='istoric'){renderHistoric();updateStorageInfo();}
+  if(name==='istoric'){
+    renderHistoric();
+    renderMeasurements();
+    updateStorageInfo();
+    updateDriveUI();
+  }
   window.scrollTo(0,0);
 }
 
@@ -391,7 +578,7 @@ function initHeader(){
 }
 
 // ═══════════════════════════════════════════════════════════════
-// TAB AZI
+// TAB AZI — ANTRENAMENT + CHECKLIST
 // ═══════════════════════════════════════════════════════════════
 function renderToday(){
   var idx=todayIdx(),sch=schedule[idx],ex=exercises[sch.exDay];
@@ -443,45 +630,27 @@ function upSet(keyEnc,setNum,field,val){
   if(!setData[key])setData[key]={};
   if(!setData[key][setNum])setData[key][setNum]={reps:'',kg:''};
   setData[key][setNum][field]=val;
-  // dacă modifici input-ul, deselectează starea "saved" vizuală
   setData[key][setNum].savedOnServer=false;
 }
 
 function saveSet(keyEnc,setNum,ei){
   var key=decodeURIComponent(keyEnc);
   var d=setData[key]&&setData[key][setNum];
-  if(!d||(!d.reps&&!d.kg)){
-    showToast('Introduceți rep și kg!','var(--acc2)');
-    return;
-  }
+  if(!d||(!d.reps&&!d.kg)){showToast('Introduceți rep și kg!','var(--acc2)');return;}
   var idx=todayIdx();
-  var ok=addRow({
-    date:today(),
-    day:schedule[idx].day,
-    type:'antrenament',
-    exercise:key,
-    set:setNum,
-    reps:parseFloat(d.reps)||0,
-    kg:parseFloat(d.kg)||0,
-    note:''
-  });
+  var ok=addRow({date:today(),day:schedule[idx].day,type:'antrenament',exercise:key,set:setNum,reps:parseFloat(d.reps)||0,kg:parseFloat(d.kg)||0,note:''});
   if(ok){
     setData[key][setNum].savedOnServer=true;
     var box=document.getElementById('sb_'+ei+'_'+setNum);
     if(box){
       box.classList.add('saved');
-      var lbl=box.querySelector('.set-lbl');
-      if(lbl)lbl.textContent='✓ S'+setNum;
-      var btn=box.querySelector('.set-btn');
-      if(btn)btn.textContent='✓ Salvat';
+      var lbl=box.querySelector('.set-lbl');if(lbl)lbl.textContent='✓ S'+setNum;
+      var btn=box.querySelector('.set-btn');if(btn)btn.textContent='✓ Salvat';
     }
     showToast('Set '+setNum+' salvat ✓');
   }
 }
 
-// ═══════════════════════════════════════════════════════════════
-// CHECKLIST
-// ═══════════════════════════════════════════════════════════════
 function renderChecklist(){
   var list=document.getElementById('chkList');if(!list)return;
   var html='';
@@ -501,16 +670,7 @@ function toggleCheck(id,el){
   el.querySelector('.chk-box').textContent=checkData[id]?'✓':'';
   updateChkCount();
   var idx=todayIdx();
-  addRow({
-    date:today(),
-    day:schedule[idx].day,
-    type:'checklist',
-    exercise:id,
-    set:'',
-    reps:'',
-    kg:'',
-    note:checkData[id]?'DA':'NU'
-  });
+  addRow({date:today(),day:schedule[idx].day,type:'checklist',exercise:id,set:'',reps:'',kg:'',note:checkData[id]?'DA':'NU'});
 }
 
 function updateChkCount(){
@@ -545,12 +705,10 @@ function renderNutDay(){
     '<div style="background:var(--s1);border:1px solid var(--bd);border-radius:12px;padding:8px 14px;text-align:center">'+
     '<div style="font-size:20px;font-weight:900;color:'+p.color+'">'+p.kcal+'</div>'+
     '<div style="font-size:9px;color:var(--muted);letter-spacing:1px">KCAL/ZI</div></div></div>';
-
   document.getElementById('nutMacros').innerHTML=
     '<div class="macro-box"><div class="macro-val mp">'+p.protein+'<span>g</span></div><div class="macro-lbl">PROTEINE</div></div>'+
     '<div class="macro-box"><div class="macro-val mc">'+p.carbs+'<span>g</span></div><div class="macro-lbl">CARBOHIDRAȚI</div></div>'+
     '<div class="macro-box"><div class="macro-val mf">'+p.fat+'<span>g</span></div><div class="macro-lbl">GRĂSIMI</div></div>';
-
   var meals=document.getElementById('nutMeals');meals.innerHTML='';
   p.meals.forEach(function(meal){
     var itemsHtml=meal.items.map(function(it){
@@ -558,7 +716,6 @@ function renderNutDay(){
     }).join('');
     meals.innerHTML+='<div class="meal-card"><div class="meal-hd"><div><div class="meal-nm">'+meal.emoji+' '+meal.name+'</div><div class="meal-tm">⏰ '+meal.time+'</div></div><div style="text-align:right"><div class="meal-kc" style="color:'+p.color+'">'+meal.kcal+' kcal</div><div class="meal-pr">~'+meal.protein+'g proteine</div></div></div><div class="meal-items">'+itemsHtml+'</div></div>';
   });
-
   document.getElementById('nutNote').innerHTML=p.note?'<div class="note-box">💡 '+p.note+'</div>':'';
 }
 
@@ -573,7 +730,6 @@ function initProgram(){
     html+='<div style="display:flex;gap:10px;padding:8px 0;border-bottom:1px solid var(--bd);font-size:13px;align-items:center"><div style="font-size:18px;font-weight:900;color:var(--acc);width:30px;flex-shrink:0">'+(i+1)+'</div><div>'+f+'</div></div>';
   });
   html+='</div></div>';
-
   var dayKeys=['luni','marti','miercuri','joi','vineri','sambata'];
   dayKeys.forEach(function(dk,di){
     var ex=exercises[dk];
@@ -587,13 +743,110 @@ function initProgram(){
 }
 
 // ═══════════════════════════════════════════════════════════════
-// ISTORIC
+// MĂSURĂTORI
 // ═══════════════════════════════════════════════════════════════
+function saveMeasurement(){
+  var dateVal=document.getElementById('measDate').value;
+  if(!dateVal){showToast('Alege o dată','var(--acc2)');return;}
+  var row={date:isoToRo(dateVal),day:'',type:'masuratoare',note:document.getElementById('mNote').value||''};
+  var hasAny=false;
+  MEAS_FIELDS.forEach(function(f){
+    var v=document.getElementById(f.el).value;
+    row[f.id]=v?parseFloat(v):null;
+    if(v)hasAny=true;
+  });
+  if(!hasAny){showToast('Introdu cel puțin o valoare','var(--acc2)');return;}
+  var ok=addRow(row);
+  if(ok){
+    showToast('Măsurători salvate ✓');
+    renderMeasurements();
+  }
+}
+
+function renderMeasurements(){
+  var history=getMeasurements();
+  var cont=document.getElementById('measHistory');
+  // pre-completează form-ul cu ultimele valori (doar dacă nu e deja completat)
+  var dateInput=document.getElementById('measDate');
+  if(!dateInput.value){dateInput.value=todayISO();}
+  // Dacă există măsurătoare pentru data curentă, completează inputs
+  var todayRo=isoToRo(dateInput.value);
+  var existing=history.find(function(r){return r.date===todayRo;});
+  if(existing){
+    MEAS_FIELDS.forEach(function(f){
+      var el=document.getElementById(f.el);
+      if(!el.value)el.value=existing[f.id]||'';
+    });
+    if(!document.getElementById('mNote').value)document.getElementById('mNote').value=existing.note||'';
+  }
+
+  if(!history.length){
+    cont.innerHTML='<p style="color:var(--muted);font-size:12px;text-align:center;padding:16px 0">Nicio măsurătoare încă. Adaugă primele valori pentru a urmări progresul.</p>';
+    return;
+  }
+  var html='<div class="meas-history" style="margin-top:10px">';
+  history.slice(0,12).forEach(function(r,i){
+    var next=history[i+1]; // următoarea = mai veche
+    html+='<div class="meas-hist-row"><div class="meas-hist-date">📅 '+r.date+(r.note?' · <span style="color:var(--muted);font-weight:400">'+r.note+'</span>':'')+'</div>';
+    html+='<div class="meas-hist-vals">';
+    MEAS_FIELDS.forEach(function(f){
+      if(r[f.id]==null) return;
+      var delta='';
+      if(next && next[f.id]!=null){
+        var diff=r[f.id]-next[f.id];
+        if(Math.abs(diff)<0.01) delta='<span class="delta-neu"> ±0</span>';
+        else if(diff>0) delta='<span class="delta-up"> +'+diff.toFixed(1)+'</span>';
+        else delta='<span class="delta-down"> '+diff.toFixed(1)+'</span>';
+      }
+      html+='<span class="meas-v"><strong>'+f.label+':</strong> '+r[f.id]+f.unit+delta+'</span>';
+    });
+    html+='</div></div>';
+  });
+  if(history.length>12){
+    html+='<div style="padding:10px;text-align:center;color:var(--muted);font-size:11px">+ '+(history.length-12)+' măsurători mai vechi (vezi în export)</div>';
+  }
+  html+='</div>';
+  cont.innerHTML=html;
+}
+
+// ═══════════════════════════════════════════════════════════════
+// ISTORIC — NAVIGARE SĂPTĂMÂNI
+// ═══════════════════════════════════════════════════════════════
+function changeWeek(delta){
+  var store=loadStore();
+  // limită: nu mergem mai înapoi decât prima înregistrare
+  var newOffset=currentWeekOffset+delta;
+  if(delta<0){
+    var oldestDate=null;
+    store.rows.forEach(function(r){
+      var d=parseRoDate(r.date);
+      if(d && (!oldestDate || d<oldestDate)) oldestDate=d;
+    });
+    if(oldestDate){
+      var b=getWeekBounds(newOffset);
+      if(b.sunday<=oldestDate) return;
+    }
+  }
+  if(delta>0 && newOffset>0) return; // nu permitem viitor
+  currentWeekOffset=newOffset;
+  renderHistoric();
+}
+
 function renderHistoric(){
+  var b=getWeekBounds(currentWeekOffset);
+  var fmt=function(d){return d.toLocaleDateString('ro-RO',{day:'numeric',month:'short'});};
+  var endOfWeek=new Date(b.sunday);endOfWeek.setDate(endOfWeek.getDate()-1);
+  document.getElementById('weekTitle').textContent=
+    currentWeekOffset===0?'Săptămâna curentă':
+    currentWeekOffset===-1?'Săptămâna trecută':
+    Math.abs(currentWeekOffset)+' săptămâni în urmă';
+  document.getElementById('weekRange').textContent=fmt(b.monday)+' — '+fmt(endOfWeek);
+  document.getElementById('weekNext').disabled=(currentWeekOffset>=0);
+
   var cont=document.getElementById('hist-content');
-  var rows=getRowsForWeek();
+  var rows=getRowsForWeek(currentWeekOffset);
   if(!rows.length){
-    cont.innerHTML='<div style="color:var(--muted);font-size:13px;text-align:center;padding:30px">Nicio dată în săptămâna aceasta. Salvează un set pentru a vedea istoricul.</div>';
+    cont.innerHTML='<div style="color:var(--muted);font-size:13px;text-align:center;padding:30px">Nicio dată în această săptămână.</div>';
     return;
   }
   var byDay={};
@@ -627,45 +880,74 @@ function renderHistoric(){
 // EXPORT PENTRU CLAUDE
 // ═══════════════════════════════════════════════════════════════
 function buildWeekSummary(){
-  var rows=getRowsForWeek();
-  if(!rows.length) return 'Nicio dată înregistrată în săptămâna aceasta.';
+  var b=getWeekBounds(currentWeekOffset);
+  var rows=getRowsForWeek(currentWeekOffset);
+  var measurements=getMeasurements();
 
-  var byDay={};
-  rows.forEach(function(r){
-    if(!byDay[r.day])byDay[r.day]={exercises:{},checks:[]};
-    if(r.type==='antrenament'){
-      if(!byDay[r.day].exercises[r.exercise])byDay[r.day].exercises[r.exercise]=[];
-      byDay[r.day].exercises[r.exercise].push({set:r.set,reps:r.reps,kg:r.kg});
-    }else if(r.type==='checklist'){
-      byDay[r.day].checks.push(r.exercise+': '+r.note);
-    }
-  });
-
-  var now=new Date();
-  var dow=now.getDay();
-  var diff=(dow===0)?-6:1-dow;
-  var monday=new Date(now);monday.setDate(now.getDate()+diff);
-
-  var out='📊 REZUMAT SĂPTĂMÂNĂ\n';
-  out+='Săptămâna cu '+monday.toLocaleDateString('ro-RO')+'\n';
+  var out='📊 REZUMAT FITNESS\n';
+  out+='Săptămâna: '+formatRoDate(b.monday)+' — '+formatRoDate(new Date(b.sunday.getTime()-86400000))+'\n';
   out+='='.repeat(40)+'\n\n';
 
-  var order=['LUNI','MARȚI','MIERCURI','JOI','VINERI','SÂMBĂTĂ','DUMINICĂ'];
-  order.forEach(function(d){
-    if(!byDay[d])return;
-    out+='▸ '+d+'\n';
-    Object.keys(byDay[d].exercises).forEach(function(ex){
-      var sets=byDay[d].exercises[ex].sort(function(a,b){return a.set-b.set;});
-      out+='  '+ex+'\n';
-      sets.forEach(function(s){out+='    Set '+s.set+': '+s.reps+' rep × '+s.kg+' kg\n';});
+  // MĂSURĂTORI — ultimele 4 pentru context
+  if(measurements.length){
+    out+='📏 MĂSURĂTORI RECENTE\n';
+    measurements.slice(0,4).forEach(function(m,i){
+      out+=(i===0?'▸ Cea mai recentă ':'▸ ')+'('+m.date+')';
+      if(m.note) out+=' · '+m.note;
+      out+='\n';
+      MEAS_FIELDS.forEach(function(f){
+        if(m[f.id]!=null) out+='    '+f.label+': '+m[f.id]+' '+f.unit+'\n';
+      });
     });
-    if(byDay[d].checks.length){
-      out+='  Checklist: '+byDay[d].checks.join(' | ')+'\n';
+    // Δ față de prima
+    if(measurements.length>=2){
+      var latest=measurements[0];
+      var oldest=measurements[measurements.length-1];
+      out+='\n▸ Evoluție ('+oldest.date+' → '+latest.date+'):\n';
+      MEAS_FIELDS.forEach(function(f){
+        if(latest[f.id]!=null && oldest[f.id]!=null){
+          var d=latest[f.id]-oldest[f.id];
+          var sign=d>0?'+':'';
+          out+='    '+f.label+': '+sign+d.toFixed(1)+' '+f.unit+'\n';
+        }
+      });
     }
     out+='\n';
-  });
+  }
 
-  out+='---\nTe rog analizează progresul meu: unde am crescut, unde stagnez, ce ajustări îmi recomanzi pentru săptămâna viitoare.';
+  // ANTRENAMENT
+  if(!rows.length){
+    out+='(Nu s-a înregistrat antrenament în această săptămână)\n\n';
+  }else{
+    var byDay={};
+    rows.forEach(function(r){
+      if(!byDay[r.day])byDay[r.day]={exercises:{},checks:[]};
+      if(r.type==='antrenament'){
+        if(!byDay[r.day].exercises[r.exercise])byDay[r.day].exercises[r.exercise]=[];
+        byDay[r.day].exercises[r.exercise].push({set:r.set,reps:r.reps,kg:r.kg});
+      }else if(r.type==='checklist'){
+        byDay[r.day].checks.push(r.exercise+': '+r.note);
+      }
+    });
+    out+='🏋️ ANTRENAMENT SĂPTĂMÂNĂ\n';
+    ['LUNI','MARȚI','MIERCURI','JOI','VINERI','SÂMBĂTĂ','DUMINICĂ'].forEach(function(d){
+      if(!byDay[d])return;
+      out+='\n▸ '+d+'\n';
+      Object.keys(byDay[d].exercises).forEach(function(ex){
+        var sets=byDay[d].exercises[ex].sort(function(a,b){return a.set-b.set;});
+        out+='  '+ex+'\n';
+        sets.forEach(function(s){out+='    Set '+s.set+': '+s.reps+' rep × '+s.kg+' kg\n';});
+      });
+      if(byDay[d].checks.length){out+='  Checklist: '+byDay[d].checks.join(' | ')+'\n';}
+    });
+    out+='\n';
+  }
+
+  out+='---\nTe rog analizează:\n';
+  out+='1. Unde am progresat (rep/kg) și unde stagnez\n';
+  out+='2. Evoluția măsurătorilor (talie/piept/brațe) vs obiectiv recompoziție\n';
+  out+='3. Ce ajustări recomanzi pentru săptămâna viitoare (greutăți, exerciții, nutriție)\n';
+  out+='4. Alerte dacă vezi dezechilibre (ex: pierd masă musculară în loc de grăsime)\n';
   return out;
 }
 
@@ -679,33 +961,27 @@ function copyExport(){
   var text=document.getElementById('exportBox').textContent;
   if(!text||text.indexOf('Apasă butonul')===0){text=buildWeekSummary();document.getElementById('exportBox').textContent=text;}
   if(navigator.clipboard&&navigator.clipboard.writeText){
-    navigator.clipboard.writeText(text).then(function(){
-      showToast('Copiat! Lipește lui Claude 📋');
-    }).catch(function(){fallbackCopy(text);});
-  }else{
-    fallbackCopy(text);
-  }
+    navigator.clipboard.writeText(text).then(function(){showToast('Copiat! Lipește lui Claude 📋');}).catch(function(){fallbackCopy(text);});
+  }else{fallbackCopy(text);}
 }
 
 function fallbackCopy(text){
   var ta=document.createElement('textarea');
   ta.value=text;ta.style.position='fixed';ta.style.left='-9999px';
   document.body.appendChild(ta);ta.select();
-  try{document.execCommand('copy');showToast('Copiat! Lipește lui Claude 📋');}
-  catch(e){showToast('Nu s-a putut copia','var(--red)');}
+  try{document.execCommand('copy');showToast('Copiat! Lipește lui Claude 📋');}catch(e){showToast('Nu s-a putut copia','var(--red)');}
   document.body.removeChild(ta);
 }
 
 // ═══════════════════════════════════════════════════════════════
-// BACKUP / RESTORE
+// BACKUP / RESTORE JSON
 // ═══════════════════════════════════════════════════════════════
 function downloadJSON(){
   var s=loadStore();
   var blob=new Blob([JSON.stringify(s,null,2)],{type:'application/json'});
   var url=URL.createObjectURL(blob);
   var a=document.createElement('a');
-  a.href=url;
-  a.download='fitness-backup-'+new Date().toISOString().slice(0,10)+'.json';
+  a.href=url;a.download='fitness-backup-'+todayISO()+'.json';
   document.body.appendChild(a);a.click();document.body.removeChild(a);
   URL.revokeObjectURL(url);
   showToast('Backup descărcat ✓');
@@ -722,9 +998,7 @@ function importJSON(ev){
       saveStore(obj);
       showToast('Import reușit: '+obj.rows.length+' rânduri');
       location.reload();
-    }catch(err){
-      showToast('Eroare import: '+err.message,'var(--red)');
-    }
+    }catch(err){showToast('Eroare import: '+err.message,'var(--red)');}
   };
   reader.readAsText(f);
   ev.target.value='';
@@ -743,6 +1017,264 @@ function updateStorageInfo(){
   var size=new Blob([JSON.stringify(s)]).size;
   var kb=(size/1024).toFixed(1);
   document.getElementById('storageInfo').textContent=s.rows.length+' înregistrări · '+kb+' KB';
+}
+
+// ═══════════════════════════════════════════════════════════════
+// GOOGLE DRIVE SYNC
+// ═══════════════════════════════════════════════════════════════
+var driveState={ready:false,token:null,fileId:null,tokenClient:null,lastSync:null,syncing:false};
+var DRIVE_FILENAME='fitness-jurnal-backup.json';
+var DRIVE_SCOPES='https://www.googleapis.com/auth/drive.appdata';
+var syncTimer=null;
+
+function loadGoogleScripts(){
+  return new Promise(function(resolve,reject){
+    if(window.gapi && window.google && window.google.accounts){resolve();return;}
+    var loaded=0;var needed=2;
+    function done(){loaded++;if(loaded===needed)resolve();}
+    var s1=document.createElement('script');
+    s1.src='https://apis.google.com/js/api.js';s1.async=true;s1.defer=true;s1.onload=done;s1.onerror=reject;
+    document.head.appendChild(s1);
+    var s2=document.createElement('script');
+    s2.src='https://accounts.google.com/gsi/client';s2.async=true;s2.defer=true;s2.onload=done;s2.onerror=reject;
+    document.head.appendChild(s2);
+  });
+}
+
+function initDrive(){
+  if(!GOOGLE_CLIENT_ID){updateDriveUI();return;}
+  loadGoogleScripts().then(function(){
+    gapi.load('client',function(){
+      gapi.client.init({discoveryDocs:['https://www.googleapis.com/discovery/v1/apis/drive/v3/rest']}).then(function(){
+        driveState.tokenClient=google.accounts.oauth2.initTokenClient({
+          client_id:GOOGLE_CLIENT_ID,scope:DRIVE_SCOPES,
+          callback:function(resp){
+            if(resp.error){showToast('Drive: '+resp.error,'var(--red)');setSyncBadge('err');return;}
+            driveState.token=resp.access_token;
+            localStorage.setItem('drive_token',resp.access_token);
+            localStorage.setItem('drive_token_exp',Date.now()+(resp.expires_in-120)*1000);
+            gapi.client.setToken({access_token:resp.access_token});
+            onDriveConnected();
+          }
+        });
+        driveState.ready=true;
+        // Restaurează token salvat dacă nu a expirat
+        var savedToken=localStorage.getItem('drive_token');
+        var exp=parseInt(localStorage.getItem('drive_token_exp')||'0');
+        if(savedToken && exp>Date.now()){
+          driveState.token=savedToken;
+          gapi.client.setToken({access_token:savedToken});
+          onDriveConnected(true);
+        }else{
+          updateDriveUI();
+        }
+      });
+    });
+  }).catch(function(){
+    showToast('Nu s-au putut încărca bibliotecile Google','var(--red)');
+    setSyncBadge('err');
+  });
+}
+
+function driveConnect(){
+  if(!driveState.ready){showToast('Drive nu e gata încă','var(--acc2)');return;}
+  driveState.tokenClient.requestAccessToken({prompt:'consent'});
+}
+
+function driveDisconnect(){
+  if(!confirm('Deconectezi Google Drive? Datele locale rămân.'))return;
+  if(driveState.token && google.accounts.oauth2){
+    google.accounts.oauth2.revoke(driveState.token,function(){});
+  }
+  driveState.token=null;driveState.fileId=null;driveState.lastSync=null;
+  localStorage.removeItem('drive_token');
+  localStorage.removeItem('drive_token_exp');
+  localStorage.removeItem('drive_file_id');
+  localStorage.removeItem('drive_last_sync');
+  setSyncBadge('off');
+  updateDriveUI();
+  showToast('Drive deconectat');
+}
+
+function onDriveConnected(silent){
+  setSyncBadge('on');
+  driveState.fileId=localStorage.getItem('drive_file_id');
+  driveState.lastSync=parseInt(localStorage.getItem('drive_last_sync')||'0')||null;
+  // Sincronizare inițială: caută fișier, merge, apoi upload
+  drivePull().then(function(){
+    updateDriveUI();
+    if(!silent)showToast('Drive conectat ✓');
+  }).catch(function(err){
+    console.error('Drive pull failed',err);
+    setSyncBadge('err');
+  });
+}
+
+function driveFindFile(){
+  return gapi.client.drive.files.list({
+    spaces:'appDataFolder',
+    q:"name='"+DRIVE_FILENAME+"'",
+    fields:'files(id,name,modifiedTime)'
+  }).then(function(r){
+    var files=r.result.files||[];
+    if(files.length>0){
+      driveState.fileId=files[0].id;
+      localStorage.setItem('drive_file_id',files[0].id);
+      return files[0];
+    }
+    return null;
+  });
+}
+
+function drivePull(){
+  return driveFindFile().then(function(file){
+    if(!file)return null;
+    return gapi.client.drive.files.get({fileId:file.id,alt:'media'}).then(function(resp){
+      var remote;
+      try{remote=typeof resp.body==='string'?JSON.parse(resp.body):resp.body;}catch(e){return null;}
+      if(!remote||!remote.rows)return null;
+      mergeRemote(remote);
+      renderHistoric();renderMeasurements();updateStorageInfo();
+      return remote;
+    });
+  });
+}
+
+function mergeRemote(remote){
+  if(!remote||!remote.rows)return;
+  var local=loadStore();
+  function key(r){
+    if(r.type==='antrenament') return r.date+'|a|'+r.exercise+'|'+r.set;
+    if(r.type==='checklist') return r.date+'|c|'+r.exercise;
+    if(r.type==='masuratoare') return r.date+'|m';
+    return r.date+'|x|'+(r.exercise||'');
+  }
+  var map={};
+  local.rows.forEach(function(r){map[key(r)]=r;});
+  remote.rows.forEach(function(r){
+    var k=key(r),e=map[k];
+    if(!e || (r.ts||0)>(e.ts||0)) map[k]=r;
+  });
+  var merged=[];for(var k in map)merged.push(map[k]);
+  saveStore({version:1,rows:merged});
+}
+
+function drivePush(){
+  if(!driveState.token) return Promise.resolve(false);
+  driveState.syncing=true;
+  setSyncBadge('on','sync...');
+  var data=loadStore();
+  var body=JSON.stringify(data);
+  var fileId=driveState.fileId;
+  var boundary='-------fit_'+Date.now();
+  var metadata=fileId?{}:{name:DRIVE_FILENAME,parents:['appDataFolder']};
+  var multipartBody=
+    '--'+boundary+'\r\n'+
+    'Content-Type: application/json; charset=UTF-8\r\n\r\n'+
+    JSON.stringify(metadata)+'\r\n'+
+    '--'+boundary+'\r\n'+
+    'Content-Type: application/json\r\n\r\n'+
+    body+'\r\n'+
+    '--'+boundary+'--';
+  var url=fileId
+    ?'https://www.googleapis.com/upload/drive/v3/files/'+fileId+'?uploadType=multipart'
+    :'https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart';
+  var method=fileId?'PATCH':'POST';
+  return fetch(url,{
+    method:method,
+    headers:{
+      'Authorization':'Bearer '+driveState.token,
+      'Content-Type':'multipart/related; boundary="'+boundary+'"'
+    },
+    body:multipartBody
+  }).then(function(r){
+    if(!r.ok) throw new Error('HTTP '+r.status);
+    return r.json();
+  }).then(function(result){
+    if(!fileId && result.id){
+      driveState.fileId=result.id;
+      localStorage.setItem('drive_file_id',result.id);
+    }
+    driveState.lastSync=Date.now();
+    localStorage.setItem('drive_last_sync',String(driveState.lastSync));
+    driveState.syncing=false;
+    setSyncBadge('on');
+    updateDriveUI();
+    return true;
+  }).catch(function(err){
+    console.error('Drive push failed',err);
+    driveState.syncing=false;
+    setSyncBadge('err');
+    // Token expirat? Cere unul nou
+    if((err.message||'').indexOf('401')>=0){
+      driveState.token=null;
+      localStorage.removeItem('drive_token');
+      updateDriveUI();
+    }
+    return false;
+  });
+}
+
+function scheduleDriveSync(){
+  if(!driveState.token)return;
+  clearTimeout(syncTimer);
+  syncTimer=setTimeout(function(){drivePush();},4000);
+}
+
+function setSyncBadge(state,text){
+  var el=document.getElementById('syncBadge');
+  if(!el)return;
+  el.className='sync-badge sb-'+state;
+  el.textContent=text||(state==='on'?'DRIVE':state==='err'?'ERR':'LOCAL');
+}
+
+function updateDriveUI(){
+  var statusDot=document.getElementById('driveStatusDot');
+  var statusText=document.getElementById('driveStatusText');
+  var sub=document.getElementById('driveSub');
+  var actions=document.getElementById('driveActions');
+  if(!statusDot)return;
+
+  if(!GOOGLE_CLIENT_ID){
+    statusDot.textContent='⚪';
+    statusText.textContent='Neconfigurat';
+    sub.innerHTML='Pentru sync automat: obține un Google OAuth Client ID (vezi pașii de mai jos) și setează-l în <code>index.html</code>.';
+    actions.innerHTML='';
+    return;
+  }
+  if(!driveState.ready){
+    statusDot.textContent='⏳';
+    statusText.textContent='Se încarcă Google API...';
+    sub.textContent='Așteaptă câteva secunde.';
+    actions.innerHTML='';
+    return;
+  }
+  if(!driveState.token){
+    statusDot.textContent='🔴';
+    statusText.textContent='Deconectat';
+    sub.textContent='Datele rămân doar pe telefon. Apasă butonul pentru sync automat cu Drive.';
+    actions.innerHTML='<button class="btn btn-acc" onclick="driveConnect()">🔗 Conectează Google Drive</button>';
+    return;
+  }
+  statusDot.textContent='🟢';
+  statusText.innerHTML='Conectat'+(driveState.syncing?' · <em>sincronizez...</em>':'');
+  var lastTxt='Niciodată';
+  if(driveState.lastSync){
+    var diff=(Date.now()-driveState.lastSync)/1000;
+    if(diff<60) lastTxt='acum '+Math.floor(diff)+'s';
+    else if(diff<3600) lastTxt='acum '+Math.floor(diff/60)+' min';
+    else if(diff<86400) lastTxt='acum '+Math.floor(diff/3600)+' ore';
+    else lastTxt=new Date(driveState.lastSync).toLocaleDateString('ro-RO');
+  }
+  sub.textContent='Ultima sincronizare: '+lastTxt+'. Sync automat la fiecare modificare.';
+  actions.innerHTML=
+    '<div class="btn-row"><button class="btn btn-ghost" onclick="drivePush()">🔄 Sincronizează acum</button>'+
+    '<button class="btn btn-ghost" onclick="drivePull()">⬇️ Trage din Drive</button></div>'+
+    '<button class="btn btn-danger" onclick="driveDisconnect()">🔌 Deconectează</button>';
+}
+
+function toggleSetup(){
+  document.getElementById('setupBox').classList.toggle('show');
 }
 
 // ═══════════════════════════════════════════════════════════════
@@ -781,6 +1313,14 @@ function preloadToday(){
 }
 
 // ═══════════════════════════════════════════════════════════════
+// INSTALL HINT
+// ═══════════════════════════════════════════════════════════════
+function dismissInstallHint(){
+  document.getElementById('installHint').classList.remove('show');
+  localStorage.setItem('installHintDismissed','1');
+}
+
+// ═══════════════════════════════════════════════════════════════
 // INIT
 // ═══════════════════════════════════════════════════════════════
 window.addEventListener('load',function(){
@@ -791,20 +1331,23 @@ window.addEventListener('load',function(){
   initNutritie();
   initProgram();
   initGhid();
+  // măsurători: setează data implicit azi
+  var mDate=document.getElementById('measDate');
+  if(mDate)mDate.value=todayISO();
 
-  // Arată install hint doar dacă nu rulează ca PWA
-  if(!window.matchMedia('(display-mode: standalone)').matches && !window.navigator.standalone){
-    if(!localStorage.getItem('installHintDismissed')){
-      setTimeout(function(){document.getElementById('installHint').classList.add('show');},1500);
-    }
+  // Install hint (persistent)
+  var isPwa=window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone;
+  if(!isPwa && !localStorage.getItem('installHintDismissed')){
+    setTimeout(function(){document.getElementById('installHint').classList.add('show');},1500);
   }
 
   // Service Worker
   if('serviceWorker' in navigator){
-    navigator.serviceWorker.register('./sw.js').catch(function(err){
-      console.warn('SW register failed',err);
-    });
+    navigator.serviceWorker.register('./sw.js').catch(function(err){console.warn('SW register failed',err);});
   }
+
+  // Google Drive (optional)
+  initDrive();
 });
 </script>
 </body>
