@@ -1533,7 +1533,20 @@ function renderBodyChart(){
   var points=all.filter(function(m){return m[metric]!=null;}).map(function(m){
     return {x:parseRoDate(m.date),y:m[metric]};
   }).filter(function(p){return p.x;});
+  // Empty-state mai util: indică unde se introduc datele
+  if(points.length===0){
+    document.getElementById('bodyChart').innerHTML=
+      '<div class="chart-empty">Nicio dată la <strong style="color:var(--text)">'+field.label+'</strong> încă.<br><br>'+
+      '<a onclick="showTab(\'istoric\',document.querySelectorAll(\'.nb\')[4])" style="color:var(--acc);text-decoration:underline;cursor:pointer">Introdu măsurători în tab «Istoric» →</a></div>';
+    document.getElementById('bodyStats').innerHTML='';
+    return;
+  }
   points=filterByRange(points,progresState.range);
+  if(points.length===0){
+    document.getElementById('bodyChart').innerHTML='<div class="chart-empty">Nicio măsurătoare în intervalul selectat. Schimbă la «Tot».</div>';
+    document.getElementById('bodyStats').innerHTML='';
+    return;
+  }
   var color=metric==='weight'?'#e8632a':'#38bdf8';
   renderLineChart('bodyChart',points,{color:color,hint:'măsurători '+field.label.toLowerCase()});
   // Stats
@@ -1562,9 +1575,15 @@ function initExerSelect(){
   var exercises={};
   loadStore().rows.forEach(function(r){if(r.type==='antrenament'&&r.exercise)exercises[r.exercise]=true;});
   var names=Object.keys(exercises).sort();
-  sel.innerHTML='<option value="">— Alege exercițiu —</option>'+names.map(function(n){
-    return '<option value="'+n.replace(/"/g,'&quot;')+'"'+(n===progresState.selectedExer?' selected':'')+'>'+n+'</option>';
-  }).join('');
+  if(!names.length){
+    sel.innerHTML='<option value="">— Salvează seturi în tab «Azi» pentru a vedea progresul —</option>';
+    sel.disabled=true;
+  }else{
+    sel.disabled=false;
+    sel.innerHTML='<option value="">— Alege exercițiu ('+names.length+' disponibile) —</option>'+names.map(function(n){
+      return '<option value="'+n.replace(/"/g,'&quot;')+'"'+(n===progresState.selectedExer?' selected':'')+'>'+n+'</option>';
+    }).join('');
+  }
   sel.onchange=function(){progresState.selectedExer=sel.value;renderExerciseChart();};
   document.getElementById('exerMetricSeg').querySelectorAll('.seg-btn').forEach(function(b){
     b.onclick=function(){
