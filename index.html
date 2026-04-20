@@ -152,6 +152,49 @@ body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSy
 .setup-box.show{display:block}
 .setup-box ol{margin-left:16px;margin-top:6px}
 .setup-box code{background:var(--bg);padding:1px 4px;border-radius:3px;font-size:11px;color:var(--acc);font-family:ui-monospace,Menlo,Consolas,monospace}
+.nb{font-size:9px}
+.nb .ico{font-size:18px}
+.seg{display:flex;gap:4px;background:var(--s1);border:1px solid var(--bd);border-radius:10px;padding:3px;margin-bottom:10px;overflow-x:auto;scrollbar-width:none}
+.seg::-webkit-scrollbar{display:none}
+.seg-btn{flex:0 0 auto;background:transparent;border:none;color:var(--muted);font-family:inherit;font-size:11px;font-weight:700;padding:8px 12px;border-radius:7px;cursor:pointer;white-space:nowrap;letter-spacing:.3px}
+.seg-btn.act{background:var(--acc);color:#fff}
+.chart-wrap{background:var(--s1);border:1px solid var(--bd);border-radius:var(--r);padding:10px 6px 6px;margin-bottom:10px}
+.chart-stats{display:flex;gap:8px;padding:8px 10px 0;justify-content:space-between;flex-wrap:wrap}
+.chart-stat{flex:1;min-width:80px;text-align:center}
+.chart-stat-lbl{font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;font-weight:700}
+.chart-stat-val{font-size:18px;font-weight:900;margin-top:2px}
+.chart-stat-delta{font-size:11px;font-weight:700;margin-top:1px}
+.delta-good{color:var(--green)}
+.delta-bad{color:var(--red)}
+.delta-neu{color:var(--muted)}
+.chart-empty{padding:40px 10px;text-align:center;color:var(--muted);font-size:12px}
+.select-box{background:var(--s1);border:1px solid var(--bd);border-radius:10px;padding:10px 12px;color:var(--text);font-family:inherit;font-size:14px;width:100%;margin-bottom:10px;-webkit-appearance:none;appearance:none;background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 8' fill='%23777'><path d='M0 0l6 8 6-8z'/></svg>");background-repeat:no-repeat;background-position:right 12px center;background-size:10px}
+.notif-row{background:var(--s1);border:1px solid var(--bd);border-radius:10px;padding:12px;margin-bottom:10px;display:flex;align-items:center;gap:10px;justify-content:space-between}
+.notif-lbl{font-size:13px;font-weight:600;flex:1}
+.notif-sub{font-size:11px;color:var(--muted);margin-top:2px}
+.sw{position:relative;display:inline-block;width:46px;height:26px;flex-shrink:0}
+.sw input{opacity:0;width:0;height:0}
+.slider{position:absolute;cursor:pointer;inset:0;background:var(--s2);border:1px solid var(--bd);border-radius:26px;transition:.2s}
+.slider:before{position:absolute;content:"";height:18px;width:18px;left:3px;bottom:3px;background:var(--muted);border-radius:50%;transition:.2s}
+input:checked + .slider{background:rgba(232,99,42,.3);border-color:var(--acc)}
+input:checked + .slider:before{transform:translateX(20px);background:var(--acc)}
+.time-input{background:var(--bg);border:1px solid var(--bd);border-radius:8px;color:var(--text);font-family:inherit;font-size:14px;padding:8px 10px;width:100px}
+.days-pick{display:flex;gap:4px;margin-top:6px}
+.day-pill{flex:1;background:var(--s2);border:1px solid var(--bd);border-radius:8px;padding:6px;text-align:center;cursor:pointer;font-size:11px;font-weight:700;color:var(--muted)}
+.day-pill.on{background:rgba(232,99,42,.15);border-color:var(--acc);color:var(--acc)}
+.edit-btn{background:none;border:none;color:var(--muted);cursor:pointer;font-size:13px;padding:2px 6px;margin-left:4px;font-family:inherit}
+.hist-set{cursor:pointer;transition:background .15s}
+.hist-set:active{background:rgba(46,204,113,.25)}
+.modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:1000;align-items:center;justify-content:center;padding:20px}
+.modal.show{display:flex}
+.modal-content{background:var(--s1);border:1px solid var(--acc);border-radius:var(--r);padding:18px;max-width:360px;width:100%}
+.modal-ttl{font-size:16px;font-weight:800;margin-bottom:4px;color:var(--acc)}
+.modal-sub{font-size:12px;color:var(--muted);margin-bottom:14px;line-height:1.4}
+.modal-inputs{display:flex;align-items:center;gap:10px;margin-bottom:14px;justify-content:center}
+.modal-inputs input{width:80px;background:var(--bg);border:1px solid var(--bd);border-radius:8px;color:var(--text);font-family:inherit;font-size:18px;font-weight:700;text-align:center;padding:10px 6px}
+.modal-inputs input:focus{outline:none;border-color:var(--acc)}
+.modal-btns{display:flex;gap:8px;flex-wrap:wrap}
+.modal-btns .btn{flex:1;margin-bottom:0;min-width:45%}
 </style>
 </head>
 <body>
@@ -171,6 +214,7 @@ body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSy
   <button class="nb act" onclick="showTab('azi',this)"><span class="ico">🏋️</span>Azi</button>
   <button class="nb" onclick="showTab('nutritie',this)"><span class="ico">🥗</span>Nutriție</button>
   <button class="nb" onclick="showTab('program',this)"><span class="ico">📅</span>Program</button>
+  <button class="nb" onclick="showTab('progres',this)"><span class="ico">📈</span>Progres</button>
   <button class="nb" onclick="showTab('istoric',this)"><span class="ico">📊</span>Istoric</button>
   <button class="nb" onclick="showTab('ghid',this)"><span class="ico">📖</span>Ghid</button>
 </nav>
@@ -194,6 +238,65 @@ body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSy
 </div>
 
 <div id="tab-program" class="sec"><div id="prog-content"></div></div>
+
+<div id="tab-progres" class="sec">
+  <div class="stitle">📏 Evoluție corp</div>
+  <div class="seg" id="metricSeg"></div>
+  <div class="seg" id="rangeSeg">
+    <button class="seg-btn" data-range="4">4 săpt.</button>
+    <button class="seg-btn act" data-range="8">8 săpt.</button>
+    <button class="seg-btn" data-range="13">3 luni</button>
+    <button class="seg-btn" data-range="0">Tot</button>
+  </div>
+  <div class="chart-wrap">
+    <div id="bodyChart"></div>
+    <div class="chart-stats" id="bodyStats"></div>
+  </div>
+
+  <div class="stitle">🏋️ Progres exercițiu</div>
+  <select class="select-box" id="exerSelect">
+    <option value="">— Alege exercițiu —</option>
+  </select>
+  <div class="seg" id="exerMetricSeg">
+    <button class="seg-btn act" data-em="maxkg">Max kg</button>
+    <button class="seg-btn" data-em="volume">Volum (Σ rep×kg)</button>
+    <button class="seg-btn" data-em="avgreps">Rep medii</button>
+  </div>
+  <div class="chart-wrap">
+    <div id="exerChart"></div>
+    <div class="chart-stats" id="exerStats"></div>
+  </div>
+
+  <div class="stitle">🔔 Notificări</div>
+  <div class="notif-row">
+    <div style="flex:1">
+      <div class="notif-lbl">Reminder zilnic</div>
+      <div class="notif-sub" id="notifStatus">Dezactivat</div>
+    </div>
+    <label class="sw"><input type="checkbox" id="notifToggle" onchange="toggleNotif()"><span class="slider"></span></label>
+  </div>
+  <div id="notifConfig" style="display:none">
+    <div class="notif-row">
+      <div style="flex:1">
+        <div class="notif-lbl">Oră</div>
+        <div class="notif-sub">Când îți amintim</div>
+      </div>
+      <input type="time" class="time-input" id="notifTime" value="19:00" onchange="updateNotifCfg()">
+    </div>
+    <div class="notif-row" style="flex-direction:column;align-items:stretch">
+      <div class="notif-lbl">Zile</div>
+      <div class="days-pick" id="notifDays"></div>
+    </div>
+    <div class="notif-row" style="flex-direction:column;align-items:stretch;gap:6px">
+      <div class="notif-lbl">Mesaj</div>
+      <div class="notif-sub" id="notifMsgPreview">—</div>
+      <button class="btn btn-ghost" style="margin:4px 0 0" onclick="testNotif()">🔔 Trimite notificare test</button>
+    </div>
+  </div>
+  <p style="font-size:11px;color:var(--muted);margin-top:8px;line-height:1.5">
+    ⚠️ Notificările merg când app-ul e deschis sau instalat ca PWA. Pe iOS trebuie neapărat instalat pe Home Screen pentru a primi notificări.
+  </p>
+</div>
 
 <div id="tab-istoric" class="sec">
   <div class="stitle">📏 Măsurători corp</div>
@@ -305,6 +408,24 @@ body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSy
   <div class="stitle">Ghid exerciții</div>
   <p style="font-size:12px;color:var(--muted);margin-bottom:12px">Apasă pentru detalii complete</p>
   <div id="ghid-content"></div>
+</div>
+
+<div class="modal" id="editModal" onclick="if(event.target===this)closeEdit()">
+  <div class="modal-content">
+    <div class="modal-ttl" id="editTtl">Editează set</div>
+    <div class="modal-sub" id="editSub"></div>
+    <div class="modal-inputs">
+      <input id="editReps" type="number" inputmode="numeric" min="0" max="99" placeholder="rep">
+      <span style="color:var(--muted);font-weight:700">rep ×</span>
+      <input id="editKg" type="number" inputmode="decimal" step="0.5" min="0" max="999" placeholder="kg">
+      <span style="color:var(--muted);font-weight:600">kg</span>
+    </div>
+    <div class="modal-btns">
+      <button class="btn btn-acc" onclick="saveEdit()">💾 Salvează</button>
+      <button class="btn btn-danger" onclick="deleteEdit()">🗑️ Șterge</button>
+      <button class="btn btn-ghost" onclick="closeEdit()">Anulează</button>
+    </div>
+  </div>
 </div>
 
 <div class="toast" id="toast"></div>
@@ -563,6 +684,11 @@ function showTab(name,btn){
     renderMeasurements();
     updateStorageInfo();
     updateDriveUI();
+  }
+  if(name==='progres'){
+    renderBodyChart();
+    renderExerciseChart();
+    initNotifUI();
   }
   window.scrollTo(0,0);
 }
@@ -867,8 +993,12 @@ function renderHistoric(){
     html+='<div class="hist-day"><div class="hist-day-hd"><span>'+d+'</span><span style="color:var(--muted);font-size:11px">'+exCount+' ex · ✓ '+chkDone+'/'+checkItems.length+'</span></div>';
     Object.keys(byDay[d].exercises).forEach(function(ex){
       var sets=byDay[d].exercises[ex].sort(function(a,b){return a.set-b.set;});
-      html+='<div class="hist-ex"><div class="hist-ex-nm">'+ex+'</div><div class="hist-sets">';
-      sets.forEach(function(s){html+='<span class="hist-set">S'+s.set+': '+s.reps+'rep × '+s.kg+'kg</span>';});
+      var exEnc=encodeURIComponent(ex);
+      html+='<div class="hist-ex"><div class="hist-ex-nm">'+ex+' <span style="color:var(--muted);font-size:10px;font-weight:400">· tap pe set pentru editare</span></div><div class="hist-sets">';
+      sets.forEach(function(s){
+        // need to find the actual row (date) to edit — pick first matching row from this week
+        html+='<span class="hist-set" onclick="openEdit(\''+d+'\',\''+exEnc+'\','+s.set+')">S'+s.set+': '+s.reps+'rep × '+s.kg+'kg ✎</span>';
+      });
       html+='</div></div>';
     });
     html+='</div>';
@@ -1313,6 +1443,400 @@ function preloadToday(){
 }
 
 // ═══════════════════════════════════════════════════════════════
+// CHART RENDERER (SVG custom, fără dependențe)
+// ═══════════════════════════════════════════════════════════════
+function renderLineChart(containerId, points, opts){
+  opts=opts||{};
+  var container=document.getElementById(containerId);
+  if(!container) return;
+  if(!points||points.length===0){
+    container.innerHTML='<div class="chart-empty">Nicio dată încă. Începe să introduci '+(opts.hint||'valori')+' pentru a vedea evoluția.</div>';
+    return;
+  }
+  var W=container.clientWidth||320,H=opts.height||180;
+  if(W<100)W=320;
+  var padL=44,padR=14,padT=14,padB=26;
+  var plotW=W-padL-padR,plotH=H-padT-padB;
+  var ys=points.map(function(p){return p.y;});
+  var minY=Math.min.apply(null,ys),maxY=Math.max.apply(null,ys);
+  if(minY===maxY){minY-=1;maxY+=1;}
+  var padY=(maxY-minY)*0.12;minY-=padY;maxY+=padY;
+  var minX=points[0].x.getTime(),maxX=points[points.length-1].x.getTime();
+  if(minX===maxX){minX-=86400000;maxX+=86400000;}
+  function sx(v){return padL+((v-minX)/(maxX-minX))*plotW;}
+  function sy(v){return padT+plotH-((v-minY)/(maxY-minY))*plotH;}
+  var color=opts.color||'#e8632a';
+  var grid='';
+  for(var i=0;i<=3;i++){
+    var y=padT+(i/3)*plotH;
+    var val=maxY-(i/3)*(maxY-minY);
+    grid+='<line x1="'+padL+'" y1="'+y+'" x2="'+(padL+plotW)+'" y2="'+y+'" stroke="#2e2e2e" stroke-width="1" stroke-dasharray="2,3"/>';
+    grid+='<text x="'+(padL-6)+'" y="'+(y+3)+'" fill="#777" font-size="9" text-anchor="end">'+val.toFixed(1)+'</text>';
+  }
+  var path=points.map(function(p,i){return (i===0?'M':'L')+sx(p.x.getTime()).toFixed(1)+','+sy(p.y).toFixed(1);}).join(' ');
+  var areaPath=path+' L'+sx(points[points.length-1].x.getTime()).toFixed(1)+','+(padT+plotH)+' L'+sx(points[0].x.getTime()).toFixed(1)+','+(padT+plotH)+' Z';
+  var dots=points.map(function(p){return '<circle cx="'+sx(p.x.getTime()).toFixed(1)+'" cy="'+sy(p.y).toFixed(1)+'" r="3" fill="'+color+'"/>';}).join('');
+  function fd(d){return d.toLocaleDateString('ro-RO',{day:'numeric',month:'short'});}
+  var xl='<text x="'+padL+'" y="'+(H-6)+'" fill="#777" font-size="9">'+fd(points[0].x)+'</text>';
+  xl+='<text x="'+(padL+plotW)+'" y="'+(H-6)+'" fill="#777" font-size="9" text-anchor="end">'+fd(points[points.length-1].x)+'</text>';
+  var svg='<svg viewBox="0 0 '+W+' '+H+'" width="100%" height="'+H+'" preserveAspectRatio="none">';
+  svg+=grid;
+  svg+='<path d="'+areaPath+'" fill="'+color+'" fill-opacity="0.12" stroke="none"/>';
+  svg+='<path d="'+path+'" fill="none" stroke="'+color+'" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>';
+  svg+=dots;
+  svg+=xl;
+  svg+='</svg>';
+  container.innerHTML=svg;
+}
+
+// ═══════════════════════════════════════════════════════════════
+// PROGRES — EVOLUȚIE CORP
+// ═══════════════════════════════════════════════════════════════
+var progresState={metric:'weight',range:8,exerMetric:'maxkg',selectedExer:''};
+
+function initMetricSeg(){
+  var seg=document.getElementById('metricSeg');
+  seg.innerHTML=MEAS_FIELDS.map(function(f,i){
+    return '<button class="seg-btn'+(f.id===progresState.metric?' act':'')+'" data-metric="'+f.id+'">'+f.label+'</button>';
+  }).join('');
+  seg.querySelectorAll('.seg-btn').forEach(function(b){
+    b.onclick=function(){
+      progresState.metric=b.dataset.metric;
+      seg.querySelectorAll('.seg-btn').forEach(function(x){x.classList.remove('act');});
+      b.classList.add('act');
+      renderBodyChart();
+    };
+  });
+  document.getElementById('rangeSeg').querySelectorAll('.seg-btn').forEach(function(b){
+    b.onclick=function(){
+      progresState.range=parseInt(b.dataset.range);
+      document.getElementById('rangeSeg').querySelectorAll('.seg-btn').forEach(function(x){x.classList.remove('act');});
+      b.classList.add('act');
+      renderBodyChart();
+      renderExerciseChart();
+    };
+  });
+}
+
+function filterByRange(points,weeks){
+  if(!weeks||weeks===0) return points;
+  var cutoff=Date.now()-weeks*7*86400000;
+  return points.filter(function(p){return p.x.getTime()>=cutoff;});
+}
+
+function renderBodyChart(){
+  var metric=progresState.metric;
+  var field=MEAS_FIELDS.find(function(f){return f.id===metric;});
+  if(!field)return;
+  var all=getMeasurements().slice().reverse(); // cel mai vechi primul pentru chart
+  var points=all.filter(function(m){return m[metric]!=null;}).map(function(m){
+    return {x:parseRoDate(m.date),y:m[metric]};
+  }).filter(function(p){return p.x;});
+  points=filterByRange(points,progresState.range);
+  var color=metric==='weight'?'#e8632a':'#38bdf8';
+  renderLineChart('bodyChart',points,{color:color,hint:'măsurători '+field.label.toLowerCase()});
+  // Stats
+  var stats=document.getElementById('bodyStats');
+  if(!points.length){stats.innerHTML='';return;}
+  var curr=points[points.length-1].y;
+  var first=points[0].y;
+  var delta=curr-first;
+  var deltaPct=first?((delta/first)*100):0;
+  var minV=Math.min.apply(null,points.map(function(p){return p.y;}));
+  var maxV=Math.max.apply(null,points.map(function(p){return p.y;}));
+  var cls=delta>0?'delta-good':(delta<0?'delta-bad':'delta-neu');
+  // Pentru talie/grăsime: scăderea e bună
+  if(metric==='waist'||metric==='hip') cls=delta<0?'delta-good':(delta>0?'delta-bad':'delta-neu');
+  stats.innerHTML=
+    '<div class="chart-stat"><div class="chart-stat-lbl">Actual</div><div class="chart-stat-val" style="color:'+color+'">'+curr.toFixed(1)+'<span style="font-size:11px;color:var(--muted)"> '+field.unit+'</span></div></div>'+
+    '<div class="chart-stat"><div class="chart-stat-lbl">Δ Total</div><div class="chart-stat-val '+cls+'">'+(delta>=0?'+':'')+delta.toFixed(1)+'</div><div class="chart-stat-delta '+cls+'">'+(deltaPct>=0?'+':'')+deltaPct.toFixed(1)+'%</div></div>'+
+    '<div class="chart-stat"><div class="chart-stat-lbl">Min / Max</div><div class="chart-stat-val" style="font-size:13px">'+minV.toFixed(1)+' — '+maxV.toFixed(1)+'</div></div>';
+}
+
+// ═══════════════════════════════════════════════════════════════
+// PROGRES — PER EXERCIȚIU
+// ═══════════════════════════════════════════════════════════════
+function initExerSelect(){
+  var sel=document.getElementById('exerSelect');
+  var exercises={};
+  loadStore().rows.forEach(function(r){if(r.type==='antrenament'&&r.exercise)exercises[r.exercise]=true;});
+  var names=Object.keys(exercises).sort();
+  sel.innerHTML='<option value="">— Alege exercițiu —</option>'+names.map(function(n){
+    return '<option value="'+n.replace(/"/g,'&quot;')+'"'+(n===progresState.selectedExer?' selected':'')+'>'+n+'</option>';
+  }).join('');
+  sel.onchange=function(){progresState.selectedExer=sel.value;renderExerciseChart();};
+  document.getElementById('exerMetricSeg').querySelectorAll('.seg-btn').forEach(function(b){
+    b.onclick=function(){
+      progresState.exerMetric=b.dataset.em;
+      document.getElementById('exerMetricSeg').querySelectorAll('.seg-btn').forEach(function(x){x.classList.remove('act');});
+      b.classList.add('act');
+      renderExerciseChart();
+    };
+  });
+}
+
+function renderExerciseChart(){
+  initExerSelect(); // refresh list
+  var ex=progresState.selectedExer;
+  var chart=document.getElementById('exerChart');
+  var stats=document.getElementById('exerStats');
+  if(!ex){chart.innerHTML='<div class="chart-empty">Alege un exercițiu pentru a vedea evoluția</div>';stats.innerHTML='';return;}
+  // Group by date, compute metric
+  var byDate={};
+  loadStore().rows.forEach(function(r){
+    if(r.type!=='antrenament'||r.exercise!==ex)return;
+    if(!byDate[r.date])byDate[r.date]={sets:[]};
+    byDate[r.date].sets.push({reps:parseFloat(r.reps)||0,kg:parseFloat(r.kg)||0});
+  });
+  var dates=Object.keys(byDate).sort(function(a,b){
+    var da=parseRoDate(a),db=parseRoDate(b);return (da?da.getTime():0)-(db?db.getTime():0);
+  });
+  var points=dates.map(function(d){
+    var sets=byDate[d].sets;
+    var val=0;
+    if(progresState.exerMetric==='maxkg'){val=Math.max.apply(null,sets.map(function(s){return s.kg;}));}
+    else if(progresState.exerMetric==='volume'){val=sets.reduce(function(a,s){return a+(s.reps*s.kg);},0);}
+    else if(progresState.exerMetric==='avgreps'){val=sets.reduce(function(a,s){return a+s.reps;},0)/sets.length;}
+    return {x:parseRoDate(d),y:val};
+  }).filter(function(p){return p.x&&!isNaN(p.y);});
+  points=filterByRange(points,progresState.range);
+  var unit=progresState.exerMetric==='maxkg'?'kg':(progresState.exerMetric==='volume'?'kg·rep':'rep');
+  renderLineChart('exerChart',points,{color:'#2ecc71',hint:'seturi la '+ex});
+  if(!points.length){stats.innerHTML='';return;}
+  var curr=points[points.length-1].y;
+  var first=points[0].y;
+  var delta=curr-first;
+  var deltaPct=first?((delta/first)*100):0;
+  var cls=delta>0?'delta-good':(delta<0?'delta-bad':'delta-neu');
+  stats.innerHTML=
+    '<div class="chart-stat"><div class="chart-stat-lbl">Actual</div><div class="chart-stat-val" style="color:#2ecc71">'+curr.toFixed(1)+'<span style="font-size:11px;color:var(--muted)"> '+unit+'</span></div></div>'+
+    '<div class="chart-stat"><div class="chart-stat-lbl">Δ Total</div><div class="chart-stat-val '+cls+'">'+(delta>=0?'+':'')+delta.toFixed(1)+'</div><div class="chart-stat-delta '+cls+'">'+(deltaPct>=0?'+':'')+deltaPct.toFixed(1)+'%</div></div>'+
+    '<div class="chart-stat"><div class="chart-stat-lbl">Sesiuni</div><div class="chart-stat-val">'+points.length+'</div></div>';
+}
+
+// ═══════════════════════════════════════════════════════════════
+// EDITARE / ȘTERGERE SETURI
+// ═══════════════════════════════════════════════════════════════
+var editCtx=null;
+
+function openEdit(dayName,exerEnc,setNum){
+  var exer=decodeURIComponent(exerEnc);
+  var rows=getRowsForWeek(currentWeekOffset);
+  var row=rows.find(function(r){return r.type==='antrenament'&&r.day===dayName&&r.exercise===exer&&r.set===setNum;});
+  if(!row){showToast('Set nu a fost găsit','var(--red)');return;}
+  editCtx={date:row.date,day:row.day,exercise:exer,set:setNum};
+  document.getElementById('editTtl').textContent='Editează set '+setNum;
+  document.getElementById('editSub').textContent=exer+' — '+dayName+' ('+row.date+')';
+  document.getElementById('editReps').value=row.reps;
+  document.getElementById('editKg').value=row.kg;
+  document.getElementById('editModal').classList.add('show');
+}
+
+function closeEdit(){
+  document.getElementById('editModal').classList.remove('show');
+  editCtx=null;
+}
+
+function saveEdit(){
+  if(!editCtx)return;
+  var reps=parseFloat(document.getElementById('editReps').value)||0;
+  var kg=parseFloat(document.getElementById('editKg').value)||0;
+  if(!reps&&!kg){showToast('Introduceți rep și kg','var(--acc2)');return;}
+  addRow({
+    date:editCtx.date,day:editCtx.day,type:'antrenament',
+    exercise:editCtx.exercise,set:editCtx.set,reps:reps,kg:kg,note:''
+  });
+  showToast('Set actualizat ✓');
+  closeEdit();
+  renderHistoric();
+  if(editCtx&&editCtx.date===today())preloadToday(); // refresh live state
+  renderExerciseChart();
+}
+
+function deleteEdit(){
+  if(!editCtx)return;
+  if(!confirm('Ștergi setul '+editCtx.set+' de la '+editCtx.exercise+'?'))return;
+  var s=loadStore();
+  s.rows=s.rows.filter(function(r){
+    return !(r.type==='antrenament'&&r.date===editCtx.date&&r.exercise===editCtx.exercise&&r.set===editCtx.set);
+  });
+  saveStore(s);
+  scheduleDriveSync();
+  // Dacă e setul de azi, curăță și state-ul live
+  if(editCtx.date===today() && setData[editCtx.exercise]){
+    delete setData[editCtx.exercise][editCtx.set];
+  }
+  showToast('Set șters');
+  closeEdit();
+  renderHistoric();
+  if(document.getElementById('tab-azi').classList.contains('act')) renderToday();
+  renderExerciseChart();
+}
+
+// ═══════════════════════════════════════════════════════════════
+// NOTIFICĂRI
+// ═══════════════════════════════════════════════════════════════
+var NOTIF_KEY='fitness_notif_cfg';
+var notifTimer=null;
+
+function getNotifCfg(){
+  try{
+    var raw=localStorage.getItem(NOTIF_KEY);
+    if(!raw) return {enabled:false,time:'19:00',days:[1,2,3,4,5]}; // lun-vin default
+    return JSON.parse(raw);
+  }catch(e){return {enabled:false,time:'19:00',days:[1,2,3,4,5]};}
+}
+
+function saveNotifCfg(cfg){localStorage.setItem(NOTIF_KEY,JSON.stringify(cfg));}
+
+function initNotifUI(){
+  var cfg=getNotifCfg();
+  document.getElementById('notifToggle').checked=cfg.enabled;
+  document.getElementById('notifTime').value=cfg.time;
+  document.getElementById('notifConfig').style.display=cfg.enabled?'block':'none';
+  renderNotifDays(cfg);
+  updateNotifStatus(cfg);
+  updateNotifPreview();
+}
+
+function renderNotifDays(cfg){
+  var daysPick=document.getElementById('notifDays');
+  var names=['D','L','M','M','J','V','S'];
+  daysPick.innerHTML=names.map(function(n,i){
+    var dow=i; // 0=Duminică în JS
+    return '<div class="day-pill'+(cfg.days.indexOf(dow)>=0?' on':'')+'" data-dow="'+dow+'">'+n+'</div>';
+  }).join('');
+  daysPick.querySelectorAll('.day-pill').forEach(function(el){
+    el.onclick=function(){
+      var dow=parseInt(el.dataset.dow);
+      var c=getNotifCfg();
+      var i=c.days.indexOf(dow);
+      if(i>=0) c.days.splice(i,1); else c.days.push(dow);
+      c.days.sort();
+      saveNotifCfg(c);
+      el.classList.toggle('on');
+      scheduleReminder();
+      updateNotifStatus(c);
+    };
+  });
+}
+
+function updateNotifStatus(cfg){
+  var el=document.getElementById('notifStatus');
+  if(!cfg.enabled){el.textContent='Dezactivat';return;}
+  if(Notification.permission==='denied'){el.textContent='Permisiune refuzată din browser';return;}
+  if(Notification.permission!=='granted'){el.textContent='Așteaptă permisiunea...';return;}
+  var dayNames=['Dum','Lun','Mar','Mie','Joi','Vin','Sâm'];
+  var days=cfg.days.map(function(d){return dayNames[d];}).join(', ');
+  el.textContent='Activ · '+cfg.time+' · '+(days||'niciunde');
+}
+
+function toggleNotif(){
+  var on=document.getElementById('notifToggle').checked;
+  var cfg=getNotifCfg();
+  if(on){
+    if(!('Notification' in window)){showToast('Browser-ul nu suportă notificări','var(--red)');document.getElementById('notifToggle').checked=false;return;}
+    Notification.requestPermission().then(function(perm){
+      if(perm!=='granted'){
+        showToast('Permisiune refuzată','var(--red)');
+        document.getElementById('notifToggle').checked=false;
+        cfg.enabled=false;saveNotifCfg(cfg);updateNotifStatus(cfg);
+        return;
+      }
+      cfg.enabled=true;saveNotifCfg(cfg);
+      document.getElementById('notifConfig').style.display='block';
+      updateNotifStatus(cfg);
+      scheduleReminder();
+      showToast('Notificări activate ✓');
+    });
+  }else{
+    cfg.enabled=false;saveNotifCfg(cfg);
+    document.getElementById('notifConfig').style.display='none';
+    clearTimeout(notifTimer);notifTimer=null;
+    updateNotifStatus(cfg);
+    showToast('Notificări dezactivate');
+  }
+}
+
+function updateNotifCfg(){
+  var cfg=getNotifCfg();
+  cfg.time=document.getElementById('notifTime').value;
+  saveNotifCfg(cfg);
+  scheduleReminder();
+  updateNotifStatus(cfg);
+}
+
+function updateNotifPreview(){
+  var el=document.getElementById('notifMsgPreview');
+  if(!el)return;
+  var idx=todayIdx();var sch=schedule[idx];var ex=exercises[sch.exDay];
+  var isRecovery=sch.exDay==='miercuri'||sch.exDay==='sambata';
+  el.textContent=isRecovery
+    ?'💪 Azi e zi recovery. Nu uita să bifezi obiectivele zilnice!'
+    :'💪 '+ex.label+' azi. Nu ai bifat antrenamentul!';
+}
+
+function nextReminderTime(cfg){
+  if(!cfg.enabled||!cfg.days.length)return null;
+  var now=new Date();
+  var parts=cfg.time.split(':');var h=parseInt(parts[0]),m=parseInt(parts[1]);
+  var d=new Date(now);d.setHours(h,m,0,0);
+  for(var i=0;i<8;i++){
+    if(d>now && cfg.days.indexOf(d.getDay())>=0) return d;
+    d.setDate(d.getDate()+1);d.setHours(h,m,0,0);
+  }
+  return null;
+}
+
+function scheduleReminder(){
+  clearTimeout(notifTimer);
+  var cfg=getNotifCfg();
+  var next=nextReminderTime(cfg);
+  if(!next)return;
+  var delay=next.getTime()-Date.now();
+  // setTimeout max: ~24 zile. Dacă e mai mult, doar setează la 1h.
+  if(delay>86400000) delay=86400000;
+  notifTimer=setTimeout(function(){
+    fireReminder();
+    scheduleReminder();
+  },delay);
+  console.log('Next reminder in',(delay/60000).toFixed(1),'min');
+}
+
+function fireReminder(){
+  if(!('Notification' in window)||Notification.permission!=='granted')return;
+  // Verifică dacă antrenamentul e deja bifat
+  var todayRows=getRowsForDate(today());
+  var antrenamentDone=todayRows.some(function(r){return r.type==='checklist'&&r.exercise==='antrenament'&&r.note==='DA';});
+  if(antrenamentDone)return; // nu deranja dacă a bifat
+  var idx=todayIdx();var sch=schedule[idx];var ex=exercises[sch.exDay];
+  var body='💪 '+ex.label+' azi. Deschide app-ul și bifează antrenamentul!';
+  // via service worker pentru PWA
+  if(navigator.serviceWorker){
+    navigator.serviceWorker.getRegistration().then(function(reg){
+      if(reg){
+        reg.showNotification('Fitness Jurnal',{
+          body:body,icon:'./manifest.json',badge:'./manifest.json',
+          tag:'daily-reminder',requireInteraction:false,vibrate:[200,100,200]
+        });
+      }else{new Notification('Fitness Jurnal',{body:body});}
+    });
+  }else{
+    new Notification('Fitness Jurnal',{body:body});
+  }
+}
+
+function testNotif(){
+  if(Notification.permission!=='granted'){showToast('Activează mai întâi notificările','var(--acc2)');return;}
+  if(navigator.serviceWorker){
+    navigator.serviceWorker.getRegistration().then(function(reg){
+      if(reg) reg.showNotification('Fitness Jurnal',{body:'🎯 Test notificare OK! Așa va arăta reminder-ul zilnic.',icon:'./manifest.json',tag:'test',vibrate:[200,100,200]});
+      else new Notification('Fitness Jurnal',{body:'Test OK!'});
+    });
+  }else{new Notification('Fitness Jurnal',{body:'Test OK!'});}
+}
+
+// ═══════════════════════════════════════════════════════════════
 // INSTALL HINT
 // ═══════════════════════════════════════════════════════════════
 function dismissInstallHint(){
@@ -1344,6 +1868,23 @@ window.addEventListener('load',function(){
   // Service Worker
   if('serviceWorker' in navigator){
     navigator.serviceWorker.register('./sw.js').catch(function(err){console.warn('SW register failed',err);});
+  }
+
+  // Inițializare Progres tab (segmente + listeners)
+  initMetricSeg();
+
+  // Notificări — re-programare la fiecare deschidere
+  var ncfg=getNotifCfg();
+  if(ncfg.enabled && 'Notification' in window && Notification.permission==='granted'){
+    scheduleReminder();
+    // check dacă am ratat reminder-ul de azi
+    var now=new Date();
+    var parts=ncfg.time.split(':');var h=parseInt(parts[0]),m=parseInt(parts[1]);
+    var todayReminder=new Date();todayReminder.setHours(h,m,0,0);
+    if(now>todayReminder && ncfg.days.indexOf(now.getDay())>=0){
+      // reminder pentru azi a trecut — verificăm dacă antrenamentul e bifat
+      setTimeout(fireReminder,500);
+    }
   }
 
   // Google Drive (optional)
