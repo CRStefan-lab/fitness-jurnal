@@ -362,37 +362,39 @@ input:checked + .slider:before{transform:translateX(20px);background:var(--acc)}
   <button class="btn btn-acc" onclick="doExport()">📤 Generează rezumat</button>
   <button class="btn btn-ghost" onclick="copyExport()">📋 Copiază</button>
 
-  <div class="stitle">☁️ Sincronizare Google Drive</div>
+  <div class="stitle">⚡ Share backup rapid</div>
+  <p style="font-size:12px;color:var(--muted);margin-bottom:10px;line-height:1.5">
+    Un tap → meniul de share al telefonului → trimite datele către Drive, Mail, Telegram, orice. Zero setup.
+  </p>
+  <button class="btn btn-acc" onclick="shareBackup()">📤 Share backup (Drive / Mail / ...)</button>
+
+  <div class="stitle">☁️ Sync GitHub Gist</div>
   <div class="drive-card">
-    <div class="drive-status" id="driveStatus">
-      <span id="driveStatusDot">⚪</span>
-      <span id="driveStatusText">Nu este configurat</span>
+    <div class="drive-status" id="gistStatus">⚪ Deconectat</div>
+    <div class="drive-sub" id="gistSub">
+      Sync automat cu un gist privat pe GitHub. Zero Google Cloud. Token-ul tău rămâne local.
     </div>
-    <div class="drive-sub" id="driveSub">
-      Datele rămân doar pe telefon. Configurează Google Drive pentru backup automat și sincronizare între device-uri.
-    </div>
-    <div id="driveActions"></div>
-    <a class="setup-link" onclick="toggleSetup()">Cum obțin Client ID? ▾</a>
-    <div class="setup-box" id="setupBox">
-      <strong>Pașii pentru Google OAuth Client ID:</strong>
+    <div id="gistActions"></div>
+    <a class="setup-link" onclick="document.getElementById('gistSetupBox').classList.toggle('show')">Cum obțin token-ul? ▾</a>
+    <div class="setup-box" id="gistSetupBox">
+      <strong>30 secunde, zero complicații:</strong>
       <ol>
-        <li>Deschide <a href="https://console.cloud.google.com/" target="_blank" style="color:var(--blue)">console.cloud.google.com</a></li>
-        <li>Create Project → nume liber (ex: "Fitness Jurnal")</li>
-        <li>În meniu: APIs &amp; Services → <strong>Enabled APIs</strong> → Enable "Google Drive API"</li>
-        <li>APIs &amp; Services → <strong>OAuth consent screen</strong> → External → completează doar numele app-ului și email-ul tău → Save</li>
-        <li>La pasul "Audience/Test users" adaugă email-ul tău</li>
-        <li>APIs &amp; Services → <strong>Credentials</strong> → Create Credentials → OAuth client ID → Web application</li>
-        <li>La "Authorized JavaScript origins" adaugă: <code>https://crstefan-lab.github.io</code></li>
-        <li>Create → copiază <strong>Client ID</strong>-ul (format: <code>...apps.googleusercontent.com</code>)</li>
-        <li>Deschide <code>index.html</code>, la începutul scriptului pune:<br><code>const GOOGLE_CLIENT_ID = 'TOKEN_AICI.apps.googleusercontent.com';</code></li>
-        <li>Push pe GitHub, reîncarcă app-ul, apasă "Conectează Drive"</li>
+        <li>Deschide <a href="https://github.com/settings/tokens/new?description=Fitness%20Jurnal&scopes=gist" target="_blank" style="color:var(--blue)">github.com/settings/tokens/new</a> (link preconfigurat)</li>
+        <li>La "Expiration" alege cât vrei (recomandat: <strong>No expiration</strong> pentru uz personal)</li>
+        <li>Verifică că e bifat doar <code>gist</code> (ar trebui să fie deja din link)</li>
+        <li>Jos: <strong>Generate token</strong></li>
+        <li>Copiază token-ul (începe cu <code>ghp_...</code>)</li>
+        <li>Paste mai sus în câmpul "Token" → Conectează</li>
       </ol>
+      <p style="margin-top:8px;color:var(--muted);font-size:11px">
+        🔒 Token-ul e salvat doar pe telefon (localStorage). Poți oricând să-l revoci de pe github.com/settings/tokens.
+      </p>
     </div>
   </div>
 
-  <div class="stitle">💾 Backup local</div>
+  <div class="stitle">💾 Backup local (fișier)</div>
   <p style="font-size:12px;color:var(--muted);margin-bottom:10px;line-height:1.5">
-    Backup manual în fișier JSON (alternativă la Drive).
+    Download / upload manual al fișierului JSON.
   </p>
   <div class="btn-row">
     <button class="btn btn-ghost" onclick="downloadJSON()">⬇️ Descarcă</button>
@@ -432,11 +434,6 @@ input:checked + .slider:before{transform:translateX(20px);background:var(--acc)}
 <div class="toast" id="toast"></div>
 
 <script>
-// ═══════════════════════════════════════════════════════════════
-// CONFIGURARE DRIVE SYNC (completează după ce obții Client ID)
-// ═══════════════════════════════════════════════════════════════
-const GOOGLE_CLIENT_ID = ''; // ex: '1234...apps.googleusercontent.com'
-
 // ═══════════════════════════════════════════════════════════════
 // DATE STATICE
 // ═══════════════════════════════════════════════════════════════
@@ -684,7 +681,7 @@ function showTab(name,btn){
     renderHistoric();
     renderMeasurements();
     updateStorageInfo();
-    updateDriveUI();
+    updateGistUI();
   }
   if(name==='progres'){
     renderBodyChart();
@@ -1151,123 +1148,145 @@ function updateStorageInfo(){
 }
 
 // ═══════════════════════════════════════════════════════════════
-// GOOGLE DRIVE SYNC
+// GITHUB GIST SYNC (zero setup — doar un token)
 // ═══════════════════════════════════════════════════════════════
-var driveState={ready:false,token:null,fileId:null,tokenClient:null,lastSync:null,syncing:false};
-var DRIVE_FILENAME='fitness-jurnal-backup.json';
-var DRIVE_SCOPES='https://www.googleapis.com/auth/drive.appdata';
+var GIST_FILENAME='fitness-jurnal.json';
+var GIST_DESCRIPTION='Fitness Jurnal — Backup (do not delete)';
+var gistState={token:null,gistId:null,lastSync:null,syncing:false};
 var syncTimer=null;
 
-function loadGoogleScripts(){
-  return new Promise(function(resolve,reject){
-    if(window.gapi && window.google && window.google.accounts){resolve();return;}
-    var loaded=0;var needed=2;
-    function done(){loaded++;if(loaded===needed)resolve();}
-    var s1=document.createElement('script');
-    s1.src='https://apis.google.com/js/api.js';s1.async=true;s1.defer=true;s1.onload=done;s1.onerror=reject;
-    document.head.appendChild(s1);
-    var s2=document.createElement('script');
-    s2.src='https://accounts.google.com/gsi/client';s2.async=true;s2.defer=true;s2.onload=done;s2.onerror=reject;
-    document.head.appendChild(s2);
-  });
-}
-
-function initDrive(){
-  if(!GOOGLE_CLIENT_ID){updateDriveUI();return;}
-  loadGoogleScripts().then(function(){
-    gapi.load('client',function(){
-      gapi.client.init({discoveryDocs:['https://www.googleapis.com/discovery/v1/apis/drive/v3/rest']}).then(function(){
-        driveState.tokenClient=google.accounts.oauth2.initTokenClient({
-          client_id:GOOGLE_CLIENT_ID,scope:DRIVE_SCOPES,
-          callback:function(resp){
-            if(resp.error){showToast('Drive: '+resp.error,'var(--red)');setSyncBadge('err');return;}
-            driveState.token=resp.access_token;
-            localStorage.setItem('drive_token',resp.access_token);
-            localStorage.setItem('drive_token_exp',Date.now()+(resp.expires_in-120)*1000);
-            gapi.client.setToken({access_token:resp.access_token});
-            onDriveConnected();
-          }
-        });
-        driveState.ready=true;
-        // Restaurează token salvat dacă nu a expirat
-        var savedToken=localStorage.getItem('drive_token');
-        var exp=parseInt(localStorage.getItem('drive_token_exp')||'0');
-        if(savedToken && exp>Date.now()){
-          driveState.token=savedToken;
-          gapi.client.setToken({access_token:savedToken});
-          onDriveConnected(true);
-        }else{
-          updateDriveUI();
-        }
-      });
+function gistInit(){
+  gistState.token=localStorage.getItem('gh_token')||null;
+  gistState.gistId=localStorage.getItem('gh_gist_id')||null;
+  gistState.lastSync=parseInt(localStorage.getItem('gh_last_sync')||'0')||null;
+  updateGistUI();
+  if(gistState.token){
+    setSyncBadge('on');
+    // Pull initial la deschiderea app-ului (să aducem date noi de pe alt device)
+    gistPull().catch(function(err){
+      console.warn('Initial pull failed',err);
+      if(String(err.message||'').indexOf('401')>=0){
+        // Token invalid — curățăm
+        showToast('Token GitHub expirat/revocat','var(--red)');
+        gistDisconnect(true);
+      }
     });
-  }).catch(function(){
-    showToast('Nu s-au putut încărca bibliotecile Google','var(--red)');
-    setSyncBadge('err');
-  });
-}
-
-function driveConnect(){
-  if(!driveState.ready){showToast('Drive nu e gata încă','var(--acc2)');return;}
-  driveState.tokenClient.requestAccessToken({prompt:'consent'});
-}
-
-function driveDisconnect(){
-  if(!confirm('Deconectezi Google Drive? Datele locale rămân.'))return;
-  if(driveState.token && google.accounts.oauth2){
-    google.accounts.oauth2.revoke(driveState.token,function(){});
+  }else{
+    setSyncBadge('off');
   }
-  driveState.token=null;driveState.fileId=null;driveState.lastSync=null;
-  localStorage.removeItem('drive_token');
-  localStorage.removeItem('drive_token_exp');
-  localStorage.removeItem('drive_file_id');
-  localStorage.removeItem('drive_last_sync');
-  setSyncBadge('off');
-  updateDriveUI();
-  showToast('Drive deconectat');
 }
 
-function onDriveConnected(silent){
-  setSyncBadge('on');
-  driveState.fileId=localStorage.getItem('drive_file_id');
-  driveState.lastSync=parseInt(localStorage.getItem('drive_last_sync')||'0')||null;
-  // Sincronizare inițială: caută fișier, merge, apoi upload
-  drivePull().then(function(){
-    updateDriveUI();
-    if(!silent)showToast('Drive conectat ✓');
-  }).catch(function(err){
-    console.error('Drive pull failed',err);
-    setSyncBadge('err');
-  });
+function gistConnectFromInput(){
+  var input=document.getElementById('gistTokenInput');
+  if(!input||!input.value.trim()){showToast('Paste token-ul GitHub','var(--acc2)');return;}
+  gistConnect(input.value.trim());
 }
 
-function driveFindFile(){
-  return gapi.client.drive.files.list({
-    spaces:'appDataFolder',
-    q:"name='"+DRIVE_FILENAME+"'",
-    fields:'files(id,name,modifiedTime)'
-  }).then(function(r){
-    var files=r.result.files||[];
-    if(files.length>0){
-      driveState.fileId=files[0].id;
-      localStorage.setItem('drive_file_id',files[0].id);
-      return files[0];
-    }
-    return null;
-  });
-}
-
-function drivePull(){
-  return driveFindFile().then(function(file){
-    if(!file)return null;
-    return gapi.client.drive.files.get({fileId:file.id,alt:'media'}).then(function(resp){
-      var remote;
-      try{remote=typeof resp.body==='string'?JSON.parse(resp.body):resp.body;}catch(e){return null;}
-      if(!remote||!remote.rows)return null;
-      mergeRemote(remote);
-      renderHistoric();renderMeasurements();updateStorageInfo();
-      return remote;
+function gistConnect(token){
+  setSyncBadge('on','conectare...');
+  // Validează token + găsește/creează gist
+  fetch('https://api.github.com/user',{headers:{Authorization:'Bearer '+token,Accept:'application/vnd.github+json'}})
+    .then(function(r){
+      if(!r.ok) throw new Error('Token invalid (HTTP '+r.status+')');
+      return r.json();
+    })
+    .then(function(user){
+      localStorage.setItem('gh_token',token);
+      gistState.token=token;
+      showToast('Conectat ca '+user.login+' ✓');
+      return gistFindOrCreate();
+    })
+    .then(function(){
+      return gistPull();
+    })
+    .then(function(){
+      return gistPush();
+    })
+    .then(function(){
+      updateGistUI();
+      setSyncBadge('on');
+    })
+    .catch(function(err){
+      showToast('Eroare: '+err.message,'var(--red)');
+      setSyncBadge('err');
+      updateGistUI();
     });
+}
+
+function gistDisconnect(silent){
+  if(!silent && !confirm('Deconectezi GitHub Gist? Datele locale rămân. Gist-ul rămâne pe GitHub (poți să-l ștergi manual dacă vrei).'))return;
+  localStorage.removeItem('gh_token');
+  localStorage.removeItem('gh_gist_id');
+  localStorage.removeItem('gh_last_sync');
+  gistState={token:null,gistId:null,lastSync:null,syncing:false};
+  setSyncBadge('off');
+  updateGistUI();
+  if(!silent)showToast('Deconectat');
+}
+
+function gistFindOrCreate(){
+  if(gistState.gistId) return Promise.resolve(gistState.gistId);
+  // Caută în gists existente
+  return fetch('https://api.github.com/gists?per_page=100',{
+    headers:{Authorization:'Bearer '+gistState.token,Accept:'application/vnd.github+json'}
+  }).then(function(r){
+    if(!r.ok) throw new Error('List gists failed: '+r.status);
+    return r.json();
+  }).then(function(gists){
+    var found=gists.find(function(g){return g.description===GIST_DESCRIPTION;});
+    if(found){
+      gistState.gistId=found.id;
+      localStorage.setItem('gh_gist_id',found.id);
+      return found.id;
+    }
+    // Creează nou
+    var data=loadStore();
+    var files={};files[GIST_FILENAME]={content:JSON.stringify(data,null,2)};
+    return fetch('https://api.github.com/gists',{
+      method:'POST',
+      headers:{Authorization:'Bearer '+gistState.token,Accept:'application/vnd.github+json','Content-Type':'application/json'},
+      body:JSON.stringify({description:GIST_DESCRIPTION,public:false,files:files})
+    }).then(function(r){
+      if(!r.ok) throw new Error('Create gist failed: '+r.status);
+      return r.json();
+    }).then(function(g){
+      gistState.gistId=g.id;
+      localStorage.setItem('gh_gist_id',g.id);
+      return g.id;
+    });
+  });
+}
+
+function gistPull(){
+  if(!gistState.token||!gistState.gistId){
+    if(gistState.token) return gistFindOrCreate().then(gistPull);
+    return Promise.resolve(null);
+  }
+  return fetch('https://api.github.com/gists/'+gistState.gistId,{
+    headers:{Authorization:'Bearer '+gistState.token,Accept:'application/vnd.github+json'}
+  }).then(function(r){
+    if(!r.ok) throw new Error('Pull failed: '+r.status);
+    return r.json();
+  }).then(function(gist){
+    var file=gist.files[GIST_FILENAME];
+    if(!file) return null;
+    if(file.truncated){
+      return fetch(file.raw_url).then(function(r){return r.text();});
+    }
+    return file.content;
+  }).then(function(content){
+    if(!content) return null;
+    try{
+      var remote=JSON.parse(content);
+      if(remote.rows){
+        mergeRemote(remote);
+        renderHistoric();renderMeasurements();updateStorageInfo();
+      }
+      return remote;
+    }catch(e){
+      console.error('Parse gist JSON failed',e);
+      return null;
+    }
   });
 }
 
@@ -1290,122 +1309,119 @@ function mergeRemote(remote){
   saveStore({version:1,rows:merged});
 }
 
-function drivePush(){
-  if(!driveState.token) return Promise.resolve(false);
-  driveState.syncing=true;
+function gistPush(){
+  if(!gistState.token) return Promise.resolve(false);
+  if(!gistState.gistId) return gistFindOrCreate().then(gistPush);
+  gistState.syncing=true;
   setSyncBadge('on','sync...');
+  updateGistUI();
   var data=loadStore();
-  var body=JSON.stringify(data);
-  var fileId=driveState.fileId;
-  var boundary='-------fit_'+Date.now();
-  var metadata=fileId?{}:{name:DRIVE_FILENAME,parents:['appDataFolder']};
-  var multipartBody=
-    '--'+boundary+'\r\n'+
-    'Content-Type: application/json; charset=UTF-8\r\n\r\n'+
-    JSON.stringify(metadata)+'\r\n'+
-    '--'+boundary+'\r\n'+
-    'Content-Type: application/json\r\n\r\n'+
-    body+'\r\n'+
-    '--'+boundary+'--';
-  var url=fileId
-    ?'https://www.googleapis.com/upload/drive/v3/files/'+fileId+'?uploadType=multipart'
-    :'https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart';
-  var method=fileId?'PATCH':'POST';
-  return fetch(url,{
-    method:method,
-    headers:{
-      'Authorization':'Bearer '+driveState.token,
-      'Content-Type':'multipart/related; boundary="'+boundary+'"'
-    },
-    body:multipartBody
+  var files={};files[GIST_FILENAME]={content:JSON.stringify(data,null,2)};
+  return fetch('https://api.github.com/gists/'+gistState.gistId,{
+    method:'PATCH',
+    headers:{Authorization:'Bearer '+gistState.token,Accept:'application/vnd.github+json','Content-Type':'application/json'},
+    body:JSON.stringify({files:files})
   }).then(function(r){
-    if(!r.ok) throw new Error('HTTP '+r.status);
-    return r.json();
-  }).then(function(result){
-    if(!fileId && result.id){
-      driveState.fileId=result.id;
-      localStorage.setItem('drive_file_id',result.id);
-    }
-    driveState.lastSync=Date.now();
-    localStorage.setItem('drive_last_sync',String(driveState.lastSync));
-    driveState.syncing=false;
+    if(!r.ok) throw new Error('Push failed: '+r.status);
+    gistState.lastSync=Date.now();
+    localStorage.setItem('gh_last_sync',String(gistState.lastSync));
+    gistState.syncing=false;
     setSyncBadge('on');
-    updateDriveUI();
+    updateGistUI();
     return true;
   }).catch(function(err){
-    console.error('Drive push failed',err);
-    driveState.syncing=false;
+    console.error('Gist push failed',err);
+    gistState.syncing=false;
     setSyncBadge('err');
-    // Token expirat? Cere unul nou
-    if((err.message||'').indexOf('401')>=0){
-      driveState.token=null;
-      localStorage.removeItem('drive_token');
-      updateDriveUI();
+    updateGistUI();
+    if(String(err.message||'').indexOf('401')>=0){
+      showToast('Token expirat — reconectează','var(--red)');
+      gistDisconnect(true);
     }
     return false;
   });
 }
 
-function scheduleDriveSync(){
-  if(!driveState.token)return;
+function scheduleGistSync(){
+  if(!gistState.token)return;
   clearTimeout(syncTimer);
-  syncTimer=setTimeout(function(){drivePush();},4000);
+  syncTimer=setTimeout(function(){gistPush();},3000);
 }
+
+// Alias retrocompatibil (folosit de addRow și deleteEdit)
+function scheduleDriveSync(){scheduleGistSync();}
 
 function setSyncBadge(state,text){
   var el=document.getElementById('syncBadge');
   if(!el)return;
   el.className='sync-badge sb-'+state;
-  el.textContent=text||(state==='on'?'DRIVE':state==='err'?'ERR':'LOCAL');
+  el.textContent=text||(state==='on'?'SYNC':state==='err'?'ERR':'LOCAL');
 }
 
-function updateDriveUI(){
-  var statusDot=document.getElementById('driveStatusDot');
-  var statusText=document.getElementById('driveStatusText');
-  var sub=document.getElementById('driveSub');
-  var actions=document.getElementById('driveActions');
-  if(!statusDot)return;
+function updateGistUI(){
+  var status=document.getElementById('gistStatus');
+  var sub=document.getElementById('gistSub');
+  var actions=document.getElementById('gistActions');
+  if(!status)return;
 
-  if(!GOOGLE_CLIENT_ID){
-    statusDot.textContent='⚪';
-    statusText.textContent='Neconfigurat';
-    sub.innerHTML='Pentru sync automat: obține un Google OAuth Client ID (vezi pașii de mai jos) și setează-l în <code>index.html</code>.';
-    actions.innerHTML='';
+  if(!gistState.token){
+    status.innerHTML='⚪ Deconectat';
+    sub.innerHTML='Sync automat cu un gist privat pe GitHub. Zero Google Cloud. Token-ul tău rămâne local.';
+    actions.innerHTML=
+      '<input type="password" id="gistTokenInput" placeholder="ghp_..." '+
+      'style="width:100%;background:var(--bg);border:1px solid var(--bd);border-radius:8px;color:var(--text);font-family:ui-monospace,Menlo,Consolas,monospace;font-size:13px;padding:10px 12px;margin-bottom:8px">'+
+      '<button class="btn btn-acc" onclick="gistConnectFromInput()">🔗 Conectează</button>';
     return;
   }
-  if(!driveState.ready){
-    statusDot.textContent='⏳';
-    statusText.textContent='Se încarcă Google API...';
-    sub.textContent='Așteaptă câteva secunde.';
-    actions.innerHTML='';
-    return;
-  }
-  if(!driveState.token){
-    statusDot.textContent='🔴';
-    statusText.textContent='Deconectat';
-    sub.textContent='Datele rămân doar pe telefon. Apasă butonul pentru sync automat cu Drive.';
-    actions.innerHTML='<button class="btn btn-acc" onclick="driveConnect()">🔗 Conectează Google Drive</button>';
-    return;
-  }
-  statusDot.textContent='🟢';
-  statusText.innerHTML='Conectat'+(driveState.syncing?' · <em>sincronizez...</em>':'');
+  status.innerHTML=(gistState.syncing?'🔵':'🟢')+' Conectat'+(gistState.syncing?' · <em>sincronizez...</em>':'');
   var lastTxt='Niciodată';
-  if(driveState.lastSync){
-    var diff=(Date.now()-driveState.lastSync)/1000;
+  if(gistState.lastSync){
+    var diff=(Date.now()-gistState.lastSync)/1000;
     if(diff<60) lastTxt='acum '+Math.floor(diff)+'s';
     else if(diff<3600) lastTxt='acum '+Math.floor(diff/60)+' min';
     else if(diff<86400) lastTxt='acum '+Math.floor(diff/3600)+' ore';
-    else lastTxt=new Date(driveState.lastSync).toLocaleDateString('ro-RO');
+    else lastTxt=new Date(gistState.lastSync).toLocaleDateString('ro-RO');
   }
-  sub.textContent='Ultima sincronizare: '+lastTxt+'. Sync automat la fiecare modificare.';
+  sub.textContent='Ultima sincronizare: '+lastTxt+' · Sync automat după fiecare salvare.';
+  var gistLink=gistState.gistId?'https://gist.github.com/'+gistState.gistId:'#';
   actions.innerHTML=
-    '<div class="btn-row"><button class="btn btn-ghost" onclick="drivePush()">🔄 Sincronizează acum</button>'+
-    '<button class="btn btn-ghost" onclick="drivePull()">⬇️ Trage din Drive</button></div>'+
-    '<button class="btn btn-danger" onclick="driveDisconnect()">🔌 Deconectează</button>';
+    '<div class="btn-row"><button class="btn btn-ghost" onclick="gistPush()">🔄 Sync acum</button>'+
+    '<button class="btn btn-ghost" onclick="gistPull().then(function(){showToast(\'Pulled ✓\');})">⬇️ Trage</button></div>'+
+    '<a href="'+gistLink+'" target="_blank" style="display:inline-block;color:var(--blue);font-size:11px;text-decoration:underline;margin:4px 0 10px">↗ Vezi gist-ul pe GitHub</a>'+
+    '<button class="btn btn-danger" onclick="gistDisconnect()">🔌 Deconectează</button>';
 }
 
-function toggleSetup(){
-  document.getElementById('setupBox').classList.toggle('show');
+// ═══════════════════════════════════════════════════════════════
+// SHARE BACKUP (folosește Web Share API nativ)
+// ═══════════════════════════════════════════════════════════════
+function shareBackup(){
+  var s=loadStore();
+  var json=JSON.stringify(s,null,2);
+  var filename='fitness-backup-'+todayISO()+'.json';
+
+  // Încearcă share ca fișier (Android+modern iOS)
+  try{
+    if(navigator.canShare){
+      var file=new File([json],filename,{type:'application/json'});
+      if(navigator.canShare({files:[file]})){
+        navigator.share({files:[file],title:'Fitness Jurnal Backup',text:'Backup date antrenament — '+todayISO()})
+          .then(function(){showToast('Backup trimis ✓');})
+          .catch(function(e){if(e.name!=='AbortError')showToast('Eroare: '+e.message,'var(--red)');});
+        return;
+      }
+    }
+  }catch(e){}
+
+  // Fallback: share text (toate browserele mobile)
+  if(navigator.share){
+    navigator.share({title:'Fitness Jurnal Backup',text:json})
+      .then(function(){showToast('Backup trimis ✓');})
+      .catch(function(e){if(e.name!=='AbortError')downloadJSON();});
+    return;
+  }
+
+  // Ultimate fallback: download
+  downloadJSON();
 }
 
 // ═══════════════════════════════════════════════════════════════
@@ -1907,8 +1923,8 @@ window.addEventListener('load',function(){
     }
   }
 
-  // Google Drive (optional)
-  initDrive();
+  // GitHub Gist sync (optional — activ dacă există token)
+  gistInit();
 });
 </script>
 </body>
