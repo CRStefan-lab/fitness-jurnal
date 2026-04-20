@@ -40,14 +40,15 @@ body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSy
 .card-bd{display:none;padding:0 14px 14px;border-top:1px solid var(--bd)}
 .card.open .card-bd{display:block}
 .sets-row{display:flex;flex-direction:column;gap:8px;padding-top:12px}
-.set-box{display:flex;align-items:center;gap:10px;background:var(--s2);border-radius:10px;padding:10px 12px;border:2px solid var(--bd);transition:border-color .2s,background .2s}
+.set-box{display:flex;align-items:center;gap:8px;background:var(--s2);border-radius:10px;padding:10px 10px;border:2px solid var(--bd);transition:border-color .2s,background .2s}
 .set-box.saved{border-color:var(--green);background:rgba(46,204,113,.06)}
-.set-lbl{font-size:12px;color:var(--muted);font-weight:800;letter-spacing:.5px;width:44px;flex-shrink:0}
-.set-inputs{display:flex;align-items:center;gap:6px;flex:1}
-.set-in{width:56px;background:var(--bg);border:1px solid var(--bd);border-radius:8px;color:var(--text);font-size:17px;font-weight:700;text-align:center;padding:8px 4px;font-family:inherit}
+.set-lbl{font-size:12px;color:var(--muted);font-weight:800;letter-spacing:.5px;width:36px;flex-shrink:0}
+.set-inputs{display:flex;align-items:center;gap:4px;flex:1;min-width:0}
+.set-in{width:52px;background:var(--bg);border:1px solid var(--bd);border-radius:8px;color:var(--text);font-size:17px;font-weight:700;text-align:center;padding:8px 2px;font-family:inherit;flex-shrink:0}
 .set-in:focus{outline:none;border-color:var(--acc)}
-.set-sep{color:var(--muted);font-size:14px;font-weight:700}
-.set-btn{background:rgba(46,204,113,.15);border:1px solid rgba(46,204,113,.4);border-radius:8px;color:var(--green);font-size:13px;font-weight:700;cursor:pointer;padding:8px 14px;font-family:inherit;flex-shrink:0}
+.set-sep{color:var(--muted);font-size:14px;font-weight:700;flex-shrink:0}
+.set-unit{font-size:11px;color:var(--muted);font-weight:600;flex-shrink:0}
+.set-btn{background:rgba(46,204,113,.15);border:1px solid rgba(46,204,113,.4);border-radius:8px;color:var(--green);font-size:12px;font-weight:700;cursor:pointer;padding:8px 10px;font-family:inherit;flex-shrink:0}
 .set-btn:active{background:rgba(46,204,113,.3)}
 .chk-count{font-size:42px;font-weight:900;color:var(--acc);text-align:center;line-height:1;padding:10px 0 4px}
 .chk-sub{font-size:12px;color:var(--muted);text-align:center;margin-bottom:14px}
@@ -726,9 +727,9 @@ function renderToday(){
       setsHtml+='<div class="set-lbl">'+(isSaved?'✓ S':'S')+s+'</div>';
       setsHtml+='<div class="set-inputs">';
       setsHtml+='<input class="set-in" type="number" inputmode="numeric" min="0" max="99" placeholder="rep" value="'+(saved.reps||'')+'" oninput="upSet(\''+sk+'\','+s+',\'reps\',this.value)">';
-      setsHtml+='<span class="set-sep">rep ×</span>';
+      setsHtml+='<span class="set-sep">×</span>';
       setsHtml+='<input class="set-in" type="number" inputmode="decimal" step="0.5" min="0" max="999" placeholder="kg" value="'+(saved.kg||'')+'" oninput="upSet(\''+sk+'\','+s+',\'kg\',this.value)">';
-      setsHtml+='<span style="font-size:12px;color:var(--muted);margin-left:2px">kg</span></div>';
+      setsHtml+='<span class="set-unit">kg</span></div>';
       setsHtml+='<button class="set-btn" onclick="saveSet(\''+sk+'\','+s+','+ei+')">'+(isSaved?'✓ Salvat':'💾 Salvează')+'</button></div>';
     }
     setsHtml+='</div>';
