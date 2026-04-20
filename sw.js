@@ -1,6 +1,6 @@
 // Service Worker — network-first pentru HTML (updates vizibile imediat)
 // cache-first pentru restul (viteză)
-const CACHE = 'fitness-v9';
+const CACHE = 'fitness-v10-fsa';
 const PRECACHE = ['./', './index.html', './manifest.json'];
 
 self.addEventListener('install', e => {

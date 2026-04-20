@@ -380,26 +380,25 @@ input:checked + .slider:before{transform:translateX(20px);background:var(--acc)}
   </p>
   <button class="btn btn-acc" onclick="shareBackup()">📤 Share backup (Drive / Mail / ...)</button>
 
-  <div class="stitle">☁️ Sync GitHub Gist</div>
-  <div class="drive-card">
-    <div class="drive-status" id="gistStatus">⚪ Deconectat</div>
-    <div class="drive-sub" id="gistSub">
-      Sync automat cu un gist privat pe GitHub. Zero Google Cloud. Token-ul tău rămâne local.
+  <div class="stitle">🗂️ Sincronizare fișier (desktop)</div>
+  <div class="drive-card" id="fsaCard">
+    <div class="drive-status" id="fsaStatus">⚪ Deconectat</div>
+    <div class="drive-sub" id="fsaSub">
+      Pe desktop Chrome/Edge poți conecta app-ul la un fișier JSON din Drive. Schimbările se salvează automat în fișier și sync-ul între device-uri se face prin Drive.
     </div>
-    <div id="gistActions"></div>
-    <a class="setup-link" onclick="document.getElementById('gistSetupBox').classList.toggle('show')">Cum obțin token-ul? ▾</a>
-    <div class="setup-box" id="gistSetupBox">
-      <strong>30 secunde, zero complicații:</strong>
+    <div id="fsaActions"></div>
+    <a class="setup-link" onclick="document.getElementById('fsaSetupBox').classList.toggle('show')">Cum funcționează? ▾</a>
+    <div class="setup-box" id="fsaSetupBox">
+      <strong>Workflow recomandat:</strong>
       <ol>
-        <li>Deschide <a href="https://github.com/settings/tokens/new?description=Fitness%20Jurnal&scopes=gist" target="_blank" style="color:var(--blue)">github.com/settings/tokens/new</a> (link preconfigurat)</li>
-        <li>La "Expiration" alege cât vrei (recomandat: <strong>No expiration</strong> pentru uz personal)</li>
-        <li>Verifică că e bifat doar <code>gist</code> (ar trebui să fie deja din link)</li>
-        <li>Jos: <strong>Generate token</strong></li>
-        <li>Copiază token-ul (începe cu <code>ghp_...</code>)</li>
-        <li>Paste mai sus în câmpul "Token" → Conectează</li>
+        <li><strong>Pe telefon</strong> (la sală): introduci datele → salvează local. Săptămânal: <code>📤 Share backup</code> → Drive (o dată pe săptămână)</li>
+        <li><strong>Pe laptop</strong> (pentru analiză): apeși <strong>📁 Alege fișier</strong> → alegi <code>fitness-data.json</code> din folder-ul tău Drive (ex: <code>G:\My Drive\Fitness\</code>)</li>
+        <li>App-ul citește fișierul + scrie automat orice modificare în el (debounce 2s)</li>
+        <li>Drive-ul sincronizează fișierul între device-uri la nivel de OS</li>
+        <li>La fiecare 30 sec app-ul verifică dacă fișierul s-a modificat extern → merge automat</li>
       </ol>
       <p style="margin-top:8px;color:var(--muted);font-size:11px">
-        🔒 Token-ul e salvat doar pe telefon (localStorage). Poți oricând să-l revoci de pe github.com/settings/tokens.
+        🔒 Fără token, fără cont. Funcționează pe Chrome/Edge desktop (nu pe mobile — pe telefon rămâne butonul Share).
       </p>
     </div>
   </div>
@@ -748,7 +747,7 @@ function showTab(name,btn){
     renderExerciseChart();
   }
   if(name==='setari'){
-    updateGistUI();
+    updateFsaUI();
     initNotifUI();
     updateStorageInfo();
     updateInfo();
@@ -1225,7 +1224,10 @@ function updateInfo(){
       :Notification.permission==='denied'?'<span style="color:var(--red)">Blocate</span>':'Neautorizate';
   }
   set('infoNotif',notifState);
-  set('infoSync',gistState.token?'<span style="color:var(--green)">GitHub Gist conectat</span>':'<span style="color:var(--muted)">Doar local</span>');
+  var syncTxt=!fsaSupported()?'<span style="color:var(--muted)">Doar local (mobile)</span>':
+    fsaState.handle?'<span style="color:var(--green)">Fișier: '+fsaState.fileName+'</span>':
+    '<span style="color:var(--muted)">Doar local</span>';
+  set('infoSync',syncTxt);
   var rows=loadStore().rows.length;
   set('infoRows',rows);
   if('serviceWorker' in navigator){
@@ -1237,147 +1239,211 @@ function updateInfo(){
 }
 
 // ═══════════════════════════════════════════════════════════════
-// GITHUB GIST SYNC (zero setup — doar un token)
+// FILE SYSTEM ACCESS API — sync cu fișier pe disc (ex: folder Drive)
+// Funcționează DOAR pe Chrome/Edge desktop. Pe mobile fallback la Share.
+// Inspirat din abordarea cpiaam_app_modular.
 // ═══════════════════════════════════════════════════════════════
-var GIST_FILENAME='fitness-jurnal.json';
-var GIST_DESCRIPTION='Fitness Jurnal — Backup (do not delete)';
-var gistState={token:null,gistId:null,lastSync:null,syncing:false};
+var fsaState={handle:null,lastModified:0,lastSync:null,syncing:false,polling:null,fileName:''};
 var syncTimer=null;
 
-function gistInit(){
-  gistState.token=localStorage.getItem('gh_token')||null;
-  gistState.gistId=localStorage.getItem('gh_gist_id')||null;
-  gistState.lastSync=parseInt(localStorage.getItem('gh_last_sync')||'0')||null;
-  updateGistUI();
-  if(gistState.token){
+function fsaSupported(){return 'showOpenFilePicker' in window && 'showSaveFilePicker' in window;}
+
+// IndexedDB pentru persistarea file handle-ului
+function fsaDb(){
+  return new Promise(function(resolve,reject){
+    var req=indexedDB.open('fitness-fsa',1);
+    req.onupgradeneeded=function(){req.result.createObjectStore('handles');};
+    req.onsuccess=function(){resolve(req.result);};
+    req.onerror=function(){reject(req.error);};
+  });
+}
+
+function fsaSaveHandle(h){
+  return fsaDb().then(function(db){
+    return new Promise(function(resolve,reject){
+      var tx=db.transaction('handles','readwrite');
+      tx.objectStore('handles').put(h,'sync-file');
+      tx.oncomplete=function(){resolve();};
+      tx.onerror=function(){reject(tx.error);};
+    });
+  });
+}
+
+function fsaLoadHandle(){
+  return fsaDb().then(function(db){
+    return new Promise(function(resolve){
+      var req=db.transaction('handles','readonly').objectStore('handles').get('sync-file');
+      req.onsuccess=function(){resolve(req.result||null);};
+      req.onerror=function(){resolve(null);};
+    });
+  });
+}
+
+function fsaClearHandle(){
+  return fsaDb().then(function(db){
+    return new Promise(function(resolve){
+      var tx=db.transaction('handles','readwrite');
+      tx.objectStore('handles').delete('sync-file');
+      tx.oncomplete=resolve;tx.onerror=resolve;
+    });
+  });
+}
+
+function fsaInit(){
+  if(!fsaSupported()){updateFsaUI();setSyncBadge('off');return;}
+  fsaLoadHandle().then(function(h){
+    if(!h){updateFsaUI();setSyncBadge('off');return;}
+    // Check permission — fără gest user, browser-ul ar putea refuza. Afișăm stare "restore" cu buton.
+    h.queryPermission({mode:'readwrite'}).then(function(perm){
+      if(perm==='granted'){
+        fsaState.handle=h;
+        fsaState.fileName=h.name;
+        setSyncBadge('on');
+        updateFsaUI();
+        fsaReadFile().then(startFilePolling);
+      }else{
+        // Nu avem permisiune automat — afișăm buton "Reconectează"
+        fsaState.handle=h;fsaState.fileName=h.name;
+        updateFsaUI(true); // needReconnect
+      }
+    }).catch(function(){updateFsaUI();});
+  });
+}
+
+function fsaPick(){
+  if(!fsaSupported()){showToast('Browser-ul nu suportă — folosește Chrome/Edge desktop','var(--red)');return;}
+  window.showOpenFilePicker({
+    types:[{description:'JSON',accept:{'application/json':['.json']}}],
+    excludeAcceptAllOption:false,multiple:false
+  }).then(function(handles){
+    var h=handles[0];
+    return h.requestPermission({mode:'readwrite'}).then(function(perm){
+      if(perm!=='granted'){showToast('Permisiune refuzată','var(--red)');return;}
+      fsaState.handle=h;fsaState.fileName=h.name;
+      return fsaSaveHandle(h).then(function(){
+        // Citește fișierul + merge cu datele locale
+        return fsaReadFile().then(function(){
+          // Scrie înapoi (pentru a include datele care existau deja local)
+          return fsaWriteFile();
+        });
+      });
+    });
+  }).then(function(){
+    startFilePolling();
     setSyncBadge('on');
-    // Pull initial la deschiderea app-ului (să aducem date noi de pe alt device)
-    gistPull().catch(function(err){
-      console.warn('Initial pull failed',err);
-      if(String(err.message||'').indexOf('401')>=0){
-        // Token invalid — curățăm
-        showToast('Token GitHub expirat/revocat','var(--red)');
-        gistDisconnect(true);
-      }
+    showToast('Sincronizat cu '+fsaState.fileName+' ✓');
+    updateFsaUI();
+  }).catch(function(e){
+    if(e.name!=='AbortError'){showToast('Eroare: '+e.message,'var(--red)');setSyncBadge('err');}
+  });
+}
+
+function fsaCreateNew(){
+  if(!fsaSupported()){showToast('Browser-ul nu suportă','var(--red)');return;}
+  window.showSaveFilePicker({
+    suggestedName:'fitness-data.json',
+    types:[{description:'JSON',accept:{'application/json':['.json']}}]
+  }).then(function(h){
+    return h.requestPermission({mode:'readwrite'}).then(function(perm){
+      if(perm!=='granted'){showToast('Permisiune refuzată','var(--red)');return;}
+      fsaState.handle=h;fsaState.fileName=h.name;
+      return fsaSaveHandle(h).then(fsaWriteFile);
     });
-  }else{
+  }).then(function(){
+    startFilePolling();
+    setSyncBadge('on');
+    showToast('Fișier creat: '+fsaState.fileName+' ✓');
+    updateFsaUI();
+  }).catch(function(e){
+    if(e.name!=='AbortError'){showToast('Eroare: '+e.message,'var(--red)');setSyncBadge('err');}
+  });
+}
+
+function fsaReconnect(){
+  if(!fsaState.handle)return;
+  fsaState.handle.requestPermission({mode:'readwrite'}).then(function(perm){
+    if(perm!=='granted'){showToast('Permisiune refuzată','var(--red)');return;}
+    setSyncBadge('on');
+    fsaReadFile().then(startFilePolling).then(function(){showToast('Reconectat ✓');updateFsaUI();});
+  });
+}
+
+function fsaReadFile(){
+  if(!fsaState.handle) return Promise.resolve();
+  return fsaState.handle.getFile().then(function(file){
+    if(file.lastModified<=fsaState.lastModified && fsaState.lastModified>0) return; // nicio schimbare
+    fsaState.lastModified=file.lastModified;
+    return file.text().then(function(text){
+      if(!text||!text.trim())return;
+      try{
+        var remote=JSON.parse(text);
+        if(remote.rows){
+          mergeRemote(remote);
+          if(document.getElementById('tab-istoric').classList.contains('act'))renderHistoric();
+          if(document.getElementById('tab-istoric').classList.contains('act'))renderMeasurements();
+          if(document.getElementById('tab-progres').classList.contains('act')){renderBodyChart();renderExerciseChart();}
+          if(document.getElementById('tab-setari').classList.contains('act'))updateStorageInfo();
+        }
+      }catch(e){console.error('Parse file failed',e);}
+    });
+  }).catch(function(e){
+    console.warn('Read file failed',e);
+    if(e.name==='NotFoundError'){
+      showToast('Fișierul a dispărut — deconectat','var(--red)');
+      fsaDisconnect(true);
+    }
+  });
+}
+
+function fsaWriteFile(){
+  if(!fsaState.handle) return Promise.resolve();
+  fsaState.syncing=true;
+  setSyncBadge('on','sync...');
+  return fsaState.handle.createWritable().then(function(writable){
+    return writable.write(JSON.stringify(loadStore(),null,2)).then(function(){
+      return writable.close();
+    });
+  }).then(function(){
+    return fsaState.handle.getFile();
+  }).then(function(file){
+    fsaState.lastModified=file.lastModified;
+    fsaState.lastSync=Date.now();
+    fsaState.syncing=false;
+    setSyncBadge('on');
+    updateFsaUI();
+  }).catch(function(e){
+    console.error('Write file failed',e);
+    fsaState.syncing=false;
+    setSyncBadge('err');
+    showToast('Eroare scriere: '+e.message,'var(--red)');
+  });
+}
+
+function startFilePolling(){
+  clearInterval(fsaState.polling);
+  fsaState.polling=setInterval(function(){fsaReadFile();},30000);
+}
+
+function fsaDisconnect(silent){
+  if(!silent && !confirm('Oprești sincronizarea cu fișierul? Datele locale rămân.'))return;
+  clearInterval(fsaState.polling);
+  clearTimeout(syncTimer);
+  fsaClearHandle().then(function(){
+    fsaState={handle:null,lastModified:0,lastSync:null,syncing:false,polling:null,fileName:''};
     setSyncBadge('off');
-  }
-}
-
-function gistConnectFromInput(){
-  var input=document.getElementById('gistTokenInput');
-  if(!input||!input.value.trim()){showToast('Paste token-ul GitHub','var(--acc2)');return;}
-  gistConnect(input.value.trim());
-}
-
-function gistConnect(token){
-  setSyncBadge('on','conectare...');
-  // Validează token + găsește/creează gist
-  fetch('https://api.github.com/user',{headers:{Authorization:'Bearer '+token,Accept:'application/vnd.github+json'}})
-    .then(function(r){
-      if(!r.ok) throw new Error('Token invalid (HTTP '+r.status+')');
-      return r.json();
-    })
-    .then(function(user){
-      localStorage.setItem('gh_token',token);
-      gistState.token=token;
-      showToast('Conectat ca '+user.login+' ✓');
-      return gistFindOrCreate();
-    })
-    .then(function(){
-      return gistPull();
-    })
-    .then(function(){
-      return gistPush();
-    })
-    .then(function(){
-      updateGistUI();
-      setSyncBadge('on');
-    })
-    .catch(function(err){
-      showToast('Eroare: '+err.message,'var(--red)');
-      setSyncBadge('err');
-      updateGistUI();
-    });
-}
-
-function gistDisconnect(silent){
-  if(!silent && !confirm('Deconectezi GitHub Gist? Datele locale rămân. Gist-ul rămâne pe GitHub (poți să-l ștergi manual dacă vrei).'))return;
-  localStorage.removeItem('gh_token');
-  localStorage.removeItem('gh_gist_id');
-  localStorage.removeItem('gh_last_sync');
-  gistState={token:null,gistId:null,lastSync:null,syncing:false};
-  setSyncBadge('off');
-  updateGistUI();
-  if(!silent)showToast('Deconectat');
-}
-
-function gistFindOrCreate(){
-  if(gistState.gistId) return Promise.resolve(gistState.gistId);
-  // Caută în gists existente
-  return fetch('https://api.github.com/gists?per_page=100',{
-    headers:{Authorization:'Bearer '+gistState.token,Accept:'application/vnd.github+json'}
-  }).then(function(r){
-    if(!r.ok) throw new Error('List gists failed: '+r.status);
-    return r.json();
-  }).then(function(gists){
-    var found=gists.find(function(g){return g.description===GIST_DESCRIPTION;});
-    if(found){
-      gistState.gistId=found.id;
-      localStorage.setItem('gh_gist_id',found.id);
-      return found.id;
-    }
-    // Creează nou
-    var data=loadStore();
-    var files={};files[GIST_FILENAME]={content:JSON.stringify(data,null,2)};
-    return fetch('https://api.github.com/gists',{
-      method:'POST',
-      headers:{Authorization:'Bearer '+gistState.token,Accept:'application/vnd.github+json','Content-Type':'application/json'},
-      body:JSON.stringify({description:GIST_DESCRIPTION,public:false,files:files})
-    }).then(function(r){
-      if(!r.ok) throw new Error('Create gist failed: '+r.status);
-      return r.json();
-    }).then(function(g){
-      gistState.gistId=g.id;
-      localStorage.setItem('gh_gist_id',g.id);
-      return g.id;
-    });
+    updateFsaUI();
+    if(!silent)showToast('Deconectat');
   });
 }
 
-function gistPull(){
-  if(!gistState.token||!gistState.gistId){
-    if(gistState.token) return gistFindOrCreate().then(gistPull);
-    return Promise.resolve(null);
-  }
-  return fetch('https://api.github.com/gists/'+gistState.gistId,{
-    headers:{Authorization:'Bearer '+gistState.token,Accept:'application/vnd.github+json'}
-  }).then(function(r){
-    if(!r.ok) throw new Error('Pull failed: '+r.status);
-    return r.json();
-  }).then(function(gist){
-    var file=gist.files[GIST_FILENAME];
-    if(!file) return null;
-    if(file.truncated){
-      return fetch(file.raw_url).then(function(r){return r.text();});
-    }
-    return file.content;
-  }).then(function(content){
-    if(!content) return null;
-    try{
-      var remote=JSON.parse(content);
-      if(remote.rows){
-        mergeRemote(remote);
-        renderHistoric();renderMeasurements();updateStorageInfo();
-      }
-      return remote;
-    }catch(e){
-      console.error('Parse gist JSON failed',e);
-      return null;
-    }
-  });
+function scheduleFileSync(){
+  if(!fsaState.handle)return;
+  clearTimeout(syncTimer);
+  syncTimer=setTimeout(function(){fsaWriteFile();},2000);
 }
+
+// Alias retrocompatibil (apelat de addRow / deleteEdit)
+function scheduleDriveSync(){scheduleFileSync();}
 
 function mergeRemote(remote){
   if(!remote||!remote.rows)return;
@@ -1398,48 +1464,6 @@ function mergeRemote(remote){
   saveStore({version:1,rows:merged});
 }
 
-function gistPush(){
-  if(!gistState.token) return Promise.resolve(false);
-  if(!gistState.gistId) return gistFindOrCreate().then(gistPush);
-  gistState.syncing=true;
-  setSyncBadge('on','sync...');
-  updateGistUI();
-  var data=loadStore();
-  var files={};files[GIST_FILENAME]={content:JSON.stringify(data,null,2)};
-  return fetch('https://api.github.com/gists/'+gistState.gistId,{
-    method:'PATCH',
-    headers:{Authorization:'Bearer '+gistState.token,Accept:'application/vnd.github+json','Content-Type':'application/json'},
-    body:JSON.stringify({files:files})
-  }).then(function(r){
-    if(!r.ok) throw new Error('Push failed: '+r.status);
-    gistState.lastSync=Date.now();
-    localStorage.setItem('gh_last_sync',String(gistState.lastSync));
-    gistState.syncing=false;
-    setSyncBadge('on');
-    updateGistUI();
-    return true;
-  }).catch(function(err){
-    console.error('Gist push failed',err);
-    gistState.syncing=false;
-    setSyncBadge('err');
-    updateGistUI();
-    if(String(err.message||'').indexOf('401')>=0){
-      showToast('Token expirat — reconectează','var(--red)');
-      gistDisconnect(true);
-    }
-    return false;
-  });
-}
-
-function scheduleGistSync(){
-  if(!gistState.token)return;
-  clearTimeout(syncTimer);
-  syncTimer=setTimeout(function(){gistPush();},3000);
-}
-
-// Alias retrocompatibil (folosit de addRow și deleteEdit)
-function scheduleDriveSync(){scheduleGistSync();}
-
 function setSyncBadge(state,text){
   var el=document.getElementById('syncBadge');
   if(!el)return;
@@ -1447,37 +1471,49 @@ function setSyncBadge(state,text){
   el.textContent=text||(state==='on'?'SYNC':state==='err'?'ERR':'LOCAL');
 }
 
-function updateGistUI(){
-  var status=document.getElementById('gistStatus');
-  var sub=document.getElementById('gistSub');
-  var actions=document.getElementById('gistActions');
+function updateFsaUI(needReconnect){
+  var status=document.getElementById('fsaStatus');
+  var sub=document.getElementById('fsaSub');
+  var actions=document.getElementById('fsaActions');
   if(!status)return;
 
-  if(!gistState.token){
-    status.innerHTML='⚪ Deconectat';
-    sub.innerHTML='Sync automat cu un gist privat pe GitHub. Zero Google Cloud. Token-ul tău rămâne local.';
-    actions.innerHTML=
-      '<input type="password" id="gistTokenInput" placeholder="ghp_..." '+
-      'style="width:100%;background:var(--bg);border:1px solid var(--bd);border-radius:8px;color:var(--text);font-family:ui-monospace,Menlo,Consolas,monospace;font-size:13px;padding:10px 12px;margin-bottom:8px">'+
-      '<button class="btn btn-acc" onclick="gistConnectFromInput()">🔗 Conectează</button>';
+  if(!fsaSupported()){
+    status.innerHTML='📱 Nu e disponibil';
+    sub.innerHTML='Pe telefon (Android/iOS) File System Access API nu merge. Folosește butonul <strong>📤 Share backup</strong> de mai sus pentru a salva manual pe Drive.';
+    actions.innerHTML='';
     return;
   }
-  status.innerHTML=(gistState.syncing?'🔵':'🟢')+' Conectat'+(gistState.syncing?' · <em>sincronizez...</em>':'');
-  var lastTxt='Niciodată';
-  if(gistState.lastSync){
-    var diff=(Date.now()-gistState.lastSync)/1000;
+
+  if(!fsaState.handle){
+    status.innerHTML='⚪ Deconectat';
+    sub.innerHTML='Alege un fișier JSON (dacă există) sau creează unul nou — ideal într-un folder Drive pentru sync între device-uri.';
+    actions.innerHTML=
+      '<div class="btn-row"><button class="btn btn-acc" onclick="fsaPick()">📁 Alege fișier</button>'+
+      '<button class="btn btn-ghost" onclick="fsaCreateNew()">➕ Creează nou</button></div>';
+    return;
+  }
+
+  if(needReconnect){
+    status.innerHTML='⏸️ '+fsaState.fileName+' · pauză';
+    sub.innerHTML='Permisiunea a expirat (normal după închidere browser). Apasă pentru a reactiva.';
+    actions.innerHTML='<button class="btn btn-acc" onclick="fsaReconnect()">🔓 Reconectează</button><button class="btn btn-danger" onclick="fsaDisconnect()">🔌 Uită fișierul</button>';
+    return;
+  }
+
+  status.innerHTML=(fsaState.syncing?'🔵':'🟢')+' '+fsaState.fileName+(fsaState.syncing?' · <em>sincronizez...</em>':'');
+  var lastTxt='—';
+  if(fsaState.lastSync){
+    var diff=(Date.now()-fsaState.lastSync)/1000;
     if(diff<60) lastTxt='acum '+Math.floor(diff)+'s';
     else if(diff<3600) lastTxt='acum '+Math.floor(diff/60)+' min';
     else if(diff<86400) lastTxt='acum '+Math.floor(diff/3600)+' ore';
-    else lastTxt=new Date(gistState.lastSync).toLocaleDateString('ro-RO');
+    else lastTxt=new Date(fsaState.lastSync).toLocaleDateString('ro-RO');
   }
-  sub.textContent='Ultima sincronizare: '+lastTxt+' · Sync automat după fiecare salvare.';
-  var gistLink=gistState.gistId?'https://gist.github.com/'+gistState.gistId:'#';
+  sub.innerHTML='Ultima scriere: '+lastTxt+' · Scriere automată 2s după fiecare modificare · Citire automată la 30s.';
   actions.innerHTML=
-    '<div class="btn-row"><button class="btn btn-ghost" onclick="gistPush()">🔄 Sync acum</button>'+
-    '<button class="btn btn-ghost" onclick="gistPull().then(function(){showToast(\'Pulled ✓\');})">⬇️ Trage</button></div>'+
-    '<a href="'+gistLink+'" target="_blank" style="display:inline-block;color:var(--blue);font-size:11px;text-decoration:underline;margin:4px 0 10px">↗ Vezi gist-ul pe GitHub</a>'+
-    '<button class="btn btn-danger" onclick="gistDisconnect()">🔌 Deconectează</button>';
+    '<div class="btn-row"><button class="btn btn-ghost" onclick="fsaWriteFile()">💾 Scrie acum</button>'+
+    '<button class="btn btn-ghost" onclick="fsaReadFile().then(function(){showToast(\'Verificat ✓\');})">🔄 Verifică</button></div>'+
+    '<button class="btn btn-danger" onclick="fsaDisconnect()">🔌 Oprește sync</button>';
 }
 
 // ═══════════════════════════════════════════════════════════════
@@ -2072,8 +2108,8 @@ window.addEventListener('load',function(){
     }
   }
 
-  // GitHub Gist sync (optional — activ dacă există token)
-  gistInit();
+  // File System Access sync (desktop Chrome/Edge) — restaurează handle-ul salvat
+  fsaInit();
 });
 </script>
 </body>
