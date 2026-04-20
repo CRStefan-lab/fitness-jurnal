@@ -237,6 +237,10 @@ input:checked + .slider:before{transform:translateX(20px);background:var(--acc)}
   💡 <strong>Adaugă pe telefon:</strong> Share → "Add to Home Screen" (iOS) sau meniu → "Install app" (Android)
 </div>
 
+<div class="install-hint" id="updateBanner" style="background:rgba(20,184,166,.12);border-color:rgba(20,184,166,.4);color:var(--acc)">
+  🚀 <strong>Versiune nouă disponibilă!</strong> <button onclick="applyUpdate()" style="color:var(--acc);font-weight:800;text-decoration:underline;background:none;border:none;cursor:pointer;padding:0 4px">Actualizează →</button>
+</div>
+
 <nav class="bnav">
   <button class="nb act" onclick="showTab('azi',this)"><span class="ico">🏋️</span>Azi</button>
   <button class="nb" onclick="showTab('nutritie',this)"><span class="ico">🥗</span>Nutriție</button>
@@ -446,13 +450,21 @@ input:checked + .slider:before{transform:translateX(20px);background:var(--acc)}
     <span id="storageInfo"></span>
   </p>
 
+  <div class="stitle">🚀 Versiune app</div>
+  <div class="rules-box" style="margin-bottom:10px">
+    <div class="rule-row">📦 Versiune curentă: <strong id="infoSw" style="color:var(--acc)">—</strong></div>
+    <div class="rule-row" style="color:var(--muted);font-size:11px;line-height:1.4">
+      App-ul verifică automat update-uri când îl deschizi sau intri pe el. Dacă apare banner "Versiune nouă disponibilă" → apasă "Actualizează".
+    </div>
+  </div>
+  <button class="btn btn-ghost" onclick="manualUpdateCheck()">🔄 Verifică update acum</button>
+
   <div class="stitle">ℹ️ Info</div>
   <div class="rules-box">
     <div class="rule-row">📱 PWA instalat: <strong id="infoPwa" style="color:var(--text)">verific...</strong></div>
     <div class="rule-row">🔔 Notificări: <strong id="infoNotif" style="color:var(--text)">verific...</strong></div>
     <div class="rule-row">☁️ Sync: <strong id="infoSync" style="color:var(--text)">verific...</strong></div>
     <div class="rule-row">📊 Înregistrări: <strong id="infoRows" style="color:var(--text)">—</strong></div>
-    <div class="rule-row">📦 Cache SW: <strong id="infoSw" style="color:var(--text)">—</strong></div>
     <div class="rule-row">🔗 <a href="https://github.com/CRStefan-lab/fitness-jurnal" target="_blank" style="color:var(--blue)">github.com/CRStefan-lab/fitness-jurnal</a></div>
   </div>
 </div>
@@ -1217,8 +1229,11 @@ function updateInfo(){
   var rows=loadStore().rows.length;
   set('infoRows',rows);
   if('serviceWorker' in navigator){
-    caches.keys().then(function(keys){set('infoSw',keys.join(', ')||'niciunul');});
-  }else{set('infoSw','nu e disponibil');}
+    caches.keys().then(function(keys){
+      var v=keys[0]||'nicio versiune';
+      set('infoSw',v);
+    });
+  }else{set('infoSw','SW nu e disponibil');}
 }
 
 // ═══════════════════════════════════════════════════════════════
@@ -1954,6 +1969,39 @@ function dismissInstallHint(){
   localStorage.setItem('installHintDismissed','1');
 }
 
+// SW UPDATE BANNER
+var _pendingSW=null;
+function showUpdateBanner(sw){
+  _pendingSW=sw;
+  document.getElementById('updateBanner').classList.add('show');
+  showToast('Versiune nouă disponibilă 🚀');
+}
+function applyUpdate(){
+  document.getElementById('updateBanner').classList.remove('show');
+  if(_pendingSW){
+    _pendingSW.postMessage({type:'SKIP_WAITING'});
+    // controllerchange listener va reload pagina automat
+  }else{
+    location.reload();
+  }
+}
+
+function manualUpdateCheck(){
+  if(!('serviceWorker' in navigator)){showToast('Browser nu suportă SW','var(--red)');return;}
+  showToast('Verific update-uri...');
+  navigator.serviceWorker.getRegistration().then(function(reg){
+    if(!reg){showToast('SW neînregistrat','var(--acc2)');return;}
+    reg.update().then(function(){
+      // Dacă apare update, showUpdateBanner e apelat automat. Dacă nu, informăm.
+      setTimeout(function(){
+        if(!document.getElementById('updateBanner').classList.contains('show')){
+          showToast('Ești pe ultima versiune ✓');
+        }
+      },1500);
+    }).catch(function(){showToast('Verificare eșuată — ești offline?','var(--acc2)');});
+  });
+}
+
 // ═══════════════════════════════════════════════════════════════
 // INIT
 // ═══════════════════════════════════════════════════════════════
@@ -1975,9 +2023,36 @@ window.addEventListener('load',function(){
     setTimeout(function(){document.getElementById('installHint').classList.add('show');},1500);
   }
 
-  // Service Worker
+  // Service Worker cu auto-update
   if('serviceWorker' in navigator){
-    navigator.serviceWorker.register('./sw.js').catch(function(err){console.warn('SW register failed',err);});
+    navigator.serviceWorker.register('./sw.js').then(function(reg){
+      // La fiecare revenire în app, caută update-uri
+      function checkForUpdate(){reg.update().catch(function(){});}
+      document.addEventListener('visibilitychange',function(){
+        if(document.visibilityState==='visible')checkForUpdate();
+      });
+      window.addEventListener('focus',checkForUpdate);
+
+      // Când se detectează SW nou
+      reg.addEventListener('updatefound',function(){
+        var newSW=reg.installing;
+        if(!newSW)return;
+        newSW.addEventListener('statechange',function(){
+          if(newSW.state==='installed' && navigator.serviceWorker.controller){
+            // Versiune nouă instalată, în așteptare. Forțează activare.
+            showUpdateBanner(newSW);
+          }
+        });
+      });
+
+      // Auto-reload când noul SW preia controlul
+      var refreshing=false;
+      navigator.serviceWorker.addEventListener('controllerchange',function(){
+        if(refreshing)return;
+        refreshing=true;
+        window.location.reload();
+      });
+    }).catch(function(err){console.warn('SW register failed',err);});
   }
 
   // Inițializare Progres tab (segmente + listeners)
