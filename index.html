@@ -221,6 +221,15 @@ input:checked + .slider:before{transform:translateX(20px);background:var(--acc)}
 .modal-inputs input:focus{outline:none;border-color:var(--acc)}
 .modal-btns{display:flex;gap:8px;flex-wrap:wrap}
 .modal-btns .btn{flex:1;margin-bottom:0;min-width:45%}
+.day-picker{display:flex;gap:4px;margin-bottom:12px}
+.dp-btn{flex:1;background:var(--s2);border:1px solid var(--bd);color:var(--muted);border-radius:9px;padding:10px 0;font-size:12px;font-weight:800;cursor:pointer;font-family:inherit;letter-spacing:.3px;transition:all .15s;position:relative}
+.dp-btn.today{border-color:rgba(94,234,212,.4);color:var(--acc2)}
+.dp-btn.today::before{content:'•';position:absolute;top:1px;right:4px;color:var(--acc2);font-size:14px;line-height:1}
+.dp-btn.selected{background:linear-gradient(135deg,var(--acc) 0%,var(--acc-dim) 100%);color:#05201d;border-color:var(--acc);box-shadow:var(--shadow-acc)}
+.dp-btn.selected.today::before{color:#05201d}
+.override-banner{background:rgba(245,158,11,.1);border:1px solid rgba(245,158,11,.4);color:#f5a623;border-radius:10px;padding:10px 12px;font-size:12px;margin-bottom:12px;display:flex;align-items:center;gap:8px;line-height:1.4}
+.override-banner strong{color:#fbbf24}
+.override-banner button{background:none;border:none;color:#fbbf24;text-decoration:underline;font-weight:800;cursor:pointer;font-family:inherit;font-size:12px;padding:0;margin-left:auto;flex-shrink:0}
 </style>
 </head>
 <body>
@@ -716,9 +725,28 @@ function roToIso(ro){
 // STATE
 // ═══════════════════════════════════════════════════════════════
 var setData={},checkData={},currentNutDay=0,currentWeekOffset=0;
+var currentWorkoutDay=null; // null = folosește ziua reală. altfel = index zi override
+var lastDetectedDay=null;   // pentru detectarea trecerii peste miezul nopții
 
 function today(){return new Date().toLocaleDateString('ro-RO');}
 function todayIdx(){var d=new Date().getDay();return d===0?6:d-1;}
+function getEffectiveDayIdx(){return currentWorkoutDay!==null?currentWorkoutDay:todayIdx();}
+
+function checkDayChanged(){
+  var now=todayIdx();
+  if(lastDetectedDay!==null && lastDetectedDay!==now){
+    // Ziua s-a schimbat (peste miezul nopții sau alt device)
+    currentWorkoutDay=null; // reset override
+    currentNutDay=now;
+    setData={};checkData={}; // reset UI state (va fi repopulat din storage)
+    preloadToday();
+    initHeader();
+    renderToday();
+    initNutritie();
+    showToast('Zi nouă: '+schedule[now].day+' 🌅');
+  }
+  lastDetectedDay=now;
+}
 function todayISO(){
   var d=new Date();
   return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
@@ -769,9 +797,27 @@ function initHeader(){
 // TAB AZI — ANTRENAMENT + CHECKLIST
 // ═══════════════════════════════════════════════════════════════
 function renderToday(){
-  var idx=todayIdx(),sch=schedule[idx],ex=exercises[sch.exDay];
+  var realIdx=todayIdx();
+  var idx=getEffectiveDayIdx(),sch=schedule[idx],ex=exercises[sch.exDay];
   var cont=document.getElementById('azi-content'),html='';
-  html+='<div class="stitle">'+ex.icon+' Antrenament de azi</div>';
+
+  // Day picker
+  var dayShort=['L','Ma','Mi','J','V','S','D'];
+  html+='<div class="day-picker">';
+  for(var di=0;di<7;di++){
+    var cls=[];
+    if(di===realIdx)cls.push('today');
+    if(di===idx)cls.push('selected');
+    html+='<button class="dp-btn '+cls.join(' ')+'" onclick="setWorkoutDay('+di+')" title="'+schedule[di].day+'">'+dayShort[di]+'</button>';
+  }
+  html+='</div>';
+
+  // Banner override
+  if(currentWorkoutDay!==null && currentWorkoutDay!==realIdx){
+    html+='<div class="override-banner">⚠️ Faci antrenamentul de <strong>'+schedule[currentWorkoutDay].day+'</strong> pe <strong>'+schedule[realIdx].day+' ('+today()+')</strong><button onclick="resetWorkoutDay()">↺ Reset</button></div>';
+  }
+
+  html+='<div class="stitle">'+ex.icon+' Antrenament'+(currentWorkoutDay!==null&&currentWorkoutDay!==realIdx?' · '+schedule[idx].day:' de azi')+'</div>';
   html+='<div class="card" style="margin-bottom:12px;border-color:rgba(20,184,166,.35)">';
   html+='<div class="card-hd" style="cursor:default"><div class="card-ico" style="background:rgba(20,184,166,.15);font-size:18px">'+ex.icon+'</div>';
   html+='<div><div class="card-ttl">'+ex.label+'</div><div class="card-sub">'+ex.duration+' &nbsp;·&nbsp; ⭐ = progres &nbsp;·&nbsp; Tempo 2–1–2</div></div></div></div>';
@@ -821,11 +867,24 @@ function upSet(keyEnc,setNum,field,val){
   setData[key][setNum].savedOnServer=false;
 }
 
+function setWorkoutDay(idx){
+  var realIdx=todayIdx();
+  if(idx===realIdx){currentWorkoutDay=null;}
+  else{currentWorkoutDay=idx;}
+  renderToday();
+}
+
+function resetWorkoutDay(){
+  currentWorkoutDay=null;
+  renderToday();
+  showToast('Revenit la '+schedule[todayIdx()].day);
+}
+
 function saveSet(keyEnc,setNum,ei){
   var key=decodeURIComponent(keyEnc);
   var d=setData[key]&&setData[key][setNum];
   if(!d||(!d.reps&&!d.kg)){showToast('Introduceți rep și kg!','var(--acc2)');return;}
-  var idx=todayIdx();
+  var idx=getEffectiveDayIdx();
   var ok=addRow({date:today(),day:schedule[idx].day,type:'antrenament',exercise:key,set:setNum,reps:parseFloat(d.reps)||0,kg:parseFloat(d.kg)||0,note:''});
   if(ok){
     setData[key][setNum].savedOnServer=true;
@@ -857,7 +916,7 @@ function toggleCheck(id,el){
   el.classList.toggle('done');
   el.querySelector('.chk-box').textContent=checkData[id]?'✓':'';
   updateChkCount();
-  var idx=todayIdx();
+  var idx=getEffectiveDayIdx();
   addRow({date:today(),day:schedule[idx].day,type:'checklist',exercise:id,set:'',reps:'',kg:'',note:checkData[id]?'DA':'NU'});
 }
 
@@ -2044,9 +2103,17 @@ function manualUpdateCheck(){
 window.addEventListener('load',function(){
   initHeader();
   currentNutDay=todayIdx();
+  lastDetectedDay=todayIdx();
   preloadToday();
   renderToday();
   initNutritie();
+
+  // Detectare schimbare zi (miezul nopții, alt timezone, app lăsat deschis)
+  document.addEventListener('visibilitychange',function(){
+    if(document.visibilityState==='visible')checkDayChanged();
+  });
+  window.addEventListener('focus',checkDayChanged);
+  setInterval(checkDayChanged,60000); // check la fiecare 60s și când app e deschis
   initProgram();
   initGhid();
   // măsurători: setează data implicit azi
