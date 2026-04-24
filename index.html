@@ -221,6 +221,13 @@ input:checked + .slider:before{transform:translateX(20px);background:var(--acc)}
 .modal-inputs input:focus{outline:none;border-color:var(--acc)}
 .modal-btns{display:flex;gap:8px;flex-wrap:wrap}
 .modal-btns .btn{flex:1;margin-bottom:0;min-width:45%}
+.date-picker-row{display:flex;gap:6px;margin-bottom:8px;align-items:center}
+.date-picker-row label{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;font-weight:700;flex-shrink:0}
+.date-picker-row input[type="date"]{flex:1;background:var(--s2);border:1px solid var(--bd);border-radius:9px;color:var(--text);font-family:inherit;font-size:13px;padding:8px 10px;font-weight:700;color-scheme:dark}
+.date-picker-row input[type="date"]:focus{outline:none;border-color:var(--acc)}
+.date-quick-btn{background:var(--s2);border:1px solid var(--bd);border-radius:9px;color:var(--muted);font-family:inherit;font-size:11px;font-weight:800;padding:8px 10px;cursor:pointer;letter-spacing:.3px;flex-shrink:0}
+.date-quick-btn:active{border-color:var(--acc);color:var(--acc)}
+.date-quick-btn.act{background:rgba(20,184,166,.15);border-color:var(--acc);color:var(--acc)}
 .day-picker{display:flex;gap:4px;margin-bottom:12px}
 .dp-btn{flex:1;background:var(--s2);border:1px solid var(--bd);color:var(--muted);border-radius:9px;padding:10px 0;font-size:12px;font-weight:800;cursor:pointer;font-family:inherit;letter-spacing:.3px;transition:all .15s;position:relative}
 .dp-btn.today{border-color:rgba(94,234,212,.4);color:var(--acc2)}
@@ -725,20 +732,39 @@ function roToIso(ro){
 // STATE
 // ═══════════════════════════════════════════════════════════════
 var setData={},checkData={},currentNutDay=0,currentWeekOffset=0;
-var currentWorkoutDay=null; // null = folosește ziua reală. altfel = index zi override
-var lastDetectedDay=null;   // pentru detectarea trecerii peste miezul nopții
+var currentWorkoutDay=null;  // null = folosește ziua derivată din dată. altfel = index zi override
+var currentWorkoutDate=null; // null = data de azi. altfel = ISO "yyyy-mm-dd"
+var lastDetectedDay=null;    // pentru detectarea trecerii peste miezul nopții
 
 function today(){return new Date().toLocaleDateString('ro-RO');}
 function todayIdx(){var d=new Date().getDay();return d===0?6:d-1;}
-function getEffectiveDayIdx(){return currentWorkoutDay!==null?currentWorkoutDay:todayIdx();}
+
+function getEffectiveDateISO(){return currentWorkoutDate||todayISO();}
+function getEffectiveDateRo(){return currentWorkoutDate?isoToRo(currentWorkoutDate):today();}
+function getDayIdxFromDate(iso){
+  if(!iso)return todayIdx();
+  var parts=iso.split('-');
+  var d=new Date(parseInt(parts[0]),parseInt(parts[1])-1,parseInt(parts[2]));
+  var dow=d.getDay();
+  return dow===0?6:dow-1;
+}
+function getEffectiveDayIdx(){
+  if(currentWorkoutDay!==null)return currentWorkoutDay;
+  if(currentWorkoutDate)return getDayIdxFromDate(currentWorkoutDate);
+  return todayIdx();
+}
+function isBackdated(){
+  return currentWorkoutDate!==null && currentWorkoutDate!==todayISO();
+}
 
 function checkDayChanged(){
   var now=todayIdx();
   if(lastDetectedDay!==null && lastDetectedDay!==now){
-    // Ziua s-a schimbat (peste miezul nopții sau alt device)
-    currentWorkoutDay=null; // reset override
+    // Ziua s-a schimbat (peste miezul nopții)
+    currentWorkoutDay=null;
+    currentWorkoutDate=null;
     currentNutDay=now;
-    setData={};checkData={}; // reset UI state (va fi repopulat din storage)
+    setData={};checkData={};
     preloadToday();
     initHeader();
     renderToday();
@@ -799,25 +825,48 @@ function initHeader(){
 function renderToday(){
   var realIdx=todayIdx();
   var idx=getEffectiveDayIdx(),sch=schedule[idx],ex=exercises[sch.exDay];
+  var effDateISO=getEffectiveDateISO();
   var cont=document.getElementById('azi-content'),html='';
 
-  // Day picker
+  // Date picker + quick buttons
+  html+='<div class="date-picker-row">';
+  html+='<label>📅 Data</label>';
+  html+='<input type="date" id="workoutDate" value="'+effDateISO+'" onchange="setWorkoutDate(this.value)">';
+  html+='<button class="date-quick-btn'+(!currentWorkoutDate?' act':'')+'" onclick="setQuickDate(0)">Azi</button>';
+  html+='<button class="date-quick-btn" onclick="setQuickDate(-1)">Ieri</button>';
+  html+='</div>';
+
+  // Day picker (ziua afișată — derivă din dată sau override)
   var dayShort=['L','Ma','Mi','J','V','S','D'];
   html+='<div class="day-picker">';
+  var dateDayIdx=currentWorkoutDate?getDayIdxFromDate(currentWorkoutDate):realIdx;
   for(var di=0;di<7;di++){
     var cls=[];
-    if(di===realIdx)cls.push('today');
+    if(di===dateDayIdx)cls.push('today'); // ziua zilei calendaristice (reală sau selectată)
     if(di===idx)cls.push('selected');
     html+='<button class="dp-btn '+cls.join(' ')+'" onclick="setWorkoutDay('+di+')" title="'+schedule[di].day+'">'+dayShort[di]+'</button>';
   }
   html+='</div>';
 
-  // Banner override
-  if(currentWorkoutDay!==null && currentWorkoutDay!==realIdx){
-    html+='<div class="override-banner">⚠️ Faci antrenamentul de <strong>'+schedule[currentWorkoutDay].day+'</strong> pe <strong>'+schedule[realIdx].day+' ('+today()+')</strong><button onclick="resetWorkoutDay()">↺ Reset</button></div>';
+  // Banner când înregistrezi cu date/day non-azi
+  var dateOverride=isBackdated();
+  var dayOverride=currentWorkoutDay!==null && currentWorkoutDay!==dateDayIdx;
+  if(dateOverride || dayOverride){
+    html+='<div class="override-banner">⚠️ Înregistrezi: ';
+    if(dateOverride){
+      var daysAgo=Math.round((Date.now()-new Date(currentWorkoutDate).getTime())/86400000);
+      var rel=daysAgo===1?'(ieri)':daysAgo===2?'(alaltaieri)':daysAgo>0?'('+daysAgo+' zile în urmă)':'';
+      html+='<strong>'+schedule[dateDayIdx].day+' '+isoToRo(currentWorkoutDate)+'</strong> '+rel;
+    }else{
+      html+='<strong>'+schedule[idx].day+'</strong> pe <strong>'+today()+'</strong>';
+    }
+    if(dayOverride){
+      html+=' · program <strong>'+schedule[idx].day+'</strong>';
+    }
+    html+='<button onclick="resetWorkoutDay()">↺ Azi</button></div>';
   }
 
-  html+='<div class="stitle">'+ex.icon+' Antrenament'+(currentWorkoutDay!==null&&currentWorkoutDay!==realIdx?' · '+schedule[idx].day:' de azi')+'</div>';
+  html+='<div class="stitle">'+ex.icon+' Antrenament'+(dateOverride||dayOverride?' · '+schedule[idx].day:' de azi')+'</div>';
   html+='<div class="card" style="margin-bottom:12px;border-color:rgba(20,184,166,.35)">';
   html+='<div class="card-hd" style="cursor:default"><div class="card-ico" style="background:rgba(20,184,166,.15);font-size:18px">'+ex.icon+'</div>';
   html+='<div><div class="card-ttl">'+ex.label+'</div><div class="card-sub">'+ex.duration+' &nbsp;·&nbsp; ⭐ = progres &nbsp;·&nbsp; Tempo 2–1–2</div></div></div></div>';
@@ -868,16 +917,40 @@ function upSet(keyEnc,setNum,field,val){
 }
 
 function setWorkoutDay(idx){
-  var realIdx=todayIdx();
-  if(idx===realIdx){currentWorkoutDay=null;}
+  // Ziua derivată din data selectată (sau azi)
+  var dateDayIdx=currentWorkoutDate?getDayIdxFromDate(currentWorkoutDate):todayIdx();
+  if(idx===dateDayIdx){currentWorkoutDay=null;}
   else{currentWorkoutDay=idx;}
   renderToday();
 }
 
+function setWorkoutDate(iso){
+  if(!iso){return;}
+  if(iso===todayISO()){currentWorkoutDate=null;}
+  else{currentWorkoutDate=iso;}
+  // Reset override ziua (se derivă din noua dată)
+  currentWorkoutDay=null;
+  // Încarcă datele pentru data selectată
+  preloadToday();
+  renderToday();
+  if(currentWorkoutDate){
+    showToast('Editez pentru '+isoToRo(currentWorkoutDate));
+  }
+}
+
+function setQuickDate(offsetDays){
+  var d=new Date();
+  d.setDate(d.getDate()+offsetDays);
+  var iso=d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+  setWorkoutDate(iso);
+}
+
 function resetWorkoutDay(){
   currentWorkoutDay=null;
+  currentWorkoutDate=null;
+  preloadToday();
   renderToday();
-  showToast('Revenit la '+schedule[todayIdx()].day);
+  showToast('Revenit la azi ('+schedule[todayIdx()].day+')');
 }
 
 function saveSet(keyEnc,setNum,ei){
@@ -885,7 +958,7 @@ function saveSet(keyEnc,setNum,ei){
   var d=setData[key]&&setData[key][setNum];
   if(!d||(!d.reps&&!d.kg)){showToast('Introduceți rep și kg!','var(--acc2)');return;}
   var idx=getEffectiveDayIdx();
-  var ok=addRow({date:today(),day:schedule[idx].day,type:'antrenament',exercise:key,set:setNum,reps:parseFloat(d.reps)||0,kg:parseFloat(d.kg)||0,note:''});
+  var ok=addRow({date:getEffectiveDateRo(),day:schedule[idx].day,type:'antrenament',exercise:key,set:setNum,reps:parseFloat(d.reps)||0,kg:parseFloat(d.kg)||0,note:''});
   if(ok){
     setData[key][setNum].savedOnServer=true;
     var box=document.getElementById('sb_'+ei+'_'+setNum);
@@ -917,7 +990,7 @@ function toggleCheck(id,el){
   el.querySelector('.chk-box').textContent=checkData[id]?'✓':'';
   updateChkCount();
   var idx=getEffectiveDayIdx();
-  addRow({date:today(),day:schedule[idx].day,type:'checklist',exercise:id,set:'',reps:'',kg:'',note:checkData[id]?'DA':'NU'});
+  addRow({date:getEffectiveDateRo(),day:schedule[idx].day,type:'checklist',exercise:id,set:'',reps:'',kg:'',note:checkData[id]?'DA':'NU'});
 }
 
 function updateChkCount(){
@@ -1628,10 +1701,11 @@ function initGhid(){
 }
 
 // ═══════════════════════════════════════════════════════════════
-// PRELOAD DATE AZI
+// PRELOAD DATE PENTRU DATA SELECTATĂ (azi sau backdated)
 // ═══════════════════════════════════════════════════════════════
 function preloadToday(){
-  var rows=getRowsForDate(today());
+  setData={};checkData={};
+  var rows=getRowsForDate(getEffectiveDateRo());
   rows.forEach(function(r){
     if(r.type==='antrenament'&&r.exercise&&r.set){
       if(!setData[r.exercise])setData[r.exercise]={};
