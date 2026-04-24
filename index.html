@@ -130,6 +130,7 @@ body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSy
 .gtag{font-size:10px;padding:2px 7px;border-radius:20px;font-weight:600;flex-shrink:0}
 .g-bara{background:rgba(56,189,248,.2);color:var(--blue)}
 .g-gantere{background:rgba(20,184,166,.15);color:var(--acc)}
+.g-bodyweight{background:rgba(94,234,212,.15);color:var(--acc2)}
 .ghid-body{display:none;margin-top:10px;border-top:1px solid var(--bd);padding-top:10px}
 .ghid-item.open .ghid-body{display:block}
 .g-row{display:flex;gap:8px;margin-bottom:6px;font-size:13px;line-height:1.4}
@@ -237,6 +238,23 @@ input:checked + .slider:before{transform:translateX(20px);background:var(--acc)}
 .override-banner{background:rgba(245,158,11,.1);border:1px solid rgba(245,158,11,.4);color:#f5a623;border-radius:10px;padding:10px 12px;font-size:12px;margin-bottom:12px;display:flex;align-items:center;gap:8px;line-height:1.4}
 .override-banner strong{color:#fbbf24}
 .override-banner button{background:none;border:none;color:#fbbf24;text-decoration:underline;font-weight:800;cursor:pointer;font-family:inherit;font-size:12px;padding:0;margin-left:auto;flex-shrink:0}
+.morning-card{background:linear-gradient(135deg,rgba(94,234,212,.08),rgba(20,184,166,.05));border:1px solid rgba(94,234,212,.25);border-radius:var(--r);margin-bottom:12px;overflow:hidden}
+.morning-hd{display:flex;align-items:center;gap:10px;padding:12px 14px;cursor:pointer;user-select:none}
+.morning-hd .sun{font-size:20px;flex-shrink:0}
+.morning-ttl{font-weight:800;font-size:14px;flex:1;color:var(--acc2)}
+.morning-sub{font-size:10px;color:var(--muted);margin-top:2px;font-weight:500}
+.morning-count{background:rgba(94,234,212,.15);border:1px solid rgba(94,234,212,.3);color:var(--acc2);font-size:11px;font-weight:800;padding:3px 8px;border-radius:20px;flex-shrink:0}
+.morning-chev{color:var(--muted);font-size:11px;transition:transform .2s;flex-shrink:0}
+.morning-card.open .morning-chev{transform:rotate(180deg)}
+.morning-bd{display:none;padding:0 14px 14px;border-top:1px solid rgba(94,234,212,.15)}
+.morning-card.open .morning-bd{display:block}
+.morning-item{display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid var(--bd);cursor:pointer}
+.morning-item:last-child{border-bottom:none}
+.morning-item .chk-box{width:22px;height:22px;border-radius:6px;border:2px solid var(--bd);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:13px;font-weight:700;transition:all .15s}
+.morning-item.done .chk-box{background:var(--acc2);border-color:var(--acc2);color:#05201d}
+.morning-item.done .morning-name{text-decoration:line-through;color:var(--muted)}
+.morning-name{font-size:13px;font-weight:700;flex:1}
+.morning-target{font-size:11px;color:var(--muted);font-weight:600;flex-shrink:0}
 </style>
 </head>
 <body>
@@ -274,6 +292,20 @@ input:checked + .slider:before{transform:translateX(20px);background:var(--acc)}
   <div class="macro-row" id="nutMacros"></div>
   <div id="nutMeals"></div>
   <div id="nutNote"></div>
+
+  <div class="stitle">🐟 Variație săptămânală (1 zi/săpt)</div>
+  <div class="meal-card" style="border-color:rgba(56,189,248,.35)">
+    <div class="meal-hd"><div><div class="meal-nm">🐟 Somon + quinoa (în loc de Masa 3)</div><div class="meal-tm">Orice zi PUI sau TON · 1x/săpt</div></div><div style="text-align:right"><div class="meal-kc" style="color:#38bdf8">~700 kcal</div><div class="meal-pr">~45g proteine · Omega 3</div></div></div>
+    <div class="meal-items">
+      <div class="item-row"><div><div class="item-nm">Somon (file, raw)</div><div class="item-am">200g</div></div><div class="item-kc">420 kcal</div></div>
+      <div class="item-row"><div><div class="item-nm">Quinoa (raw)</div><div class="item-am">80g</div></div><div class="item-kc">300 kcal</div></div>
+      <div class="item-row"><div><div class="item-nm">Legume frunze verzi + ulei măsline</div><div class="item-am">200g + 1 lg</div></div><div class="item-kc">150 kcal</div></div>
+    </div>
+  </div>
+  <div class="note-box" style="background:rgba(56,189,248,.08);border-color:rgba(56,189,248,.3);color:#38bdf8">
+    💡 <strong>De ce</strong>: Omega 3 (reducere inflamație), fier (energie), folat (recuperare). Lidl/Profi au somon și quinoa — ~25 lei/săpt în plus.
+  </div>
+
   <div class="rules-box">
     <div style="font-size:10px;font-weight:800;color:var(--purple);letter-spacing:2px;margin-bottom:10px">REGULI ZILNICE</div>
     <div class="rule-row">🚫 Zero dulciuri — banană dacă ai poftă de dulce</div>
@@ -569,9 +601,12 @@ var nutPlans={
       {time:'15:00',name:'Masa 2 — Pre-antrenament',emoji:'🥤',kcal:299,protein:35,items:[{name:'Shake proteic izolat',amount:'40g',kcal:160},{name:'Lapte de soia',amount:'250ml',kcal:70},{name:'Banană',amount:'1 medie',kcal:89}]},
       {time:'19:00–19:30',name:'Masa 3 — Post-antrenament (TON)',emoji:'🐟',kcal:725,protein:64,items:[{name:'Ton în saramură (drained)',amount:'240g',kcal:200},{name:'Cartofi fierți',amount:'300g',kcal:255},{name:'Ulei de măsline',amount:'1 lingură',kcal:120},{name:'Legume',amount:'liber',kcal:35}]}],
     note:'Ton 240g drained = ~3 conserve mici. Shake izolat proteic — lactoză minimă.'},
-  omad:{subtitle:'OMAD · 1 masă la prânz · Zi fără exerciții',kcal:857,protein:118,carbs:34,fat:26,cls:'a-omad',color:'#f97316',tag:'OMAD',tagCls:'t-omad',
-    meals:[{time:'12:00–13:00',name:'Singura masă a zilei',emoji:'🥗',kcal:857,protein:118,items:[{name:'Albuș lichid',amount:'300ml',kcal:124},{name:'Ouă întregi',amount:'2 buc',kcal:140},{name:'Cottage cheese 3%',amount:'200g',kcal:160},{name:'Piept de pui (raw)',amount:'250g',kcal:275},{name:'Legume la aburi',amount:'200g',kcal:60},{name:'Banană',amount:'1 medie',kcal:89}]}],
-    note:'Masă la prânz = metabolizare mai bună. Seara: apă, ceai, cafea neagră.'}
+  omad:{subtitle:'OMAD · 1 masă la prânz · Zi fără exerciții',kcal:1007,protein:148,carbs:34,fat:28,cls:'a-omad',color:'#f97316',tag:'OMAD',tagCls:'t-omad',
+    meals:[
+      {time:'12:00–13:00',name:'Singura masă a zilei',emoji:'🥗',kcal:857,protein:118,items:[{name:'Albuș lichid',amount:'300ml',kcal:124},{name:'Ouă întregi',amount:'2 buc',kcal:140},{name:'Cottage cheese 3%',amount:'200g',kcal:160},{name:'Piept de pui (raw)',amount:'250g',kcal:275},{name:'Legume la aburi',amount:'200g',kcal:60},{name:'Banană',amount:'1 medie',kcal:89}]},
+      {time:'19:00–20:00',name:'Shake proteic seară (boost)',emoji:'🥤',kcal:150,protein:30,items:[{name:'Izolat proteic (whey/vegan)',amount:'30g',kcal:120},{name:'Apă sau lapte de soia',amount:'250ml',kcal:30}]}
+    ],
+    note:'Shake-ul seara: recomandat pentru ~30g proteine în plus (target 150g/zi). Nu rupe OMAD-ul — e lichid izolat, insulina minimă.'}
 };
 
 var ghidEx=[
@@ -585,11 +620,20 @@ var ghidEx=[
   {name:'Pullover cu ganteră',tag:'gantere',start:'Culcat pe bancă plată, gantera cu ambele mâini deasupra pieptului.',move:'Cobori în arc peste cap, simți întindere. Revii în arc deasupra pieptului.',err:'Coatele prea îndoite. Mișcare prea rapidă.',tip:'Menține coatele ușor îndoite pe tot parcursul.'},
   {name:'Hip Thrust cu bara',tag:'bară',start:'Spatele pe bancă (omoplați pe margine). Bara pe șolduri cu prosop. Picioare la lățimea șoldurilor.',move:'Împingi șoldurile în sus până corpul e drept. Strângi fesierii 1 sec. Cobori controlat.',err:'Șoldurile nu ajung sus. Spatele se arcuiește exagerat.',tip:'Bărbia ușor în piept. Simți în fesieri, nu în spate.'},
   {name:'Deadlift cu bara',tag:'bară',start:'Bara deasupra mijlocului piciorului. Picioare la lățimea șoldurilor. Spatele drept, pieptul sus.',move:'Împingi podeaua cu picioarele. Bara rămâne lipită de corp. Șolduri și umeri urcă simultan.',err:'SPATELE ROTUNJIT (pericol!). Bara departe de corp.',tip:'Respiră adânc, contractă abdomenul înainte. Începe cu greutate FOARTE mică!'},
-  {name:'Flexii biceps alternante',tag:'gantere',start:'Stând sau șezut, gantere pe lângă corp, palme față în față.',move:'Ridici rotind palma în sus. Cobori lent. Alternezi brațele.',err:'Coatul se mișcă înainte. Balansul spatelui.',tip:'Coatul rămâne fix pe lângă corp tot timpul.'}
+  {name:'Flexii biceps alternante',tag:'gantere',start:'Stând sau șezut, gantere pe lângă corp, palme față în față.',move:'Ridici rotind palma în sus. Cobori lent. Alternezi brațele.',err:'Coatul se mișcă înainte. Balansul spatelui.',tip:'Coatul rămâne fix pe lângă corp tot timpul.'},
+  {name:'Flotări lente (dimineață)',tag:'bodyweight',start:'Poziție plank cu brațele la lățimea umerilor, corp drept de la cap până la călcâie.',move:'Cobori controlat 3 sec până pieptul aproape atinge podeaua. Împingi 1 sec în sus.',err:'Șoldurile cad. Coatele evazate la 90° lateral.',tip:'Coatele la ~45° față de corp. Tempo: 3-1-1 (ai timp să înveți mișcarea).'},
+  {name:'Pike Push-up (dimineață)',tag:'bodyweight',start:'Poziție "pike" — fese sus, formă de V inversat. Palmele pe podea, cap între brațe.',move:'Cobori capul spre podea îndoind coatele. Împingi înapoi sus. Simulează împins umeri.',err:'Corpul prea orizontal. Coatele evazate.',tip:'Alternativă blândă pentru împins umeri — activare umeri fără greutăți.'},
+  {name:'Fandări în loc (dimineață)',tag:'bodyweight',start:'Stând drept, picioare la lățimea șoldurilor, mâinile pe șolduri.',move:'Un picior mare în spate, cobori genunchiul spre podea. Revii împingând în călcâi. Alternezi.',err:'Genunchiul din față trece de vârful piciorului. Trunchiul se apleacă.',tip:'Control total — e pattern, nu cardio. Lent și curat.'},
+  {name:'Glute Bridge (dimineață)',tag:'bodyweight',start:'Pe spate, genunchi îndoiți la 90°, tălpile pe podea, brațe pe lângă corp.',move:'Împingi șoldurile sus strângând fesierii. Strângi 1 sec sus. Cobori controlat.',err:'Arcuiești lomba exagerat. Șoldurile nu ajung sus.',tip:'Activare fesieri — critică pentru squat + hip thrust seara.'},
+  {name:'Dead Bug (core)',tag:'bodyweight',start:'Pe spate, brațele întinse spre plafon, picioarele ridicate cu genunchii la 90°.',move:'Cobori simultan un braț (înapoi) și piciorul opus (întins înainte). Revii. Alternezi.',err:'Lomba se arcuiește (SEMNAL să oprești). Mișcare prea rapidă.',tip:'Lipește lomba de podea tot timpul — dacă apare spațiu, reduce amplitudinea.'},
+  {name:'Plank lateral (dimineață)',tag:'bodyweight',start:'Lateral pe cot, corp drept, picioarele suprapuse.',move:'Ridici șoldurile până corpul e linie dreaptă. Menții tensionat. Respiră liniștit.',err:'Șoldurile cad. Gâtul ridicat nenatural.',tip:'Focus la oblici — ai corpul ca un stâlp.'},
+  {name:'Hip Hinge cu gantere (dimineață)',tag:'gantere',start:'Stând drept, gantere pe coapse, genunchi ușor îndoiți.',move:'Împingi șoldurile înapoi (NU cobori genunchi). Spatele drept. Cobori până întindere biceps femural. Revii strângând fesierii.',err:'Rotunjești spatele. Îndoi genunchii prea mult (devine squat).',tip:'Pattern pentru RDL/Deadlift seara. Îl faci cu 50% din greutatea serii.'},
+  {name:'Flotări înguste (dimineață)',tag:'bodyweight',start:'Flotare clasică dar mâinile aproape una de alta (formă de diamant sau index-ii se ating).',move:'Cobori coatele lipite de corp. Împingi sus. Mai mult triceps, mai puțin piept.',err:'Coatele se evazează (devine flotare normală).',tip:'Activare triceps + core. Dacă e greu, fă pe genunchi.'},
+  {name:'Dead Hang (dimineață)',tag:'bodyweight',start:'Atârnat de o bară, ușă solidă sau bandă fixată — brațele întinse, corpul relaxat.',move:'Menții poziția. Respiri normal. Activezi ușor omoplații (nu stai "mort" cu umerii în urechi).',err:'Umerii la urechi. Corpul se balansează.',tip:'Decompresie coloană + mobilitate umeri. Excelent după o zi la birou.'},
+  {name:'Kegel (pelvis)',tag:'bodyweight',start:'Identifică mușchii planșeului pelvin — cei pe care îi contracți când vrei să oprești urinarea. Sau "tragi" testiculele în sus fără să contracți fesierii.',move:'Contractă 3-5 sec, relaxează 3 sec. 10-15 repetări × 3 serii. Poți face pe scaun, în pat, oricând.',err:'Contracți fesierii sau abdomenul în loc de planșeul pelvin. Ții respirația.',tip:'Discret, fără echipament. Beneficii: postură pelvină, control urinar, performanță sexuală, stabilitate core profund.'}
 ];
 
 var checkItems=[
-  {id:'activare',lbl:'☀️ Activare dimineață (10–15 min)'},
   {id:'proteine',lbl:'🥩 180g proteine'},
   {id:'apa',lbl:'💧 Apă 3L'},
   {id:'pasi',lbl:'🚶 6.000+ pași'},
@@ -597,6 +641,46 @@ var checkItems=[
   {id:'progres',lbl:'⭐ Progres la 1 exercițiu ⭐'},
   {id:'somn',lbl:'😴 Somn 7+ ore'}
 ];
+
+// Rutina de dimineață — pattern învățare (10 min), pregătește antrenamentul de seară
+var morningRoutines={
+  luni:{label:'Pattern Push',sub:'umeri + piept (pattern, nu la eșec)',duration:'~10 min',list:[
+    {id:'morn_flotari_lente',name:'Flotări lente',target:'3×6–8 rep'},
+    {id:'morn_pike_pushup',name:'Pike push-up',target:'2×6 rep'},
+    {id:'morn_mob_umeri',name:'Mobilitate umeri',target:'5 min'},
+    {id:'morn_kegel',name:'Kegel (contracții)',target:'3×10–15'}
+  ]},
+  marti:{label:'Pattern Lower',sub:'șolduri + core',duration:'~10 min',list:[
+    {id:'morn_fandari',name:'Fandări în loc',target:'3×8/picior'},
+    {id:'morn_glute_bridge',name:'Glute bridge',target:'3×10 rep'},
+    {id:'morn_plank',name:'Plank',target:'2×45 sec'},
+    {id:'morn_kegel',name:'Kegel (contracții)',target:'3×10–15'}
+  ]},
+  miercuri:{label:'Recovery Core',sub:'zi ușoară, activare',duration:'~8 min',list:[
+    {id:'morn_dead_bug',name:'Dead bug',target:'2×10/parte'},
+    {id:'morn_plank_leg_raise',name:'Plank + ridicări picioare',target:'2 runde'},
+    {id:'morn_mob_general',name:'Mobilitate full body',target:'3 min'},
+    {id:'morn_kegel',name:'Kegel (contracții)',target:'3×10–15'}
+  ]},
+  joi:{label:'Pattern Pull',sub:'spate + omoplați',duration:'~10 min',list:[
+    {id:'morn_ramat_usor',name:'Ramat gantere ușoare (sprijinit)',target:'3×10 rep'},
+    {id:'morn_reverse_fly',name:'Reverse fly',target:'2×12 rep'},
+    {id:'morn_dead_hang',name:'Dead hang (ușă/bară)',target:'2×30 sec'},
+    {id:'morn_kegel',name:'Kegel (contracții)',target:'3×10–15'}
+  ]},
+  vineri:{label:'Pattern Full Body',sub:'hip hinge + core',duration:'~10 min',list:[
+    {id:'morn_hip_hinge',name:'Hip hinge cu gantere',target:'3×10 rep'},
+    {id:'morn_flotari_inguste',name:'Flotări înguste',target:'2×8 rep'},
+    {id:'morn_plank_lateral',name:'Plank lateral',target:'2×30/parte'},
+    {id:'morn_kegel',name:'Kegel (contracții)',target:'3×10–15'}
+  ]},
+  sambata:{label:'Recovery + Mobilitate',sub:'decompresie',duration:'~25 min',list:[
+    {id:'morn_stretch_full',name:'Stretching full body',target:'10–15 min'},
+    {id:'morn_mob_articulatii',name:'Mobilitate umeri/șolduri',target:'5 min'},
+    {id:'morn_plimbare',name:'Plimbare exterior',target:'20–30 min'},
+    {id:'morn_kegel',name:'Kegel (contracții)',target:'3×10–15'}
+  ]}
+};
 
 var MEAS_FIELDS=[
   {id:'weight',el:'mWeight',label:'Greutate',unit:'kg',icon:'⚖️'},
@@ -649,6 +733,11 @@ function addRow(row){
   if(row.type==='checklist'){
     s.rows=s.rows.filter(function(r){
       return !(r.type==='checklist' && r.date===row.date && r.exercise===row.exercise);
+    });
+  }
+  if(row.type==='dimineata'){
+    s.rows=s.rows.filter(function(r){
+      return !(r.type==='dimineata' && r.date===row.date && r.exercise===row.exercise);
     });
   }
   if(row.type==='masuratoare'){
@@ -731,7 +820,7 @@ function roToIso(ro){
 // ═══════════════════════════════════════════════════════════════
 // STATE
 // ═══════════════════════════════════════════════════════════════
-var setData={},checkData={},currentNutDay=0,currentWeekOffset=0;
+var setData={},checkData={},morningData={},currentNutDay=0,currentWeekOffset=0;
 var currentWorkoutDay=null;  // null = folosește ziua derivată din dată. altfel = index zi override
 var currentWorkoutDate=null; // null = data de azi. altfel = ISO "yyyy-mm-dd"
 var lastDetectedDay=null;    // pentru detectarea trecerii peste miezul nopții
@@ -866,7 +955,10 @@ function renderToday(){
     html+='<button onclick="resetWorkoutDay()">↺ Azi</button></div>';
   }
 
-  html+='<div class="stitle">'+ex.icon+' Antrenament'+(dateOverride||dayOverride?' · '+schedule[idx].day:' de azi')+'</div>';
+  // Morning routine card
+  html+=buildMorningCard(idx);
+
+  html+='<div class="stitle">'+ex.icon+' Antrenament'+(dateOverride||dayOverride?' · '+schedule[idx].day:' seară')+'</div>';
   html+='<div class="card" style="margin-bottom:12px;border-color:rgba(20,184,166,.35)">';
   html+='<div class="card-hd" style="cursor:default"><div class="card-ico" style="background:rgba(20,184,166,.15);font-size:18px">'+ex.icon+'</div>';
   html+='<div><div class="card-ttl">'+ex.label+'</div><div class="card-sub">'+ex.duration+' &nbsp;·&nbsp; ⭐ = progres &nbsp;·&nbsp; Tempo 2–1–2</div></div></div></div>';
@@ -991,6 +1083,49 @@ function toggleCheck(id,el){
   updateChkCount();
   var idx=getEffectiveDayIdx();
   addRow({date:getEffectiveDateRo(),day:schedule[idx].day,type:'checklist',exercise:id,set:'',reps:'',kg:'',note:checkData[id]?'DA':'NU'});
+}
+
+// ═══════════════════════════════════════════════════════════════
+// MORNING ROUTINE
+// ═══════════════════════════════════════════════════════════════
+function buildMorningCard(idx){
+  var sch=schedule[idx];
+  var routine=morningRoutines[sch.exDay];
+  if(!routine) return '';
+  var done=routine.list.filter(function(e){return morningData[e.id]===true;}).length;
+  var total=routine.list.length;
+  var html='<div class="morning-card" id="morningCard"><div class="morning-hd" onclick="document.getElementById(\'morningCard\').classList.toggle(\'open\')">';
+  html+='<div class="sun">☀️</div>';
+  html+='<div style="flex:1"><div class="morning-ttl">DIMINEAȚĂ — '+routine.label+'</div>';
+  html+='<div class="morning-sub">'+routine.duration+' · '+routine.sub+'</div></div>';
+  html+='<div class="morning-count" id="morningCount">'+done+'/'+total+'</div>';
+  html+='<div class="morning-chev">▼</div></div>';
+  html+='<div class="morning-bd">';
+  routine.list.forEach(function(ex){
+    var isDone=morningData[ex.id]===true;
+    html+='<div class="morning-item'+(isDone?' done':'')+'" onclick="toggleMorning(\''+ex.id+'\',this)">';
+    html+='<div class="chk-box">'+(isDone?'✓':'')+'</div>';
+    html+='<div class="morning-name">'+ex.name+'</div>';
+    html+='<div class="morning-target">'+ex.target+'</div>';
+    html+='</div>';
+  });
+  html+='</div></div>';
+  return html;
+}
+
+function toggleMorning(id,el){
+  morningData[id]=!morningData[id];
+  el.classList.toggle('done');
+  el.querySelector('.chk-box').textContent=morningData[id]?'✓':'';
+  // Update counter
+  var idx=getEffectiveDayIdx();
+  var routine=morningRoutines[schedule[idx].exDay];
+  if(routine){
+    var done=routine.list.filter(function(e){return morningData[e.id]===true;}).length;
+    var cnt=document.getElementById('morningCount');
+    if(cnt)cnt.textContent=done+'/'+routine.list.length;
+  }
+  addRow({date:getEffectiveDateRo(),day:schedule[idx].day,type:'dimineata',exercise:id,set:'',reps:'',kg:'',note:morningData[id]?'DA':'NU'});
 }
 
 function updateChkCount(){
@@ -1245,18 +1380,27 @@ function buildWeekSummary(){
   }else{
     var byDay={};
     rows.forEach(function(r){
-      if(!byDay[r.day])byDay[r.day]={exercises:{},checks:[]};
+      if(!byDay[r.day])byDay[r.day]={exercises:{},checks:[],morning:[]};
       if(r.type==='antrenament'){
         if(!byDay[r.day].exercises[r.exercise])byDay[r.day].exercises[r.exercise]=[];
         byDay[r.day].exercises[r.exercise].push({set:r.set,reps:r.reps,kg:r.kg});
       }else if(r.type==='checklist'){
         byDay[r.day].checks.push(r.exercise+': '+r.note);
+      }else if(r.type==='dimineata'){
+        byDay[r.day].morning.push({id:r.exercise,done:r.note==='DA'});
       }
     });
     out+='🏋️ ANTRENAMENT SĂPTĂMÂNĂ\n';
     ['LUNI','MARȚI','MIERCURI','JOI','VINERI','SÂMBĂTĂ','DUMINICĂ'].forEach(function(d){
       if(!byDay[d])return;
       out+='\n▸ '+d+'\n';
+      if(byDay[d].morning.length){
+        var doneM=byDay[d].morning.filter(function(m){return m.done;}).length;
+        out+='  ☀️ Dimineață: '+doneM+'/'+byDay[d].morning.length+' bifate';
+        var notDone=byDay[d].morning.filter(function(m){return !m.done;}).map(function(m){return m.id.replace('morn_','');});
+        if(notDone.length)out+=' (lipsă: '+notDone.join(', ')+')';
+        out+='\n';
+      }
       Object.keys(byDay[d].exercises).forEach(function(ex){
         var sets=byDay[d].exercises[ex].sort(function(a,b){return a.set-b.set;});
         out+='  '+ex+'\n';
@@ -1268,10 +1412,12 @@ function buildWeekSummary(){
   }
 
   out+='---\nTe rog analizează:\n';
-  out+='1. Unde am progresat (rep/kg) și unde stagnez\n';
+  out+='1. Unde am progresat la ⭐ (rep/kg) și unde stagnez\n';
   out+='2. Evoluția măsurătorilor (talie/piept/brațe) vs obiectiv recompoziție\n';
-  out+='3. Ce ajustări recomanzi pentru săptămâna viitoare (greutăți, exerciții, nutriție)\n';
-  out+='4. Alerte dacă vezi dezechilibre (ex: pierd masă musculară în loc de grăsime)\n';
+  out+='3. Aderența la rutina de dimineață (pattern) și checklist\n';
+  out+='4. Ce ajustări recomanzi pentru săptămâna viitoare (greutăți, exerciții, nutriție)\n';
+  out+='5. Alerte dacă vezi dezechilibre (ex: pierd masă musculară în loc de grăsime)\n';
+  out+='6. Dacă DOMS sever >48h + stagnare la ⭐ — recomandare reducere volum\n';
   return out;
 }
 
@@ -1583,6 +1729,7 @@ function mergeRemote(remote){
   function key(r){
     if(r.type==='antrenament') return r.date+'|a|'+r.exercise+'|'+r.set;
     if(r.type==='checklist') return r.date+'|c|'+r.exercise;
+    if(r.type==='dimineata') return r.date+'|d|'+r.exercise;
     if(r.type==='masuratoare') return r.date+'|m';
     return r.date+'|x|'+(r.exercise||'');
   }
@@ -1689,7 +1836,8 @@ function initGhid(){
   ghidEx.forEach(function(ex,i){
     var id='gh_'+i;
     html+='<div class="ghid-item" id="'+id+'" onclick="document.getElementById(\''+id+'\').classList.toggle(\'open\')">';
-    html+='<div class="ghid-nm">'+ex.name+'<span class="gtag '+(ex.tag==='bară'?'g-bara':'g-gantere')+'">'+ex.tag+'</span><span style="color:var(--muted);font-size:11px;margin-left:auto">▼</span></div>';
+    var tagCls=ex.tag==='bară'?'g-bara':(ex.tag==='bodyweight'?'g-bodyweight':'g-gantere');
+    html+='<div class="ghid-nm">'+ex.name+'<span class="gtag '+tagCls+'">'+ex.tag+'</span><span style="color:var(--muted);font-size:11px;margin-left:auto">▼</span></div>';
     html+='<div class="ghid-body">';
     html+='<div class="g-row"><div class="g-lbl">Start</div><div>'+ex.start+'</div></div>';
     html+='<div class="g-row"><div class="g-lbl">Mișcare</div><div>'+ex.move+'</div></div>';
@@ -1704,7 +1852,7 @@ function initGhid(){
 // PRELOAD DATE PENTRU DATA SELECTATĂ (azi sau backdated)
 // ═══════════════════════════════════════════════════════════════
 function preloadToday(){
-  setData={};checkData={};
+  setData={};checkData={};morningData={};
   var rows=getRowsForDate(getEffectiveDateRo());
   rows.forEach(function(r){
     if(r.type==='antrenament'&&r.exercise&&r.set){
@@ -1713,6 +1861,9 @@ function preloadToday(){
     }
     if(r.type==='checklist'&&r.exercise){
       checkData[r.exercise]=(r.note==='DA');
+    }
+    if(r.type==='dimineata'&&r.exercise){
+      morningData[r.exercise]=(r.note==='DA');
     }
   });
 }
