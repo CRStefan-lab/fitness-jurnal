@@ -275,6 +275,11 @@ input:checked + .slider:before{transform:translateX(20px);background:var(--acc)}
   🚀 <strong>Versiune nouă disponibilă!</strong> <button onclick="applyUpdate()" style="color:var(--acc);font-weight:800;text-decoration:underline;background:none;border:none;cursor:pointer;padding:0 4px">Actualizează →</button>
 </div>
 
+<div class="install-hint" id="fsaReconnectBanner" style="background:rgba(245,158,11,.12);border-color:rgba(245,158,11,.5);color:#fbbf24">
+  🔒 <strong>Sync fișier întrerupt</strong> (permisiune pierdută după update).
+  <button onclick="fsaReconnect()" style="color:#fbbf24;font-weight:800;text-decoration:underline;background:none;border:none;cursor:pointer;padding:0 4px">🔓 Reconectează →</button>
+</div>
+
 <nav class="bnav">
   <button class="nb act" onclick="showTab('azi',this)"><span class="ico">🏋️</span>Azi</button>
   <button class="nb" onclick="showTab('nutritie',this)"><span class="ico">🥗</span>Nutriție</button>
@@ -1571,21 +1576,41 @@ function fsaInit(){
   if(!fsaSupported()){updateFsaUI();setSyncBadge('off');return;}
   fsaLoadHandle().then(function(h){
     if(!h){updateFsaUI();setSyncBadge('off');return;}
-    // Check permission — fără gest user, browser-ul ar putea refuza. Afișăm stare "restore" cu buton.
     h.queryPermission({mode:'readwrite'}).then(function(perm){
+      fsaState.handle=h;
+      fsaState.fileName=h.name;
       if(perm==='granted'){
-        fsaState.handle=h;
-        fsaState.fileName=h.name;
         setSyncBadge('on');
         updateFsaUI();
         fsaReadFile().then(startFilePolling);
       }else{
-        // Nu avem permisiune automat — afișăm buton "Reconectează"
-        fsaState.handle=h;fsaState.fileName=h.name;
-        updateFsaUI(true); // needReconnect
+        fsaOnPermLost();
       }
     }).catch(function(){updateFsaUI();});
   });
+}
+
+// Verifică silent dacă permisiunea e validă (nu declanșează prompt)
+function fsaPermOK(){
+  if(!fsaState.handle) return Promise.resolve(false);
+  return fsaState.handle.queryPermission({mode:'readwrite'})
+    .then(function(p){return p==='granted';})
+    .catch(function(){return false;});
+}
+
+// Apelat când permisiunea e pierdută — stop polling, banner, UI
+function fsaOnPermLost(){
+  if(fsaState.polling){clearInterval(fsaState.polling);fsaState.polling=null;}
+  clearTimeout(syncTimer);
+  setSyncBadge('err');
+  updateFsaUI(true);
+  var banner=document.getElementById('fsaReconnectBanner');
+  if(banner)banner.classList.add('show');
+}
+
+function fsaHideReconnectBanner(){
+  var banner=document.getElementById('fsaReconnectBanner');
+  if(banner)banner.classList.remove('show');
 }
 
 function fsaPick(){
@@ -1641,59 +1666,80 @@ function fsaReconnect(){
   if(!fsaState.handle)return;
   fsaState.handle.requestPermission({mode:'readwrite'}).then(function(perm){
     if(perm!=='granted'){showToast('Permisiune refuzată','var(--red)');return;}
+    fsaHideReconnectBanner();
     setSyncBadge('on');
-    fsaReadFile().then(startFilePolling).then(function(){showToast('Reconectat ✓');updateFsaUI();});
+    fsaReadFile().then(function(){
+      return fsaWriteFile();
+    }).then(function(){
+      startFilePolling();
+      showToast('Reconectat ✓');
+      updateFsaUI();
+    });
   });
 }
 
 function fsaReadFile(){
   if(!fsaState.handle) return Promise.resolve();
-  return fsaState.handle.getFile().then(function(file){
-    if(file.lastModified<=fsaState.lastModified && fsaState.lastModified>0) return; // nicio schimbare
-    fsaState.lastModified=file.lastModified;
-    return file.text().then(function(text){
-      if(!text||!text.trim())return;
-      try{
-        var remote=JSON.parse(text);
-        if(remote.rows){
-          mergeRemote(remote);
-          if(document.getElementById('tab-istoric').classList.contains('act'))renderHistoric();
-          if(document.getElementById('tab-istoric').classList.contains('act'))renderMeasurements();
-          if(document.getElementById('tab-progres').classList.contains('act')){renderBodyChart();renderExerciseChart();}
-          if(document.getElementById('tab-setari').classList.contains('act'))updateStorageInfo();
-        }
-      }catch(e){console.error('Parse file failed',e);}
+  return fsaPermOK().then(function(ok){
+    if(!ok){fsaOnPermLost();return;}
+    return fsaState.handle.getFile().then(function(file){
+      if(file.lastModified<=fsaState.lastModified && fsaState.lastModified>0) return;
+      fsaState.lastModified=file.lastModified;
+      return file.text().then(function(text){
+        if(!text||!text.trim())return;
+        try{
+          var remote=JSON.parse(text);
+          if(remote.rows){
+            mergeRemote(remote);
+            if(document.getElementById('tab-istoric').classList.contains('act')){renderHistoric();renderMeasurements();}
+            if(document.getElementById('tab-progres').classList.contains('act')){renderBodyChart();renderExerciseChart();}
+            if(document.getElementById('tab-setari').classList.contains('act'))updateStorageInfo();
+          }
+        }catch(e){console.error('Parse file failed',e);}
+      });
+    }).catch(function(e){
+      console.warn('Read file failed',e);
+      if(e.name==='NotFoundError'){
+        showToast('Fișierul a dispărut — deconectat','var(--red)');
+        fsaDisconnect(true);
+      }else if(e.name==='NotAllowedError' || String(e.message||'').indexOf('getFile')>=0){
+        fsaOnPermLost();
+      }
     });
-  }).catch(function(e){
-    console.warn('Read file failed',e);
-    if(e.name==='NotFoundError'){
-      showToast('Fișierul a dispărut — deconectat','var(--red)');
-      fsaDisconnect(true);
-    }
   });
 }
 
 function fsaWriteFile(){
   if(!fsaState.handle) return Promise.resolve();
-  fsaState.syncing=true;
-  setSyncBadge('on','sync...');
-  return fsaState.handle.createWritable().then(function(writable){
-    return writable.write(JSON.stringify(loadStore(),null,2)).then(function(){
-      return writable.close();
-    });
-  }).then(function(){
-    return fsaState.handle.getFile();
-  }).then(function(file){
-    fsaState.lastModified=file.lastModified;
-    fsaState.lastSync=Date.now();
-    fsaState.syncing=false;
-    setSyncBadge('on');
+  return fsaPermOK().then(function(ok){
+    if(!ok){fsaOnPermLost();return false;}
+    fsaState.syncing=true;
+    setSyncBadge('on','sync...');
     updateFsaUI();
-  }).catch(function(e){
-    console.error('Write file failed',e);
-    fsaState.syncing=false;
-    setSyncBadge('err');
-    showToast('Eroare scriere: '+e.message,'var(--red)');
+    return fsaState.handle.createWritable().then(function(writable){
+      return writable.write(JSON.stringify(loadStore(),null,2)).then(function(){
+        return writable.close();
+      });
+    }).then(function(){
+      return fsaState.handle.getFile();
+    }).then(function(file){
+      fsaState.lastModified=file.lastModified;
+      fsaState.lastSync=Date.now();
+      fsaState.syncing=false;
+      setSyncBadge('on');
+      updateFsaUI();
+      return true;
+    }).catch(function(e){
+      console.error('Write file failed',e);
+      fsaState.syncing=false;
+      if(e.name==='NotAllowedError'){
+        fsaOnPermLost();
+      }else{
+        setSyncBadge('err');
+        showToast('Eroare scriere: '+e.message,'var(--red)');
+      }
+      return false;
+    });
   });
 }
 
@@ -1706,6 +1752,7 @@ function fsaDisconnect(silent){
   if(!silent && !confirm('Oprești sincronizarea cu fișierul? Datele locale rămân.'))return;
   clearInterval(fsaState.polling);
   clearTimeout(syncTimer);
+  fsaHideReconnectBanner();
   fsaClearHandle().then(function(){
     fsaState={handle:null,lastModified:0,lastSync:null,syncing:false,polling:null,fileName:''};
     setSyncBadge('off');
