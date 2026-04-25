@@ -1529,7 +1529,17 @@ function updateInfo(){
 var fsaState={handle:null,lastModified:0,lastSync:null,syncing:false,polling:null,fileName:''};
 var syncTimer=null;
 
-function fsaSupported(){return 'showOpenFilePicker' in window && 'showSaveFilePicker' in window;}
+function fsaSupported(){
+  // API check
+  if(!('showOpenFilePicker' in window) || !('showSaveFilePicker' in window)) return false;
+  // UA mobile detect — chiar dacă API-ul e expus, NU funcționează corect pe Android/iOS
+  // (permisiunile expiră la fiecare refresh, getFile dă erori)
+  var ua=(navigator.userAgent||'').toLowerCase();
+  if(/android|iphone|ipad|ipod/.test(ua))return false;
+  // Touch + small screen heuristic suplimentară (catch tablets in pretend mode)
+  if('ontouchstart' in window && window.innerWidth<900)return false;
+  return true;
+}
 
 // IndexedDB pentru persistarea file handle-ului
 function fsaDb(){
@@ -1573,7 +1583,16 @@ function fsaClearHandle(){
 }
 
 function fsaInit(){
-  if(!fsaSupported()){updateFsaUI();setSyncBadge('off');return;}
+  if(!fsaSupported()){
+    // Pe mobile / browser nesuportat — curățăm orice handle stale din IDB
+    // ca să nu existe state inconsistent
+    fsaClearHandle().catch(function(){});
+    fsaHideReconnectBanner();
+    fsaState={handle:null,lastModified:0,lastSync:null,syncing:false,polling:null,fileName:''};
+    updateFsaUI();
+    setSyncBadge('off');
+    return;
+  }
   fsaLoadHandle().then(function(h){
     if(!h){updateFsaUI();setSyncBadge('off');return;}
     h.queryPermission({mode:'readwrite'}).then(function(perm){
