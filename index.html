@@ -1914,74 +1914,40 @@ function updateFsaUI(needReconnect){
 }
 
 // ═══════════════════════════════════════════════════════════════
-// SHARE BACKUP (cascading fallbacks — robust pe toate platformele)
-// 1. File share → 2. Text share → 3. Clipboard → 4. Download
+// SHARE BACKUP — apel identic cu v15 (când funcționa cu Drive)
+// File share cu application/json → download fallback
 // ═══════════════════════════════════════════════════════════════
 function shareBackup(){
   var s=loadStore();
   var json=JSON.stringify(s,null,2);
   var filename='fitness-backup-'+todayISO()+'.json';
 
-  function tryFileShareWithMime(mime){
-    if(!navigator.share||!navigator.canShare) return Promise.resolve(false);
+  // Încercăm DIRECT navigator.share, fără canShare check (poate da false fals pe PWA Android)
+  if(navigator.share){
     try{
-      var file=new File([json],filename,{type:mime});
-      if(!navigator.canShare({files:[file]})) return Promise.resolve(false);
-      // Apel SIMPLU — doar files, fără title/text (Android Drive le ignoră oricum)
-      return navigator.share({files:[file]})
-        .then(function(){showToast('Backup trimis ✓');return true;})
+      var file=new File([json],filename,{type:'application/json'});
+      navigator.share({
+        files:[file],
+        title:'Fitness Jurnal Backup',
+        text:'Backup '+todayISO()
+      })
+        .then(function(){showToast('Backup trimis ✓');})
         .catch(function(e){
-          if(e.name==='AbortError') return true;
-          console.warn('File share ['+mime+'] fail:',e.name,e.message);
-          return false;
+          if(e.name==='AbortError') return; // user a anulat dialogul
+          console.warn('Share file fail:',e.name,e.message);
+          // Fallback: download local — Chrome Android va arăta "Open with..." → user alege Drive
+          downloadJSON();
+          showToast('Share-ul nu merge → fișier descărcat (deschide cu Drive)','var(--acc2)');
         });
-    }catch(e){return Promise.resolve(false);}
+      return;
+    }catch(e){
+      console.warn('Share threw:',e);
+    }
   }
 
-  function tryFileShare(){
-    // Încearcă întâi application/json (cum era în versiunile vechi care funcționau cu Drive)
-    return tryFileShareWithMime('application/json').then(function(ok){
-      if(ok)return true;
-      // Fallback: text/plain (unele Android sunt mai stricte)
-      return tryFileShareWithMime('text/plain');
-    });
-  }
-
-  function tryTextShare(){
-    if(!navigator.share) return Promise.resolve(false);
-    return navigator.share({title:'Fitness Backup '+todayISO(),text:json})
-      .then(function(){showToast('Backup trimis ✓');return true;})
-      .catch(function(e){
-        if(e.name==='AbortError') return true;
-        console.warn('Text share fail:',e);
-        return false;
-      });
-  }
-
-  function tryClipboard(){
-    if(!navigator.clipboard||!navigator.clipboard.writeText) return Promise.resolve(false);
-    return navigator.clipboard.writeText(json)
-      .then(function(){showToast('Backup în clipboard 📋 — paste în Drive/Mail/Telegram','var(--acc2)');return true;})
-      .catch(function(){return false;});
-  }
-
-  function tryDownload(){
-    try{downloadJSON();return true;}catch(e){return false;}
-  }
-
-  // Cascadă: încearcă în ordine, oprește la primul succes
-  tryFileShare().then(function(ok){
-    if(ok) return true;
-    return tryTextShare();
-  }).then(function(ok){
-    if(ok) return true;
-    return tryClipboard();
-  }).then(function(ok){
-    if(ok) return true;
-    tryDownload();
-    showToast('Share indisponibil — fișier descărcat','var(--acc2)');
-    return true;
-  });
+  // Niciun share API: download direct
+  downloadJSON();
+  showToast('Backup descărcat ✓');
 }
 
 // ═══════════════════════════════════════════════════════════════
