@@ -518,7 +518,7 @@ input:checked + .slider:before{transform:translateX(20px);background:var(--acc)}
 
   <div class="notif-row" style="margin-top:12px">
     <div style="flex:1">
-      <div class="notif-lbl">💾 Reminder backup zilnic</div>
+      <div class="notif-lbl">💾 Reminder backup</div>
       <div class="notif-sub" id="backupReminderStatus">Dezactivat</div>
     </div>
     <label class="sw"><input type="checkbox" id="backupReminderToggle" onchange="toggleBackupReminder()"><span class="slider"></span></label>
@@ -526,7 +526,18 @@ input:checked + .slider:before{transform:translateX(20px);background:var(--acc)}
   <div id="backupReminderConfig" style="display:none">
     <div class="notif-row">
       <div style="flex:1">
-        <div class="notif-lbl">Oră backup</div>
+        <div class="notif-lbl">Frecvență</div>
+        <div class="notif-sub">Săptămânal = recomandat (acumulează mai puține fișiere)</div>
+      </div>
+      <select id="backupReminderFreq" class="time-input" style="width:auto" onchange="updateBackupReminderCfg()">
+        <option value="weekly">Săptămânal (Duminică)</option>
+        <option value="daily">Zilnic</option>
+        <option value="monthly">Lunar (1 a lunii)</option>
+      </select>
+    </div>
+    <div class="notif-row">
+      <div style="flex:1">
+        <div class="notif-lbl">Oră</div>
         <div class="notif-sub">Recomandat: după ce termini ziua</div>
       </div>
       <input type="time" class="time-input" id="backupReminderTime" value="22:00" onchange="updateBackupReminderCfg()">
@@ -2618,8 +2629,9 @@ var BACKUP_KEY='fitness_backup_cfg';
 var backupTimer=null;
 
 function getBackupCfg(){
-  try{var raw=localStorage.getItem(BACKUP_KEY);if(!raw)return {enabled:false,time:'22:00'};return JSON.parse(raw);}
-  catch(e){return {enabled:false,time:'22:00'};}
+  try{var raw=localStorage.getItem(BACKUP_KEY);if(!raw)return {enabled:false,time:'22:00',freq:'weekly'};
+    var c=JSON.parse(raw);if(!c.freq)c.freq='weekly';return c;}
+  catch(e){return {enabled:false,time:'22:00',freq:'weekly'};}
 }
 
 function saveBackupCfg(c){localStorage.setItem(BACKUP_KEY,JSON.stringify(c));}
@@ -2632,11 +2644,16 @@ function initBackupReminderUI(){
   if(!t)return;
   t.checked=cfg.enabled;
   document.getElementById('backupReminderTime').value=cfg.time;
+  var fs=document.getElementById('backupReminderFreq');
+  if(fs)fs.value=cfg.freq;
   c.style.display=cfg.enabled?'block':'none';
   if(s){
     if(!cfg.enabled){s.textContent='Dezactivat';}
     else if(Notification.permission!=='granted'){s.textContent='Așteaptă permisiunea';}
-    else{s.textContent='Activ · zilnic la '+cfg.time;}
+    else{
+      var freqText=cfg.freq==='daily'?'zilnic':cfg.freq==='monthly'?'lunar (1 a lunii)':'duminică';
+      s.textContent='Activ · '+freqText+' la '+cfg.time;
+    }
   }
 }
 
@@ -2668,24 +2685,53 @@ function toggleBackupReminder(){
 function updateBackupReminderCfg(){
   var cfg=getBackupCfg();
   cfg.time=document.getElementById('backupReminderTime').value;
+  var fs=document.getElementById('backupReminderFreq');
+  if(fs)cfg.freq=fs.value;
   saveBackupCfg(cfg);
   scheduleBackupReminder();
   initBackupReminderUI();
+}
+
+function nextBackupReminderTime(cfg){
+  var parts=cfg.time.split(':');
+  var h=parseInt(parts[0]),m=parseInt(parts[1]);
+  var now=new Date();
+  var next=new Date();next.setHours(h,m,0,0);
+
+  if(cfg.freq==='daily'){
+    if(next<=now)next.setDate(next.getDate()+1);
+    return next;
+  }
+  if(cfg.freq==='weekly'){
+    // Duminică = ziua 0
+    while(next.getDay()!==0 || next<=now){
+      next.setDate(next.getDate()+1);
+      next.setHours(h,m,0,0);
+    }
+    return next;
+  }
+  if(cfg.freq==='monthly'){
+    // Prima zi a lunii viitoare (sau azi dacă e ziua 1 și ora nu a trecut)
+    if(next.getDate()!==1||next<=now){
+      next.setMonth(next.getMonth()+1,1);
+      next.setHours(h,m,0,0);
+    }
+    return next;
+  }
+  return next;
 }
 
 function scheduleBackupReminder(){
   clearTimeout(backupTimer);
   var cfg=getBackupCfg();
   if(!cfg.enabled)return;
-  var parts=cfg.time.split(':');
-  var h=parseInt(parts[0]),m=parseInt(parts[1]);
-  var now=new Date();
-  var next=new Date();next.setHours(h,m,0,0);
-  if(next<=now)next.setDate(next.getDate()+1);
+  var next=nextBackupReminderTime(cfg);
   var delay=next.getTime()-Date.now();
+  // setTimeout maxim ~24 zile. Dacă e mai mult (ex monthly), set la 1 zi și recheck
   if(delay>86400000)delay=86400000;
   backupTimer=setTimeout(function(){
-    fireBackupReminder();
+    var realNext=nextBackupReminderTime(cfg);
+    if(Date.now()>=realNext.getTime()-60000)fireBackupReminder(); // suntem la timp
     scheduleBackupReminder();
   },delay);
 }
