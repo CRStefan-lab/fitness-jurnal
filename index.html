@@ -209,6 +209,22 @@ input:checked + .slider:before{transform:translateX(20px);background:var(--acc)}
 .days-pick{display:flex;gap:4px;margin-top:6px}
 .day-pill{flex:1;background:var(--s2);border:1px solid var(--bd);border-radius:8px;padding:6px;text-align:center;cursor:pointer;font-size:11px;font-weight:700;color:var(--muted)}
 .day-pill.on{background:rgba(20,184,166,.15);border-color:var(--acc);color:var(--acc)}
+.recom-header{background:linear-gradient(135deg,rgba(20,184,166,.12),rgba(94,234,212,.06));border:1px solid rgba(20,184,166,.3);border-radius:var(--r);padding:14px;margin-bottom:10px}
+.recom-week{font-size:18px;font-weight:900;color:var(--acc);letter-spacing:.5px}
+.recom-focus{font-size:12px;color:var(--text);margin-top:4px}
+.recom-focus strong{color:var(--acc2)}
+.recom-progress{display:flex;gap:3px;margin-top:10px}
+.recom-progress-bar{flex:1;height:5px;background:var(--s2);border-radius:3px}
+.recom-progress-bar.done{background:var(--acc)}
+.recom-progress-bar.current{background:var(--acc2);box-shadow:0 0 8px rgba(94,234,212,.5)}
+.recom-item{background:var(--s1);border:1px solid var(--bd);border-radius:var(--r);padding:12px 14px;margin-bottom:8px}
+.recom-item.has-data{border-left:3px solid var(--acc)}
+.recom-item.no-data{border-left:3px solid var(--muted);opacity:.85}
+.recom-ex-name{font-weight:800;font-size:13px;display:flex;align-items:center;gap:6px;margin-bottom:6px}
+.recom-current{font-size:12px;color:var(--muted);margin:3px 0}
+.recom-target{font-size:13px;color:var(--acc2);font-weight:700;margin:5px 0;display:flex;align-items:center;gap:6px}
+.recom-tip{font-size:11px;color:var(--muted);font-style:italic;margin-top:6px;line-height:1.4}
+.recom-action-tag{display:inline-block;font-size:9px;letter-spacing:.5px;padding:2px 6px;border-radius:4px;background:rgba(20,184,166,.15);color:var(--acc);font-weight:700;margin-left:6px}
 .edit-btn{background:none;border:none;color:var(--muted);cursor:pointer;font-size:13px;padding:2px 6px;margin-left:4px;font-family:inherit}
 .hist-set{cursor:pointer;transition:background .15s}
 .hist-set:active{background:rgba(34,197,94,.25)}
@@ -324,6 +340,14 @@ input:checked + .slider:before{transform:translateX(20px);background:var(--acc)}
 <div id="tab-program" class="sec"><div id="prog-content"></div></div>
 
 <div id="tab-progres" class="sec">
+  <div class="stitle">🎯 Smart Coach — recomandări săptămânale</div>
+  <div class="recom-header" id="recomHeader">
+    <div class="recom-week" id="recomWeek">Săptămâna 1 din 8</div>
+    <div class="recom-focus" id="recomFocus">Focus: găsește greutatea de start</div>
+    <div class="recom-progress" id="recomProgress"></div>
+  </div>
+  <div id="recomList"></div>
+
   <div class="stitle">📏 Evoluție corp</div>
   <div class="seg" id="metricSeg"></div>
   <div class="seg" id="rangeSeg">
@@ -891,6 +915,7 @@ function showTab(name,btn){
     renderMeasurements();
   }
   if(name==='progres'){
+    renderRecommendations();
     renderBodyChart();
     renderExerciseChart();
   }
@@ -1416,7 +1441,20 @@ function buildWeekSummary(){
     out+='\n';
   }
 
-  out+='---\nTe rog analizează:\n';
+  // Smart Coach recommendations
+  var week=getProgramWeek();
+  var focus=WEEK_FOCUS[week-1]||WEEK_FOCUS[7];
+  out+='🎯 SMART COACH — SĂPT. '+week+'/8\n';
+  out+='Focus oficial: '+focus.label+'\n\n';
+  var stars=getStarExercises();
+  stars.forEach(function(s){
+    var rec=getRecommendation(s.name,week);
+    if(!rec)return;
+    out+='⭐ '+s.name+' ['+s.dayLabel+']\n';
+    if(rec.last)out+='  Ultima: '+rec.last.reps+' rep × '+rec.last.kg+' kg ('+rec.last.date+')\n';
+    out+='  Țintă: '+rec.target+'\n';
+  });
+  out+='\n---\nTe rog analizează:\n';
   out+='1. Unde am progresat la ⭐ (rep/kg) și unde stagnez\n';
   out+='2. Evoluția măsurătorilor (talie/piept/brațe) vs obiectiv recompoziție\n';
   out+='3. Aderența la rutina de dimineață (pattern) și checklist\n';
@@ -1961,6 +1999,175 @@ function preloadToday(){
       morningData[r.exercise]=(r.note==='DA');
     }
   });
+}
+
+// ═══════════════════════════════════════════════════════════════
+// SMART COACH — recomandări kg/rep bazate pe progres
+// ═══════════════════════════════════════════════════════════════
+var WEEK_FOCUS=[
+  {label:'Găsește greutatea de start',short:'Baseline'},
+  {label:'Consolidează tehnica',short:'Tehnică'},
+  {label:'+1-2 repetări la ⭐',short:'+rep'},
+  {label:'+1-2 repetări la ⭐',short:'+rep'},
+  {label:'+1-2 kg la ⭐',short:'+kg'},
+  {label:'+1-2 kg la ⭐',short:'+kg'},
+  {label:'+1 set la primul exercițiu/zi',short:'+set'},
+  {label:'DELOAD — -30% seturi · greutăți la 80%',short:'Deload'}
+];
+
+function getProgramWeek(){
+  var rows=loadStore().rows.filter(function(r){return r.type==='antrenament';});
+  if(!rows.length) return 1;
+  var dates=rows.map(function(r){return parseRoDate(r.date);}).filter(Boolean).sort(function(a,b){return a-b;});
+  if(!dates.length) return 1;
+  var earliest=dates[0];
+  var daysSince=(Date.now()-earliest.getTime())/86400000;
+  return Math.max(1,Math.min(8,Math.floor(daysSince/7)+1));
+}
+
+function getLastPerformance(exerciseName){
+  var rows=loadStore().rows.filter(function(r){return r.type==='antrenament' && r.exercise===exerciseName;});
+  if(!rows.length) return null;
+  var byDate={};
+  rows.forEach(function(r){
+    if(!byDate[r.date])byDate[r.date]=[];
+    byDate[r.date].push(r);
+  });
+  var datesSorted=Object.keys(byDate).sort(function(a,b){return parseRoDate(b)-parseRoDate(a);});
+  var latestDate=datesSorted[0];
+  var sets=byDate[latestDate];
+  var maxKg=Math.max.apply(null,sets.map(function(s){return parseFloat(s.kg)||0;}));
+  var atMaxKg=sets.filter(function(s){return parseFloat(s.kg)===maxKg;});
+  var avgReps=atMaxKg.reduce(function(a,s){return a+(parseFloat(s.reps)||0);},0)/atMaxKg.length;
+  return {kg:maxKg,reps:Math.round(avgReps),date:latestDate,setsCount:sets.length,sessions:datesSorted.length};
+}
+
+function findExerciseMeta(name){
+  var meta=null;
+  Object.keys(exercises).forEach(function(dk){
+    var ex=exercises[dk].list.find(function(e){return e.name===name;});
+    if(ex)meta={ex:ex,dayLabel:exercises[dk].label};
+  });
+  return meta;
+}
+
+function getKgIncrement(name){
+  var lower=name.toLowerCase();
+  // Bara → 2.5kg, gantere → 1kg per ganteră (2kg total bilateral pentru împins, dar afișăm pe ganteră)
+  if(lower.indexOf('bara')>=0||lower.indexOf('hip thrust')>=0)return 2.5;
+  return 1;
+}
+
+function getRecommendation(exerciseName,week){
+  var meta=findExerciseMeta(exerciseName);
+  if(!meta)return null;
+  var ex=meta.ex;
+  var range=ex.target.match(/(\d+)[-–](\d+)/);
+  var minRep=range?parseInt(range[1]):8;
+  var maxRep=range?parseInt(range[2]):12;
+  var inc=getKgIncrement(exerciseName);
+  var last=getLastPerformance(exerciseName);
+
+  if(!last){
+    return {
+      action:'start',tag:'START',
+      target:'Începe cu greutate ușoară',
+      tip:'Țintă: '+minRep+'-'+maxRep+' rep curat. Tempo 2-1-2.'
+    };
+  }
+
+  if(week<=2){
+    return {
+      action:'stabilize',tag:'BASELINE',last:last,
+      target:last.kg+' kg × '+last.reps+' rep (consolidează)',
+      tip:'Săpt. '+week+': fixează tiparul. Aceeași greutate, tempo 2-1-2 strict.'
+    };
+  }
+
+  if(week<=4){
+    if(last.reps>=maxRep){
+      return {
+        action:'add_kg',tag:'+'+inc+' KG',last:last,
+        target:(last.kg+inc)+' kg × '+minRep+' rep',
+        tip:'Ai atins maximul de rep ('+maxRep+') → urci în greutate, scazi rep.'
+      };
+    }
+    var newReps=Math.min(last.reps+2,maxRep);
+    return {
+      action:'add_rep',tag:'+'+(newReps-last.reps)+' REP',last:last,
+      target:last.kg+' kg × '+newReps+' rep',
+      tip:'Săpt. '+week+': adaugă reps la aceeași greutate.'
+    };
+  }
+
+  if(week<=6){
+    return {
+      action:'add_kg',tag:'+'+inc+' KG',last:last,
+      target:(last.kg+inc)+' kg × '+minRep+'-'+(minRep+2)+' rep',
+      tip:'Săpt. '+week+': urci în greutate, începi de la min rep range.'
+    };
+  }
+
+  if(week===7){
+    return {
+      action:'add_set',tag:'+1 SET',last:last,
+      target:last.kg+' kg × '+last.reps+' rep — adaugă 1 serie',
+      tip:'Săpt. 7: aceeași greutate, dar +1 set la primul ⭐ al zilei.'
+    };
+  }
+
+  if(week>=8){
+    var deloadKg=Math.round(last.kg*0.8*2)/2;
+    return {
+      action:'deload',tag:'DELOAD',last:last,
+      target:deloadKg+' kg × '+last.reps+' rep, -30% seturi',
+      tip:'Săpt. 8: recovery activă. Tempo curat, fără efort maxim.'
+    };
+  }
+  return null;
+}
+
+function getStarExercises(){
+  var stars=[];
+  Object.keys(exercises).forEach(function(dk){
+    exercises[dk].list.forEach(function(e){
+      if(e.star)stars.push({name:e.name,dayLabel:exercises[dk].label,dayKey:dk});
+    });
+  });
+  return stars;
+}
+
+function renderRecommendations(){
+  var week=getProgramWeek();
+  var focus=WEEK_FOCUS[week-1]||WEEK_FOCUS[7];
+  document.getElementById('recomWeek').textContent='Săptămâna '+week+' din 8';
+  document.getElementById('recomFocus').innerHTML='Focus: <strong>'+focus.label+'</strong>';
+  // Progress bar
+  var pgHtml='';
+  for(var i=1;i<=8;i++){
+    var cls=i<week?'done':(i===week?'current':'');
+    pgHtml+='<div class="recom-progress-bar '+cls+'" title="Săpt '+i+': '+WEEK_FOCUS[i-1].short+'"></div>';
+  }
+  document.getElementById('recomProgress').innerHTML=pgHtml;
+
+  // Per-exercise recommendations
+  var stars=getStarExercises();
+  var html='';
+  stars.forEach(function(s){
+    var rec=getRecommendation(s.name,week);
+    if(!rec)return;
+    var hasData=!!rec.last;
+    html+='<div class="recom-item '+(hasData?'has-data':'no-data')+'">';
+    html+='<div class="recom-ex-name">⭐ '+s.name+'<span class="recom-action-tag">'+rec.tag+'</span></div>';
+    html+='<div style="font-size:10px;color:var(--muted);margin-bottom:6px">'+s.dayLabel+'</div>';
+    if(rec.last){
+      html+='<div class="recom-current">📊 Ultima sesiune ('+rec.last.date+'): <strong style="color:var(--text)">'+rec.last.reps+' rep × '+rec.last.kg+' kg</strong> · '+rec.last.setsCount+' seturi</div>';
+    }
+    html+='<div class="recom-target">🎯 Țintă: <strong>'+rec.target+'</strong></div>';
+    html+='<div class="recom-tip">💡 '+rec.tip+'</div>';
+    html+='</div>';
+  });
+  document.getElementById('recomList').innerHTML=html;
 }
 
 // ═══════════════════════════════════════════════════════════════
