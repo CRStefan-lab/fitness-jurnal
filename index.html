@@ -1862,36 +1862,65 @@ function updateFsaUI(needReconnect){
 }
 
 // ═══════════════════════════════════════════════════════════════
-// SHARE BACKUP (folosește Web Share API nativ)
+// SHARE BACKUP (cascading fallbacks — robust pe toate platformele)
+// 1. File share → 2. Text share → 3. Clipboard → 4. Download
 // ═══════════════════════════════════════════════════════════════
 function shareBackup(){
   var s=loadStore();
   var json=JSON.stringify(s,null,2);
   var filename='fitness-backup-'+todayISO()+'.json';
 
-  // Încearcă share ca fișier (Android+modern iOS)
-  try{
-    if(navigator.canShare){
-      var file=new File([json],filename,{type:'application/json'});
-      if(navigator.canShare({files:[file]})){
-        navigator.share({files:[file],title:'Fitness Jurnal Backup',text:'Backup date antrenament — '+todayISO()})
-          .then(function(){showToast('Backup trimis ✓');})
-          .catch(function(e){if(e.name!=='AbortError')showToast('Eroare: '+e.message,'var(--red)');});
-        return;
-      }
-    }
-  }catch(e){}
-
-  // Fallback: share text (toate browserele mobile)
-  if(navigator.share){
-    navigator.share({title:'Fitness Jurnal Backup',text:json})
-      .then(function(){showToast('Backup trimis ✓');})
-      .catch(function(e){if(e.name!=='AbortError')downloadJSON();});
-    return;
+  function tryFileShare(){
+    if(!navigator.share||!navigator.canShare) return Promise.resolve(false);
+    try{
+      // text/plain e mai compatibil cu app-uri receiver decât application/json
+      var file=new File([json],filename,{type:'text/plain'});
+      if(!navigator.canShare({files:[file]})) return Promise.resolve(false);
+      return navigator.share({files:[file],title:'Fitness Backup',text:'Backup '+todayISO()})
+        .then(function(){showToast('Backup trimis ✓');return true;})
+        .catch(function(e){
+          if(e.name==='AbortError') return true; // user a anulat — OK
+          console.warn('File share fail:',e);
+          return false;
+        });
+    }catch(e){return Promise.resolve(false);}
   }
 
-  // Ultimate fallback: download
-  downloadJSON();
+  function tryTextShare(){
+    if(!navigator.share) return Promise.resolve(false);
+    return navigator.share({title:'Fitness Backup '+todayISO(),text:json})
+      .then(function(){showToast('Backup trimis ✓');return true;})
+      .catch(function(e){
+        if(e.name==='AbortError') return true;
+        console.warn('Text share fail:',e);
+        return false;
+      });
+  }
+
+  function tryClipboard(){
+    if(!navigator.clipboard||!navigator.clipboard.writeText) return Promise.resolve(false);
+    return navigator.clipboard.writeText(json)
+      .then(function(){showToast('Backup în clipboard 📋 — paste în Drive/Mail/Telegram','var(--acc2)');return true;})
+      .catch(function(){return false;});
+  }
+
+  function tryDownload(){
+    try{downloadJSON();return true;}catch(e){return false;}
+  }
+
+  // Cascadă: încearcă în ordine, oprește la primul succes
+  tryFileShare().then(function(ok){
+    if(ok) return true;
+    return tryTextShare();
+  }).then(function(ok){
+    if(ok) return true;
+    return tryClipboard();
+  }).then(function(ok){
+    if(ok) return true;
+    tryDownload();
+    showToast('Share indisponibil — fișier descărcat','var(--acc2)');
+    return true;
+  });
 }
 
 // ═══════════════════════════════════════════════════════════════
