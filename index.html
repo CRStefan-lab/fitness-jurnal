@@ -546,12 +546,14 @@ input:checked + .slider:before{transform:translateX(20px);background:var(--acc)}
 
   <div class="stitle">💾 Backup local (fișier)</div>
   <p style="font-size:12px;color:var(--muted);margin-bottom:10px;line-height:1.5">
-    Download / upload manual al fișierului JSON.
+    <code style="background:var(--bg);padding:1px 4px;border-radius:3px;font-size:11px;color:var(--acc)">fitness-data.json</code> = nume CONSTANT, suprascrie în Drive la upload.
+    Pentru backup cu istoric (file diferit pe data) → buton dată.
   </p>
   <div class="btn-row">
-    <button class="btn btn-ghost" onclick="downloadJSON()">⬇️ Descarcă</button>
+    <button class="btn btn-ghost" onclick="downloadJSON()">⬇️ fitness-data.json</button>
     <button class="btn btn-ghost" onclick="document.getElementById('fileImport').click()">⬆️ Importă</button>
   </div>
+  <button class="btn btn-ghost" style="font-size:12px;padding:8px;margin-bottom:10px" onclick="downloadJSONwithDate()">📅 Download cu dată (istoric)</button>
   <input type="file" id="fileImport" accept="application/json" style="display:none" onchange="importJSON(event)">
 
   <div class="stitle">⚠️ Zona periculoasă</div>
@@ -1526,13 +1528,28 @@ function fallbackCopy(text){
 // ═══════════════════════════════════════════════════════════════
 function downloadJSON(){
   var s=loadStore();
+  // Adaug data în CONȚINUTUL fișierului (pentru istoric vizibil), dar numele rămâne CONSTANT
+  // ca să suprascrie în Drive (același file ID). Numele cu dată folosit doar pt download manual din Istoric.
+  var blob=new Blob([JSON.stringify(s,null,2)],{type:'application/json'});
+  var url=URL.createObjectURL(blob);
+  var a=document.createElement('a');
+  a.href=url;
+  a.download='fitness-data.json';  // CONSTANT — Drive va suprascrie cel vechi când upload-uiești
+  document.body.appendChild(a);a.click();document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+  showToast('fitness-data.json descărcat ✓');
+}
+
+// Pentru download manual cu dată (din zona de Backup local — istoric vizibil)
+function downloadJSONwithDate(){
+  var s=loadStore();
   var blob=new Blob([JSON.stringify(s,null,2)],{type:'application/json'});
   var url=URL.createObjectURL(blob);
   var a=document.createElement('a');
   a.href=url;a.download='fitness-backup-'+todayISO()+'.json';
   document.body.appendChild(a);a.click();document.body.removeChild(a);
   URL.revokeObjectURL(url);
-  showToast('Backup descărcat ✓');
+  showToast('Backup cu dată descărcat ✓');
 }
 
 function importJSON(ev){
@@ -1950,7 +1967,7 @@ function updateFsaUI(needReconnect){
 function shareBackup(){
   var s=loadStore();
   var json=JSON.stringify(s,null,2);
-  var filename='fitness-backup-'+todayISO()+'.json';
+  var filename='fitness-data.json'; // CONSTANT — Drive suprascrie pe cel vechi
 
   if(!navigator.share){
     downloadJSON();
@@ -1987,10 +2004,9 @@ function markBackupDone(){
 }
 
 function showDriveUploadHint(){
-  // Doar prima dată — user știe după aceea
   if(localStorage.getItem('drive_hint_shown'))return;
   localStorage.setItem('drive_hint_shown','1');
-  alert('💡 Cum salvezi în Drive:\n\n1. Deschide aplicația Files / Manager pe telefon\n2. Mergi la Downloads\n3. Tap pe fitness-backup-...json\n4. Tap "Open with..." sau "Share"\n5. Alege Drive → Upload\n\nFișierul va fi în Drive-ul tău, accesibil pe orice device.');
+  alert('💡 SETUP DRIVE (o singură dată):\n\n1. Files → Downloads → tap pe fitness-data.json\n2. Share / Open with → Drive\n3. Alege folder (ex: "Fitness")\n4. Upload\n\n📌 IMPORTANT pentru următoarele backup-uri:\n• Fișierul se descarcă MEREU cu același nume (fitness-data.json)\n• La upload, Drive te va întreba dacă să "Înlocuiască" fișierul existent\n• Alege INTOTDEAUNA "Replace" / "Înlocuiește"\n• Așa în Drive ai un singur fișier mereu actualizat\n\n💡 Bonus: în Files manager poți șterge versiunile vechi din Downloads (file mici, dar curat).');
 }
 
 function showShareDiag(){
