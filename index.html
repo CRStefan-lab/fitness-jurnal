@@ -456,6 +456,7 @@ input:checked + .slider:before{transform:translateX(20px);background:var(--acc)}
     Un tap → meniul de share al telefonului → trimite datele către Drive, Mail, Telegram, orice. Zero setup.
   </p>
   <button class="btn btn-acc" onclick="shareBackup()">📤 Share backup (Drive / Mail / ...)</button>
+  <button class="btn btn-ghost" style="margin-top:6px;font-size:12px;padding:8px" onclick="showShareDiag()">🔧 Diagnostic share (dacă nu merge)</button>
   <p style="font-size:11px;color:var(--acc2);margin:6px 0 0;line-height:1.5;text-align:center" id="shareHint" style="display:none">
     💡 <strong>Pe mobile = sincronizarea ta.</strong> Apasă Share o dată pe săptămână → salvează în Drive.
   </p>
@@ -1914,40 +1915,69 @@ function updateFsaUI(needReconnect){
 }
 
 // ═══════════════════════════════════════════════════════════════
-// SHARE BACKUP — apel identic cu v15 (când funcționa cu Drive)
-// File share cu application/json → download fallback
+// SHARE BACKUP — debug mode + 3 strategii
 // ═══════════════════════════════════════════════════════════════
 function shareBackup(){
   var s=loadStore();
   var json=JSON.stringify(s,null,2);
   var filename='fitness-backup-'+todayISO()+'.json';
 
-  // Încercăm DIRECT navigator.share, fără canShare check (poate da false fals pe PWA Android)
-  if(navigator.share){
-    try{
-      var file=new File([json],filename,{type:'application/json'});
-      navigator.share({
-        files:[file],
-        title:'Fitness Jurnal Backup',
-        text:'Backup '+todayISO()
-      })
-        .then(function(){showToast('Backup trimis ✓');})
-        .catch(function(e){
-          if(e.name==='AbortError') return; // user a anulat dialogul
-          console.warn('Share file fail:',e.name,e.message);
-          // Fallback: download local — Chrome Android va arăta "Open with..." → user alege Drive
-          downloadJSON();
-          showToast('Share-ul nu merge → fișier descărcat (deschide cu Drive)','var(--acc2)');
-        });
-      return;
-    }catch(e){
-      console.warn('Share threw:',e);
-    }
+  // DIAGNOSTIC: arată tot ce află despre share API
+  if(!navigator.share){
+    showToast('Share API lipsă — descarcă...','var(--acc2)');
+    setTimeout(downloadJSON,500);
+    return;
   }
 
-  // Niciun share API: download direct
-  downloadJSON();
-  showToast('Backup descărcat ✓');
+  var diagnostics={
+    hasShare:!!navigator.share,
+    hasCanShare:!!navigator.canShare,
+    fileSupport:false
+  };
+
+  try{
+    var file=new File([json],filename,{type:'application/json'});
+    if(navigator.canShare){
+      try{diagnostics.fileSupport=navigator.canShare({files:[file]});}catch(e){diagnostics.fileSupport='throw: '+e.message;}
+    }
+    // Salvează pentru debug
+    localStorage.setItem('share_diagnostic',JSON.stringify(diagnostics));
+
+    // STRATEGIA 1: Încearcă file share (forțat, fără canShare check)
+    navigator.share({
+      files:[file],
+      title:'Fitness Jurnal Backup',
+      text:'Backup '+todayISO()
+    })
+      .then(function(){showToast('Backup trimis ✓');})
+      .catch(function(e){
+        if(e.name==='AbortError') return; // user dismiss
+        // Salvează eroarea pentru debug
+        localStorage.setItem('last_share_error',e.name+': '+e.message);
+        // STRATEGIA 2: Încearcă text-only share (poate Android n-acceptă file)
+        navigator.share({title:filename,text:json})
+          .then(function(){showToast('Backup trimis (text) ✓');})
+          .catch(function(e2){
+            if(e2.name==='AbortError') return;
+            localStorage.setItem('last_share_error2',e2.name+': '+e2.message);
+            // STRATEGIA 3: Download
+            downloadJSON();
+            showToast('Share-ul nu merge ('+e.name+') → descărcat. Vezi Setări pentru detalii.','var(--red)');
+          });
+      });
+  }catch(e){
+    localStorage.setItem('last_share_error',e.message);
+    downloadJSON();
+    showToast('Eroare: '+e.message+' → descărcat','var(--red)');
+  }
+}
+
+// Helper: arată ultima eroare de share (pentru debug în Setări)
+function showShareDiag(){
+  var d=localStorage.getItem('share_diagnostic')||'(niciun share încercat)';
+  var e1=localStorage.getItem('last_share_error')||'(nicio eroare)';
+  var e2=localStorage.getItem('last_share_error2')||'(nicio eroare)';
+  alert('SHARE DIAGNOSTIC\n\nDevice support:\n'+d+'\n\n--- Last error file share ---\n'+e1+'\n\n--- Last error text share ---\n'+e2);
 }
 
 // ═══════════════════════════════════════════════════════════════
