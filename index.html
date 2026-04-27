@@ -451,32 +451,37 @@ input:checked + .slider:before{transform:translateX(20px);background:var(--acc)}
 <div id="tab-setari" class="sec">
   <div class="stitle">⚙️ Setări & sync</div>
 
-  <div class="stitle">⚡ Share backup rapid</div>
-  <p style="font-size:12px;color:var(--muted);margin-bottom:10px;line-height:1.5">
+  <div class="stitle" id="shareTitle">⚡ Share backup rapid</div>
+  <p style="font-size:12px;color:var(--muted);margin-bottom:10px;line-height:1.5" id="shareDesc">
     Un tap → meniul de share al telefonului → trimite datele către Drive, Mail, Telegram, orice. Zero setup.
   </p>
   <button class="btn btn-acc" onclick="shareBackup()">📤 Share backup (Drive / Mail / ...)</button>
+  <p style="font-size:11px;color:var(--acc2);margin:6px 0 0;line-height:1.5;text-align:center" id="shareHint" style="display:none">
+    💡 <strong>Pe mobile = sincronizarea ta.</strong> Apasă Share o dată pe săptămână → salvează în Drive.
+  </p>
 
-  <div class="stitle">🗂️ Sincronizare fișier (desktop)</div>
-  <div class="drive-card" id="fsaCard">
-    <div class="drive-status" id="fsaStatus">⚪ Deconectat</div>
-    <div class="drive-sub" id="fsaSub">
-      Pe desktop Chrome/Edge poți conecta app-ul la un fișier JSON din Drive. Schimbările se salvează automat în fișier și sync-ul între device-uri se face prin Drive.
-    </div>
-    <div id="fsaActions"></div>
-    <a class="setup-link" onclick="document.getElementById('fsaSetupBox').classList.toggle('show')">Cum funcționează? ▾</a>
-    <div class="setup-box" id="fsaSetupBox">
-      <strong>Workflow recomandat:</strong>
-      <ol>
-        <li><strong>Pe telefon</strong> (la sală): introduci datele → salvează local. Săptămânal: <code>📤 Share backup</code> → Drive (o dată pe săptămână)</li>
-        <li><strong>Pe laptop</strong> (pentru analiză): apeși <strong>📁 Alege fișier</strong> → alegi <code>fitness-data.json</code> din folder-ul tău Drive (ex: <code>G:\My Drive\Fitness\</code>)</li>
-        <li>App-ul citește fișierul + scrie automat orice modificare în el (debounce 2s)</li>
-        <li>Drive-ul sincronizează fișierul între device-uri la nivel de OS</li>
-        <li>La fiecare 30 sec app-ul verifică dacă fișierul s-a modificat extern → merge automat</li>
-      </ol>
-      <p style="margin-top:8px;color:var(--muted);font-size:11px">
-        🔒 Fără token, fără cont. Funcționează pe Chrome/Edge desktop (nu pe mobile — pe telefon rămâne butonul Share).
-      </p>
+  <div id="fsaWrapper" style="display:none">
+    <div class="stitle">🗂️ Sincronizare fișier (desktop)</div>
+    <div class="drive-card" id="fsaCard">
+      <div class="drive-status" id="fsaStatus">⚪ Deconectat</div>
+      <div class="drive-sub" id="fsaSub">
+        Conectează app-ul la un fișier JSON din Drive. Schimbările se salvează automat în fișier și sync-ul între device-uri se face prin Drive.
+      </div>
+      <div id="fsaActions"></div>
+      <a class="setup-link" onclick="document.getElementById('fsaSetupBox').classList.toggle('show')">Cum funcționează? ▾</a>
+      <div class="setup-box" id="fsaSetupBox">
+        <strong>Workflow recomandat:</strong>
+        <ol>
+          <li><strong>Pe telefon</strong> (la sală): introduci datele → salvează local. Săptămânal: <code>📤 Share backup</code> → Drive</li>
+          <li><strong>Pe laptop</strong> (pentru analiză): apeși <strong>📁 Alege fișier</strong> → alegi <code>fitness-data.json</code> din folder-ul tău Drive (ex: <code>G:\My Drive\Fitness\</code>)</li>
+          <li>App-ul citește fișierul + scrie automat orice modificare (debounce 2s)</li>
+          <li>Drive-ul sincronizează fișierul între device-uri la nivel de OS</li>
+          <li>La fiecare 30 sec app-ul verifică schimbări externe → merge automat</li>
+        </ol>
+        <p style="margin-top:8px;color:var(--muted);font-size:11px">
+          🔒 Fără token, fără cont. Funcționează pe Chrome/Edge desktop.
+        </p>
+      </div>
     </div>
   </div>
 
@@ -1858,14 +1863,23 @@ function updateFsaUI(needReconnect){
   var status=document.getElementById('fsaStatus');
   var sub=document.getElementById('fsaSub');
   var actions=document.getElementById('fsaActions');
+  var wrapper=document.getElementById('fsaWrapper');
+  var shareHint=document.getElementById('shareHint');
   if(!status)return;
 
+  // Pe mobile: ascunde tot wrapper-ul FSA, evidențiază că Share = sync
   if(!fsaSupported()){
-    status.innerHTML='📱 Nu e disponibil';
-    sub.innerHTML='Pe telefon (Android/iOS) File System Access API nu merge. Folosește butonul <strong>📤 Share backup</strong> de mai sus pentru a salva manual pe Drive.';
-    actions.innerHTML='';
+    if(wrapper)wrapper.style.display='none';
+    if(shareHint){
+      shareHint.style.display='block';
+      shareHint.removeAttribute('style');
+      shareHint.style.cssText='font-size:11px;color:var(--acc2);margin:8px 0 0;line-height:1.5;text-align:center;padding:8px 12px;background:rgba(94,234,212,.08);border:1px solid rgba(94,234,212,.25);border-radius:10px';
+    }
     return;
   }
+  // Pe desktop: afișează wrapper, ascunde hint-ul mobile
+  if(wrapper)wrapper.style.display='';
+  if(shareHint)shareHint.style.display='none';
 
   if(!fsaState.handle){
     status.innerHTML='⚪ Deconectat';
