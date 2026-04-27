@@ -516,6 +516,23 @@ input:checked + .slider:before{transform:translateX(20px);background:var(--acc)}
     ⚠️ Notificările merg când app-ul e deschis sau instalat ca PWA. Pe iOS trebuie neapărat instalat pe Home Screen.
   </p>
 
+  <div class="notif-row" style="margin-top:12px">
+    <div style="flex:1">
+      <div class="notif-lbl">💾 Reminder backup zilnic</div>
+      <div class="notif-sub" id="backupReminderStatus">Dezactivat</div>
+    </div>
+    <label class="sw"><input type="checkbox" id="backupReminderToggle" onchange="toggleBackupReminder()"><span class="slider"></span></label>
+  </div>
+  <div id="backupReminderConfig" style="display:none">
+    <div class="notif-row">
+      <div style="flex:1">
+        <div class="notif-lbl">Oră backup</div>
+        <div class="notif-sub">Recomandat: după ce termini ziua</div>
+      </div>
+      <input type="time" class="time-input" id="backupReminderTime" value="22:00" onchange="updateBackupReminderCfg()">
+    </div>
+  </div>
+
   <div class="stitle">💾 Backup local (fișier)</div>
   <p style="font-size:12px;color:var(--muted);margin-bottom:10px;line-height:1.5">
     Download / upload manual al fișierului JSON.
@@ -928,6 +945,7 @@ function showTab(name,btn){
   if(name==='setari'){
     updateFsaUI();
     initNotifUI();
+    initBackupReminderUI();
     updateStorageInfo();
     updateInfo();
   }
@@ -1915,69 +1933,60 @@ function updateFsaUI(needReconnect){
 }
 
 // ═══════════════════════════════════════════════════════════════
-// SHARE BACKUP — debug mode + 3 strategii
+// SHARE BACKUP — un singur apel (cascada pierde user gesture)
+// Pe Chrome PWA Android file share = blocat. Fallback direct la download.
 // ═══════════════════════════════════════════════════════════════
 function shareBackup(){
   var s=loadStore();
   var json=JSON.stringify(s,null,2);
   var filename='fitness-backup-'+todayISO()+'.json';
 
-  // DIAGNOSTIC: arată tot ce află despre share API
   if(!navigator.share){
-    showToast('Share API lipsă — descarcă...','var(--acc2)');
-    setTimeout(downloadJSON,500);
+    downloadJSON();
+    showToast('Backup descărcat în Downloads ✓','var(--acc2)');
+    setTimeout(showDriveUploadHint,800);
     return;
   }
 
-  var diagnostics={
-    hasShare:!!navigator.share,
-    hasCanShare:!!navigator.canShare,
-    fileSupport:false
-  };
-
   try{
     var file=new File([json],filename,{type:'application/json'});
-    if(navigator.canShare){
-      try{diagnostics.fileSupport=navigator.canShare({files:[file]});}catch(e){diagnostics.fileSupport='throw: '+e.message;}
-    }
-    // Salvează pentru debug
-    localStorage.setItem('share_diagnostic',JSON.stringify(diagnostics));
-
-    // STRATEGIA 1: Încearcă file share (forțat, fără canShare check)
-    navigator.share({
-      files:[file],
-      title:'Fitness Jurnal Backup',
-      text:'Backup '+todayISO()
-    })
-      .then(function(){showToast('Backup trimis ✓');})
+    // Single call — fără cascade ca să nu pierdem user gesture
+    navigator.share({files:[file],title:filename,text:'Backup '+todayISO()})
+      .then(function(){
+        showToast('Backup trimis ✓');
+        markBackupDone();
+      })
       .catch(function(e){
-        if(e.name==='AbortError') return; // user dismiss
-        // Salvează eroarea pentru debug
-        localStorage.setItem('last_share_error',e.name+': '+e.message);
-        // STRATEGIA 2: Încearcă text-only share (poate Android n-acceptă file)
-        navigator.share({title:filename,text:json})
-          .then(function(){showToast('Backup trimis (text) ✓');})
-          .catch(function(e2){
-            if(e2.name==='AbortError') return;
-            localStorage.setItem('last_share_error2',e2.name+': '+e2.message);
-            // STRATEGIA 3: Download
-            downloadJSON();
-            showToast('Share-ul nu merge ('+e.name+') → descărcat. Vezi Setări pentru detalii.','var(--red)');
-          });
+        if(e.name==='AbortError') return;
+        // PWA Chrome blochează file share — direct la download (NU mai re-apel share)
+        downloadJSON();
+        showToast('Salvat în Downloads — upload manual la Drive','var(--acc2)');
+        setTimeout(showDriveUploadHint,800);
+        markBackupDone();
       });
   }catch(e){
-    localStorage.setItem('last_share_error',e.message);
     downloadJSON();
-    showToast('Eroare: '+e.message+' → descărcat','var(--red)');
+    showToast('Salvat în Downloads ✓','var(--acc2)');
+    markBackupDone();
   }
 }
 
-// Helper: arată ultima eroare de share (pentru debug în Setări)
+function markBackupDone(){
+  localStorage.setItem('last_backup_ts',String(Date.now()));
+}
+
+function showDriveUploadHint(){
+  // Doar prima dată — user știe după aceea
+  if(localStorage.getItem('drive_hint_shown'))return;
+  localStorage.setItem('drive_hint_shown','1');
+  alert('💡 Cum salvezi în Drive:\n\n1. Deschide aplicația Files / Manager pe telefon\n2. Mergi la Downloads\n3. Tap pe fitness-backup-...json\n4. Tap "Open with..." sau "Share"\n5. Alege Drive → Upload\n\nFișierul va fi în Drive-ul tău, accesibil pe orice device.');
+}
+
 function showShareDiag(){
-  var d=localStorage.getItem('share_diagnostic')||'(niciun share încercat)';
-  var e1=localStorage.getItem('last_share_error')||'(nicio eroare)';
-  var e2=localStorage.getItem('last_share_error2')||'(nicio eroare)';
-  alert('SHARE DIAGNOSTIC\n\nDevice support:\n'+d+'\n\n--- Last error file share ---\n'+e1+'\n\n--- Last error text share ---\n'+e2);
+  var d=localStorage.getItem('share_diagnostic')||'{}';
+  var lb=localStorage.getItem('last_backup_ts');
+  var lbStr=lb?new Date(parseInt(lb)).toLocaleString('ro-RO'):'niciodată';
+  alert('DIAGNOSTIC\n\nShare:\n'+d+'\n\nUltimul backup: '+lbStr+'\n\nNotă: pe Android Chrome PWA, file share = blocat (NotAllowedError). Folosește download → upload manual la Drive.');
 }
 
 // ═══════════════════════════════════════════════════════════════
@@ -2603,6 +2612,109 @@ function testNotif(){
 }
 
 // ═══════════════════════════════════════════════════════════════
+// BACKUP REMINDER ZILNIC
+// ═══════════════════════════════════════════════════════════════
+var BACKUP_KEY='fitness_backup_cfg';
+var backupTimer=null;
+
+function getBackupCfg(){
+  try{var raw=localStorage.getItem(BACKUP_KEY);if(!raw)return {enabled:false,time:'22:00'};return JSON.parse(raw);}
+  catch(e){return {enabled:false,time:'22:00'};}
+}
+
+function saveBackupCfg(c){localStorage.setItem(BACKUP_KEY,JSON.stringify(c));}
+
+function initBackupReminderUI(){
+  var cfg=getBackupCfg();
+  var t=document.getElementById('backupReminderToggle');
+  var c=document.getElementById('backupReminderConfig');
+  var s=document.getElementById('backupReminderStatus');
+  if(!t)return;
+  t.checked=cfg.enabled;
+  document.getElementById('backupReminderTime').value=cfg.time;
+  c.style.display=cfg.enabled?'block':'none';
+  if(s){
+    if(!cfg.enabled){s.textContent='Dezactivat';}
+    else if(Notification.permission!=='granted'){s.textContent='Așteaptă permisiunea';}
+    else{s.textContent='Activ · zilnic la '+cfg.time;}
+  }
+}
+
+function toggleBackupReminder(){
+  var on=document.getElementById('backupReminderToggle').checked;
+  var cfg=getBackupCfg();
+  if(on){
+    if(!('Notification' in window)){showToast('Browser nu suportă notificări','var(--red)');document.getElementById('backupReminderToggle').checked=false;return;}
+    Notification.requestPermission().then(function(p){
+      if(p!=='granted'){
+        showToast('Permisiune refuzată','var(--red)');
+        document.getElementById('backupReminderToggle').checked=false;
+        cfg.enabled=false;saveBackupCfg(cfg);initBackupReminderUI();return;
+      }
+      cfg.enabled=true;saveBackupCfg(cfg);
+      document.getElementById('backupReminderConfig').style.display='block';
+      scheduleBackupReminder();
+      initBackupReminderUI();
+      showToast('Reminder backup zilnic activat ✓');
+    });
+  }else{
+    cfg.enabled=false;saveBackupCfg(cfg);
+    document.getElementById('backupReminderConfig').style.display='none';
+    clearTimeout(backupTimer);backupTimer=null;
+    initBackupReminderUI();
+  }
+}
+
+function updateBackupReminderCfg(){
+  var cfg=getBackupCfg();
+  cfg.time=document.getElementById('backupReminderTime').value;
+  saveBackupCfg(cfg);
+  scheduleBackupReminder();
+  initBackupReminderUI();
+}
+
+function scheduleBackupReminder(){
+  clearTimeout(backupTimer);
+  var cfg=getBackupCfg();
+  if(!cfg.enabled)return;
+  var parts=cfg.time.split(':');
+  var h=parseInt(parts[0]),m=parseInt(parts[1]);
+  var now=new Date();
+  var next=new Date();next.setHours(h,m,0,0);
+  if(next<=now)next.setDate(next.getDate()+1);
+  var delay=next.getTime()-Date.now();
+  if(delay>86400000)delay=86400000;
+  backupTimer=setTimeout(function(){
+    fireBackupReminder();
+    scheduleBackupReminder();
+  },delay);
+}
+
+function fireBackupReminder(){
+  if(!('Notification' in window)||Notification.permission!=='granted')return;
+  // Verifică dacă a făcut deja backup azi
+  var lastTs=parseInt(localStorage.getItem('last_backup_ts')||'0');
+  if(lastTs){
+    var lastDate=new Date(lastTs);
+    var today=new Date();
+    if(lastDate.toDateString()===today.toDateString())return; // backup deja azi
+  }
+  var rows=loadStore().rows.length;
+  var body='💾 Sfârșitul zilei — backup '+rows+' înregistrări. Tap pentru a salva.';
+  if(navigator.serviceWorker){
+    navigator.serviceWorker.getRegistration().then(function(reg){
+      if(reg){
+        reg.showNotification('Fitness — Backup zilnic',{
+          body:body,icon:'./manifest.json',badge:'./manifest.json',
+          tag:'backup-reminder',requireInteraction:true,vibrate:[200,100,200],
+          data:{action:'backup'}
+        });
+      }else{new Notification('Backup zilnic',{body:body});}
+    });
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════
 // INSTALL HINT
 // ═══════════════════════════════════════════════════════════════
 function dismissInstallHint(){
@@ -2719,6 +2831,12 @@ window.addEventListener('load',function(){
       // reminder pentru azi a trecut — verificăm dacă antrenamentul e bifat
       setTimeout(fireReminder,500);
     }
+  }
+
+  // Backup reminder zilnic — re-programare
+  var bcfg=getBackupCfg();
+  if(bcfg.enabled && 'Notification' in window && Notification.permission==='granted'){
+    scheduleBackupReminder();
   }
 
   // File System Access sync (desktop Chrome/Edge) — restaurează handle-ul salvat
