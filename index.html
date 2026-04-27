@@ -1922,20 +1922,29 @@ function shareBackup(){
   var json=JSON.stringify(s,null,2);
   var filename='fitness-backup-'+todayISO()+'.json';
 
-  function tryFileShare(){
+  function tryFileShareWithMime(mime){
     if(!navigator.share||!navigator.canShare) return Promise.resolve(false);
     try{
-      // text/plain e mai compatibil cu app-uri receiver decât application/json
-      var file=new File([json],filename,{type:'text/plain'});
+      var file=new File([json],filename,{type:mime});
       if(!navigator.canShare({files:[file]})) return Promise.resolve(false);
-      return navigator.share({files:[file],title:'Fitness Backup',text:'Backup '+todayISO()})
+      // Apel SIMPLU — doar files, fără title/text (Android Drive le ignoră oricum)
+      return navigator.share({files:[file]})
         .then(function(){showToast('Backup trimis ✓');return true;})
         .catch(function(e){
-          if(e.name==='AbortError') return true; // user a anulat — OK
-          console.warn('File share fail:',e);
+          if(e.name==='AbortError') return true;
+          console.warn('File share ['+mime+'] fail:',e.name,e.message);
           return false;
         });
     }catch(e){return Promise.resolve(false);}
+  }
+
+  function tryFileShare(){
+    // Încearcă întâi application/json (cum era în versiunile vechi care funcționau cu Drive)
+    return tryFileShareWithMime('application/json').then(function(ok){
+      if(ok)return true;
+      // Fallback: text/plain (unele Android sunt mai stricte)
+      return tryFileShareWithMime('text/plain');
+    });
   }
 
   function tryTextShare(){
