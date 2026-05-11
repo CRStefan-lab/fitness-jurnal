@@ -1051,12 +1051,17 @@ function renderToday(){
     }
     setsHtml+='</div>';
 
-    // Smart Coach hint pentru ⭐ exerciții
+    // Smart Coach hint pentru ⭐ + accesorii (double progression)
     var smartHint='';
     if(e.star){
       var rec=getRecommendation(e.name,coachWeek);
       if(rec){
         smartHint='<div style="background:rgba(20,184,166,.1);border-left:3px solid var(--acc);padding:4px 10px;margin:4px 14px 0;border-radius:0 6px 6px 0;font-size:11px;color:var(--text)">🎯 <strong style="color:var(--acc2)">AZI</strong>: '+rec.target+'</div>';
+      }
+    }else{
+      var accRec=getAccessoryRec(e.name,e);
+      if(accRec){
+        smartHint='<div style="background:rgba(125,141,154,.06);border-left:2px solid '+accRec.color+';padding:3px 10px;margin:4px 14px 0;border-radius:0 4px 4px 0;font-size:11px;color:var(--muted)">📊 <strong style="color:var(--text)">'+accRec.summary+'</strong> <span style="color:'+accRec.color+'">'+accRec.action+'</span></div>';
       }
     }
     html+='<div class="card" id="ec_'+ei+'">';
@@ -1318,6 +1323,11 @@ function initProgram(){
       if(e.star){
         var rec=getRecommendation(e.name,week);
         if(rec)smartTarget='<div style="font-size:11px;color:var(--acc2);margin-top:2px">🎯 '+rec.target+'</div>';
+      }else{
+        var accRec=getAccessoryRec(e.name,e);
+        if(accRec){
+          smartTarget='<div style="font-size:11px;color:var(--muted);margin-top:2px">📊 <strong style="color:var(--text)">'+accRec.summary+'</strong> <span style="color:'+accRec.color+'">'+accRec.action+'</span></div>';
+        }
       }
       html+='<div style="display:flex;align-items:flex-start;gap:8px;padding:8px 0;border-bottom:1px solid var(--bd);font-size:13px">';
       html+='<div style="color:'+(e.star?'var(--acc2)':'transparent')+';width:18px;flex-shrink:0;padding-top:1px">'+(e.star?'⭐':'·')+'</div>';
@@ -2327,6 +2337,74 @@ function getStarExercises(){
     });
   });
   return stars;
+}
+
+// Increment specific pentru tine: gantere rotunde 0.5-1kg, bară 2.5kg
+function getAccessoryIncrement(name,maxRep){
+  var lower=name.toLowerCase();
+  if(lower.indexOf('bara')>=0||lower.indexOf('deadlift')>=0)return 2.5;
+  // DB compound mai grele (squat, hinge, hip thrust)
+  if(lower.indexOf('squat')>=0||lower.indexOf('hinge')>=0||lower.indexOf('thrust')>=0)return maxRep<12?2:1;
+  // Lunges + ramat un braț (unilateral compound)
+  if(lower.indexOf('lunges')>=0||lower.indexOf('ramat un')>=0)return 1;
+  // Lateral / reverse fly / fluturări — mușchi mici, rep mari
+  if(lower.indexOf('laterale')>=0||lower.indexOf('reverse')>=0||lower.indexOf('flutur')>=0)return 0.5;
+  // Biceps / triceps
+  if(lower.indexOf('biceps')>=0||lower.indexOf('triceps')>=0||lower.indexOf('flexii')>=0||lower.indexOf('extens')>=0)return 1;
+  // Pullover, alte accesorii medii
+  if(lower.indexOf('pullover')>=0)return 1;
+  // Calf raises — increment mic, rep mari
+  if(lower.indexOf('vârfuri')>=0||lower.indexOf('varfuri')>=0)return 1;
+  // Abs cu greutate
+  if(lower.indexOf('abdomene')>=0)return 2.5;
+  // Default DB
+  return maxRep<12?1.5:1;
+}
+
+// Sugestie pentru exerciții NON-⭐ — double progression conservativă
+function getAccessoryRec(exerciseName,exMeta){
+  // Exerciții non-progresive (recovery, stretching, pași)
+  var nm=exerciseName.toLowerCase();
+  if(nm.indexOf('pași')>=0||nm.indexOf('stretch')>=0||nm.indexOf('mobilitate')>=0||nm.indexOf('plank')===0){
+    return null; // nu sugerează nimic
+  }
+  // Parse rep range
+  var range=exMeta.target.match(/(\d+)[-–](\d+)/);
+  if(!range){
+    // Format special (8/pic, 10/p, etc.) — parse doar primul număr
+    var single=exMeta.target.match(/(\d+)/);
+    if(!single)return null;
+    range=[null,single[1],single[1]]; // tratează ca rep fix
+  }
+  var minRep=parseInt(range[1]);
+  var maxRep=parseInt(range[2]);
+  var last=getLastPerformance(exerciseName);
+  if(!last)return null; // fără date, nu sugerăm
+  if(!last.kg||last.kg<=0)return null; // bodyweight fără date suficiente
+
+  var inc=getAccessoryIncrement(exerciseName,maxRep);
+  if(last.reps>=maxRep){
+    return {
+      type:'at_max',
+      summary:last.kg+' kg × '+last.reps+' rep ✓',
+      action:'→ urcă la '+(last.kg+inc)+' kg, scade la '+minRep+' rep',
+      color:'var(--green)'
+    };
+  }
+  if(last.reps>=minRep){
+    return {
+      type:'in_range',
+      summary:last.kg+' kg × '+last.reps+' rep',
+      action:'→ +1 rep (păstrează kg)',
+      color:'var(--acc2)'
+    };
+  }
+  return {
+    type:'below_min',
+    summary:last.kg+' kg × '+last.reps+' rep',
+    action:'→ repetă, ajunge la '+minRep+' rep mai întâi',
+    color:'var(--muted)'
+  };
 }
 
 function renderRecommendations(){
