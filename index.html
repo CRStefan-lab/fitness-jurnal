@@ -299,7 +299,7 @@ input:checked + .slider:before{transform:translateX(20px);background:var(--acc)}
 <nav class="bnav">
   <button class="nb act" onclick="showTab('azi',this)"><span class="ico">🏋️</span>Azi</button>
   <button class="nb" onclick="showTab('nutritie',this)"><span class="ico">🥗</span>Nutriție</button>
-  <button class="nb" onclick="showTab('program',this)"><span class="ico">📅</span>Program</button>
+  <button class="nb" onclick="showTab('program',this)"><span class="ico">📅</span>Săptămâna</button>
   <button class="nb" onclick="showTab('progres',this)"><span class="ico">📈</span>Progres</button>
   <button class="nb" onclick="showTab('istoric',this)"><span class="ico">📊</span>Istoric</button>
   <button class="nb" onclick="showTab('ghid',this)"><span class="ico">📖</span>Ghid</button>
@@ -340,47 +340,6 @@ input:checked + .slider:before{transform:translateX(20px);background:var(--acc)}
 <div id="tab-program" class="sec"><div id="prog-content"></div></div>
 
 <div id="tab-progres" class="sec">
-  <div class="stitle">🎯 Smart Coach — recomandări săptămânale</div>
-  <div class="recom-header" id="recomHeader">
-    <div class="recom-week" id="recomWeek">Săptămâna 1 din 8</div>
-    <div class="recom-focus" id="recomFocus">Focus: găsește greutatea de start</div>
-    <div class="recom-progress" id="recomProgress"></div>
-  </div>
-  <div id="recomList"></div>
-
-  <div class="stitle">📏 Evoluție corp</div>
-  <div class="seg" id="metricSeg"></div>
-  <div class="seg" id="rangeSeg">
-    <button class="seg-btn" data-range="4">4 săpt.</button>
-    <button class="seg-btn act" data-range="8">8 săpt.</button>
-    <button class="seg-btn" data-range="13">3 luni</button>
-    <button class="seg-btn" data-range="0">Tot</button>
-  </div>
-  <div class="chart-wrap">
-    <div id="bodyChart"></div>
-    <div class="chart-stats" id="bodyStats"></div>
-  </div>
-
-  <div class="stitle">🏋️ Progres exercițiu</div>
-  <select class="select-box" id="exerSelect">
-    <option value="">— Alege exercițiu —</option>
-  </select>
-  <div class="seg" id="exerMetricSeg">
-    <button class="seg-btn act" data-em="maxkg">Max kg</button>
-    <button class="seg-btn" data-em="volume">Volum (Σ rep×kg)</button>
-    <button class="seg-btn" data-em="avgreps">Rep medii</button>
-  </div>
-  <div class="chart-wrap">
-    <div id="exerChart"></div>
-    <div class="chart-stats" id="exerStats"></div>
-  </div>
-
-  <p style="font-size:11px;color:var(--muted);margin-top:16px;line-height:1.5;text-align:center">
-    🔔 Notificări · ☁️ Sync · 💾 Backup — găsești toate în <a onclick="showTab('setari')" style="color:var(--acc);cursor:pointer;text-decoration:underline">Setări ⚙️</a>
-  </p>
-</div>
-
-<div id="tab-istoric" class="sec">
   <div class="stitle">📏 Măsurători corp</div>
   <div class="meas-date">
     <div class="meas-lbl">DATA</div>
@@ -427,7 +386,40 @@ input:checked + .slider:before{transform:translateX(20px);background:var(--acc)}
   <button class="btn btn-acc" onclick="saveMeasurement()">💾 Salvează măsurătorile</button>
   <div id="measHistory"></div>
 
-  <div class="stitle">📊 Antrenament</div>
+  <div class="stitle">📈 Grafice evoluție corp</div>
+  <div class="seg" id="metricSeg"></div>
+  <div class="seg" id="rangeSeg">
+    <button class="seg-btn" data-range="4">4 săpt.</button>
+    <button class="seg-btn act" data-range="8">8 săpt.</button>
+    <button class="seg-btn" data-range="13">3 luni</button>
+    <button class="seg-btn" data-range="0">Tot</button>
+  </div>
+  <div class="chart-wrap">
+    <div id="bodyChart"></div>
+    <div class="chart-stats" id="bodyStats"></div>
+  </div>
+
+  <div class="stitle">🏋️ Progres exercițiu</div>
+  <select class="select-box" id="exerSelect">
+    <option value="">— Alege exercițiu —</option>
+  </select>
+  <div class="seg" id="exerMetricSeg">
+    <button class="seg-btn act" data-em="maxkg">Max kg</button>
+    <button class="seg-btn" data-em="volume">Volum (Σ rep×kg)</button>
+    <button class="seg-btn" data-em="avgreps">Rep medii</button>
+  </div>
+  <div class="chart-wrap">
+    <div id="exerChart"></div>
+    <div class="chart-stats" id="exerStats"></div>
+  </div>
+
+  <p style="font-size:11px;color:var(--muted);margin-top:16px;line-height:1.5;text-align:center">
+    🔔 Notificări · ☁️ Sync · 💾 Backup — găsești toate în <a onclick="showTab('setari')" style="color:var(--acc);cursor:pointer;text-decoration:underline">Setări ⚙️</a>
+  </p>
+</div>
+
+<div id="tab-istoric" class="sec">
+  <div class="stitle">📊 Săptămâna afișată</div>
   <div class="week-nav">
     <button class="week-nav-btn" id="weekPrev" onclick="changeWeek(-1)">‹</button>
     <div class="week-nav-title">
@@ -436,6 +428,7 @@ input:checked + .slider:before{transform:translateX(20px);background:var(--acc)}
     </div>
     <button class="week-nav-btn" id="weekNext" onclick="changeWeek(1)">›</button>
   </div>
+  <div id="weekSummary" style="font-size:11px;color:var(--muted);text-align:center;margin-bottom:12px"></div>
   <div id="hist-content"></div>
 
   <div class="stitle">📤 Export pentru Claude</div>
@@ -948,10 +941,12 @@ function showTab(name,btn){
   if(btn) btn.classList.add('act');
   if(name==='istoric'){
     renderHistoric();
-    renderMeasurements();
+  }
+  if(name==='program'){
+    initProgram();
   }
   if(name==='progres'){
-    renderRecommendations();
+    renderMeasurements();
     renderBodyChart();
     renderExerciseChart();
   }
@@ -1022,6 +1017,13 @@ function renderToday(){
     html+='<button onclick="resetWorkoutDay()">↺ Azi</button></div>';
   }
 
+  // Smart Coach summary header (mic, deasupra)
+  var coachWeek=getProgramWeek();
+  var coachFocus=WEEK_FOCUS[coachWeek-1]||WEEK_FOCUS[7];
+  html+='<div style="background:linear-gradient(135deg,rgba(20,184,166,.12),rgba(94,234,212,.06));border:1px solid rgba(20,184,166,.3);border-radius:10px;padding:10px 14px;margin-bottom:12px;font-size:12px;text-align:center">';
+  html+='📍 <strong style="color:var(--acc)">Săpt. '+coachWeek+'/8</strong> · Focus: <strong style="color:var(--acc2)">'+coachFocus.label+'</strong>';
+  html+='</div>';
+
   // Morning routine card
   html+=buildMorningCard(idx);
 
@@ -1049,11 +1051,20 @@ function renderToday(){
     }
     setsHtml+='</div>';
 
+    // Smart Coach hint pentru ⭐ exerciții
+    var smartHint='';
+    if(e.star){
+      var rec=getRecommendation(e.name,coachWeek);
+      if(rec){
+        smartHint='<div style="background:rgba(20,184,166,.1);border-left:3px solid var(--acc);padding:4px 10px;margin:4px 14px 0;border-radius:0 6px 6px 0;font-size:11px;color:var(--text)">🎯 <strong style="color:var(--acc2)">AZI</strong>: '+rec.target+'</div>';
+      }
+    }
     html+='<div class="card" id="ec_'+ei+'">';
     html+='<div class="card-hd" onclick="document.getElementById(\'ec_'+ei+'\').classList.toggle(\'open\')">';
     html+='<div style="color:'+(e.star?'var(--acc2)':'transparent')+';font-size:13px;width:18px;flex-shrink:0">'+(e.star?'⭐':'·')+'</div>';
     html+='<div style="flex:1"><div class="card-ttl">'+e.name+'</div><div class="card-sub">'+e.sets+' seturi · Țintă: '+e.target+' rep</div></div>';
     html+='<div class="card-chev">▼</div></div>';
+    html+=smartHint;
     html+='<div class="card-bd"><div>'+setsHtml+'</div></div></div>';
   });
 
@@ -1242,25 +1253,95 @@ function renderNutDay(){
 }
 
 // ═══════════════════════════════════════════════════════════════
-// PROGRAM
+// SĂPTĂMÂNA — overview săpt. curentă + Smart Coach + zile cu status
 // ═══════════════════════════════════════════════════════════════
 function initProgram(){
-  var cont=document.getElementById('prog-content'),html='<div class="stitle">Obiective pe săptămâni</div>';
-  var focuses=['Găsește greutatea de start · Tempo 2-1-2','Consolidează tehnica · Tempo 2-1-2','+1–2 repetări la ⭐','+1–2 repetări la ⭐','+1–2 kg la ⭐','+1–2 kg la ⭐','+1 set la primul exercițiu/zi','DELOAD — –30% seturi · greutăți la 80%'];
-  html+='<div class="card"><div class="card-bd" style="display:block;padding:14px;border-top:none">';
-  focuses.forEach(function(f,i){
-    html+='<div style="display:flex;gap:10px;padding:8px 0;border-bottom:1px solid var(--bd);font-size:13px;align-items:center"><div style="font-size:18px;font-weight:900;color:var(--acc);width:30px;flex-shrink:0">'+(i+1)+'</div><div>'+f+'</div></div>';
-  });
+  var cont=document.getElementById('prog-content');
+  var week=getProgramWeek();
+  var focus=WEEK_FOCUS[week-1]||WEEK_FOCUS[7];
+  var realDay=todayIdx();
+  var html='';
+
+  // Header săptămână
+  html+='<div class="recom-header" style="margin-top:14px">';
+  html+='<div class="recom-week">Săptămâna '+week+' din 8</div>';
+  html+='<div class="recom-focus">Focus: <strong>'+focus.label+'</strong></div>';
+  html+='<div class="recom-progress">';
+  for(var i=1;i<=8;i++){
+    var cls=i<week?'done':(i===week?'current':'');
+    html+='<div class="recom-progress-bar '+cls+'" title="Săpt '+i+': '+WEEK_FOCUS[i-1].short+'"></div>';
+  }
   html+='</div></div>';
-  var dayKeys=['luni','marti','miercuri','joi','vineri','sambata'];
-  dayKeys.forEach(function(dk,di){
+
+  // 7 zile cu status
+  html+='<div class="stitle">📋 Zilele săptămânii</div>';
+  var dayLabels=['LUNI','MARȚI','MIERCURI','JOI','VINERI','SÂMBĂTĂ','DUMINICĂ'];
+  var dayKeys=['luni','marti','miercuri','joi','vineri','sambata','sambata'];
+
+  for(var di=0;di<7;di++){
+    var dk=dayKeys[di];
     var ex=exercises[dk];
-    html+='<div class="card" id="pc_'+di+'"><div class="card-hd" onclick="document.getElementById(\'pc_'+di+'\').classList.toggle(\'open\')"><div class="card-ico" style="background:rgba(20,184,166,.12)">'+ex.icon+'</div><div><div class="card-ttl">'+dk.toUpperCase()+' — '+ex.label+'</div><div class="card-sub">'+ex.duration+'</div></div><div class="card-chev">▼</div></div><div class="card-bd"><div style="padding-top:10px">';
+    var dayLabel=dayLabels[di];
+    var isToday=di===realDay;
+    var isPast=di<realDay;
+    var isFuture=di>realDay;
+    // Verifică dacă a fost făcut antrenamentul în săptămâna curentă pentru această zi
+    var weekRows=getRowsForWeek(0).filter(function(r){return r.type==='antrenament' && r.day===dayLabel;});
+    var doneCount={};
+    weekRows.forEach(function(r){doneCount[r.exercise]=true;});
+    var doneExercises=Object.keys(doneCount).length;
+    var totalExercises=ex.list.length;
+    var statusBadge='';
+    var borderColor='var(--bd)';
+    var bgTint='';
+    if(doneExercises>0){
+      statusBadge='<span style="background:rgba(34,197,94,.2);color:var(--green);font-size:10px;font-weight:800;padding:2px 7px;border-radius:6px">✓ '+doneExercises+'/'+totalExercises+'</span>';
+      borderColor='rgba(34,197,94,.4)';
+    }else if(isToday){
+      statusBadge='<span style="background:rgba(20,184,166,.2);color:var(--acc);font-size:10px;font-weight:800;padding:2px 7px;border-radius:6px">⏳ AZI</span>';
+      borderColor='var(--acc)';
+      bgTint='background:linear-gradient(135deg,rgba(20,184,166,.06),transparent);';
+    }else if(isPast){
+      statusBadge='<span style="background:rgba(125,141,154,.15);color:var(--muted);font-size:10px;font-weight:800;padding:2px 7px;border-radius:6px">— SĂRIT</span>';
+    }else{
+      statusBadge='<span style="background:rgba(125,141,154,.1);color:var(--muted);font-size:10px;font-weight:800;padding:2px 7px;border-radius:6px">🕓 VIITOR</span>';
+    }
+
+    html+='<div class="card" id="pc_'+di+'" style="border-color:'+borderColor+';'+bgTint+'"><div class="card-hd" onclick="document.getElementById(\'pc_'+di+'\').classList.toggle(\'open\')">';
+    html+='<div class="card-ico" style="background:rgba(20,184,166,.12)">'+ex.icon+'</div>';
+    html+='<div style="flex:1"><div class="card-ttl">'+dayLabel+' — '+ex.label+'</div><div class="card-sub">'+ex.duration+'</div></div>';
+    html+='<div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px">'+statusBadge+'<div class="card-chev">▼</div></div>';
+    html+='</div>';
+    html+='<div class="card-bd"><div style="padding-top:10px">';
     ex.list.forEach(function(e){
-      html+='<div style="display:flex;align-items:center;gap:8px;padding:8px 0;border-bottom:1px solid var(--bd);font-size:13px"><div style="color:'+(e.star?'var(--acc2)':'transparent')+';width:18px;flex-shrink:0">'+(e.star?'⭐':'·')+'</div><div style="flex:1;font-weight:500">'+e.name+'</div><div style="font-size:11px;color:var(--acc);background:rgba(20,184,166,.1);padding:2px 7px;border-radius:20px;flex-shrink:0">'+e.sets+'×'+e.target+'</div></div>';
+      var smartTarget='';
+      if(e.star){
+        var rec=getRecommendation(e.name,week);
+        if(rec)smartTarget='<div style="font-size:11px;color:var(--acc2);margin-top:2px">🎯 '+rec.target+'</div>';
+      }
+      html+='<div style="display:flex;align-items:flex-start;gap:8px;padding:8px 0;border-bottom:1px solid var(--bd);font-size:13px">';
+      html+='<div style="color:'+(e.star?'var(--acc2)':'transparent')+';width:18px;flex-shrink:0;padding-top:1px">'+(e.star?'⭐':'·')+'</div>';
+      html+='<div style="flex:1"><div style="font-weight:500">'+e.name+'</div>'+smartTarget+'</div>';
+      html+='<div style="font-size:11px;color:var(--acc);background:rgba(20,184,166,.1);padding:2px 7px;border-radius:20px;flex-shrink:0;align-self:flex-start;margin-top:1px">'+e.sets+'×'+e.target+'</div>';
+      html+='</div>';
     });
     html+='</div></div></div>';
+  }
+
+  // Plan general 8 săpt. (compact, la final)
+  html+='<div class="stitle">📅 Plan 8 săptămâni</div>';
+  html+='<div class="card"><div class="card-bd" style="display:block;padding:14px;border-top:none">';
+  WEEK_FOCUS.forEach(function(f,i){
+    var isCurrent=(i+1)===week;
+    var color=isCurrent?'var(--acc)':'var(--muted)';
+    var weight=isCurrent?'900':'500';
+    html+='<div style="display:flex;gap:10px;padding:6px 0;border-bottom:1px solid var(--bd);font-size:12px;align-items:center">';
+    html+='<div style="font-size:14px;font-weight:'+weight+';color:'+color+';width:30px;flex-shrink:0">'+(i+1)+'</div>';
+    html+='<div style="color:'+(isCurrent?'var(--text)':'var(--muted)')+';flex:1">'+f.label+(isCurrent?' ← <strong style="color:var(--acc2)">acum</strong>':'')+'</div>';
+    html+='</div>';
   });
+  html+='</div></div>';
+
   cont.innerHTML=html;
 }
 
@@ -1366,37 +1447,93 @@ function renderHistoric(){
   document.getElementById('weekNext').disabled=(currentWeekOffset>=0);
 
   var cont=document.getElementById('hist-content');
+  var summaryEl=document.getElementById('weekSummary');
   var rows=getRowsForWeek(currentWeekOffset);
+
+  // Sumar săptămână
+  var totalSets=rows.filter(function(r){return r.type==='antrenament';}).length;
+  var totalMornings=rows.filter(function(r){return r.type==='dimineata'&&r.note==='DA';}).length;
+  var totalChecks=rows.filter(function(r){return r.type==='checklist'&&r.note==='DA';}).length;
+  // Comparație cu săpt. anterioară
+  var prevRows=getRowsForWeek(currentWeekOffset-1);
+  var prevSets=prevRows.filter(function(r){return r.type==='antrenament';}).length;
+  var delta=totalSets-prevSets;
+  var deltaStr='';
+  if(prevSets>0){
+    var d=delta>0?' (+'+delta+')':(delta<0?' ('+delta+')':' (=)');
+    deltaStr=' <span style="color:'+(delta>0?'var(--green)':delta<0?'var(--acc2)':'var(--muted)')+'">vs săpt anterioară'+d+'</span>';
+  }
+  if(summaryEl){
+    summaryEl.innerHTML=totalSets?
+      '📊 '+totalSets+' seturi · ☀️ '+totalMornings+' bife dimineață · ✅ '+totalChecks+' bife checklist'+deltaStr
+      :'Nicio activitate înregistrată';
+  }
+
   if(!rows.length){
-    cont.innerHTML='<div style="color:var(--muted);font-size:13px;text-align:center;padding:30px">Nicio dată în această săptămână.</div>';
+    cont.innerHTML='<div style="color:var(--muted);font-size:13px;text-align:center;padding:30px">Nicio dată în această săptămână.<br><br><span style="font-size:11px">Navighează cu ‹ › pentru alte săptămâni</span></div>';
     return;
   }
+
+  // Grupare pe zi
   var byDay={};
   rows.forEach(function(r){
-    if(!byDay[r.day])byDay[r.day]={exercises:{},checks:[]};
+    if(!byDay[r.day])byDay[r.day]={exercises:{},checks:[],morning:[]};
     if(r.type==='antrenament'){
       if(!byDay[r.day].exercises[r.exercise])byDay[r.day].exercises[r.exercise]=[];
       byDay[r.day].exercises[r.exercise].push({set:r.set,reps:r.reps,kg:r.kg});
     }else if(r.type==='checklist'){
       byDay[r.day].checks.push({item:r.exercise,value:r.note});
+    }else if(r.type==='dimineata'){
+      byDay[r.day].morning.push({id:r.exercise,done:r.note==='DA'});
     }
   });
+
   var html='';
   ['LUNI','MARȚI','MIERCURI','JOI','VINERI','SÂMBĂTĂ','DUMINICĂ'].forEach(function(d){
     if(!byDay[d])return;
-    var exCount=Object.keys(byDay[d].exercises).length;
-    var chkDone=byDay[d].checks.filter(function(c){return c.value==='DA';}).length;
-    html+='<div class="hist-day"><div class="hist-day-hd"><span>'+d+'</span><span style="color:var(--muted);font-size:11px">'+exCount+' ex · ✓ '+chkDone+'/'+checkItems.length+'</span></div>';
-    Object.keys(byDay[d].exercises).forEach(function(ex){
-      var sets=byDay[d].exercises[ex].sort(function(a,b){return a.set-b.set;});
-      var exEnc=encodeURIComponent(ex);
-      html+='<div class="hist-ex"><div class="hist-ex-nm">'+ex+' <span style="color:var(--muted);font-size:10px;font-weight:400">· tap pe set pentru editare</span></div><div class="hist-sets">';
-      sets.forEach(function(s){
-        // need to find the actual row (date) to edit — pick first matching row from this week
-        html+='<span class="hist-set" onclick="openEdit(\''+d+'\',\''+exEnc+'\','+s.set+')">S'+s.set+': '+s.reps+'rep × '+s.kg+'kg ✎</span>';
+    var dayData=byDay[d];
+    var exCount=Object.keys(dayData.exercises).length;
+    var totalSetsInDay=Object.values(dayData.exercises).reduce(function(a,sets){return a+sets.length;},0);
+    var chkDone=dayData.checks.filter(function(c){return c.value==='DA';}).length;
+    var morningDone=dayData.morning.filter(function(m){return m.done;}).length;
+    var morningTotal=dayData.morning.length;
+
+    html+='<div class="hist-day">';
+    // Header zi
+    html+='<div class="hist-day-hd"><span>'+d+'</span>';
+    html+='<span style="color:var(--muted);font-size:11px">';
+    if(exCount)html+='💪 '+exCount+' ex · '+totalSetsInDay+' sets';
+    if(morningTotal)html+=' · ☀️ '+morningDone+'/'+morningTotal;
+    if(chkDone)html+=' · ✅ '+chkDone+'/'+checkItems.length;
+    html+='</span></div>';
+
+    // Exercitii
+    if(exCount){
+      Object.keys(dayData.exercises).forEach(function(ex){
+        var sets=dayData.exercises[ex].sort(function(a,b){return a.set-b.set;});
+        var exEnc=encodeURIComponent(ex);
+        // Verifică dacă e ⭐
+        var meta=findExerciseMeta(ex);
+        var starIcon=(meta&&meta.ex.star)?'<span style="color:var(--acc2);margin-right:4px">⭐</span>':'';
+        html+='<div class="hist-ex"><div class="hist-ex-nm">'+starIcon+ex+' <span style="color:var(--muted);font-size:10px;font-weight:400">· tap set = editare</span></div><div class="hist-sets">';
+        sets.forEach(function(s){
+          html+='<span class="hist-set" onclick="openEdit(\''+d+'\',\''+exEnc+'\','+s.set+')">S'+s.set+': '+s.reps+'×'+s.kg+'kg ✎</span>';
+        });
+        html+='</div></div>';
       });
-      html+='</div></div>';
-    });
+    }
+
+    // Sumar morning + checklist (compact)
+    if(morningTotal||dayData.checks.length){
+      html+='<div class="hist-ex" style="background:rgba(20,184,166,.04);font-size:11px;color:var(--muted)">';
+      if(morningTotal)html+='☀️ Dimineață: '+morningDone+'/'+morningTotal+' bifate';
+      if(morningTotal&&dayData.checks.length)html+=' · ';
+      if(dayData.checks.length){
+        var doneList=dayData.checks.filter(function(c){return c.value==='DA';}).map(function(c){return c.item;}).join(', ');
+        if(doneList)html+='✅ '+doneList;
+      }
+      html+='</div>';
+    }
     html+='</div>';
   });
   cont.innerHTML=html;
