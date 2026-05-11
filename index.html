@@ -2227,8 +2227,13 @@ function getProgramWeek(){
   return Math.max(1,Math.min(8,Math.floor(daysSince/7)+1));
 }
 
-function getLastPerformance(exerciseName){
-  var rows=loadStore().rows.filter(function(r){return r.type==='antrenament' && r.exercise===exerciseName;});
+function getLastPerformance(exerciseName,excludeDate){
+  // excludeDate = sare peste o anumită dată (ex: AZI, ca recomandarea să fie stabilă în timpul sesiunii)
+  var rows=loadStore().rows.filter(function(r){
+    if(r.type!=='antrenament'||r.exercise!==exerciseName)return false;
+    if(excludeDate&&r.date===excludeDate)return false;
+    return true;
+  });
   if(!rows.length) return null;
   var byDate={};
   rows.forEach(function(r){
@@ -2268,7 +2273,8 @@ function getRecommendation(exerciseName,week){
   var minRep=range?parseInt(range[1]):8;
   var maxRep=range?parseInt(range[2]):12;
   var inc=getKgIncrement(exerciseName);
-  var last=getLastPerformance(exerciseName);
+  // Exclude AZI ca recomandarea să fie STABILĂ în timpul sesiunii (vine din sesiunea anterioară)
+  var last=getLastPerformance(exerciseName,getEffectiveDateRo());
 
   if(!last){
     return {
@@ -2378,11 +2384,13 @@ function getAccessoryRec(exerciseName,exMeta){
   }
   var minRep=parseInt(range[1]);
   var maxRep=parseInt(range[2]);
-  var last=getLastPerformance(exerciseName);
-  if(!last)return null; // fără date, nu sugerăm
-  if(!last.kg||last.kg<=0)return null; // bodyweight fără date suficiente
+  // Exclude AZI — recomandare stabilă din sesiunea anterioară
+  var last=getLastPerformance(exerciseName,getEffectiveDateRo());
+  if(!last)return null;
+  if(!last.kg||last.kg<=0)return null;
 
   var inc=getAccessoryIncrement(exerciseName,maxRep);
+  // (last vine din getLastPerformance care a exclus AZI mai jos)
   if(last.reps>=maxRep){
     return {
       type:'at_max',
