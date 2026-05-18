@@ -1652,13 +1652,22 @@ function renderHistoric(){
       Object.keys(dayData.exercises).forEach(function(ex){
         var sets=dayData.exercises[ex].sort(function(a,b){return a.set-b.set;});
         var exEnc=encodeURIComponent(ex);
-        // Verifică dacă e ⭐
         var meta=findExerciseMeta(ex);
+        var totalSets=meta?meta.ex.sets:Math.max.apply(null,sets.map(function(s){return s.set;}));
         var starIcon=(meta&&meta.ex.star)?'<span style="color:var(--acc2);margin-right:4px">⭐</span>':'';
-        html+='<div class="hist-ex"><div class="hist-ex-nm">'+starIcon+ex+' <span style="color:var(--muted);font-size:10px;font-weight:400">· tap set = editare</span></div><div class="hist-sets">';
-        sets.forEach(function(s){
-          html+='<span class="hist-set" onclick="openEdit(\''+d+'\',\''+exEnc+'\','+s.set+')">S'+s.set+': '+s.reps+'×'+s.kg+'kg ✎</span>';
-        });
+        var doneCount=sets.length;
+        var doneIndicator='<span style="color:var(--muted);font-size:10px;font-weight:400"> · '+doneCount+'/'+totalSets+' · tap set/+ adaugă</span>';
+        html+='<div class="hist-ex"><div class="hist-ex-nm">'+starIcon+ex+doneIndicator+'</div><div class="hist-sets">';
+        // Afișează TOATE sloturile (1..totalSets) — salvate sau goale
+        for(var setNum=1;setNum<=totalSets;setNum++){
+          var found=sets.find(function(s){return s.set===setNum;});
+          if(found){
+            html+='<span class="hist-set" onclick="openEdit(\''+d+'\',\''+exEnc+'\','+setNum+')">S'+setNum+': '+found.reps+'×'+found.kg+'kg ✎</span>';
+          }else{
+            // Slot gol — tap pentru a adăuga
+            html+='<span class="hist-set" style="background:rgba(245,158,11,.08);color:#fbbf24;border:1px dashed rgba(245,158,11,.4)" onclick="openAddSet(\''+d+'\',\''+exEnc+'\','+setNum+')">+ S'+setNum+'</span>';
+          }
+        }
         html+='</div></div>';
       });
     }
@@ -2848,11 +2857,42 @@ function openEdit(dayName,exerEnc,setNum){
   var rows=getRowsForWeek(currentWeekOffset);
   var row=rows.find(function(r){return r.type==='antrenament'&&r.day===dayName&&r.exercise===exer&&r.set===setNum;});
   if(!row){showToast('Set nu a fost găsit','var(--red)');return;}
-  editCtx={date:row.date,day:row.day,exercise:exer,set:setNum};
+  editCtx={date:row.date,day:row.day,exercise:exer,set:setNum,isNew:false};
   document.getElementById('editTtl').textContent='Editează set '+setNum;
   document.getElementById('editSub').textContent=exer+' — '+dayName+' ('+row.date+')';
   document.getElementById('editReps').value=row.reps;
   document.getElementById('editKg').value=row.kg;
+  // Show delete button (în caz că a fost ascuns la addSet)
+  document.querySelectorAll('.modal-btns .btn-danger').forEach(function(b){b.style.display='';});
+  document.getElementById('editModal').classList.add('show');
+}
+
+function openAddSet(dayName,exerEnc,setNum){
+  var exer=decodeURIComponent(exerEnc);
+  // Găsesc data din orice set salvat pentru această zi+exercițiu în săpt. curentă
+  var rows=getRowsForWeek(currentWeekOffset);
+  var existingRow=rows.find(function(r){
+    return r.type==='antrenament' && r.day===dayName && r.exercise===exer;
+  });
+  if(!existingRow){
+    showToast('Adaugă măcar 1 set de la tab Azi cu data potrivită','var(--acc2)');
+    return;
+  }
+  editCtx={date:existingRow.date,day:dayName,exercise:exer,set:setNum,isNew:true};
+
+  // Pre-fill cu valorile setului anterior (dacă există)
+  var prevSet=rows.filter(function(r){
+    return r.type==='antrenament' && r.day===dayName && r.exercise===exer && r.set<setNum;
+  }).sort(function(a,b){return b.set-a.set;})[0];
+  var prefReps=prevSet?prevSet.reps:'';
+  var prefKg=prevSet?prevSet.kg:'';
+
+  document.getElementById('editTtl').textContent='+ Adaugă set '+setNum;
+  document.getElementById('editSub').textContent=exer+' — '+dayName+' ('+existingRow.date+')';
+  document.getElementById('editReps').value=prefReps;
+  document.getElementById('editKg').value=prefKg;
+  // Ascund butonul delete (n-are sens să ștergi ceva inexistent)
+  document.querySelectorAll('.modal-btns .btn-danger').forEach(function(b){b.style.display='none';});
   document.getElementById('editModal').classList.add('show');
 }
 
@@ -2866,14 +2906,15 @@ function saveEdit(){
   var reps=parseFloat(document.getElementById('editReps').value)||0;
   var kg=parseFloat(document.getElementById('editKg').value)||0;
   if(!reps&&!kg){showToast('Introduceți rep și kg','var(--acc2)');return;}
+  var wasNew=editCtx.isNew;
   addRow({
     date:editCtx.date,day:editCtx.day,type:'antrenament',
     exercise:editCtx.exercise,set:editCtx.set,reps:reps,kg:kg,note:''
   });
-  showToast('Set actualizat ✓');
+  showToast(wasNew?'Set adăugat ✓':'Set actualizat ✓');
   closeEdit();
   renderHistoric();
-  if(editCtx&&editCtx.date===today())preloadToday(); // refresh live state
+  if(editCtx&&editCtx.date===today())preloadToday();
   renderExerciseChart();
 }
 
