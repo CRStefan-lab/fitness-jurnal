@@ -440,10 +440,13 @@ input:checked + .slider:before{transform:translateX(20px);background:var(--acc)}
   <div id="weekSummary" style="font-size:11px;color:var(--muted);text-align:center;margin-bottom:12px"></div>
   <div id="hist-content"></div>
 
-  <div class="stitle">📤 Export pentru Claude</div>
-  <div class="export-box" id="exportBox">Apasă butonul pentru a genera rezumatul.</div>
-  <button class="btn btn-acc" onclick="doExport()">📤 Generează rezumat</button>
-  <button class="btn btn-ghost" onclick="copyExport()">📋 Copiază</button>
+  <div class="stitle">📤 Export pentru Claude / AI</div>
+  <p style="font-size:11px;color:var(--muted);margin-bottom:10px;line-height:1.5">
+    Export <strong style="color:var(--text)">complet</strong>: toate săptămânile, măsurători, BF%, stagnări, PR-uri, volum/grup, aderență — gata pentru AI.
+  </p>
+  <div class="export-box" id="exportBox">Apasă butonul pentru a genera exportul complet.</div>
+  <button class="btn btn-acc" onclick="doExport()">📤 Generează export complet</button>
+  <button class="btn btn-ghost" onclick="copyExport()">📋 Copiază în clipboard</button>
 
   <p style="font-size:11px;color:var(--muted);margin-top:20px;text-align:center">
     💾 Backup · ☁️ Sync · ⚡ Share → <a onclick="showTab('setari')" style="color:var(--acc);cursor:pointer;text-decoration:underline">Setări ⚙️</a>
@@ -1691,41 +1694,259 @@ function renderHistoric(){
 // ═══════════════════════════════════════════════════════════════
 // EXPORT PENTRU CLAUDE
 // ═══════════════════════════════════════════════════════════════
+// Mapează exercițiul la grup muscular principal
+function getPrimaryMuscle(exerciseName){
+  var l=exerciseName.toLowerCase();
+  if(l.indexOf('triceps')>=0||l.indexOf('flotări înguste')>=0)return 'Triceps';
+  if(l.indexOf('biceps')>=0||l.indexOf('flexii biceps')>=0)return 'Biceps';
+  if(l.indexOf('lateral')>=0||l.indexOf('deasupra capului')>=0||l.indexOf('pike')>=0||l.indexOf('mobilitate umeri')>=0)return 'Umeri';
+  if(l.indexOf('reverse fly')>=0)return 'Spate posterior';
+  if(l.indexOf('ramat')>=0||l.indexOf('row')>=0||l.indexOf('pullover')>=0||l.indexOf('dead hang')>=0||l.indexOf('bent-over')>=0)return 'Spate';
+  if(l.indexOf('împins gantere')>=0||l.indexOf('flutur')>=0||l.indexOf('flotări')>=0)return 'Piept';
+  if(l.indexOf('vârfuri')>=0||l.indexOf('varfuri')>=0)return 'Gambă';
+  if(l.indexOf('squat')>=0||l.indexOf('lunges')>=0||l.indexOf('fandări')>=0||l.indexOf('step-back')>=0)return 'Cvadriceps';
+  if(l.indexOf('hip thrust')>=0||l.indexOf('glute')>=0||l.indexOf('românești')>=0||l.indexOf('hinge')>=0||l.indexOf('deadlift')>=0)return 'Glute/Ischio';
+  if(l.indexOf('abdomene')>=0||l.indexOf('plank')>=0||l.indexOf('dead bug')>=0||l.indexOf('core')>=0)return 'Core';
+  if(l.indexOf('mobilitate')>=0||l.indexOf('stretch')>=0||l.indexOf('plimbare')>=0||l.indexOf('pași')>=0)return 'Recovery';
+  if(l.indexOf('kegel')>=0)return 'Pelvis';
+  return 'Altele';
+}
+
+function buildVolumePerGroup(weekOffset){
+  var rows=getRowsForWeek(weekOffset).filter(function(r){return r.type==='antrenament';});
+  var byGroup={};
+  rows.forEach(function(r){
+    var g=getPrimaryMuscle(r.exercise);
+    if(!byGroup[g])byGroup[g]={sets:0,tonnage:0};
+    byGroup[g].sets++;
+    byGroup[g].tonnage+=(parseFloat(r.kg)||0)*(parseFloat(r.reps)||0);
+  });
+  var keys=Object.keys(byGroup).sort(function(a,b){return byGroup[b].sets-byGroup[a].sets;});
+  if(!keys.length)return '  (fără antrenamente în săpt.)\n';
+  var out='';
+  keys.forEach(function(g){
+    var v=byGroup[g];
+    out+='  '+g+': '+v.sets+' sets · '+v.tonnage.toFixed(0)+' kg total\n';
+  });
+  return out;
+}
+
+function buildWeekDigest(weekOffset){
+  var b=getWeekBounds(weekOffset);
+  var rows=getRowsForWeek(weekOffset);
+  if(!rows.length) return null;
+  var trainingRows=rows.filter(function(r){return r.type==='antrenament';});
+  var ratings=rows.filter(function(r){return r.type==='rating';});
+  var morning=rows.filter(function(r){return r.type==='dimineata'&&r.note==='DA';});
+  var checks=rows.filter(function(r){return r.type==='checklist'&&r.note==='DA';});
+  var prs=trainingRows.filter(function(r){return r.note&&r.note.indexOf('PR:')===0;});
+  // Sesiuni distincte (zile cu antrenament)
+  var sessionDays={};
+  trainingRows.forEach(function(r){sessionDays[r.date]=true;});
+  var sessions=Object.keys(sessionDays).length;
+  var totalSets=trainingRows.length;
+  var tonnage=trainingRows.reduce(function(a,r){return a+(parseFloat(r.kg)||0)*(parseFloat(r.reps)||0);},0);
+  var energyAvg=null,sleepAvg=null;
+  var energyVals=ratings.filter(function(r){return r.exercise==='energy';}).map(function(r){return parseInt(r.note)||0;});
+  var sleepVals=ratings.filter(function(r){return r.exercise==='sleep';}).map(function(r){return parseInt(r.note)||0;});
+  if(energyVals.length)energyAvg=(energyVals.reduce(function(a,v){return a+v;},0)/energyVals.length).toFixed(1);
+  if(sleepVals.length)sleepAvg=(sleepVals.reduce(function(a,v){return a+v;},0)/sleepVals.length).toFixed(1);
+  var fmt=function(d){return d.toLocaleDateString('ro-RO',{day:'numeric',month:'short'});};
+  var endOfWeek=new Date(b.sunday);endOfWeek.setDate(endOfWeek.getDate()-1);
+  var label=weekOffset===0?'curentă':Math.abs(weekOffset)+(weekOffset===-1?' săpt. în urmă':' săpt. în urmă');
+  var out='▸ Săpt. '+label+' ('+fmt(b.monday)+'–'+fmt(endOfWeek)+')\n';
+  out+='  '+sessions+' sesiuni · '+totalSets+' sets · '+tonnage.toFixed(0)+' kg total\n';
+  if(energyAvg||sleepAvg){
+    out+='  ';
+    if(energyAvg)out+='⚡ Energie medie '+energyAvg+'/10';
+    if(energyAvg&&sleepAvg)out+=' · ';
+    if(sleepAvg)out+='😴 Somn mediu '+sleepAvg+'/10';
+    out+='\n';
+  }
+  out+='  ☀️ Dimineață: '+morning.length+' bifate · ✅ Checklist: '+checks.length+' bife';
+  if(prs.length)out+=' · 🏆 PR: '+prs.length;
+  out+='\n';
+  return out;
+}
+
+function buildTopPRs(limit){
+  var byExercise={};
+  loadStore().rows.forEach(function(r){
+    if(r.type!=='antrenament')return;
+    if(!byExercise[r.exercise])byExercise[r.exercise]=[];
+    byExercise[r.exercise].push(r);
+  });
+  var records=[];
+  Object.keys(byExercise).forEach(function(ex){
+    var rs=byExercise[ex];
+    var maxKg=Math.max.apply(null,rs.map(function(r){return parseFloat(r.kg)||0;}));
+    if(maxKg<=0)return;
+    var atMax=rs.filter(function(r){return parseFloat(r.kg)===maxKg;});
+    var maxRepsAtKg=Math.max.apply(null,atMax.map(function(r){return parseFloat(r.reps)||0;}));
+    var bestSet=atMax.find(function(r){return parseFloat(r.reps)===maxRepsAtKg;});
+    var maxVol=0,bestVolSet=null;
+    rs.forEach(function(r){
+      var v=(parseFloat(r.kg)||0)*(parseFloat(r.reps)||0);
+      if(v>maxVol){maxVol=v;bestVolSet=r;}
+    });
+    records.push({exercise:ex,maxKg:maxKg,maxKgReps:maxRepsAtKg,maxKgDate:bestSet?bestSet.date:'',maxVol:maxVol,maxVolSet:bestVolSet});
+  });
+  records.sort(function(a,b){return b.maxKg-a.maxKg;});
+  var out='';
+  records.slice(0,limit).forEach(function(pr){
+    out+='  ▸ '+pr.exercise+'\n';
+    out+='    Max kg: '+pr.maxKgReps+' rep × '+pr.maxKg+' kg ('+pr.maxKgDate+')\n';
+    if(pr.maxVolSet&&pr.maxVol!==pr.maxKg*pr.maxKgReps){
+      out+='    Max volum: '+pr.maxVolSet.reps+' rep × '+pr.maxVolSet.kg+' kg = '+pr.maxVol.toFixed(0)+'\n';
+    }
+  });
+  return out||'  (fără date încă)\n';
+}
+
+function buildAdherenceStats(){
+  var store=loadStore();
+  var trainingRows=store.rows.filter(function(r){return r.type==='antrenament';});
+  if(!trainingRows.length) return '  (fără date încă)\n';
+  // Sesiuni complete = zile cu cel puțin 1 set salvat
+  var sessionDays={};
+  trainingRows.forEach(function(r){sessionDays[r.date]=true;});
+  // Zile așteptate: 5/săpt (LUNI,MARȚI,JOI,VINERI active + opt MIE recovery)
+  var weeks=Math.max(1,getProgramWeek());
+  var expectedSessions=weeks*4; // 4 zile active/săpt
+  var actualSessions=Object.keys(sessionDays).length;
+  var adherence=Math.min(100,Math.round((actualSessions/expectedSessions)*100));
+  // Streak morning — zile consecutive cu cel puțin 1 bifă matinală
+  var morningRows=store.rows.filter(function(r){return r.type==='dimineata'&&r.note==='DA';});
+  var morningDays={};
+  morningRows.forEach(function(r){morningDays[r.date]=true;});
+  var streak=0;
+  var d=new Date();
+  // Dacă azi nu e bifat, începem de ieri
+  if(!morningDays[d.toLocaleDateString('ro-RO')]){d.setDate(d.getDate()-1);}
+  // Safety: max 90 zile lookback
+  for(var iter=0;iter<90;iter++){
+    var ds=d.toLocaleDateString('ro-RO');
+    if(morningDays[ds]){streak++;d.setDate(d.getDate()-1);}
+    else break;
+  }
+  // Checklist streak similar
+  var checkRows=store.rows.filter(function(r){return r.type==='checklist'&&r.note==='DA';});
+  var checkDayCounts={};
+  checkRows.forEach(function(r){checkDayCounts[r.date]=(checkDayCounts[r.date]||0)+1;});
+  // Total all-time PRs
+  var totalPRs=trainingRows.filter(function(r){return r.note&&r.note.indexOf('PR:')===0;}).length;
+  var out='';
+  out+='  Sesiuni complete: '+actualSessions+'/'+expectedSessions+' ('+adherence+'%)\n';
+  out+='  Morning streak curent: '+streak+' zile consecutive\n';
+  out+='  Total PR-uri marcate: '+totalPRs+'\n';
+  return out;
+}
+
+function buildActiveStagnations(){
+  var stars=getStarExercises();
+  var alerts=[];
+  stars.forEach(function(s){
+    var stag=detectStagnation(s.name);
+    if(stag){
+      alerts.push('  ⚠️ '+s.name+': '+stag.prevReps+'×'+stag.prevKg+' → '+stag.lastReps+'×'+stag.lastKg+' (2 săpt.)');
+    }
+  });
+  return alerts.length?alerts.join('\n')+'\n':'  (niciuna activă — bun)\n';
+}
+
 function buildWeekSummary(){
   var b=getWeekBounds(currentWeekOffset);
   var rows=getRowsForWeek(currentWeekOffset);
   var measurements=getMeasurements();
+  var profile=getProfile();
+  var store=loadStore();
+  var allTraining=store.rows.filter(function(r){return r.type==='antrenament';});
 
-  var out='📊 REZUMAT FITNESS\n';
-  out+='Săptămâna: '+formatRoDate(b.monday)+' — '+formatRoDate(new Date(b.sunday.getTime()-86400000))+'\n';
-  out+='='.repeat(40)+'\n\n';
+  // === HEADER ===
+  var out='🏋️ FITNESS JURNAL — EXPORT COMPLET PT. ANALIZA AI\n';
+  out+='Generat: '+new Date().toLocaleDateString('ro-RO')+'\n';
+  out+='Profil: '+profile.age+' ani · '+profile.height+' cm · Bărbat\n';
+  // Program start
+  var oldestDate=null;
+  allTraining.forEach(function(r){
+    var d=parseRoDate(r.date);
+    if(d&&(!oldestDate||d<oldestDate))oldestDate=d;
+  });
+  var weeksSince=oldestDate?Math.ceil((Date.now()-oldestDate.getTime())/(7*86400000)):0;
+  if(oldestDate)out+='Program start: '+oldestDate.toLocaleDateString('ro-RO')+' ('+weeksSince+' săpt. activitate)\n';
+  var curWeek=getProgramWeek();
+  out+='Săptămâna program: '+curWeek+'/8 — Focus oficial: '+(WEEK_FOCUS[curWeek-1]||WEEK_FOCUS[7]).label+'\n';
+  out+='='.repeat(50)+'\n\n';
 
-  // MĂSURĂTORI — ultimele 4 pentru context
+  // === MĂSURĂTORI COMPLETE ===
   if(measurements.length){
-    out+='📏 MĂSURĂTORI RECENTE\n';
-    measurements.slice(0,4).forEach(function(m,i){
-      out+=(i===0?'▸ Cea mai recentă ':'▸ ')+'('+m.date+')';
-      if(m.note) out+=' · '+m.note;
-      out+='\n';
+    out+='📏 MĂSURĂTORI CORP — TOATE ('+measurements.length+' înregistrări)\n';
+    measurements.forEach(function(m){
+      var bf=calcBFNavy(m.waist,m.neck,profile.height);
+      out+='▸ '+m.date+(m.note?' · '+m.note:'')+'\n';
       MEAS_FIELDS.forEach(function(f){
         if(m[f.id]!=null) out+='    '+f.label+': '+m[f.id]+' '+f.unit+'\n';
       });
+      if(bf!=null){
+        out+='    🎯 BF% (Navy): '+bf+'%';
+        if(m.weight)out+=' · Masă slabă: '+(m.weight*(1-bf/100)).toFixed(1)+' kg';
+        out+='\n';
+      }
     });
-    // Δ față de prima
     if(measurements.length>=2){
       var latest=measurements[0];
       var oldest=measurements[measurements.length-1];
-      out+='\n▸ Evoluție ('+oldest.date+' → '+latest.date+'):\n';
+      out+='\n📈 EVOLUȚIE TOTALĂ ('+oldest.date+' → '+latest.date+')\n';
       MEAS_FIELDS.forEach(function(f){
         if(latest[f.id]!=null && oldest[f.id]!=null){
           var d=latest[f.id]-oldest[f.id];
           var sign=d>0?'+':'';
-          out+='    '+f.label+': '+sign+d.toFixed(1)+' '+f.unit+'\n';
+          out+='  '+f.label+': '+sign+d.toFixed(1)+' '+f.unit+'\n';
         }
       });
+      var bfFirst=calcBFNavy(oldest.waist,oldest.neck,profile.height);
+      var bfLast=calcBFNavy(latest.waist,latest.neck,profile.height);
+      if(bfFirst!=null&&bfLast!=null){
+        var bfDiff=bfLast-bfFirst;
+        out+='  BF% (Navy): '+(bfDiff>0?'+':'')+bfDiff.toFixed(1)+'%\n';
+        if(latest.weight&&oldest.weight){
+          var leanLast=latest.weight*(1-bfLast/100);
+          var leanFirst=oldest.weight*(1-bfFirst/100);
+          var leanDiff=leanLast-leanFirst;
+          out+='  Masă slabă: '+(leanDiff>0?'+':'')+leanDiff.toFixed(1)+' kg (indicator recomp)\n';
+        }
+      }
     }
     out+='\n';
   }
+
+  // === SMART COACH ===
+  out+='🎯 SMART COACH — STATUS COMPLET\n';
+  out+='Săptămâna program: '+curWeek+'/8 — Focus: '+(WEEK_FOCUS[curWeek-1]||WEEK_FOCUS[7]).label+'\n\n';
+  var stars=getStarExercises();
+  stars.forEach(function(s){
+    var rec=getRecommendation(s.name,curWeek);
+    if(!rec)return;
+    out+='⭐ '+s.name+' ['+s.dayLabel+']\n';
+    if(rec.last) out+='  Ultima: '+rec.last.reps+' rep × '+rec.last.kg+' kg ('+rec.last.date+')\n';
+    out+='  Țintă: '+rec.target+'\n';
+    var stag=detectStagnation(s.name);
+    if(stag) out+='  ⚠️ STAGNARE 2 săpt.: '+stag.prevReps+'×'+stag.prevKg+' → '+stag.lastReps+'×'+stag.lastKg+'\n';
+  });
+  out+='\n';
+
+  // === ULTIMELE 8 SĂPTĂMÂNI — SUMARI ===
+  out+='📊 ULTIMELE 8 SĂPTĂMÂNI — REZUMAT\n';
+  var anyWeekData=false;
+  for(var off=0;off>=-7;off--){
+    var dig=buildWeekDigest(off);
+    if(dig){out+=dig;anyWeekData=true;}
+  }
+  if(!anyWeekData) out+='  (fără antrenamente înregistrate încă)\n';
+  out+='\n';
+
+  // === SĂPTĂMÂNA AFIȘATĂ — DETALIAT ===
+  out+='🔍 SĂPTĂMÂNA AFIȘATĂ — DETALIAT ('+formatRoDate(b.monday)+' — '+formatRoDate(new Date(b.sunday.getTime()-86400000))+')\n';
 
   // ANTRENAMENT
   if(!rows.length){
@@ -1775,26 +1996,46 @@ function buildWeekSummary(){
     out+='\n';
   }
 
-  // Smart Coach recommendations
-  var week=getProgramWeek();
-  var focus=WEEK_FOCUS[week-1]||WEEK_FOCUS[7];
-  out+='🎯 SMART COACH — SĂPT. '+week+'/8\n';
-  out+='Focus oficial: '+focus.label+'\n\n';
-  var stars=getStarExercises();
-  stars.forEach(function(s){
-    var rec=getRecommendation(s.name,week);
-    if(!rec)return;
-    out+='⭐ '+s.name+' ['+s.dayLabel+']\n';
-    if(rec.last)out+='  Ultima: '+rec.last.reps+' rep × '+rec.last.kg+' kg ('+rec.last.date+')\n';
-    out+='  Țintă: '+rec.target+'\n';
-  });
-  out+='\n---\nTe rog analizează:\n';
-  out+='1. Unde am progresat la ⭐ (rep/kg) și unde stagnez\n';
-  out+='2. Evoluția măsurătorilor (talie/piept/brațe) vs obiectiv recompoziție\n';
-  out+='3. Aderența la rutina de dimineață (pattern) și checklist\n';
-  out+='4. Ce ajustări recomanzi pentru săptămâna viitoare (greutăți, exerciții, nutriție)\n';
-  out+='5. Alerte dacă vezi dezechilibre (ex: pierd masă musculară în loc de grăsime)\n';
-  out+='6. Dacă DOMS sever >48h + stagnare la ⭐ — recomandare reducere volum\n';
+  // === VOLUM PE GRUP MUSCULAR ===
+  out+='\n💪 VOLUM PE GRUP MUSCULAR (săpt. afișată)\n';
+  out+=buildVolumePerGroup(currentWeekOffset);
+  // Și săpt. anterioară pentru comparație
+  out+='\n💪 VOLUM PE GRUP (săpt. anterioară pt. comparație)\n';
+  out+=buildVolumePerGroup(currentWeekOffset-1);
+
+  // === STAGNĂRI ===
+  out+='\n⚠️ STAGNĂRI ACTIVE (⭐ care nu progresează 2 săpt.)\n';
+  out+=buildActiveStagnations();
+
+  // === TOP PR-uri ===
+  out+='\n🏆 TOP 10 PR-uri ISTORICE (după kg maxim per exercițiu)\n';
+  out+=buildTopPRs(10);
+
+  // === ADERENȚĂ ===
+  out+='\n🔥 ADERENȚĂ & STREAK\n';
+  out+=buildAdherenceStats();
+
+  // === REGULI PROGRAM (context pentru AI) ===
+  out+='\n📋 CONTEXT PROGRAM\n';
+  out+='  Obiectiv: hipertrofie + recompoziție (92→85 kg)\n';
+  out+='  Echipament: bancă înclinabilă, gantere rotunde, bară, bloc friendly\n';
+  out+='  Tempo: 2-1-2 strict pe toate exercițiile\n';
+  out+='  Progresie ⭐ săptămânală: săpt 1-2 baseline · 3-4 +rep · 5-6 +kg · 7 +set · 8 deload\n';
+  out+='  Frecvență: 4 zile active (L/Ma/J/V) + 1 recovery (Mi) + 2 mobilitate (S/D)\n';
+  out+='  Nutriție: 19:6 IF pe zile antrenament (1717-1769 kcal) · OMAD pe recovery (1007 kcal)\n';
+
+  // === CERERE ANALIZĂ ===
+  out+='\n'+'='.repeat(50)+'\n';
+  out+='🎯 CERERE ANALIZĂ COMPLETĂ (pentru AI)\n';
+  out+='='.repeat(50)+'\n';
+  out+='1. PROGRESIE ⭐: Unde am crescut săptămână peste săptămână, unde stagnez de 2+ săpt., ce să schimb concret.\n';
+  out+='2. RECOMP: BF% trend vs greutate — pierd grăsime sau masă musculară? Verifică indicatorul "Masă slabă" — crește/scade?\n';
+  out+='3. VOLUM: sub MEV / la MAV / peste MRV per grup? Recomandări concrete (+ sau - sets).\n';
+  out+='4. ADERENȚĂ: săptămâni slabe — coreează cu energie/somn. De ce s-a întâmplat și cum prevenim.\n';
+  out+='5. AJUSTĂRI săpt. viitoare: greutăți specifice per ⭐, exerciții schimbate, deload/non-deload, nutriție (kcal mai mult/mai puțin), recovery.\n';
+  out+='6. ALERTE/RISC: overreaching, dezechilibre, semnale stagnare prelungită, pierd masă musculară.\n';
+  out+='7. ÎNCURAJEAZĂ: ce am făcut BINE consistent (focus pe wins, nu doar probleme).\n';
+  out+='8. RĂSPUNDE SPECIFIC, nu generic. Folosește numerele și datele de mai sus.\n';
   return out;
 }
 
