@@ -330,6 +330,16 @@ input:checked + .slider:before{transform:translateX(20px);background:var(--acc)}
   <button onclick="fsaReconnect()" style="color:#fbbf24;font-weight:800;text-decoration:underline;background:none;border:none;cursor:pointer;padding:0 4px">🔓 Reconectează →</button>
 </div>
 
+<div class="install-hint" id="backupOverdueBanner" style="background:rgba(244,63,94,.12);border-color:rgba(244,63,94,.5);color:#f87a8c">
+  <button onclick="dismissBackupBanner()" style="background:none;border:none;color:var(--muted);float:right;cursor:pointer;font-size:18px;margin-top:-4px">×</button>
+  ⚠️ <strong>Backup vechi</strong> — <span id="backupOverdueDays">n-ai salvat de mult</span>. <button onclick="shareBackup()" style="color:#f87a8c;font-weight:800;text-decoration:underline;background:none;border:none;cursor:pointer;padding:0 4px">💾 Backup acum →</button>
+</div>
+
+<div class="install-hint" id="measOverdueBanner" style="background:rgba(56,189,248,.1);border-color:rgba(56,189,248,.4);color:#7cc6f0">
+  <button onclick="dismissMeasBanner()" style="background:none;border:none;color:var(--muted);float:right;cursor:pointer;font-size:18px;margin-top:-4px">×</button>
+  📏 <strong>Măsoară-te</strong> — <span id="measOverdueDays"></span> pentru a urmări recomp-ul. <button onclick="showTab('progres',document.querySelectorAll('.nb')[3])" style="color:#7cc6f0;font-weight:800;text-decoration:underline;background:none;border:none;cursor:pointer;padding:0 4px">📏 Acum →</button>
+</div>
+
 <nav class="bnav">
   <button class="nb act" onclick="showTab('azi',this)"><span class="ico">🏋️</span>Azi</button>
   <button class="nb" onclick="showTab('nutritie',this)"><span class="ico">🥗</span>Nutriție</button>
@@ -433,6 +443,15 @@ input:checked + .slider:before{transform:translateX(20px);background:var(--acc)}
     <div class="chart-stats" id="bodyStats"></div>
   </div>
 
+  <div class="stitle">⚖️ Recomp: greutate vs masă slabă</div>
+  <p style="font-size:11px;color:var(--muted);margin-bottom:8px;line-height:1.4">
+    🟠 greutate · 🟢 masă slabă. Ideal: greutatea scade, masa slabă rămâne stabilă/crește = pierzi grăsime, nu mușchi.
+  </p>
+  <div class="chart-wrap">
+    <div id="recompChart"></div>
+    <div class="chart-stats" id="recompStats"></div>
+  </div>
+
   <div class="stitle">🏋️ Progres exercițiu</div>
   <select class="select-box" id="exerSelect">
     <option value="">— Alege exercițiu —</option>
@@ -486,7 +505,10 @@ input:checked + .slider:before{transform:translateX(20px);background:var(--acc)}
     Un tap → meniul de share al telefonului → trimite datele către Drive, Mail, Telegram, orice. Zero setup.
   </p>
   <button class="btn btn-acc" onclick="shareBackup()">📤 Share backup (Drive / Mail / ...)</button>
-  <button class="btn btn-ghost" style="margin-top:6px;font-size:12px;padding:8px" onclick="showShareDiag()">🔧 Diagnostic share (dacă nu merge)</button>
+  <div class="btn-row" style="margin-top:6px">
+    <button class="btn btn-ghost" style="font-size:12px;padding:8px" onclick="emailBackup()">✉️ Trimite pe email</button>
+    <button class="btn btn-ghost" style="font-size:12px;padding:8px" onclick="showShareDiag()">🔧 Diagnostic</button>
+  </div>
   <p style="font-size:11px;color:var(--acc2);margin:6px 0 0;line-height:1.5;text-align:center" id="shareHint" style="display:none">
     💡 <strong>Pe mobile = sincronizarea ta.</strong> Apasă Share o dată pe săptămână → salvează în Drive.
   </p>
@@ -1027,6 +1049,7 @@ function showTab(name,btn){
   if(name==='progres'){
     renderMeasurements();
     renderBodyChart();
+    renderRecompChart();
     renderExerciseChart();
   }
   if(name==='setari'){
@@ -1140,6 +1163,13 @@ function renderToday(){
   html+='<div style="background:linear-gradient(135deg,rgba(20,184,166,.08),transparent);border-left:3px solid var(--acc);border-radius:0 8px 8px 0;padding:6px 12px;margin-bottom:12px;font-size:11px">';
   html+='🎯 Focus: <strong style="color:var(--acc2)">'+coachFocus.label+'</strong>';
   html+='</div>';
+
+  // Banner DELOAD în săptămâna 8
+  if(coachWeek===8){
+    html+='<div style="background:rgba(167,139,250,.12);border:1px solid rgba(167,139,250,.4);color:var(--purple);border-radius:10px;padding:10px 12px;margin-bottom:12px;font-size:12px;line-height:1.5">';
+    html+='🧘 <strong>SĂPTĂMÂNĂ DELOAD</strong> — recuperare activă:<br>• Fă doar <strong>3 din 4 seturi</strong> (sau 2 din 3)<br>• Greutăți la <strong>~80%</strong> · tempo curat, fără efort maxim<br>• Scop: recuperare CNS + articulații înainte de ciclul nou';
+    html+='</div>';
+  }
 
   // Morning routine card
   html+=buildMorningCard(idx);
@@ -1609,15 +1639,21 @@ function initProgram(){
   var html='';
 
   // Header săptămână
+  var cycleInfo=getCycleInfo();
   html+='<div class="recom-header" style="margin-top:14px">';
-  html+='<div class="recom-week">Săptămâna '+week+' din 8</div>';
+  html+='<div class="recom-week">Săptămâna '+week+' din 8'+(cycleInfo.cycle>1?' · Ciclul '+cycleInfo.cycle:'')+'</div>';
   html+='<div class="recom-focus">Focus: <strong>'+focus.label+'</strong></div>';
   html+='<div class="recom-progress">';
   for(var i=1;i<=8;i++){
     var cls=i<week?'done':(i===week?'current':'');
     html+='<div class="recom-progress-bar '+cls+'" title="Săpt '+i+': '+WEEK_FOCUS[i-1].short+'"></div>';
   }
-  html+='</div></div>';
+  html+='</div>';
+  // Buton ciclu nou — apare dacă ești în săpt. 8 sau mai departe
+  if(week>=8 || cycleInfo.absWeek>8){
+    html+='<button class="btn btn-acc" style="margin-top:10px;margin-bottom:0;font-size:13px;padding:10px" onclick="startNewCycle()">🔄 Începe ciclul nou (săpt. 1/8)</button>';
+  }
+  html+='</div>';
 
   // 7 zile cu status
   html+='<div class="stitle">📋 Zilele săptămânii</div>';
@@ -1714,6 +1750,7 @@ function saveMeasurement(){
   if(ok){
     showToast('Măsurători salvate ✓');
     renderMeasurements();
+    var mb=document.getElementById('measOverdueBanner');if(mb)mb.classList.remove('show');
   }
 }
 
@@ -2107,7 +2144,8 @@ function buildWeekSummary(){
   var weeksSince=oldestDate?Math.ceil((Date.now()-oldestDate.getTime())/(7*86400000)):0;
   if(oldestDate)out+='Program start: '+oldestDate.toLocaleDateString('ro-RO')+' ('+weeksSince+' săpt. activitate)\n';
   var curWeek=getProgramWeek();
-  out+='Săptămâna program: '+curWeek+'/8 — Focus oficial: '+(WEEK_FOCUS[curWeek-1]||WEEK_FOCUS[7]).label+'\n';
+  var cycleInfo=getCycleInfo();
+  out+='Săptămâna program: '+curWeek+'/8'+(cycleInfo.cycle>1?' (Ciclul '+cycleInfo.cycle+')':'')+' — Focus oficial: '+(WEEK_FOCUS[curWeek-1]||WEEK_FOCUS[7]).label+'\n';
   out+='='.repeat(50)+'\n\n';
 
   // === MĂSURĂTORI COMPLETE ===
@@ -2795,6 +2833,38 @@ function shareBackup(){
 
 function markBackupDone(){
   localStorage.setItem('last_backup_ts',String(Date.now()));
+  var banner=document.getElementById('backupOverdueBanner');
+  if(banner)banner.classList.remove('show');
+}
+
+function dismissBackupBanner(){
+  document.getElementById('backupOverdueBanner').classList.remove('show');
+  localStorage.setItem('backup_banner_dismissed_date',todayISO());
+}
+
+function checkMeasurementOverdue(){
+  var banner=document.getElementById('measOverdueBanner');
+  if(!banner)return;
+  var store=loadStore();
+  if(store.rows.length<3){banner.classList.remove('show');return;}
+  var meas=getMeasurements();
+  var daysSince=999;
+  if(meas.length){
+    var last=parseRoDate(meas[0].date);
+    if(last)daysSince=Math.floor((Date.now()-last.getTime())/86400000);
+  }
+  if(daysSince>=7){
+    document.getElementById('measOverdueDays').textContent=meas.length?('ultima acum '+daysSince+' zile'):('încă n-ai măsurători');
+    var dismissed=localStorage.getItem('meas_banner_dismissed_date');
+    if(dismissed!==todayISO())banner.classList.add('show');
+  }else{
+    banner.classList.remove('show');
+  }
+}
+
+function dismissMeasBanner(){
+  document.getElementById('measOverdueBanner').classList.remove('show');
+  localStorage.setItem('meas_banner_dismissed_date',todayISO());
 }
 
 function showDriveUploadHint(){
@@ -2867,14 +2937,42 @@ var WEEK_FOCUS=[
   {label:'DELOAD — -30% seturi · greutăți la 80%',short:'Deload'}
 ];
 
-function getProgramWeek(){
+function getCycleStartDate(){
+  // Manual override dacă user a apăsat "Start ciclu nou"
+  var manual=localStorage.getItem('program_cycle_start');
+  if(manual){var d=new Date(manual);if(!isNaN(d.getTime()))return d;}
+  // Altfel: prima înregistrare de antrenament
   var rows=loadStore().rows.filter(function(r){return r.type==='antrenament';});
-  if(!rows.length) return 1;
+  if(!rows.length) return null;
   var dates=rows.map(function(r){return parseRoDate(r.date);}).filter(Boolean).sort(function(a,b){return a-b;});
-  if(!dates.length) return 1;
-  var earliest=dates[0];
-  var daysSince=(Date.now()-earliest.getTime())/86400000;
-  return Math.max(1,Math.min(8,Math.floor(daysSince/7)+1));
+  return dates.length?dates[0]:null;
+}
+
+function getCycleInfo(){
+  var start=getCycleStartDate();
+  if(!start) return {week:1,cycle:1,absWeek:1};
+  var daysSince=(Date.now()-start.getTime())/86400000;
+  var absWeek=Math.floor(daysSince/7)+1; // săptămâna absolută de la start
+  if(absWeek<1)absWeek=1;
+  var cycle=Math.floor((absWeek-1)/8)+1; // ciclul 1, 2, 3...
+  var week=((absWeek-1)%8)+1;            // săptămâna în ciclu (1-8)
+  return {week:week,cycle:cycle,absWeek:absWeek};
+}
+
+function getProgramWeek(){
+  return getCycleInfo().week;
+}
+
+function startNewCycle(){
+  if(!confirm('Începi un CICLU NOU de 8 săptămâni?\n\nGreutățile rămân (Smart Coach continuă de la nivelul actual), dar săptămâna revine la 1 (baseline → progresie).\n\nUtil după ce ai terminat un ciclu complet.'))return;
+  var d=new Date();
+  var iso=d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+  localStorage.setItem('program_cycle_start',iso);
+  scheduleDriveSync&&scheduleDriveSync();
+  showToast('Ciclu nou început! Săpt. 1/8 🔄','var(--green)');
+  // Re-render
+  if(document.getElementById('tab-azi').classList.contains('act'))renderToday();
+  if(document.getElementById('tab-program').classList.contains('act'))initProgram();
 }
 
 function getLastPerformance(exerciseName,excludeDate){
@@ -3200,6 +3298,7 @@ function initMetricSeg(){
       document.getElementById('rangeSeg').querySelectorAll('.seg-btn').forEach(function(x){x.classList.remove('act');});
       b.classList.add('act');
       renderBodyChart();
+      renderRecompChart();
       renderExerciseChart();
     };
   });
@@ -3251,6 +3350,90 @@ function renderBodyChart(){
     '<div class="chart-stat"><div class="chart-stat-lbl">Actual</div><div class="chart-stat-val" style="color:'+color+'">'+curr.toFixed(1)+'<span style="font-size:11px;color:var(--muted)"> '+field.unit+'</span></div></div>'+
     '<div class="chart-stat"><div class="chart-stat-lbl">Δ Total</div><div class="chart-stat-val '+cls+'">'+(delta>=0?'+':'')+delta.toFixed(1)+'</div><div class="chart-stat-delta '+cls+'">'+(deltaPct>=0?'+':'')+deltaPct.toFixed(1)+'%</div></div>'+
     '<div class="chart-stat"><div class="chart-stat-lbl">Min / Max</div><div class="chart-stat-val" style="font-size:13px">'+minV.toFixed(1)+' — '+maxV.toFixed(1)+'</div></div>';
+}
+
+// Chart cu 2 linii (greutate + masă slabă) — partajează axa X, axă Y comună
+function renderDualChart(containerId,series1,series2,opts){
+  opts=opts||{};
+  var container=document.getElementById(containerId);
+  if(!container)return;
+  var allPts=series1.concat(series2);
+  if(allPts.length===0){
+    container.innerHTML='<div class="chart-empty">'+(opts.hint||'Adaugă măsurători cu talie + gât pentru a vedea recomp-ul')+'</div>';
+    return;
+  }
+  var W=container.clientWidth||320,H=opts.height||180;
+  if(W<100)W=320;
+  var padL=40,padR=14,padT=14,padB=26;
+  var plotW=W-padL-padR,plotH=H-padT-padB;
+  var ys=allPts.map(function(p){return p.y;});
+  var minY=Math.min.apply(null,ys),maxY=Math.max.apply(null,ys);
+  if(minY===maxY){minY-=1;maxY+=1;}
+  var padY=(maxY-minY)*0.12;minY-=padY;maxY+=padY;
+  var allX=allPts.map(function(p){return p.x.getTime();});
+  var minX=Math.min.apply(null,allX),maxX=Math.max.apply(null,allX);
+  if(minX===maxX){minX-=86400000;maxX+=86400000;}
+  function sx(v){return padL+((v-minX)/(maxX-minX))*plotW;}
+  function sy(v){return padT+plotH-((v-minY)/(maxY-minY))*plotH;}
+  var grid='';
+  for(var i=0;i<=3;i++){
+    var y=padT+(i/3)*plotH;
+    var val=maxY-(i/3)*(maxY-minY);
+    grid+='<line x1="'+padL+'" y1="'+y+'" x2="'+(padL+plotW)+'" y2="'+y+'" stroke="#273340" stroke-width="1" stroke-dasharray="2,3"/>';
+    grid+='<text x="'+(padL-6)+'" y="'+(y+3)+'" fill="#7d8d9a" font-size="9" text-anchor="end">'+val.toFixed(0)+'</text>';
+  }
+  function lineFor(pts,color){
+    if(!pts.length)return '';
+    var path=pts.map(function(p,i){return (i===0?'M':'L')+sx(p.x.getTime()).toFixed(1)+','+sy(p.y).toFixed(1);}).join(' ');
+    var dots=pts.map(function(p){return '<circle cx="'+sx(p.x.getTime()).toFixed(1)+'" cy="'+sy(p.y).toFixed(1)+'" r="3" fill="'+color+'"/>';}).join('');
+    return '<path d="'+path+'" fill="none" stroke="'+color+'" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>'+dots;
+  }
+  function fd(d){return d.toLocaleDateString('ro-RO',{day:'numeric',month:'short'});}
+  var firstD=new Date(minX),lastD=new Date(maxX);
+  var svg='<svg viewBox="0 0 '+W+' '+H+'" width="100%" height="'+H+'" preserveAspectRatio="none">';
+  svg+=grid;
+  svg+=lineFor(series1,opts.color1||'#14b8a6');
+  svg+=lineFor(series2,opts.color2||'#22c55e');
+  svg+='<text x="'+padL+'" y="'+(H-6)+'" fill="#7d8d9a" font-size="9">'+fd(firstD)+'</text>';
+  svg+='<text x="'+(padL+plotW)+'" y="'+(H-6)+'" fill="#7d8d9a" font-size="9" text-anchor="end">'+fd(lastD)+'</text>';
+  svg+='</svg>';
+  container.innerHTML=svg;
+}
+
+function renderRecompChart(){
+  var profile=getProfile();
+  var all=getMeasurements().slice().reverse(); // vechi → nou
+  var weightPts=[],leanPts=[];
+  all.forEach(function(m){
+    var d=parseRoDate(m.date);if(!d)return;
+    if(m.weight!=null)weightPts.push({x:d,y:m.weight});
+    var bf=calcBFNavy(m.waist,m.neck,profile.height);
+    if(bf!=null&&m.weight!=null)leanPts.push({x:d,y:m.weight*(1-bf/100)});
+  });
+  weightPts=filterByRange(weightPts,progresState.range);
+  leanPts=filterByRange(leanPts,progresState.range);
+  renderDualChart('recompChart',weightPts,leanPts,{color1:'#e8a23a',color2:'#22c55e',hint:'Adaugă măsurători cu talie + gât (pt. BF%)'});
+  var stats=document.getElementById('recompStats');
+  if(!weightPts.length){stats.innerHTML='';return;}
+  var html='';
+  // Greutate Δ
+  var wCurr=weightPts[weightPts.length-1].y,wFirst=weightPts[0].y,wDelta=wCurr-wFirst;
+  var wCls=wDelta<0?'delta-good':(wDelta>0?'delta-bad':'delta-neu');
+  html+='<div class="chart-stat"><div class="chart-stat-lbl">⚖️ Greutate</div><div class="chart-stat-val" style="color:#e8a23a">'+wCurr.toFixed(1)+'</div><div class="chart-stat-delta '+wCls+'">'+(wDelta>=0?'+':'')+wDelta.toFixed(1)+' kg</div></div>';
+  // Masă slabă Δ
+  if(leanPts.length>=2){
+    var lCurr=leanPts[leanPts.length-1].y,lFirst=leanPts[0].y,lDelta=lCurr-lFirst;
+    var lCls=lDelta>=0?'delta-good':'delta-bad'; // masă slabă: creștere/stabil = bun
+    html+='<div class="chart-stat"><div class="chart-stat-lbl">🟢 Masă slabă</div><div class="chart-stat-val" style="color:#22c55e">'+lCurr.toFixed(1)+'</div><div class="chart-stat-delta '+lCls+'">'+(lDelta>=0?'+':'')+lDelta.toFixed(1)+' kg</div></div>';
+    // Verdict recomp
+    var verdict,vColor;
+    if(wDelta<-0.3 && lDelta>=-0.3){verdict='✓ Recomp OK';vColor='var(--green)';}
+    else if(wDelta<-0.3 && lDelta<-0.3){verdict='⚠️ Pierzi mușchi';vColor='var(--red)';}
+    else if(wDelta>=0.3 && lDelta>0.3){verdict='💪 Bulk curat';vColor='var(--acc2)';}
+    else{verdict='≈ Stabil';vColor='var(--muted)';}
+    html+='<div class="chart-stat"><div class="chart-stat-lbl">Verdict</div><div class="chart-stat-val" style="font-size:12px;color:'+vColor+'">'+verdict+'</div></div>';
+  }
+  stats.innerHTML=html;
 }
 
 // ═══════════════════════════════════════════════════════════════
@@ -3736,6 +3919,44 @@ function maybeShowOnboarding(){
   setTimeout(function(){document.getElementById('onboarding').classList.add('show');},800);
 }
 
+function checkBackupOverdue(){
+  var banner=document.getElementById('backupOverdueBanner');
+  if(!banner)return;
+  var store=loadStore();
+  if(store.rows.length<3){banner.classList.remove('show');return;} // n-are sens fără date
+  var lastTs=parseInt(localStorage.getItem('last_backup_ts')||'0');
+  var now=Date.now();
+  var daysSince=lastTs?Math.floor((now-lastTs)/86400000):999;
+  if(daysSince>=7){
+    var txt=lastTs?('ultimul backup acum '+daysSince+' zile'):('niciun backup salvat încă');
+    document.getElementById('backupOverdueDays').textContent=txt;
+    // Nu re-arăta dacă l-a închis azi
+    var dismissed=localStorage.getItem('backup_banner_dismissed_date');
+    if(dismissed!==todayISO()){
+      banner.classList.add('show');
+    }
+  }else{
+    banner.classList.remove('show');
+  }
+}
+
+function emailBackup(){
+  var s=loadStore();
+  var json=JSON.stringify(s,null,2);
+  var subject='Fitness Backup '+todayDateForFile();
+  var body='Backup fitness jurnal — '+todayDateForFile()+'\n\nSalvează acest fișier sau copiază textul de mai jos:\n\n'+json;
+  // mailto are limită de lungime; dacă e prea mare, copiem în clipboard
+  if(body.length>1800){
+    if(navigator.clipboard&&navigator.clipboard.writeText){
+      navigator.clipboard.writeText(json).then(function(){
+        showToast('Date copiate — lipește în email/notă 📋','var(--acc2)');
+      }).catch(function(){downloadJSON();});
+    }else{downloadJSON();}
+    return;
+  }
+  window.location.href='mailto:?subject='+encodeURIComponent(subject)+'&body='+encodeURIComponent(body);
+}
+
 // Adaugă exercițiu custom (în plus față de program)
 function addCustomExerciseDialog(){
   var name=prompt('Nume exercițiu custom (ex: "Tricep dips"):');
@@ -3851,6 +4072,12 @@ window.addEventListener('load',function(){
 
   // Onboarding pentru primul start
   maybeShowOnboarding();
+
+  // Verifică dacă backup-ul e vechi (>7 zile)
+  setTimeout(checkBackupOverdue,1200);
+
+  // Verifică dacă măsurătorile sunt vechi (>7 zile) — important pentru recomp
+  setTimeout(checkMeasurementOverdue,1400);
 
   // Notificări — re-programare la fiecare deschidere
   var ncfg=getNotifCfg();
