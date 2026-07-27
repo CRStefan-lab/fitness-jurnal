@@ -1,0 +1,143 @@
+/* Test harness pentru generator.js — rulează cu: node test-generator.js */
+var G=require('./generator.js');
+var pass=0,fail=0;
+function assert(cond,msg){
+  if(cond){pass++;}
+  else{fail++;console.error('  ❌ FAIL: '+msg);}
+}
+
+var PERSONAS=[
+  {name:'Tu (referință)',p:{sex:'M',age:38,height:178,weight:90,experience:'intermediar',equipment:'home_min',hasBara:true,days:4,goal:'recomp',morningRoutine:true}},
+  {name:'Iubita (slăbit, acasă gantere)',p:{sex:'F',age:32,height:165,weight:68,experience:'incepator',equipment:'home_min',hasBara:false,days:3,goal:'slabit',morningRoutine:true}},
+  {name:'Prieten sală (masă)',p:{sex:'M',age:28,height:182,weight:75,experience:'intermediar',equipment:'gym',days:4,goal:'masa',morningRoutine:false}},
+  {name:'Bodyweight begin (F, slăbit)',p:{sex:'F',age:45,height:170,weight:80,experience:'incepator',equipment:'bodyweight',days:3,goal:'slabit',morningRoutine:true}},
+  {name:'Senior 58 (M, recomp, sală)',p:{sex:'M',age:58,height:175,weight:95,experience:'incepator',equipment:'gym',days:3,goal:'recomp',morningRoutine:true}},
+  {name:'Bodyweight intermediar (M)',p:{sex:'M',age:25,height:180,weight:70,experience:'intermediar',equipment:'bodyweight',days:4,goal:'masa',morningRoutine:true}}
+];
+
+console.log('══════ TESTE GENERATOR ══════\n');
+
+PERSONAS.forEach(function(persona){
+  console.log('▸ '+persona.name);
+  var r=G.generateProgram(persona.p);
+  assert(!r.errors,'fără erori de validare ('+JSON.stringify(r.errors)+')');
+  if(r.errors)return;
+
+  // 1. Structura: toate zilele au listă
+  var dayKeys=Object.keys(r.exercises);
+  assert(dayKeys.length>=5,'minim 5 zile definite (are '+dayKeys.length+')');
+  assert(r.schedule.length===7,'schedule acoperă 7 zile calendaristice');
+  r.schedule.forEach(function(k){assert(!!r.exercises[k],'schedule referă zi existentă: '+k);});
+
+  // 2. Zilele active au exerciții + minim 1 ⭐
+  var trainingDays=0,totalStars=0;
+  dayKeys.forEach(function(k){
+    var day=r.exercises[k];
+    var stars=day.list.filter(function(e){return e.star;}).length;
+    var isRecovery=day.label.toLowerCase().indexOf('recovery')>=0;
+    if(!isRecovery){
+      trainingDays++;
+      totalStars+=stars;
+      assert(day.list.length>=3,k+': minim 3 exerciții (are '+day.list.length+')');
+      assert(stars>=1,k+': minim 1 exercițiu ⭐ (are '+stars+')');
+    }
+  });
+  assert(trainingDays===persona.p.days,'zile antrenament = '+persona.p.days+' (are '+trainingDays+')');
+
+  // 3. Echipament respectat (verificăm prin exId → DB)
+  var avail=G.EQUIPMENT_PROFILES[persona.p.equipment].available.slice();
+  if(persona.p.equipment==='home_min'&&persona.p.hasBara)avail.push('bara');
+  dayKeys.forEach(function(k){
+    r.exercises[k].list.forEach(function(e){
+      if(!e.exId)return; // recovery items fără exId
+      var db=G.EXERCISE_DB.find(function(x){return x.id===e.exId;});
+      assert(!!db,'exId valid: '+e.exId);
+      if(db){
+        db.equipment.forEach(function(eq){
+          assert(avail.indexOf(eq)>=0,k+'/'+e.name+': echipament "'+eq+'" indisponibil pentru profil '+persona.p.equipment);
+        });
+        if(persona.p.experience==='incepator'){
+          assert(db.level===1,k+'/'+e.name+': nivel '+db.level+' la începător');
+          assert(!db.risky,k+'/'+e.name+': exercițiu risky la începător');
+        }
+      }
+    });
+  });
+
+  // 4. Fără duplicate în aceeași zi
+  dayKeys.forEach(function(k){
+    var ids=r.exercises[k].list.filter(function(e){return e.exId;}).map(function(e){return e.exId;});
+    var uniq={};ids.forEach(function(i){uniq[i]=true;});
+    assert(ids.length===Object.keys(uniq).length,k+': fără exerciții duplicate');
+  });
+
+  // 5. Volum: vârstă 55+ → ⭐ max 3 seturi
+  if(persona.p.age>=55){
+    dayKeys.forEach(function(k){
+      r.exercises[k].list.forEach(function(e){
+        if(e.star)assert(e.sets<=3,'senior: ⭐ '+e.name+' max 3 seturi (are '+e.sets+')');
+      });
+    });
+  }
+
+  // 6. Nutriție sanity
+  var n=r.nutrition;
+  assert(n.kcal>=1200&&n.kcal<=4000,'kcal rezonabile: '+n.kcal);
+  assert(n.protein>=persona.p.weight*1.5,'proteine >= 1.5g/kg: '+n.protein+'g');
+  assert(n.carbs>=50,'carbs >= 50g: '+n.carbs);
+  var kcalCheck=n.protein*4+n.carbs*4+n.fat*9;
+  assert(Math.abs(kcalCheck-n.kcal)<200,'macros ≈ kcal ('+kcalCheck+' vs '+n.kcal+')');
+  if(persona.p.goal==='slabit')assert(n.kcal<n.tdee,'slăbit: kcal < TDEE');
+  if(persona.p.goal==='masa')assert(n.kcal>n.tdee,'masă: kcal > TDEE');
+
+  // 7. Checklist scalat
+  assert(r.checklist.length===6,'checklist 6 items');
+  assert(r.checklist[0].lbl.indexOf(String(n.protein))>=0,'checklist proteine scalate');
+
+  // 8. Morning routines
+  if(persona.p.morningRoutine!==false){
+    assert(!!r.morningRoutines,'morning routines generate');
+    dayKeys.forEach(function(k){assert(!!r.morningRoutines[k],'morning pentru '+k);});
+  }else{
+    assert(r.morningRoutines===null,'morning dezactivat la cerere');
+  }
+
+  // 9. Ghid acoperă exercițiile folosite
+  var usedNames={};
+  dayKeys.forEach(function(k){r.exercises[k].list.forEach(function(e){if(e.exId)usedNames[e.name]=true;});});
+  Object.keys(usedNames).forEach(function(nm){
+    assert(r.ghid.some(function(g){return g.name===nm;}),'ghid pentru: '+nm);
+  });
+
+  // 10. Warnings afișate
+  if(r.warnings.length)console.log('  ⚠️ warnings: '+r.warnings.join(' | '));
+
+  // Sumar vizual
+  var sampleDay=dayKeys.find(function(k){return r.exercises[k].list.some(function(e){return e.star;});});
+  console.log('  kcal '+n.kcal+' · P'+n.protein+' C'+n.carbs+' F'+n.fat+' · '+persona.p.days+' zile · ex/zi activă: '+
+    dayKeys.filter(function(k){return r.exercises[k].label.toLowerCase().indexOf('recovery')<0;}).map(function(k){return r.exercises[k].list.length;}).join(','));
+  console.log('  ex. zi ['+sampleDay+']: '+r.exercises[sampleDay].list.map(function(e){return (e.star?'⭐':'')+e.name.slice(0,30);}).join(' · '));
+  console.log('');
+});
+
+// 11. Validare inputs invalide
+var bad=G.generateProgram({sex:'X',age:200,height:50,weight:500,experience:'pro',equipment:'spatiu',days:7,goal:'zbor'});
+assert(bad.errors&&bad.errors.length>=5,'inputs invalide → erori multiple ('+(bad.errors?bad.errors.length:0)+')');
+var missing=G.generateProgram(null);
+assert(missing.errors&&missing.errors.length,'profil null → eroare');
+
+// 12. Determinism: aceleași inputs → același output
+var p1=G.generateProgram(PERSONAS[0].p);
+var p2=G.generateProgram(PERSONAS[0].p);
+assert(JSON.stringify(p1.exercises)===JSON.stringify(p2.exercises),'determinist: aceleași inputs → același program');
+
+// 13. Programul TĂU (referință) conține exercițiile cheie așteptate
+var ref=G.generateProgram(PERSONAS[0].p);
+var refNames=[];
+Object.keys(ref.exercises).forEach(function(k){ref.exercises[k].list.forEach(function(e){refNames.push(e.name);});});
+assert(refNames.indexOf('Împins gantere bancă înclinată 30–45°')>=0,'referință: împins înclinat prezent');
+assert(refNames.indexOf('Goblet squat')>=0,'referință: goblet prezent');
+assert(refNames.indexOf('Hip thrust cu bara pe bancă plată')>=0,'referință: hip thrust bara prezent (hasBara)');
+
+console.log('══════ REZULTAT: '+pass+' PASS · '+fail+' FAIL ══════');
+process.exit(fail?1:0);
