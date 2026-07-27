@@ -636,6 +636,16 @@ input:checked + .slider:before{transform:translateX(20px);background:var(--acc)}
       <option value="180">180s</option>
     </select>
   </div>
+  <div class="notif-row" id="restTimerSoundRow">
+    <div style="flex:1">
+      <div class="notif-lbl">🔊 Sunet la final</div>
+      <div class="notif-sub">Beep triplu când pauza s-a terminat</div>
+    </div>
+    <label class="sw"><input type="checkbox" id="restTimerSound" onchange="toggleRestTimerSound()"><span class="slider"></span></label>
+  </div>
+  <p style="font-size:11px;color:var(--muted);margin-top:4px;line-height:1.5">
+    💡 Timerul merge și când minimizezi app-ul (calculează pe ceas, nu pe cronometru). Dacă ai notificările activate, primești și notificare cu vibrație când expiră în fundal.
+  </p>
 
   <div class="stitle">💾 Backup local (fișier)</div>
   <p style="font-size:12px;color:var(--muted);margin-bottom:10px;line-height:1.5">
@@ -727,6 +737,7 @@ input:checked + .slider:before{transform:translateX(20px);background:var(--acc)}
 </div>
 
 <div class="rest-timer" id="restTimer">
+  <div id="restTimerBar" style="position:absolute;left:0;top:0;height:3px;background:rgba(255,255,255,.85);width:0%;transition:width .25s linear;border-radius:0 2px 2px 0"></div>
   <span class="rest-timer-icon" id="restTimerIcon">⏱️</span>
   <div class="rest-timer-info">
     <div class="rest-timer-time" id="restTimerTime">1:30</div>
@@ -1336,7 +1347,7 @@ function renderToday(){
     }else{
       var accRec=getAccessoryRec(e.name,e);
       if(accRec){
-        smartHint='<div style="background:rgba(125,141,154,.06);border-left:2px solid '+accRec.color+';padding:3px 10px;margin:4px 14px 0;border-radius:0 4px 4px 0;font-size:11px;color:var(--muted)">📊 <strong style="color:var(--text)">'+accRec.summary+'</strong> <span style="color:'+accRec.color+'">'+accRec.action+'</span></div>';
+        smartHint='<div style="background:rgba(125,141,154,.06);border-left:2px solid '+accRec.color+';padding:3px 10px;margin:4px 14px 0;border-radius:0 4px 4px 0;font-size:11px;color:var(--muted)">📊 Ultima: '+accRec.lastStr+' · 🎯 <strong style="color:'+accRec.color+'">Opțional azi: '+accRec.targetStr+'</strong> <span style="color:var(--muted)">('+accRec.why+')</span></div>';
       }
     }
     // Auto-expand pentru primul exercițiu incomplet
@@ -1574,42 +1585,85 @@ function saveSet(keyEnc,setNum,ei){
 }
 
 // ═══════════════════════════════════════════════════════════════
-// REST TIMER
+// REST TIMER — deadline-based (merge corect și în fundal)
+// + beep audio + notificare când app-ul e minimizat
 // ═══════════════════════════════════════════════════════════════
-var restTimerState={interval:null,remaining:0,total:90};
+var restTimerState={interval:null,deadline:null,total:90,finished:false};
+var audioCtx=null;
 
 function getRestTimerCfg(){
   var v=localStorage.getItem('rest_timer_sec');
-  return {enabled:localStorage.getItem('rest_timer_enabled')!=='0',seconds:v?parseInt(v):90};
+  return {
+    enabled:localStorage.getItem('rest_timer_enabled')!=='0',
+    seconds:v?parseInt(v):90,
+    sound:localStorage.getItem('rest_timer_sound')!=='0'
+  };
+}
+
+// AudioContext trebuie creat pe un gest de user (tap) — apelat din saveSet
+function ensureAudio(){
+  if(!audioCtx){
+    try{audioCtx=new (window.AudioContext||window.webkitAudioContext)();}catch(e){}
+  }
+  if(audioCtx&&audioCtx.state==='suspended'){audioCtx.resume().catch(function(){});}
+}
+
+function playBeep(){
+  if(!getRestTimerCfg().sound)return;
+  if(!audioCtx)return;
+  try{
+    var t=audioCtx.currentTime;
+    [0,0.25,0.5].forEach(function(off,i){
+      var o=audioCtx.createOscillator(),g=audioCtx.createGain();
+      o.connect(g);g.connect(audioCtx.destination);
+      o.frequency.value=(i===2)?1320:880; // ultimul beep mai înalt
+      o.type='sine';
+      g.gain.setValueAtTime(0.001,t+off);
+      g.gain.exponentialRampToValueAtTime(0.35,t+off+0.02);
+      g.gain.exponentialRampToValueAtTime(0.001,t+off+0.18);
+      o.start(t+off);o.stop(t+off+0.2);
+    });
+  }catch(e){}
 }
 
 function startRestTimer(){
   var cfg=getRestTimerCfg();
   if(!cfg.enabled)return;
-  restTimerState.remaining=cfg.seconds;
+  ensureAudio(); // suntem într-un tap (Save) — momentul potrivit
   restTimerState.total=cfg.seconds;
+  restTimerState.deadline=Date.now()+cfg.seconds*1000;
+  restTimerState.finished=false;
   var el=document.getElementById('restTimer');
   el.classList.remove('done');
   el.classList.add('show');
   document.getElementById('restTimerIcon').textContent='⏱️';
   document.getElementById('restTimerLbl').textContent='Pauză recomandată';
-  updateRestTimerDisplay();
+  tickRestTimer();
   clearInterval(restTimerState.interval);
-  restTimerState.interval=setInterval(function(){
-    restTimerState.remaining--;
-    updateRestTimerDisplay();
-    if(restTimerState.remaining<=0){
-      clearInterval(restTimerState.interval);
-      restTimerDone();
-    }
-  },1000);
+  restTimerState.interval=setInterval(tickRestTimer,250);
 }
 
-function updateRestTimerDisplay(){
-  var s=Math.max(0,restTimerState.remaining);
+function tickRestTimer(){
+  if(!restTimerState.deadline)return;
+  var remaining=Math.ceil((restTimerState.deadline-Date.now())/1000);
+  updateRestTimerDisplay(remaining);
+  if(remaining<=0&&!restTimerState.finished){
+    restTimerState.finished=true;
+    clearInterval(restTimerState.interval);
+    restTimerDone();
+  }
+}
+
+function updateRestTimerDisplay(remaining){
+  var s=Math.max(0,remaining);
   var m=Math.floor(s/60),sec=s%60;
   var el=document.getElementById('restTimerTime');
   if(el)el.textContent=m+':'+String(sec).padStart(2,'0');
+  var bar=document.getElementById('restTimerBar');
+  if(bar&&restTimerState.total){
+    var pct=Math.max(0,Math.min(100,(1-s/restTimerState.total)*100));
+    bar.style.width=pct+'%';
+  }
 }
 
 function restTimerDone(){
@@ -1618,17 +1672,28 @@ function restTimerDone(){
   document.getElementById('restTimerIcon').textContent='✅';
   document.getElementById('restTimerTime').textContent='Gata!';
   document.getElementById('restTimerLbl').textContent='Următorul set';
+  playBeep();
   if(navigator.vibrate)navigator.vibrate([200,100,200]);
+  // Dacă app-ul e minimizat → notificare (necesită permisiunea de notificări activată)
+  if(document.hidden&&'Notification' in window&&Notification.permission==='granted'&&navigator.serviceWorker){
+    navigator.serviceWorker.getRegistration().then(function(reg){
+      if(reg)reg.showNotification('⏱️ Pauza s-a terminat',{body:'Următorul set — hai! 💪',tag:'rest-timer',vibrate:[200,100,200],icon:'./manifest.json'});
+    });
+  }
+  restTimerState.deadline=null;
   setTimeout(function(){el.classList.remove('show');},4000);
 }
 
 function restTimerAdjust(delta){
-  restTimerState.remaining=Math.max(0,restTimerState.remaining+delta);
-  updateRestTimerDisplay();
+  if(!restTimerState.deadline)return;
+  restTimerState.deadline+=delta*1000;
+  restTimerState.total=Math.max(1,restTimerState.total+delta);
+  tickRestTimer();
 }
 
 function stopRestTimer(){
   clearInterval(restTimerState.interval);
+  restTimerState.deadline=null;
   document.getElementById('restTimer').classList.remove('show');
 }
 
@@ -1639,7 +1704,19 @@ function initRestTimerUI(){
   t.checked=cfg.enabled;
   document.getElementById('restTimerDur').value=String(cfg.seconds);
   document.getElementById('restTimerDurRow').style.display=cfg.enabled?'':'none';
-  document.getElementById('restTimerStatus').textContent=cfg.enabled?('Activ · '+cfg.seconds+'s'):'Dezactivat';
+  var soundRow=document.getElementById('restTimerSoundRow');
+  if(soundRow)soundRow.style.display=cfg.enabled?'':'none';
+  var soundChk=document.getElementById('restTimerSound');
+  if(soundChk)soundChk.checked=cfg.sound;
+  document.getElementById('restTimerStatus').textContent=cfg.enabled?('Activ · '+cfg.seconds+'s'+(cfg.sound?' · 🔊':'')):'Dezactivat';
+}
+
+function toggleRestTimerSound(){
+  var on=document.getElementById('restTimerSound').checked;
+  localStorage.setItem('rest_timer_sound',on?'1':'0');
+  ensureAudio(); // gest de user — bun moment să deblocăm audio
+  if(on)playBeep(); // demo instant
+  initRestTimerUI();
 }
 
 function toggleRestTimer(){
@@ -1901,7 +1978,7 @@ function initProgram(){
       }else{
         var accRec=getAccessoryRec(e.name,e);
         if(accRec){
-          smartTarget='<div style="font-size:11px;color:var(--muted);margin-top:2px">📊 <strong style="color:var(--text)">'+accRec.summary+'</strong> <span style="color:'+accRec.color+'">'+accRec.action+'</span></div>';
+          smartTarget='<div style="font-size:11px;color:var(--muted);margin-top:2px">🎯 <strong style="color:'+accRec.color+'">Opțional: '+accRec.targetStr+'</strong> <span style="color:var(--muted)">(ultima: '+accRec.lastStr+')</span></div>';
         }
       }
       html+='<div style="display:flex;align-items:flex-start;gap:8px;padding:8px 0;border-bottom:1px solid var(--bd);font-size:13px">';
@@ -3402,27 +3479,31 @@ function getAccessoryRec(exerciseName,exMeta){
   if(!last.kg||last.kg<=0)return null;
 
   var inc=getAccessoryIncrement(exerciseName,maxRep);
-  // (last vine din getLastPerformance care a exclus AZI mai jos)
+  // Returnează ȚINTA EXPLICITĂ (rep × kg concrete), nu doar delta —
+  // ca userul să știe exact ce să facă azi, fără calcul mental.
   if(last.reps>=maxRep){
     return {
       type:'at_max',
-      summary:last.kg+' kg × '+last.reps+' rep ✓',
-      action:'→ urcă la '+(last.kg+inc)+' kg, scade la '+minRep+' rep',
+      lastStr:last.reps+'×'+last.kg+'kg ✓ max',
+      targetStr:minRep+' rep × '+(last.kg+inc)+' kg',
+      why:'ai atins maximul → +'+inc+' kg',
       color:'var(--green)'
     };
   }
   if(last.reps>=minRep){
     return {
       type:'in_range',
-      summary:last.kg+' kg × '+last.reps+' rep',
-      action:'→ +1 rep (păstrează kg)',
+      lastStr:last.reps+'×'+last.kg+'kg',
+      targetStr:(last.reps+1)+' rep × '+last.kg+' kg',
+      why:'+1 rep față de ultima',
       color:'var(--acc2)'
     };
   }
   return {
     type:'below_min',
-    summary:last.kg+' kg × '+last.reps+' rep',
-    action:'→ repetă, ajunge la '+minRep+' rep mai întâi',
+    lastStr:last.reps+'×'+last.kg+'kg',
+    targetStr:minRep+' rep × '+last.kg+' kg',
+    why:'întâi atinge minimul de '+minRep,
     color:'var(--muted)'
   };
 }
@@ -4305,7 +4386,11 @@ window.addEventListener('load',function(){
 
   // Detectare schimbare zi (miezul nopții, alt timezone, app lăsat deschis)
   document.addEventListener('visibilitychange',function(){
-    if(document.visibilityState==='visible')checkDayChanged();
+    if(document.visibilityState==='visible'){
+      checkDayChanged();
+      // Timer: recalculează instant din deadline (a mers "în fundal" pe timestamp)
+      if(restTimerState.deadline)tickRestTimer();
+    }
   });
   window.addEventListener('focus',checkDayChanged);
   setInterval(checkDayChanged,60000); // check la fiecare 60s și când app e deschis
