@@ -701,7 +701,7 @@ input:checked + .slider:before{transform:translateX(20px);background:var(--acc)}
   <div class="rules-box" style="margin-bottom:10px">
     <div class="rule-row" id="myProgramInfo">—</div>
   </div>
-  <button class="btn btn-ghost" onclick="openWizard(true)" id="myProgramBtn">✨ Generează / reconfigurează programul</button>
+  <button class="btn btn-ghost" onclick="openWizard(true)" id="myProgramBtn">🔄 Reia wizard-ul (modifică programul)</button>
   <p style="font-size:11px;color:var(--muted);margin-bottom:12px;line-height:1.4">
     Istoricul și PR-urile tale rămân intacte la regenerare — se schimbă doar planul de exerciții/nutriție.
   </p>
@@ -779,7 +779,7 @@ input:checked + .slider:before{transform:translateX(20px);background:var(--acc)}
 </div>
 
 <div class="onboarding" id="onboarding">
-  <div class="onboarding-card" style="text-align:left;max-height:88vh;overflow-y:auto;width:100%;max-width:380px">
+  <div class="onboarding-card" style="text-align:left;max-height:88vh;overflow-y:auto;width:100%;max-width:380px;position:relative">
     <div id="wizardContent"></div>
   </div>
 </div>
@@ -4488,7 +4488,8 @@ function closeWizard(){
 }
 
 function wizChoiceBtn(field,value,title,sub,extraOnclick){
-  var sel=wizState.data[field]===value?' sel':'';
+  // String() pe ambele — altfel days (număr 3) !== '3' și selecția nu se evidențiază
+  var sel=String(wizState.data[field])===String(value)?' sel':'';
   return '<button class="wiz-choice'+sel+'" onclick="wizSet(\''+field+'\',\''+value+'\')'+(extraOnclick||'')+'">'+
     '<div class="wiz-choice-title">'+title+'</div>'+(sub?'<div class="wiz-choice-sub">'+sub+'</div>':'')+'</button>';
 }
@@ -4571,6 +4572,12 @@ function renderWizard(){
   var d=wizState.data;
   var s=wizState.step;
   var html='';
+  // X de închidere — doar dacă app-ul e deja configurat (reconfigurare din Setări);
+  // userii noi au "Sar peste" la pasul 0
+  var isReconfigure=!!(localStorage.getItem('custom_program')||localStorage.getItem('legacy_program'));
+  if(isReconfigure){
+    html+='<button onclick="closeWizard()" style="position:absolute;top:10px;right:12px;background:none;border:none;color:var(--muted);font-size:22px;cursor:pointer;padding:4px;z-index:10">×</button>';
+  }
   // progress dots
   html+='<div class="wiz-progress">';
   for(var i=0;i<WIZ_STEPS;i++){html+='<div class="wiz-progress-dot'+(i<=s?' done':'')+'"></div>';}
