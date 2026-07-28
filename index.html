@@ -90,6 +90,30 @@ body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSy
 .empty-state-action{display:inline-block;color:var(--acc);text-decoration:underline;cursor:pointer;margin-top:8px;font-weight:700}
 .add-custom-row{display:flex;gap:8px;align-items:center;background:var(--s2);border:1px dashed rgba(20,184,166,.3);border-radius:10px;padding:10px;margin-top:10px;cursor:pointer}
 .add-custom-row:active{background:rgba(20,184,166,.06)}
+/* Wizard onboarding */
+.wiz-title{font-size:20px;font-weight:900;color:var(--acc);margin-bottom:4px}
+.wiz-sub{font-size:12px;color:var(--muted);margin-bottom:16px;line-height:1.5}
+.wiz-progress{display:flex;gap:4px;margin-bottom:16px}
+.wiz-progress-dot{flex:1;height:4px;border-radius:2px;background:var(--s2)}
+.wiz-progress-dot.done{background:var(--acc)}
+.wiz-label{font-size:11px;font-weight:800;letter-spacing:1px;color:var(--acc2);text-transform:uppercase;margin:14px 0 8px}
+.wiz-choice{display:block;width:100%;background:var(--s2);border:2px solid var(--bd);border-radius:12px;padding:12px 14px;margin-bottom:8px;cursor:pointer;font-family:inherit;text-align:left;color:var(--text)}
+.wiz-choice.sel{border-color:var(--acc);background:rgba(20,184,166,.1)}
+.wiz-choice-title{font-size:14px;font-weight:800}
+.wiz-choice-sub{font-size:11px;color:var(--muted);margin-top:2px;line-height:1.4}
+.wiz-row{display:flex;gap:8px}
+.wiz-row .wiz-choice{flex:1;text-align:center}
+.wiz-input-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px}
+.wiz-input-box{background:var(--s2);border:1px solid var(--bd);border-radius:10px;padding:8px 10px}
+.wiz-input-box label{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;font-weight:700;display:block;margin-bottom:4px}
+.wiz-input-box input{width:100%;background:var(--bg);border:1px solid var(--bd);border-radius:8px;color:var(--text);font-size:17px;font-weight:700;padding:8px;font-family:inherit;text-align:center}
+.wiz-input-box input:focus{outline:none;border-color:var(--acc)}
+.wiz-nav{display:flex;gap:8px;margin-top:16px}
+.wiz-nav .btn{margin-bottom:0}
+.wiz-nav .btn-back{flex:0 0 auto;width:auto;padding:14px 18px}
+.wiz-err{background:rgba(244,63,94,.1);border:1px solid rgba(244,63,94,.4);color:#f87a8c;border-radius:10px;padding:8px 12px;font-size:12px;margin-top:10px;display:none}
+.wiz-preview-stat{display:flex;justify-content:space-between;padding:7px 0;border-bottom:1px solid var(--bd);font-size:13px}
+.wiz-preview-stat:last-child{border-bottom:none}
 /* Rest timer sticky bar */
 .rest-timer{position:fixed;left:0;right:0;bottom:calc(72px + env(safe-area-inset-bottom));background:linear-gradient(135deg,#0e1822,#14b8a6);border-top:2px solid var(--acc);z-index:180;display:none;align-items:center;gap:12px;padding:10px 16px;box-shadow:0 -4px 20px rgba(0,0,0,.4)}
 .rest-timer.show{display:flex}
@@ -374,6 +398,7 @@ input:checked + .slider:before{transform:translateX(20px);background:var(--acc)}
   <div id="nutMeals"></div>
   <div id="nutNote"></div>
 
+  <div id="nutVariationWrap">
   <div class="stitle">🐟 Variație săptămânală (1 zi/săpt)</div>
   <div class="meal-card" style="border-color:rgba(56,189,248,.35)">
     <div class="meal-hd"><div><div class="meal-nm">🐟 Somon + quinoa (în loc de Masa 3)</div><div class="meal-tm">Orice zi PUI sau TON · 1x/săpt</div></div><div style="text-align:right"><div class="meal-kc" style="color:#38bdf8">~700 kcal</div><div class="meal-pr">~45g proteine · Omega 3</div></div></div>
@@ -385,6 +410,7 @@ input:checked + .slider:before{transform:translateX(20px);background:var(--acc)}
   </div>
   <div class="note-box" style="background:rgba(56,189,248,.08);border-color:rgba(56,189,248,.3);color:#38bdf8">
     💡 <strong>De ce</strong>: Omega 3 (reducere inflamație), fier (energie), folat (recuperare). Lidl/Profi au somon și quinoa — ~25 lei/săpt în plus.
+  </div>
   </div>
 
   <div class="rules-box">
@@ -670,6 +696,15 @@ input:checked + .slider:before{transform:translateX(20px);background:var(--acc)}
     <span id="storageInfo"></span>
   </p>
 
+  <div class="stitle">🏋️ Programul meu</div>
+  <div class="rules-box" style="margin-bottom:10px">
+    <div class="rule-row" id="myProgramInfo">—</div>
+  </div>
+  <button class="btn btn-ghost" onclick="openWizard(true)" id="myProgramBtn">✨ Generează / reconfigurează programul</button>
+  <p style="font-size:11px;color:var(--muted);margin-bottom:12px;line-height:1.4">
+    Istoricul și PR-urile tale rămân intacte la regenerare — se schimbă doar planul de exerciții/nutriție.
+  </p>
+
   <div class="stitle">📏 Profil corp</div>
   <div class="meas-grid">
     <div class="meas-field">
@@ -727,19 +762,8 @@ input:checked + .slider:before{transform:translateX(20px);background:var(--acc)}
 </div>
 
 <div class="onboarding" id="onboarding">
-  <div class="onboarding-card">
-    <div class="onboarding-title">🏋️ Fitness Jurnal</div>
-    <div class="onboarding-sub">8 săptămâni · bloc friendly · gantere + bară</div>
-    <ol class="onboarding-steps">
-      <li><strong>🏋️ Azi</strong>: vezi ce ai de făcut + salvezi seturi (rep × kg)</li>
-      <li><strong>☀️ Dimineață</strong>: 4 exerciții pattern (învățare mișcare)</li>
-      <li><strong>📅 Săptămâna</strong>: progres + ținte Smart Coach</li>
-      <li><strong>📈 Progres</strong>: măsurători corp + BF% + grafice</li>
-      <li><strong>📊 Istoric</strong>: săpt. trecute + export AI</li>
-      <li><strong>⚙️ Setări</strong>: profil + backup + notificări</li>
-    </ol>
-    <p style="font-size:11px;color:var(--muted);margin-bottom:14px;line-height:1.4">💡 Pre-fill automat din ultima sesiune · Smart Coach îți spune ce să faci · PR celebrare</p>
-    <button class="btn btn-acc" onclick="dismissOnboarding()">🚀 Începe</button>
+  <div class="onboarding-card" style="text-align:left;max-height:88vh;overflow-y:auto;width:100%;max-width:380px">
+    <div id="wizardContent"></div>
   </div>
 </div>
 
@@ -757,6 +781,7 @@ input:checked + .slider:before{transform:translateX(20px);background:var(--acc)}
 
 <div class="toast" id="toast"></div>
 
+<script src="./generator.js"></script>
 <script>
 // ═══════════════════════════════════════════════════════════════
 // DATE STATICE
@@ -907,6 +932,34 @@ var MEAS_FIELDS=[
   {id:'neck',el:'mNeck',label:'Gât',unit:'cm'},
   {id:'calf',el:'mCalf',label:'Gambă',unit:'cm'}
 ];
+
+// ═══════════════════════════════════════════════════════════════
+// PROGRAM CUSTOM (generat la onboarding) — suprascrie definițiile
+// statice de mai sus. Userii vechi (cu date, fără custom_program)
+// rămân pe programul standard = "grandfathered".
+// ═══════════════════════════════════════════════════════════════
+var isCustomProgram=false;
+var customNutrition=null;
+var customMeta=null;
+(function applyCustomProgram(){
+  try{
+    var raw=localStorage.getItem('custom_program');
+    if(!raw)return;
+    var p=JSON.parse(raw);
+    if(!p||!p.exercises||!p.schedule)return;
+    exercises=p.exercises;
+    if(p.morningRoutines)morningRoutines=p.morningRoutines;
+    if(p.checklist&&p.checklist.length)checkItems=p.checklist;
+    if(p.ghid&&p.ghid.length)ghidEx=p.ghid;
+    var DAY_NAMES=['LUNI','MARȚI','MIERCURI','JOI','VINERI','SÂMBĂTĂ','DUMINICĂ'];
+    schedule=p.schedule.map(function(exDay,i){
+      return {day:DAY_NAMES[i],nutType:'auto',exDay:exDay};
+    });
+    customNutrition=p.nutrition||null;
+    customMeta=p.meta||null;
+    isCustomProgram=true;
+  }catch(e){console.error('applyCustomProgram failed',e);}
+})();
 
 // ═══════════════════════════════════════════════════════════════
 // STORAGE
@@ -1140,6 +1193,17 @@ function showTab(name,btn){
     var p=getProfile();
     var ph=document.getElementById('profileHeight');if(ph)ph.value=p.height;
     var pa=document.getElementById('profileAge');if(pa)pa.value=p.age;
+    // Programul meu
+    var mpi=document.getElementById('myProgramInfo');
+    if(mpi){
+      if(isCustomProgram){
+        var goalL={slabit:'Slăbit',recomp:'Recompoziție',masa:'Masă'}[p.goal]||p.goal||'—';
+        var eqL={bodyweight:'Bodyweight',home_min:'Gantere+bancă'+(p.hasBara?'+bară':''),gym:'Sală'}[p.equipment]||'—';
+        mpi.innerHTML='✨ <strong style="color:var(--acc)">Program personalizat</strong> · '+goalL+' · '+eqL+' · '+(p.days||'?')+' zile/săpt · '+(p.experience==='incepator'?'Începător':'Intermediar');
+      }else{
+        mpi.innerHTML='📘 <strong style="color:var(--text)">Program standard</strong> (gantere+bancă+bară · 4 zile · recompoziție)';
+      }
+    }
   }
   window.scrollTo(0,0);
 }
@@ -1883,8 +1947,42 @@ function updateChkCount(){
 // ═══════════════════════════════════════════════════════════════
 // NUTRIȚIE
 // ═══════════════════════════════════════════════════════════════
+// Nutriție pentru programe GENERATE: calculator kcal/macros + principii
+// (planurile de mese hardcodate rămân doar pentru programul standard)
+function renderNutritionAuto(){
+  var n=customNutrition;
+  document.getElementById('nutDays').style.display='none';
+  var vw=document.getElementById('nutVariationWrap');
+  if(vw)vw.style.display='none';
+  var goalLabel={slabit:'Slăbit',recomp:'Recompoziție',masa:'Masă musculară'}[customMeta&&customMeta.goal]||'';
+  document.getElementById('nutDayHdr').innerHTML=
+    '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">'+
+    '<div><div style="font-size:22px;font-weight:900">Planul tău caloric</div>'+
+    '<div style="font-size:11px;color:var(--purple);font-weight:600;margin-top:2px">Obiectiv: '+goalLabel+' · TDEE estimat '+n.tdee+' kcal</div></div>'+
+    '<div style="background:var(--s1);border:1px solid var(--bd);border-radius:12px;padding:8px 14px;text-align:center">'+
+    '<div style="font-size:20px;font-weight:900;color:var(--acc)">'+n.kcal+'</div>'+
+    '<div style="font-size:10px;color:var(--muted);letter-spacing:1px">KCAL/ZI</div></div></div>';
+  document.getElementById('nutMacros').innerHTML=
+    '<div class="macro-box"><div class="macro-val mp">'+n.protein+'<span>g</span></div><div class="macro-lbl">PROTEINE</div></div>'+
+    '<div class="macro-box"><div class="macro-val mc">'+n.carbs+'<span>g</span></div><div class="macro-lbl">CARBOHIDRAȚI</div></div>'+
+    '<div class="macro-box"><div class="macro-val mf">'+n.fat+'<span>g</span></div><div class="macro-lbl">GRĂSIMI</div></div>';
+  var meals=document.getElementById('nutMeals');
+  var html='<div class="meal-card"><div class="meal-hd"><div><div class="meal-nm">📋 Principiile planului tău</div><div class="meal-tm">generat pe profilul tău — nu mese impuse</div></div></div><div class="meal-items">';
+  (n.principles||[]).forEach(function(p){
+    html+='<div class="item-row"><div class="item-nm" style="font-weight:500;line-height:1.4">'+p+'</div></div>';
+  });
+  html+='</div></div>';
+  html+='<div class="meal-card"><div class="meal-hd"><div><div class="meal-nm">💧 Ținte zilnice</div></div></div><div class="meal-items">';
+  html+='<div class="item-row"><div class="item-nm">Apă</div><div class="item-kc">'+n.waterL+' L</div></div>';
+  html+='<div class="item-row"><div class="item-nm">Pași</div><div class="item-kc">'+n.stepsTarget+'</div></div>';
+  html+='</div></div>';
+  meals.innerHTML=html;
+  document.getElementById('nutNote').innerHTML=(customMeta&&customMeta.goalNotes)?'<div class="note-box">💡 '+customMeta.goalNotes+'</div>':'';
+}
+
 function initNutritie(){
-  var scroll=document.getElementById('nutDays');scroll.innerHTML='';
+  if(isCustomProgram&&customNutrition){renderNutritionAuto();return;}
+  var scroll=document.getElementById('nutDays');scroll.innerHTML='';scroll.style.display='';
   schedule.forEach(function(s,i){
     var plan=nutPlans[s.nutType];
     var btn=document.createElement('button');
@@ -2105,11 +2203,11 @@ function renderMeasurements(){
       html+='<span class="meas-v"><strong>'+f.label+':</strong> '+r[f.id]+f.unit+delta+'</span>';
     });
     // BF% estimat (Navy) — afișat dacă avem talie + gât + înălțime
-    var bf=calcBFNavy(r.waist,r.neck,profile.height);
+    var bf=calcBFNavy(r.waist,r.neck,profile.height,profile.sex,r.hip);
     if(bf!=null){
       var bfDelta='';
       if(next){
-        var bfPrev=calcBFNavy(next.waist,next.neck,profile.height);
+        var bfPrev=calcBFNavy(next.waist,next.neck,profile.height,profile.sex,next.hip);
         if(bfPrev!=null){
           var bfDiff=bf-bfPrev;
           if(Math.abs(bfDiff)<0.05) bfDelta='<span class="delta-neu"> ±0</span>';
@@ -2464,7 +2562,7 @@ function buildWeekSummary(){
   if(measurements.length){
     out+='📏 MĂSURĂTORI CORP — TOATE ('+measurements.length+' înregistrări)\n';
     measurements.forEach(function(m){
-      var bf=calcBFNavy(m.waist,m.neck,profile.height);
+      var bf=calcBFNavy(m.waist,m.neck,profile.height,profile.sex,m.hip);
       out+='▸ '+m.date+(m.note?' · '+m.note:'')+'\n';
       MEAS_FIELDS.forEach(function(f){
         if(m[f.id]!=null) out+='    '+f.label+': '+m[f.id]+' '+f.unit+'\n';
@@ -2486,8 +2584,8 @@ function buildWeekSummary(){
           out+='  '+f.label+': '+sign+d.toFixed(1)+' '+f.unit+'\n';
         }
       });
-      var bfFirst=calcBFNavy(oldest.waist,oldest.neck,profile.height);
-      var bfLast=calcBFNavy(latest.waist,latest.neck,profile.height);
+      var bfFirst=calcBFNavy(oldest.waist,oldest.neck,profile.height,profile.sex,oldest.hip);
+      var bfLast=calcBFNavy(latest.waist,latest.neck,profile.height,profile.sex,latest.hip);
       if(bfFirst!=null&&bfLast!=null){
         var bfDiff=bfLast-bfFirst;
         out+='  BF% (Navy): '+(bfDiff>0?'+':'')+bfDiff.toFixed(1)+'%\n';
@@ -2605,12 +2703,23 @@ function buildWeekSummary(){
 
   // === REGULI PROGRAM (context pentru AI) ===
   out+='\n📋 CONTEXT PROGRAM\n';
-  out+='  Obiectiv: hipertrofie + recompoziție (92→85 kg)\n';
-  out+='  Echipament: bancă înclinabilă, gantere rotunde, bară, bloc friendly\n';
-  out+='  Tempo: 2-1-2 strict pe toate exercițiile\n';
-  out+='  Progresie ⭐ săptămânală: săpt 1-2 baseline · 3-4 +rep · 5-6 +kg · 7 +set · 8 deload\n';
-  out+='  Frecvență: 4 zile active (L/Ma/J/V) + 1 recovery (Mi) + 2 mobilitate (S/D)\n';
-  out+='  Nutriție: 19:6 IF pe zile antrenament (1717-1769 kcal) · OMAD pe recovery (1007 kcal)\n';
+  if(isCustomProgram&&customNutrition){
+    var goalL={slabit:'slăbit (deficit ~20%)',recomp:'recompoziție (deficit ~12%)',masa:'masă musculară (surplus ~10%)'}[customMeta&&customMeta.goal]||'—';
+    var eqL={bodyweight:'doar bodyweight',home_min:'gantere + bancă'+(profile.hasBara?' + bară':''),gym:'sală completă'}[profile.equipment]||'—';
+    out+='  Program GENERAT pe profil: '+goalL+'\n';
+    out+='  Echipament: '+eqL+' · '+(profile.days||'?')+' zile antrenament/săpt · nivel '+(profile.experience||'?')+'\n';
+    out+='  Tempo: 2-1-2 strict pe toate exercițiile\n';
+    out+='  Progresie ⭐: săpt 1-2 baseline · 3-4 +rep · 5-6 +kg · 7 +set · 8 deload\n';
+    out+='  Nutriție: '+customNutrition.kcal+' kcal/zi (TDEE '+customNutrition.tdee+') · P'+customNutrition.protein+' C'+customNutrition.carbs+' F'+customNutrition.fat+'\n';
+    if(customMeta&&customMeta.goalNotes)out+='  Notă obiectiv: '+customMeta.goalNotes+'\n';
+  }else{
+    out+='  Obiectiv: hipertrofie + recompoziție (92→85 kg)\n';
+    out+='  Echipament: bancă înclinabilă, gantere rotunde, bară, bloc friendly\n';
+    out+='  Tempo: 2-1-2 strict pe toate exercițiile\n';
+    out+='  Progresie ⭐ săptămânală: săpt 1-2 baseline · 3-4 +rep · 5-6 +kg · 7 +set · 8 deload\n';
+    out+='  Frecvență: 4 zile active (L/Ma/J/V) + 1 recovery (Mi) + 2 mobilitate (S/D)\n';
+    out+='  Nutriție: 19:6 IF pe zile antrenament (1717-1769 kcal) · OMAD pe recovery (1007 kcal)\n';
+  }
 
   // === CERERE ANALIZĂ ===
   out+='\n'+'='.repeat(50)+'\n';
@@ -2717,11 +2826,19 @@ function saveProfile(){
   if(document.getElementById('tab-progres').classList.contains('act'))renderMeasurements();
 }
 
-// Navy method BF% pentru bărbați (SI / cm-kg)
-function calcBFNavy(waistCm,neckCm,heightCm){
+// Navy method BF% (SI / cm-kg) — formule diferite pe sex
+// Femei: necesită și circumferința șoldurilor
+function calcBFNavy(waistCm,neckCm,heightCm,sex,hipCm){
   if(!waistCm||!neckCm||!heightCm) return null;
-  if(waistCm<=neckCm) return null;
-  var bf=495/(1.0324-0.19077*Math.log10(waistCm-neckCm)+0.15456*Math.log10(heightCm))-450;
+  var bf;
+  if(sex==='F'){
+    if(!hipCm) return null;
+    if(waistCm+hipCm<=neckCm) return null;
+    bf=495/(1.29579-0.35004*Math.log10(waistCm+hipCm-neckCm)+0.22100*Math.log10(heightCm))-450;
+  }else{
+    if(waistCm<=neckCm) return null;
+    bf=495/(1.0324-0.19077*Math.log10(waistCm-neckCm)+0.15456*Math.log10(heightCm))-450;
+  }
   if(isNaN(bf)||bf<3||bf>60) return null;
   return Math.round(bf*10)/10;
 }
@@ -3758,7 +3875,7 @@ function renderRecompChart(){
   all.forEach(function(m){
     var d=parseRoDate(m.date);if(!d)return;
     if(m.weight!=null)weightPts.push({x:d,y:m.weight});
-    var bf=calcBFNavy(m.waist,m.neck,profile.height);
+    var bf=calcBFNavy(m.waist,m.neck,profile.height,profile.sex,m.hip);
     if(bf!=null&&m.weight!=null)leanPts.push({x:d,y:m.weight*(1-bf/100)});
   });
   weightPts=filterByRange(weightPts,progresState.range);
@@ -4307,20 +4424,223 @@ function dismissInstallHint(){
   localStorage.setItem('installHintDismissed','1');
 }
 
-function dismissOnboarding(){
-  document.getElementById('onboarding').classList.remove('show');
-  localStorage.setItem('onboarding_done','1');
-}
+// ═══════════════════════════════════════════════════════════════
+// ONBOARDING WIZARD — generează program personalizat
+// ═══════════════════════════════════════════════════════════════
+var wizState={step:0,data:{sex:null,age:'',height:'',weight:'',experience:null,equipment:null,hasBara:false,days:null,goal:null,morningRoutine:true},generated:null};
+var WIZ_STEPS=7;
 
 function maybeShowOnboarding(){
-  if(localStorage.getItem('onboarding_done'))return;
-  // Show only if no data yet
+  if(localStorage.getItem('custom_program'))return;      // deja configurat
+  if(localStorage.getItem('legacy_program'))return;      // grandfathered explicit
   var store=loadStore();
   if(store.rows.length>0){
-    localStorage.setItem('onboarding_done','1');
+    // Date existente fără program custom = creatorul app-ului → program standard
+    localStorage.setItem('legacy_program','1');
     return;
   }
-  setTimeout(function(){document.getElementById('onboarding').classList.add('show');},800);
+  setTimeout(function(){openWizard();},600);
+}
+
+function openWizard(prefill){
+  if(prefill){
+    var p=getProfile();
+    wizState.data.sex=p.sex||null;
+    wizState.data.age=p.age||'';
+    wizState.data.height=p.height||'';
+    wizState.data.weight=p.weight||'';
+    wizState.data.experience=p.experience||null;
+    wizState.data.equipment=p.equipment||null;
+    wizState.data.hasBara=!!p.hasBara;
+    wizState.data.days=p.days||null;
+    wizState.data.goal=p.goal||null;
+    wizState.data.morningRoutine=p.morningRoutine!==false;
+  }
+  wizState.step=0;
+  renderWizard();
+  document.getElementById('onboarding').classList.add('show');
+}
+
+function closeWizard(){
+  document.getElementById('onboarding').classList.remove('show');
+}
+
+function wizChoiceBtn(field,value,title,sub,extraOnclick){
+  var sel=wizState.data[field]===value?' sel':'';
+  return '<button class="wiz-choice'+sel+'" onclick="wizSet(\''+field+'\',\''+value+'\')'+(extraOnclick||'')+'">'+
+    '<div class="wiz-choice-title">'+title+'</div>'+(sub?'<div class="wiz-choice-sub">'+sub+'</div>':'')+'</button>';
+}
+
+function wizSet(field,value){
+  if(field==='days')value=parseInt(value);
+  if(field==='hasBara'||field==='morningRoutine')value=(value==='true');
+  wizState.data[field]=value;
+  renderWizard();
+}
+
+function wizErr(msg){
+  var el=document.getElementById('wizErr');
+  if(el){el.textContent=msg;el.style.display='block';}
+}
+
+function wizNext(){
+  var d=wizState.data;
+  // Validare pas curent
+  if(wizState.step===1){
+    d.age=parseInt(document.getElementById('wizAge').value)||0;
+    d.height=parseFloat(document.getElementById('wizHeight').value)||0;
+    d.weight=parseFloat(document.getElementById('wizWeight').value)||0;
+    if(!d.sex){wizErr('Alege sexul');return;}
+    if(!(d.age>=16&&d.age<=80)){wizErr('Vârstă între 16 și 80');return;}
+    if(!(d.height>=120&&d.height<=230)){wizErr('Înălțime în cm (ex: 175)');return;}
+    if(!(d.weight>=35&&d.weight<=250)){wizErr('Greutate în kg (ex: 80)');return;}
+  }
+  if(wizState.step===2&&!d.experience){wizErr('Alege nivelul');return;}
+  if(wizState.step===3&&!d.equipment){wizErr('Alege echipamentul');return;}
+  if(wizState.step===4){
+    if(!d.days){wizErr('Alege câte zile');return;}
+    if(!d.goal){wizErr('Alege obiectivul');return;}
+  }
+  if(wizState.step===5){
+    // Generare
+    var res=ProgramGenerator.generateProgram({
+      sex:d.sex,age:d.age,height:d.height,weight:d.weight,
+      experience:d.experience,equipment:d.equipment,hasBara:d.hasBara,
+      days:d.days,goal:d.goal,morningRoutine:d.morningRoutine
+    });
+    if(res.errors){wizErr('Eroare: '+res.errors.join(', '));return;}
+    wizState.generated=res;
+  }
+  wizState.step++;
+  renderWizard();
+}
+
+function wizBack(){
+  if(wizState.step>0){wizState.step--;renderWizard();}
+}
+
+function wizFinish(){
+  var res=wizState.generated;
+  if(!res)return;
+  localStorage.setItem('custom_program',JSON.stringify(res));
+  // Profil complet (folosit de BF%, TDEE, Setări)
+  var d=wizState.data;
+  localStorage.setItem('user_profile',JSON.stringify({
+    sex:d.sex,age:d.age,height:d.height,weight:d.weight,
+    experience:d.experience,equipment:d.equipment,hasBara:d.hasBara,
+    days:d.days,goal:d.goal,morningRoutine:d.morningRoutine
+  }));
+  localStorage.setItem('onboarding_done','1');
+  localStorage.removeItem('legacy_program');
+  location.reload(); // aplicare curată a programului nou
+}
+
+function wizSkip(){
+  // Folosește programul standard (al creatorului) fără personalizare
+  if(!confirm('Sari peste personalizare? Vei folosi programul standard (gantere + bancă + bară, 4 zile, recompoziție). Poți genera oricând programul tău din Setări.'))return;
+  localStorage.setItem('legacy_program','1');
+  localStorage.setItem('onboarding_done','1');
+  closeWizard();
+}
+
+function renderWizard(){
+  var c=document.getElementById('wizardContent');
+  if(!c)return;
+  var d=wizState.data;
+  var s=wizState.step;
+  var html='';
+  // progress dots
+  html+='<div class="wiz-progress">';
+  for(var i=0;i<WIZ_STEPS;i++){html+='<div class="wiz-progress-dot'+(i<=s?' done':'')+'"></div>';}
+  html+='</div>';
+
+  if(s===0){
+    html+='<div class="wiz-title">🏋️ Bine ai venit!</div>';
+    html+='<div class="wiz-sub">Programul tău de <strong style="color:var(--text)">8 săptămâni</strong>, personalizat pe corpul, echipamentul și obiectivul tău. Progresie săptămânală ghidată automat — tu doar te antrenezi.</div>';
+    html+='<div class="wiz-sub">📝 6 întrebări rapide · ⏱️ sub 1 minut</div>';
+    html+='<div class="wiz-sub" style="font-size:10px">⚠️ Aplicația nu înlocuiește sfatul medical. Dacă ai afecțiuni (cardiace, articulare, tensiune), consultă medicul înainte de a începe un program de forță.</div>';
+    html+='<div class="wiz-nav"><button class="btn btn-acc" onclick="wizNext()">Începe →</button></div>';
+    html+='<button class="btn btn-ghost" style="font-size:12px;padding:8px;margin-top:6px" onclick="wizSkip()">Sar peste — folosesc programul standard</button>';
+  }
+  else if(s===1){
+    html+='<div class="wiz-title">Despre tine</div>';
+    html+='<div class="wiz-label">Sex (pentru calcule calorii + BF%)</div>';
+    html+='<div class="wiz-row">'+wizChoiceBtn('sex','M','👨 Bărbat','')+wizChoiceBtn('sex','F','👩 Femeie','')+'</div>';
+    html+='<div class="wiz-label">Corp</div>';
+    html+='<div class="wiz-input-grid">';
+    html+='<div class="wiz-input-box"><label>Vârstă</label><input type="number" id="wizAge" inputmode="numeric" placeholder="ani" value="'+(d.age||'')+'"></div>';
+    html+='<div class="wiz-input-box"><label>Înălțime</label><input type="number" id="wizHeight" inputmode="numeric" placeholder="cm" value="'+(d.height||'')+'"></div>';
+    html+='<div class="wiz-input-box" style="grid-column:1/3"><label>Greutate actuală</label><input type="number" id="wizWeight" inputmode="decimal" step="0.1" placeholder="kg" value="'+(d.weight||'')+'"></div>';
+    html+='</div>';
+    html+='<div class="wiz-err" id="wizErr"></div>';
+    html+='<div class="wiz-nav"><button class="btn btn-ghost btn-back" onclick="wizBack()">←</button><button class="btn btn-acc" onclick="wizNext()">Continuă →</button></div>';
+  }
+  else if(s===2){
+    html+='<div class="wiz-title">Experiența ta</div>';
+    html+=wizChoiceBtn('experience','incepator','🌱 Începător','Sub 6 luni de antrenament constant cu greutăți. Primești exerciții sigure, tehnică întâi.');
+    html+=wizChoiceBtn('experience','intermediar','💪 Intermediar','6+ luni constant. Cunoști squat, împins, ramat. Primești volum complet.');
+    html+='<div class="wiz-err" id="wizErr"></div>';
+    html+='<div class="wiz-nav"><button class="btn btn-ghost btn-back" onclick="wizBack()">←</button><button class="btn btn-acc" onclick="wizNext()">Continuă →</button></div>';
+  }
+  else if(s===3){
+    html+='<div class="wiz-title">Ce echipament ai?</div>';
+    html+=wizChoiceBtn('equipment','bodyweight','🤸 Doar corpul','Acasă, fără echipament. Flotări, genuflexiuni, ramat cu prosop — totul funcționează.');
+    html+=wizChoiceBtn('equipment','home_min','🏠 Gantere + bancă','Acasă cu gantere (ideal reglabile) și o bancă înclinabilă.');
+    html+=wizChoiceBtn('equipment','gym','🏋️ Sală completă','Acces la aparate, cabluri, bare — programul folosește tot.');
+    if(d.equipment==='home_min'){
+      html+='<button class="wiz-choice'+(d.hasBara?' sel':'')+'" onclick="wizSet(\'hasBara\',\''+(!d.hasBara)+'\')">';
+      html+='<div class="wiz-choice-title">'+(d.hasBara?'✅':'⬜')+' Am și bară cu discuri</div>';
+      html+='<div class="wiz-choice-sub">Deblochează hip thrust cu bara, bent-over row, deadlift</div></button>';
+    }
+    html+='<div class="wiz-err" id="wizErr"></div>';
+    html+='<div class="wiz-nav"><button class="btn btn-ghost btn-back" onclick="wizBack()">←</button><button class="btn btn-acc" onclick="wizNext()">Continuă →</button></div>';
+  }
+  else if(s===4){
+    html+='<div class="wiz-title">Timp și obiectiv</div>';
+    html+='<div class="wiz-label">Câte zile pe săptămână te poți antrena?</div>';
+    html+='<div class="wiz-row">'+wizChoiceBtn('days','3','3 zile','Full Body ×3')+wizChoiceBtn('days','4','4 zile','Push/Legs/Pull/Full')+'</div>';
+    html+='<div class="wiz-label">Obiectivul principal</div>';
+    html+=wizChoiceBtn('goal','slabit','🔥 Slăbit','Deficit caloric ~20% + antrenament greu ca să pierzi grăsime, nu mușchi');
+    html+=wizChoiceBtn('goal','recomp','⚖️ Recompoziție','Slăbești ȘI construiești mușchi simultan. Deficit moderat. Cel mai popular.');
+    html+=wizChoiceBtn('goal','masa','💪 Masă musculară','Surplus caloric lejer + progresie constantă la greutăți');
+    html+='<div class="wiz-err" id="wizErr"></div>';
+    html+='<div class="wiz-nav"><button class="btn btn-ghost btn-back" onclick="wizBack()">←</button><button class="btn btn-acc" onclick="wizNext()">Continuă →</button></div>';
+  }
+  else if(s===5){
+    html+='<div class="wiz-title">Rutina de dimineață</div>';
+    html+='<div class="wiz-sub">10 minute dimineața: înveți tiparul mișcării pe care o încarci seara + mobilitate. Diferențiatorul acestui program — recomandat.</div>';
+    html+='<div class="wiz-row">';
+    html+='<button class="wiz-choice'+(d.morningRoutine?' sel':'')+'" onclick="wizSet(\'morningRoutine\',\'true\')"><div class="wiz-choice-title">☀️ Da</div><div class="wiz-choice-sub">recomandat</div></button>';
+    html+='<button class="wiz-choice'+(!d.morningRoutine?' sel':'')+'" onclick="wizSet(\'morningRoutine\',\'false\')"><div class="wiz-choice-title">Nu</div><div class="wiz-choice-sub">doar seara</div></button>';
+    html+='</div>';
+    html+='<div class="wiz-err" id="wizErr"></div>';
+    html+='<div class="wiz-nav"><button class="btn btn-ghost btn-back" onclick="wizBack()">←</button><button class="btn btn-acc" onclick="wizNext()">✨ Generează programul</button></div>';
+  }
+  else if(s===6){
+    var g=wizState.generated;
+    if(!g){html+='<div class="wiz-sub">Eroare — reia pasul anterior.</div>';}
+    else{
+      var n=g.nutrition;
+      html+='<div class="wiz-title">🎉 Programul tău e gata!</div>';
+      html+='<div class="wiz-label">Săptămâna ta</div>';
+      var DAY_N=['Luni','Marți','Miercuri','Joi','Vineri','Sâmbătă','Duminică'];
+      var seen={};
+      g.schedule.forEach(function(k,i){
+        if(seen[k]&&i>4)return;seen[k]=true;
+        var day=g.exercises[k];
+        if(!day)return;
+        var isRec=day.label.toLowerCase().indexOf('recovery')>=0;
+        html+='<div class="wiz-preview-stat"><span>'+DAY_N[i]+'</span><span style="color:'+(isRec?'var(--muted)':'var(--acc2)')+';font-weight:700">'+day.icon+' '+day.label+'</span></div>';
+      });
+      html+='<div class="wiz-label">Nutriția ta</div>';
+      html+='<div class="wiz-preview-stat"><span>Calorii/zi</span><strong style="color:var(--acc)">'+n.kcal+' kcal</strong></div>';
+      html+='<div class="wiz-preview-stat"><span>Proteine · Carbo · Grăsimi</span><strong>'+n.protein+'g · '+n.carbs+'g · '+n.fat+'g</strong></div>';
+      html+='<div class="wiz-preview-stat"><span>Apă · Pași</span><strong>'+n.waterL+'L · '+n.stepsTarget+'</strong></div>';
+      html+='<div class="wiz-sub" style="margin-top:12px">📈 Progresie automată: săpt. 1-2 înveți · 3-4 +repetări · 5-6 +kg · 7 +set · 8 recuperare — apoi ciclu nou. Smart Coach îți spune zilnic exact ce să faci.</div>';
+      html+='<div class="wiz-nav"><button class="btn btn-ghost btn-back" onclick="wizBack()">←</button><button class="btn btn-acc" onclick="wizFinish()">🚀 Începe programul</button></div>';
+    }
+  }
+  c.innerHTML=html;
 }
 
 function checkBackupOverdue(){
