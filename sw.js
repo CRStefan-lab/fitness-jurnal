@@ -1,6 +1,6 @@
 // Service Worker — network-first pentru HTML (updates vizibile imediat)
 // cache-first pentru restul (viteză)
-const CACHE = 'fitness-v35-timer-bg-sound-clear-targets';
+const CACHE = 'fitness-v36-louder-beep-visual-audit';
 const PRECACHE = ['./', './index.html', './manifest.json'];
 
 self.addEventListener('install', e => {

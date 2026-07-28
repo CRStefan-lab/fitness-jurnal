@@ -75,7 +75,7 @@ body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSy
 .azi-stats{display:flex;gap:8px;background:linear-gradient(135deg,rgba(20,184,166,.06),transparent);border:1px solid rgba(20,184,166,.2);border-radius:10px;padding:8px 12px;margin-bottom:10px;font-size:11px;align-items:center;justify-content:space-around}
 .azi-stat{text-align:center;flex:1}
 .azi-stat-val{font-size:16px;font-weight:900;color:var(--text);line-height:1.1}
-.azi-stat-lbl{font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-top:1px}
+.azi-stat-lbl{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-top:1px}
 .date-toggle{display:flex;align-items:center;justify-content:space-between;padding:8px 12px;background:var(--s1);border:1px solid var(--bd);border-radius:10px;margin-bottom:10px;cursor:pointer;font-size:12px;color:var(--muted)}
 .date-toggle-act{color:#fbbf24;border-color:rgba(245,158,11,.4)}
 .date-drawer{display:none;margin-bottom:10px}
@@ -102,7 +102,7 @@ body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSy
 .rest-timer.done{background:linear-gradient(135deg,#0e1822,#22c55e);border-top-color:var(--green)}
 /* Steppers +/- pentru inputuri */
 .stepper{display:flex;flex-direction:column;gap:2px;flex-shrink:0}
-.stepper-btn{background:var(--bg);border:1px solid var(--bd);color:var(--acc2);width:24px;height:21px;border-radius:5px;font-size:13px;font-weight:900;cursor:pointer;font-family:inherit;line-height:1;display:flex;align-items:center;justify-content:center;padding:0}
+.stepper-btn{background:var(--bg);border:1px solid var(--bd);color:var(--acc2);width:31px;height:24px;border-radius:6px;font-size:16px;font-weight:900;cursor:pointer;font-family:inherit;line-height:1;display:flex;align-items:center;justify-content:center;padding:0}
 .stepper-btn:active{background:var(--acc);color:#05201d}
 .set-note-input{width:100%;background:var(--bg);border:1px solid var(--bd);border-radius:6px;color:var(--text);font-size:12px;padding:5px 8px;font-family:inherit;margin-top:6px}
 .set-note-input:focus{outline:none;border-color:var(--acc2)}
@@ -132,7 +132,7 @@ body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSy
 .day-btn.a-ton .day-abbr{color:#38bdf8}
 .day-btn.a-pui .day-abbr{color:var(--green)}
 .day-btn.a-omad .day-abbr{color:#f97316}
-.ntag{font-size:9px;font-weight:700;padding:1px 5px;border-radius:4px}
+.ntag{font-size:10px;font-weight:700;padding:1px 5px;border-radius:4px}
 .t-ton{color:#38bdf8;background:#38bdf820}
 .t-pui{color:var(--green);background:rgba(34,197,94,.15)}
 .t-omad{color:#f97316;background:#f9731620}
@@ -140,7 +140,7 @@ body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSy
 .macro-box{flex:1;background:var(--s1);border:1px solid var(--bd);border-radius:10px;padding:8px 4px;text-align:center}
 .macro-val{font-size:16px;font-weight:900}
 .macro-val span{font-size:10px;font-weight:400}
-.macro-lbl{font-size:9px;color:var(--muted);margin-top:1px}
+.macro-lbl{font-size:10px;color:var(--muted);margin-top:1px}
 .mp{color:#f87171}.mc{color:#38bdf8}.mf{color:#fbbf24}
 .meal-card{background:var(--s1);border:1px solid var(--bd);border-radius:var(--r);margin-bottom:10px;overflow:hidden}
 .meal-hd{padding:12px 14px;border-bottom:1px solid var(--bd);display:flex;justify-content:space-between;align-items:center}
@@ -229,7 +229,7 @@ body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSy
 .chart-wrap{background:var(--s1);border:1px solid var(--bd);border-radius:var(--r);padding:10px 6px 6px;margin-bottom:10px}
 .chart-stats{display:flex;gap:8px;padding:8px 10px 0;justify-content:space-between;flex-wrap:wrap}
 .chart-stat{flex:1;min-width:80px;text-align:center}
-.chart-stat-lbl{font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;font-weight:700}
+.chart-stat-lbl{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;font-weight:700}
 .chart-stat-val{font-size:18px;font-weight:900;margin-top:2px}
 .chart-stat-delta{font-size:11px;font-weight:700;margin-top:1px}
 .delta-good{color:var(--green)}
@@ -401,6 +401,11 @@ input:checked + .slider:before{transform:translateX(20px);background:var(--acc)}
 
 <div id="tab-progres" class="sec">
   <div class="stitle">📏 Măsurători corp</div>
+  <div class="date-toggle" id="measFormToggle" onclick="toggleMeasForm()">
+    <span>📏 <strong style="color:var(--text)" id="measFormLabel">Adaugă măsurătoare</strong></span>
+    <span id="measFormChev">▾</span>
+  </div>
+  <div class="date-drawer" id="measFormWrap">
   <div class="meas-date">
     <div class="meas-lbl">DATA</div>
     <input class="meas-in" type="date" id="measDate">
@@ -444,6 +449,7 @@ input:checked + .slider:before{transform:translateX(20px);background:var(--acc)}
     <input class="meas-in" type="text" id="mNote" placeholder="ex: după antrenament, dimineața, etc.">
   </div>
   <button class="btn btn-acc" onclick="saveMeasurement()">💾 Salvează măsurătorile</button>
+  </div>
   <div id="measHistory"></div>
 
   <div class="stitle">📈 Grafice evoluție corp</div>
@@ -644,7 +650,8 @@ input:checked + .slider:before{transform:translateX(20px);background:var(--acc)}
     <label class="sw"><input type="checkbox" id="restTimerSound" onchange="toggleRestTimerSound()"><span class="slider"></span></label>
   </div>
   <p style="font-size:11px;color:var(--muted);margin-top:4px;line-height:1.5">
-    💡 Timerul merge și când minimizezi app-ul (calculează pe ceas, nu pe cronometru). Dacă ai notificările activate, primești și notificare cu vibrație când expiră în fundal.
+    💡 Timerul merge și când minimizezi app-ul (calculează pe ceas, nu pe cronometru). Dacă ai notificările activate, primești și notificare cu vibrație când expiră în fundal.<br>
+    🔊 <strong style="color:var(--acc2)">Sunetul folosește volumul MEDIA al telefonului</strong> — dă volumul media mai tare la sală (nu cel de sonerie). Testează cu toggle-ul de mai sus.
   </p>
 
   <div class="stitle">💾 Backup local (fișier)</div>
@@ -1116,6 +1123,7 @@ function showTab(name,btn){
   }
   if(name==='progres'){
     renderMeasurements();
+    syncMeasFormState();
     renderBodyChart();
     renderRecompChart();
     renderExerciseChart();
@@ -1613,15 +1621,23 @@ function playBeep(){
   if(!audioCtx)return;
   try{
     var t=audioCtx.currentTime;
-    [0,0.25,0.5].forEach(function(off,i){
-      var o=audioCtx.createOscillator(),g=audioCtx.createGain();
-      o.connect(g);g.connect(audioCtx.destination);
-      o.frequency.value=(i===2)?1320:880; // ultimul beep mai înalt
-      o.type='sine';
-      g.gain.setValueAtTime(0.001,t+off);
-      g.gain.exponentialRampToValueAtTime(0.35,t+off+0.02);
-      g.gain.exponentialRampToValueAtTime(0.001,t+off+0.18);
-      o.start(t+off);o.stop(t+off+0.2);
+    // 6 beep-uri în 2 grupe pe ~1.6s — square wave (penetrant) + 2 oscilatoare
+    // ușor dezacordate per beep = percepție mult mai tare decât sine simplu
+    var pattern=[0,0.22,0.44, 0.95,1.17,1.39];
+    pattern.forEach(function(off,i){
+      var freq=(i%3===2)?1568:1046; // al 3-lea din grup mai înalt (Sol6 vs Do6)
+      [0,4].forEach(function(det){
+        var o=audioCtx.createOscillator(),g=audioCtx.createGain();
+        o.connect(g);g.connect(audioCtx.destination);
+        o.type='square';
+        o.frequency.value=freq;
+        o.detune.value=det;
+        g.gain.setValueAtTime(0.0001,t+off);
+        g.gain.exponentialRampToValueAtTime(0.45,t+off+0.015);
+        g.gain.setValueAtTime(0.45,t+off+0.13);
+        g.gain.exponentialRampToValueAtTime(0.0001,t+off+0.21);
+        o.start(t+off);o.stop(t+off+0.23);
+      });
     });
   }catch(e){}
 }
@@ -1673,7 +1689,7 @@ function restTimerDone(){
   document.getElementById('restTimerTime').textContent='Gata!';
   document.getElementById('restTimerLbl').textContent='Următorul set';
   playBeep();
-  if(navigator.vibrate)navigator.vibrate([200,100,200]);
+  if(navigator.vibrate)navigator.vibrate([300,100,300,100,500]);
   // Dacă app-ul e minimizat → notificare (necesită permisiunea de notificări activată)
   if(document.hidden&&'Notification' in window&&Notification.permission==='granted'&&navigator.serviceWorker){
     navigator.serviceWorker.getRegistration().then(function(reg){
@@ -2010,6 +2026,27 @@ function initProgram(){
 // ═══════════════════════════════════════════════════════════════
 // MĂSURĂTORI
 // ═══════════════════════════════════════════════════════════════
+function toggleMeasForm(){
+  var w=document.getElementById('measFormWrap');
+  w.classList.toggle('open');
+  var chev=document.getElementById('measFormChev');
+  if(chev)chev.textContent=w.classList.contains('open')?'▴':'▾';
+}
+
+function syncMeasFormState(){
+  // Deschis automat doar dacă nu există nicio măsurătoare (prima utilizare)
+  var w=document.getElementById('measFormWrap');
+  if(!w)return;
+  var has=getMeasurements().length>0;
+  var lbl=document.getElementById('measFormLabel');
+  if(lbl)lbl.textContent=has?'Adaugă măsurătoare nouă':'Adaugă prima măsurătoare';
+  if(!has && !w.classList.contains('open')){
+    w.classList.add('open');
+    var chev=document.getElementById('measFormChev');
+    if(chev)chev.textContent='▴';
+  }
+}
+
 function saveMeasurement(){
   var dateVal=document.getElementById('measDate').value;
   if(!dateVal){showToast('Alege o dată','var(--acc2)');return;}
