@@ -25,7 +25,7 @@
 var EXERCISE_DB=[
   // ── PUSH ORIZONTAL (piept) ──
   {id:'db_impins_inclinat',name:'Împins gantere bancă înclinată 30–45°',muscle:'Piept',pattern:'push_h',equipment:['gantere','banca'],level:1,compound:true,starEligible:true,prio:1,
-   ghid:{start:'Bancă 30–45°. Gantere la nivelul pieptului, coate la 45° față de corp.',move:'Împingi în sus ușor spre interior. Cobori lent 2 sec.',err:'Coatele prea largi. Arcuirea spatelui.',tip:'Strânge omoplații de bancă tot timpul.'}},
+   ghid:{start:'Bancă la ~30°. Gantere la nivelul pieptului, coate la 45° față de corp.',move:'Împingi în sus ușor spre interior. Cobori lent 2 sec cu întindere completă.',err:'Coatele prea largi. Unghi peste 45° (preia umărul).',tip:'30° e unghiul optim pentru pieptul superior — nu mai sus (Rodríguez-Ridao 2020).'}},
   {id:'db_impins_orizontal',name:'Împins gantere bancă orizontală 0°',muscle:'Piept',pattern:'push_h',equipment:['gantere','banca'],level:1,compound:true,starEligible:true,prio:2,
    ghid:{start:'Bancă plată. Gantere deasupra pieptului, brațe întinse.',move:'Cobori controlat la piept, împingi înapoi sus.',err:'Ganterele se ating sus cu impact. Cobori prea rapid.',tip:'Picioarele ferme pe podea, omoplații strânși.'}},
   {id:'gym_bench_bara',name:'Împins cu bara la bancă (bench press)',muscle:'Piept',pattern:'push_h',equipment:['bara','banca'],level:2,compound:true,starEligible:true,prio:1,gymOnly:true,
@@ -62,13 +62,19 @@ var EXERCISE_DB=[
    ghid:{start:'Scaun reglat: mânerele la nivelul pieptului.',move:'Aduci brațele în față, strângi pieptul 1 sec.',err:'Umerii se rotesc în față.',tip:'Pieptul sus, omoplații strânși.'}},
 
   // ── TRICEPS ──
-  {id:'db_extensii_triceps',name:'Extensii triceps cu ganteră',muscle:'Triceps',pattern:'triceps',equipment:['gantere'],level:1,compound:false,starEligible:false,prio:1,
-   ghid:{start:'O ganteră ținută cu ambele mâini deasupra capului.',move:'Cobori în spatele capului, extinzi înapoi sus.',err:'Coatele se deschid lateral.',tip:'Coatele fixe, aproape de cap.'}},
-  {id:'cable_pushdown',name:'Extensii triceps la cablu (pushdown)',muscle:'Triceps',pattern:'triceps',equipment:['cablu'],level:1,compound:false,starEligible:false,prio:2,
-   ghid:{start:'Cablul sus, coatele lipite de corp.',move:'Extinzi complet în jos, revii controlat.',err:'Coatele se mișcă înainte.',tip:'Doar antebrațul se mișcă.'}},
-  {id:'bw_flotari_inguste',name:'Flotări înguste (diamond)',muscle:'Triceps',pattern:'triceps',equipment:[],level:2,compound:true,starEligible:false,prio:3,
+  // Dovezi: extensiile DEASUPRA CAPULUI cresc capul lung cu ~45% mai mult
+  // decât pushdown-ul și bat pushdown-ul pe TOATE capetele (Maeo 2023, EJSS)
+  {id:'gym_overhead_cablu',name:'Extensii triceps deasupra capului la cablu',muscle:'Triceps (cap lung)',pattern:'triceps',equipment:['cablu'],level:1,compound:false,starEligible:false,prio:1,
+   ghid:{start:'Cu spatele la cablu (setat jos/mediu), frânghia deasupra capului, coatele lângă urechi.',move:'Extinzi brațele complet în față-sus, revii lent lăsând tricepsul să se întindă.',err:'Coatele se deschid lateral. Trunchiul se apleacă excesiv.',tip:'Poziția deasupra capului = +45% creștere pe capul lung vs pushdown (Maeo 2023).'}},
+  {id:'db_extensii_triceps',name:'Extensii triceps cu ganteră (deasupra capului)',muscle:'Triceps (cap lung)',pattern:'triceps',equipment:['gantere'],level:1,compound:false,starEligible:false,prio:2,
+   ghid:{start:'O ganteră ținută cu ambele mâini deasupra capului.',move:'Cobori lent în spatele capului (întindere completă), extinzi înapoi sus.',err:'Coatele se deschid lateral.',tip:'Poziția deasupra capului crește capul lung mult mai bine decât pushdown-ul (Maeo 2023). Coboară adânc.'}},
+  {id:'db_skull_crusher',name:'Skull crusher cu gantere',muscle:'Triceps (cap lung)',pattern:'triceps',equipment:['gantere','banca'],level:2,compound:false,starEligible:false,prio:3,
+   ghid:{start:'Culcat pe bancă, ganterele deasupra pieptului, brațele ușor înclinate spre cap.',move:'Îndoi coatele coborând ganterele pe lângă tâmple/în spatele capului, extinzi înapoi.',err:'Coatele se evazează. Brațul superior perfect vertical (scoate tensiunea).',tip:'Brațele înclinate ~20° spre cap = tensiune continuă pe capul lung.'}},
+  {id:'cable_pushdown',name:'Extensii triceps la cablu (pushdown)',muscle:'Triceps',pattern:'triceps',equipment:['cablu'],level:1,compound:false,starEligible:false,prio:4,
+   ghid:{start:'Cablul sus, coatele lipite de corp.',move:'Extinzi complet în jos, revii controlat.',err:'Coatele se mișcă înainte.',tip:'Eficient, dar inferior variantelor deasupra capului pentru toate capetele (Maeo 2023).'}},
+  {id:'bw_flotari_inguste',name:'Flotări înguste (diamond)',muscle:'Triceps',pattern:'triceps',equipment:[],level:2,compound:true,starEligible:false,prio:5,
    ghid:{start:'Flotare cu mâinile apropiate sub piept.',move:'Cobori cu coatele lipite de corp, împingi sus.',err:'Coatele se evazează.',tip:'Prea greu? Pe genunchi.'}},
-  {id:'bw_dips_banca',name:'Dips cu sprijin pe bancă/scaun',muscle:'Triceps',pattern:'triceps',equipment:[],level:1,compound:true,starEligible:false,prio:4,
+  {id:'bw_dips_banca',name:'Dips cu sprijin pe bancă/scaun',muscle:'Triceps',pattern:'triceps',equipment:[],level:1,compound:true,starEligible:false,prio:6,
    ghid:{start:'Mâinile pe marginea băncii în spate, picioarele întinse în față.',move:'Cobori îndoind coatele la 90°, împingi sus.',err:'Umerii se ridică spre urechi la coborâre.',tip:'Cu cât picioarele-s mai departe, cu atât mai greu.'}},
 
   // ── SQUAT (cvadriceps dominant) ──
@@ -85,19 +91,21 @@ var EXERCISE_DB=[
   {id:'bw_bulgarian',name:'Bulgarian split squat',muscle:'Cvadriceps',pattern:'squat',equipment:[],level:2,compound:true,starEligible:true,prio:5,
    ghid:{start:'Un picior în spate pe bancă/scaun, celălalt în față.',move:'Cobori pe piciorul din față până coapsa paralelă. Revii.',err:'Genunchiul din față trece mult de vârf.',tip:'Cel mai greu exercițiu bodyweight de picioare — și cel mai eficient. Cu gantere devine și mai valoros.'}},
   {id:'gym_leg_extension',name:'Extensii cvadriceps la aparat',muscle:'Cvadriceps',pattern:'squat',equipment:['aparate'],level:1,compound:false,starEligible:false,prio:6,
-   ghid:{start:'Scaun reglat, glezna sub rolă.',move:'Extinzi complet, cobori controlat.',err:'Balans cu avânt.',tip:'Ține 1 sec sus pentru contracție maximă.'}},
+   ghid:{start:'Scaun reglat, glezna sub rolă. Dacă spătarul se lasă pe spate, înclină-l.',move:'Extinzi complet, cobori controlat.',err:'Balans cu avânt.',tip:'Spătar înclinat (șold extins) = singurul mod fiabil de a crește dreptul femural — squat-ul NU îl crește (Larsen 2025).'}},
 
   // ── HINGE (fesieri + ischio) ──
   {id:'db_rdl',name:'Îndreptări românești cu gantere',muscle:'Ischio + fesieri',pattern:'hinge',equipment:['gantere'],level:1,compound:true,starEligible:true,prio:1,
    ghid:{start:'Gantere pe coapse, genunchi ușor îndoiți, spate drept.',move:'Împingi șoldurile înapoi, cobori pe lângă picioare. Revii strângând fesierii.',err:'Spatele rotunjit. Genunchii se îndoaie prea mult.',tip:'Mișcarea vine din șolduri, nu din genunchi.'}},
   {id:'bara_deadlift',name:'Deadlift cu bara',muscle:'Lanț posterior',pattern:'hinge',equipment:['bara'],level:2,compound:true,starEligible:true,prio:2,risky:true,
    ghid:{start:'Bara deasupra mijlocului piciorului. Spatele drept, pieptul sus.',move:'Împingi podeaua, bara lipită de corp, șoldurile și umerii urcă simultan.',err:'SPATELE ROTUNJIT (pericol!). Bara departe de corp.',tip:'Începe cu greutate FOARTE mică. Opțional până tehnica e solidă.'}},
-  {id:'gym_leg_curl',name:'Flexii ischio la aparat (leg curl)',muscle:'Ischio',pattern:'hinge',equipment:['aparate'],level:1,compound:false,starEligible:false,prio:3,
-   ghid:{start:'Poziționat la aparat, glezna sub rolă.',move:'Flexezi complet, revii controlat.',err:'Șoldurile se ridică.',tip:'Tempo lent la coborâre.'}},
+  {id:'gym_leg_curl',name:'Leg curl ȘEZÂND la aparat',muscle:'Ischio',pattern:'hinge',equipment:['aparate'],level:1,compound:false,starEligible:false,prio:3,
+   ghid:{start:'La aparatul de leg curl ȘEZÂND (nu culcat), glezna sub rolă.',move:'Flexezi complet, revii lent cu întindere.',err:'Șoldurile se ridică de pe scaun.',tip:'Șezând > culcat: +14% vs +9% creștere (Maeo 2021) — șoldul flexat = ischio la lungime mare.'}},
   {id:'bw_glute_bridge',name:'Glute bridge',muscle:'Fesieri',pattern:'hinge',equipment:[],level:1,compound:true,starEligible:true,prio:4,
    ghid:{start:'Pe spate, genunchi îndoiți, tălpile pe podea.',move:'Împingi șoldurile sus strângând fesierii, ții 1 sec.',err:'Arcuirea lombară exagerată.',tip:'Progresie: cu un singur picior.'}},
   {id:'bw_single_bridge',name:'Glute bridge cu un picior',muscle:'Fesieri',pattern:'hinge',equipment:[],level:2,compound:true,starEligible:true,prio:5,
    ghid:{start:'Ca glute bridge, dar un picior întins în aer.',move:'Împingi șoldurile sus pe un singur picior.',err:'Șoldul cade pe partea piciorului ridicat.',tip:'Șoldurile paralele tot timpul.'}},
+  {id:'bw_sliding_leg_curl',name:'Leg curl cu prosop pe podea',muscle:'Ischio',pattern:'hinge',equipment:[],level:2,compound:true,starEligible:false,prio:6,
+   ghid:{start:'Pe spate ca la glute bridge, călcâiele pe un prosop (podea alunecoasă) sau șosete pe parchet.',move:'Ridici șoldurile și aluneci călcâiele spre fesieri, apoi întinzi lent picioarele menținând șoldurile sus.',err:'Șoldurile cad în timpul alunecării.',tip:'Singura variantă bodyweight care lucrează ischio prin flexia genunchiului — faza de întindere lentă e cheia.'}},
 
   // ── GLUTE (hip thrust) ──
   {id:'bara_hip_thrust',name:'Hip thrust cu bara pe bancă plată',muscle:'Fesieri',pattern:'glute',equipment:['bara','banca'],level:1,compound:true,starEligible:true,prio:1,
@@ -115,11 +123,11 @@ var EXERCISE_DB=[
 
   // ── GAMBE ──
   {id:'db_calf',name:'Ridicări pe vârfuri cu gantere',muscle:'Gambe',pattern:'gambe',equipment:['gantere'],level:1,compound:false,starEligible:false,prio:1,
-   ghid:{start:'Gantere în mâini, picioare la lățimea șoldurilor.',move:'Ridici pe vârfuri cât de sus poți, cobori lent.',err:'Amplitudine mică, balans.',tip:'Pauză 1 sec sus. Pe o treaptă pentru amplitudine mai mare.'}},
+   ghid:{start:'Gantere în mâini, picioare la lățimea șoldurilor.',move:'Ridici pe vârfuri cât de sus poți, cobori lent.',err:'Amplitudine mică, balans.',tip:'Pe o treaptă, cu întindere PROFUNDĂ jos — jumătatea de jos a mișcării dă dublul creșterii (Kassiano 2023).'}},
   {id:'gym_calf',name:'Ridicări gambe la aparat',muscle:'Gambe',pattern:'gambe',equipment:['aparate'],level:1,compound:false,starEligible:false,prio:2,
-   ghid:{start:'Poziționat la aparat, vârfurile pe platformă.',move:'Extensie completă sus, întindere completă jos.',err:'Repetări scurte, rapide.',tip:'Amplitudine maximă > greutate.'}},
+   ghid:{start:'Poziționat la aparat, vârfurile pe platformă.',move:'Extensie completă sus, întindere completă jos.',err:'Repetări scurte, rapide.',tip:'Întinderea profundă de jos = dublul creșterii vs amplitudine scurtă (Kassiano 2023). În picioare > șezând pentru gambe (Kinoshita 2023).'}},
   {id:'bw_calf',name:'Ridicări pe vârfuri',muscle:'Gambe',pattern:'gambe',equipment:[],level:1,compound:false,starEligible:false,prio:3,
-   ghid:{start:'Pe o treaptă cu călcâiele în aer (sau pe podea).',move:'Ridici pe vârfuri, cobori lent sub nivel.',err:'Fără pauză sus.',tip:'Un picior odată când devine ușor.'}},
+   ghid:{start:'Pe o treaptă cu călcâiele în aer (sau pe podea).',move:'Ridici pe vârfuri, cobori lent sub nivel.',err:'Fără pauză sus.',tip:'Întinde profund jos și oprește-te 1 sec. Un picior odată când devine ușor.'}},
 
   // ── PULL (spate) ──
   {id:'db_ramat_sprijinit',name:'Ramat gantere sprijinit pe bancă înclinată',muscle:'Spate',pattern:'pull',equipment:['gantere','banca'],level:1,compound:true,starEligible:true,prio:1,
@@ -142,32 +150,51 @@ var EXERCISE_DB=[
    ghid:{start:'Culcat pe bancă, gantera cu ambele mâini deasupra pieptului.',move:'Cobori în arc peste cap, revii.',err:'Coatele prea îndoite.',tip:'Coatele ușor îndoite pe tot parcursul.'}},
 
   // ── SPATE POSTERIOR (umăr posterior) ──
-  {id:'db_reverse_fly',name:'Reverse fly cu gantere',muscle:'Umăr posterior',pattern:'spate_post',equipment:['gantere'],level:1,compound:false,starEligible:false,prio:1,
-   ghid:{start:'Aplecat la 45°, gantere atârnând, coate ușor îndoite.',move:'Deschizi brațele lateral, strângi omoplații.',err:'Balans, greutate prea mare.',tip:'Greutate mică — mușchiul e mic.'}},
-  {id:'cable_face_pull',name:'Face pull la cablu',muscle:'Umăr posterior',pattern:'spate_post',equipment:['cablu'],level:1,compound:false,starEligible:false,prio:2,
+  // Dovezi: reverse fly are RCT longitudinal solid (+15-26% deltoid posterior,
+  // Jones 2025) — printre puținele izolări cu dovezi directe de hipertrofie
+  {id:'gym_reverse_pec_deck',name:'Reverse fly la aparat (pec deck invers)',muscle:'Umăr posterior',pattern:'spate_post',equipment:['aparate'],level:1,compound:false,starEligible:false,prio:1,
+   ghid:{start:'Cu fața la spătarul aparatului, mânerele în față.',move:'Deschizi brațele în arc spre spate, strângi 1 sec.',err:'Coatele se îndoaie prea mult (devine ramat).',tip:'RCT: +15-26% deltoid posterior în 10 săpt. (Jones 2025). Priza neutră (degetele mari în sus) ajută.'}},
+  {id:'db_reverse_fly',name:'Reverse fly cu gantere',muscle:'Umăr posterior',pattern:'spate_post',equipment:['gantere'],level:1,compound:false,starEligible:false,prio:2,
+   ghid:{start:'Aplecat la 45°, gantere atârnând, coate ușor îndoite.',move:'Deschizi brațele lateral, strângi omoplații.',err:'Balans, greutate prea mare.',tip:'Greutate mică — mușchiul e mic. Priza neutră (degetele mari în sus) activează mai bine (Schoenfeld 2013).'}},
+  {id:'cable_face_pull',name:'Face pull la cablu',muscle:'Umăr posterior',pattern:'spate_post',equipment:['cablu'],level:1,compound:false,starEligible:false,prio:3,
    ghid:{start:'Cablul la nivelul feței, frânghie în mâini.',move:'Tragi spre față cu coatele sus și în afară.',err:'Tras cu tot corpul.',tip:'Excelent pentru postura umerilor.'}},
-  {id:'bw_yt_raises',name:'Y-T raises la sol',muscle:'Umăr posterior',pattern:'spate_post',equipment:[],level:1,compound:false,starEligible:false,prio:3,
+  {id:'bw_yt_raises',name:'Y-T raises la sol',muscle:'Umăr posterior',pattern:'spate_post',equipment:[],level:1,compound:false,starEligible:false,prio:4,
    ghid:{start:'Culcat pe burtă, brațele întinse în formă de Y, degetele mari în sus.',move:'Ridici brațele de la sol strângând omoplații, ții 1 sec, treci în formă de T, cobori.',err:'Ridici pieptul de pe podea. Mișcare din gât.',tip:'Amplitudine mică dar contracție reală — mușchiul e mic.'}},
-  {id:'bw_superman',name:'Superman',muscle:'Spate jos + posterior',pattern:'spate_post',equipment:[],level:1,compound:false,starEligible:false,prio:4,
+  {id:'bw_superman',name:'Superman',muscle:'Spate jos + posterior',pattern:'spate_post',equipment:[],level:1,compound:false,starEligible:false,prio:5,
    ghid:{start:'Culcat pe burtă, brațele întinse înainte.',move:'Ridici simultan brațele și picioarele de la sol, ții 2 sec, cobori lent.',err:'Smucitură din gât în sus.',tip:'Privirea în podea — gâtul neutru.'}},
 
   // ── BICEPS ──
-  {id:'db_flexii_alternante',name:'Flexii biceps alternante',muscle:'Biceps',pattern:'biceps',equipment:['gantere'],level:1,compound:false,starEligible:false,prio:1,
-   ghid:{start:'Gantere pe lângă corp, palme față în față.',move:'Ridici rotind palma în sus. Alternezi.',err:'Coatul se mișcă înainte. Balans.',tip:'Coatele fixe pe lângă corp.'}},
-  {id:'db_hammer',name:'Hammer curl',muscle:'Biceps + antebraț',pattern:'biceps',equipment:['gantere'],level:1,compound:false,starEligible:false,prio:2,
-   ghid:{start:'Gantere pe lângă corp, palme față în față.',move:'Ridici fără rotire (priza neutră).',err:'Balans.',tip:'Lucrează și antebrațul.'}},
-  {id:'cable_biceps',name:'Flexii biceps la cablu',muscle:'Biceps',pattern:'biceps',equipment:['cablu'],level:1,compound:false,starEligible:false,prio:3,
+  // Dovezi (Kassiano 2025, IJSM): incline curl crește partea PROXIMALĂ,
+  // preacher partea DISTALĂ — complementare; flexia la cot la lungime
+  // mare superioară (Sato 2021: +8.9% vs +3.4%)
+  {id:'db_incline_curl',name:'Flexii biceps pe bancă înclinată',muscle:'Biceps (proximal)',pattern:'biceps',equipment:['gantere','banca'],level:1,compound:false,starEligible:false,prio:1,
+   ghid:{start:'Bancă la ~45-60°, spatele lipit, brațele atârnă în spatele corpului (umăr extins).',move:'Flexezi coatele fără să miști umerii, cobori COMPLET până brațul e întins.',err:'Umerii se mișcă în față. Coborâre incompletă.',tip:'Poziția cu brațul în spate = biceps la lungime mare — crește mai mult (Kassiano 2025).'}},
+  {id:'db_flexii_alternante',name:'Flexii biceps alternante',muscle:'Biceps',pattern:'biceps',equipment:['gantere'],level:1,compound:false,starEligible:false,prio:2,
+   ghid:{start:'Gantere pe lângă corp, palme față în față.',move:'Ridici rotind palma în sus. Cobori COMPLET (braț întins). Alternezi.',err:'Coatul se mișcă înainte. Balans.',tip:'Coatele fixe. Extensia completă jos contează mai mult decât vârful de sus.'}},
+  {id:'gym_preacher_curl',name:'Flexii la banca preacher',muscle:'Biceps (distal)',pattern:'biceps',equipment:['aparate'],level:1,compound:false,starEligible:false,prio:3,
+   ghid:{start:'Brațele pe perna înclinată, pieptul lipit.',move:'Flexezi complet, cobori lent până brațul e aproape întins.',err:'Ridici umerii. Coborâre bruscă.',tip:'Crește partea de jos a bicepsului (distal) — combinat cu incline curl acoperi tot (Kassiano 2025).'}},
+  {id:'db_hammer',name:'Hammer curl',muscle:'Biceps + antebraț',pattern:'biceps',equipment:['gantere'],level:1,compound:false,starEligible:false,prio:4,
+   ghid:{start:'Gantere pe lângă corp, palme față în față.',move:'Ridici fără rotire (priza neutră).',err:'Balans.',tip:'Lucrează și brahialul + antebrațul.'}},
+  {id:'cable_biceps',name:'Flexii biceps la cablu',muscle:'Biceps',pattern:'biceps',equipment:['cablu'],level:1,compound:false,starEligible:false,prio:5,
    ghid:{start:'Cablul jos, bara/mânerul în mâini.',move:'Flexezi complet, cobori controlat.',err:'Coatele înainte.',tip:'Tensiune constantă pe tot parcursul.'}},
 
   // ── CORE ──
-  {id:'db_abdomene',name:'Abdomene cu greutate',muscle:'Core',pattern:'core',equipment:['gantere'],level:1,compound:false,starEligible:false,prio:1,
-   ghid:{start:'Culcat, genunchii îndoiți, gantera la piept.',move:'Ridici trunchiul controlat, cobori lent.',err:'Tras de gât.',tip:'Bărbia depărtată de piept.'}},
-  {id:'bw_plank',name:'Plank',muscle:'Core',pattern:'core',equipment:[],level:1,compound:false,starEligible:false,prio:2,timeBased:true,
+  // Dovezi: flexia spinală cu greutate = cel mai bun stimul pt drept abdominal
+  // (Roberts 2023) și e SIGURĂ pentru antrenați sănătoși (Saraceni 2020, meta)
+  {id:'gym_cable_crunch',name:'Crunch la cablu (în genunchi)',muscle:'Core',pattern:'core',equipment:['cablu'],level:1,compound:false,starEligible:false,prio:1,
+   ghid:{start:'În genunchi cu spatele la cablu, frânghia ținută la tâmple.',move:'Flexezi trunchiul rotunjind coloana (coatele spre genunchi), revii lent cu întindere.',err:'Tragi cu brațele. Miști doar șoldurile.',tip:'Singurul exercițiu de abs încărcabil progresiv curat — flexia cu greutate e cel mai bun stimul (Roberts 2023).'}},
+  {id:'db_abdomene',name:'Abdomene cu greutate',muscle:'Core',pattern:'core',equipment:['gantere'],level:1,compound:false,starEligible:false,prio:2,
+   ghid:{start:'Culcat, genunchii îndoiți, gantera la piept.',move:'Ridici trunchiul controlat, cobori lent cu întindere completă.',err:'Tras de gât.',tip:'Flexia cu greutate e sigură și eficientă (Saraceni 2020) — progresezi în kg ca la orice mușchi.'}},
+  {id:'bw_hanging_leg_raise',name:'Ridicări de picioare atârnat',muscle:'Core inferior',pattern:'core',equipment:['tractiuni'],level:2,compound:false,starEligible:false,prio:3,
+   ghid:{start:'Atârnat de bară, corpul stabil.',move:'Ridici genunchii/picioarele rotind bazinul în sus (pelvisul se rulează), cobori controlat.',err:'Doar flexie de șold fără rularea bazinului. Balans.',tip:'Rularea bazinului transformă mișcarea în flexie spinală reală — partea de jos a dreptului abdominal.'}},
+  {id:'bw_plank',name:'Plank',muscle:'Core',pattern:'core',equipment:[],level:1,compound:false,starEligible:false,prio:4,timeBased:true,
    ghid:{start:'Pe coate, corp drept de la cap la călcâie.',move:'Menții poziția, respiri normal.',err:'Șoldurile cad sau urcă.',tip:'Fesierii și abdomenul contractate.'}},
-  {id:'bw_dead_bug',name:'Dead bug',muscle:'Core',pattern:'core',equipment:[],level:1,compound:false,starEligible:false,prio:3,
+  {id:'bw_dead_bug',name:'Dead bug',muscle:'Core',pattern:'core',equipment:[],level:1,compound:false,starEligible:false,prio:5,
    ghid:{start:'Pe spate, brațele spre plafon, genunchii la 90°.',move:'Cobori braț + picior opus simultan, revii.',err:'Lomba se dezlipește de podea.',tip:'Lomba lipită tot timpul.'}},
-  {id:'bw_ridicari_picioare',name:'Ridicări de picioare',muscle:'Core inferior',pattern:'core',equipment:[],level:1,compound:false,starEligible:false,prio:4,
-   ghid:{start:'Culcat, mâinile sub fesieri.',move:'Ridici picioarele întinse la 90°, cobori lent fără să atingi podeaua.',err:'Lomba se arcuiește la coborâre.',tip:'Genunchii îndoiți dacă e prea greu.'}}
+  {id:'bw_ridicari_picioare',name:'Ridicări de picioare',muscle:'Core inferior',pattern:'core',equipment:[],level:1,compound:false,starEligible:false,prio:6,
+   ghid:{start:'Culcat, mâinile sub fesieri.',move:'Ridici picioarele întinse la 90°, cobori lent fără să atingi podeaua.',err:'Lomba se arcuiește la coborâre.',tip:'Genunchii îndoiți dacă e prea greu.'}},
+  {id:'db_suitcase_carry',name:'Suitcase carry (mers cu o ganteră)',muscle:'Oblici',pattern:'core',equipment:['gantere'],level:1,compound:false,starEligible:false,prio:7,
+   ghid:{start:'O ganteră grea într-o singură mână, stând perfect drept.',move:'Mergi lent 20-30 pași, corpul NU se înclină spre greutate.',err:'Umărul cade spre ganteră. Pași grăbiți.',tip:'Cel mai bun stimul pentru oblici dintre variantele cu greutate liberă (EMG 2024) + antebrațe gratis.'}}
 ];
 
 /* ───────────────────────────────────────────────────────────────

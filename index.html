@@ -661,6 +661,7 @@ input:checked + .slider:before{transform:translateX(20px);background:var(--acc)}
       <div class="notif-sub">Recomandat: 90s hipertrofie</div>
     </div>
     <select id="restTimerDur" class="time-input" style="width:auto" onchange="updateRestTimerDur()">
+      <option value="auto">Auto (90s / 2½min ⭐)</option>
       <option value="60">60s</option>
       <option value="90">90s</option>
       <option value="120">120s</option>
@@ -738,8 +739,24 @@ input:checked + .slider:before{transform:translateX(20px);background:var(--acc)}
 </div>
 
 <div id="tab-ghid" class="sec">
+  <div class="stitle">🧬 Principii dovedite (cercetare 2020-2025)</div>
+  <div class="card" id="principiiCard">
+    <div class="card-hd" onclick="document.getElementById('principiiCard').classList.toggle('open')">
+      <div class="card-ico" style="background:rgba(167,139,250,.15)">🔬</div>
+      <div style="flex:1"><div class="card-ttl">De ce e construit programul așa</div><div class="card-sub">5 principii din meta-analize recente</div></div>
+      <div class="card-chev">▼</div>
+    </div>
+    <div class="card-bd"><div style="padding-top:10px;font-size:12px;line-height:1.6;color:var(--text)">
+      <p style="margin-bottom:8px">💪 <strong>Amplitudine completă, cu accent pe întindere.</strong> Mușchiul crește cel mai mult lucrat în poziția întinsă — coboară adânc și controlat la fiecare exercițiu. (Wolf 2023, Kassiano 2023)</p>
+      <p style="margin-bottom:8px">⏱️ <strong>Pauze: 90s la izolări, 2-3 min la ⭐.</strong> Sub 60s pierzi creștere. Timerul "Auto" face asta pentru tine. (Singer 2024)</p>
+      <p style="margin-bottom:8px">📊 <strong>10-20 seturi pe mușchi pe săptămână.</strong> Programul tău e calibrat în acest interval — mai mult nu înseamnă automat mai bine. (Pelland 2025, 67 studii)</p>
+      <p style="margin-bottom:8px">🔁 <strong>Aceleași exerciții 6-12 săptămâni.</strong> Variația nu crește mușchiul — progresia da. De-asta ciclul de 8 săptămâni păstrează exercițiile fixe. (Kassiano 2024)</p>
+      <p>🧠 <strong>Aproape de eșec, nu la eșec.</strong> Oprește-te cu 1-3 repetări "în rezervor" la majoritatea seturilor — crești la fel, recuperezi mai bine.</p>
+    </div></div>
+  </div>
+
   <div class="stitle">Ghid exerciții</div>
-  <p style="font-size:12px;color:var(--muted);margin-bottom:12px">Apasă pentru detalii complete</p>
+  <p style="font-size:12px;color:var(--muted);margin-bottom:12px">Apasă pentru detalii complete · sfaturile marcate cu autori = dovezi din studii</p>
   <div id="ghid-content"></div>
 </div>
 
@@ -1641,7 +1658,7 @@ function saveSet(keyEnc,setNum,ei){
         }
       },800);
       // Pornește rest timer (mai sunt seturi de făcut)
-      startRestTimer();
+      startRestTimer(!!exObj.star);
     }else{
       // Auto-scroll la următorul set incomplet din același exercițiu
       setTimeout(function(){
@@ -1651,7 +1668,7 @@ function saveSet(keyEnc,setNum,ei){
         }
       },300);
       // Pornește rest timer
-      startRestTimer();
+      startRestTimer(!!exObj.star);
     }
   }
 }
@@ -1665,9 +1682,11 @@ var audioCtx=null;
 
 function getRestTimerCfg(){
   var v=localStorage.getItem('rest_timer_sec');
+  var auto=(v==='auto');
   return {
     enabled:localStorage.getItem('rest_timer_enabled')!=='0',
-    seconds:v?parseInt(v):90,
+    auto:auto,
+    seconds:auto?90:(v?parseInt(v):90),
     sound:localStorage.getItem('rest_timer_sound')!=='0'
   };
 }
@@ -1706,12 +1725,15 @@ function playBeep(){
   }catch(e){}
 }
 
-function startRestTimer(){
+function startRestTimer(isStar){
   var cfg=getRestTimerCfg();
   if(!cfg.enabled)return;
   ensureAudio(); // suntem într-un tap (Save) — momentul potrivit
-  restTimerState.total=cfg.seconds;
-  restTimerState.deadline=Date.now()+cfg.seconds*1000;
+  // Mod auto: 90s izolări · 150s compound ⭐ (Singer 2024: beneficiul pauzei
+  // se aplatizează ~90s la izolări; compound-urile cer 2-3 min)
+  var secs=cfg.auto?(isStar?150:90):cfg.seconds;
+  restTimerState.total=secs;
+  restTimerState.deadline=Date.now()+secs*1000;
   restTimerState.finished=false;
   var el=document.getElementById('restTimer');
   el.classList.remove('done');
@@ -1782,13 +1804,13 @@ function initRestTimerUI(){
   var t=document.getElementById('restTimerToggle');
   if(!t)return;
   t.checked=cfg.enabled;
-  document.getElementById('restTimerDur').value=String(cfg.seconds);
+  document.getElementById('restTimerDur').value=cfg.auto?'auto':String(cfg.seconds);
   document.getElementById('restTimerDurRow').style.display=cfg.enabled?'':'none';
   var soundRow=document.getElementById('restTimerSoundRow');
   if(soundRow)soundRow.style.display=cfg.enabled?'':'none';
   var soundChk=document.getElementById('restTimerSound');
   if(soundChk)soundChk.checked=cfg.sound;
-  document.getElementById('restTimerStatus').textContent=cfg.enabled?('Activ · '+cfg.seconds+'s'+(cfg.sound?' · 🔊':'')):'Dezactivat';
+  document.getElementById('restTimerStatus').textContent=cfg.enabled?('Activ · '+(cfg.auto?'auto 90s/150s⭐':cfg.seconds+'s')+(cfg.sound?' · 🔊':'')):'Dezactivat';
 }
 
 function toggleRestTimerSound(){
