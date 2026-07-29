@@ -505,6 +505,15 @@ input:checked + .slider:before{transform:translateX(20px);background:var(--acc)}
   </div>
   <div id="measHistory"></div>
 
+  <div class="stitle">📸 Poze de progres</div>
+  <p style="font-size:11px;color:var(--muted);margin-bottom:8px;line-height:1.4">
+    Cântarul minte, oglinda minte — pozele nu. O poză pe lună, aceeași poziție și lumină. Stocate DOAR pe telefonul tău.
+  </p>
+  <button class="btn btn-ghost" onclick="document.getElementById('photoInput').click()">➕ Adaugă poză de progres</button>
+  <input type="file" id="photoInput" accept="image/*" capture="environment" style="display:none" onchange="addProgressPhoto(event)">
+  <div id="photoCompare"></div>
+  <div id="photoGrid" style="display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-top:8px"></div>
+
   <div class="stitle">📈 Grafice evoluție corp</div>
   <div class="seg" id="metricSeg"></div>
   <div class="seg" id="rangeSeg">
@@ -561,6 +570,9 @@ input:checked + .slider:before{transform:translateX(20px);background:var(--acc)}
   </div>
   <div id="weekSummary" style="font-size:11px;color:var(--muted);text-align:center;margin-bottom:12px"></div>
   <div id="hist-content"></div>
+
+  <div class="stitle">🎉 Rezumatul săptămânii</div>
+  <button class="btn btn-ghost" onclick="showWeeklyDigest(currentWeekOffset)">🎉 Vezi rezumatul săptămânii afișate</button>
 
   <div class="stitle">📤 Export pentru Claude / AI</div>
   <p style="font-size:11px;color:var(--muted);margin-bottom:10px;line-height:1.5">
@@ -811,6 +823,19 @@ input:checked + .slider:before{transform:translateX(20px);background:var(--acc)}
   </div>
 </div>
 
+<div class="modal" id="digestModal" onclick="if(event.target===this)closeDigest()">
+  <div class="modal-content" style="max-height:85vh;overflow-y:auto;border-color:var(--acc2)">
+    <div class="modal-ttl" style="color:var(--acc2)" id="digestTitle">🎉 Săptămâna ta</div>
+    <div class="modal-sub" id="digestPeriod"></div>
+    <div id="digestBody" style="font-size:13px;line-height:1.7"></div>
+    <button class="btn btn-acc" style="margin-top:12px" onclick="downloadDigestImage()">📸 Salvează ca imagine</button>
+    <div class="btn-row" style="margin-top:8px">
+      <button class="btn btn-ghost" onclick="copyDigestText()">📋 Copiază text</button>
+      <button class="btn btn-ghost" onclick="closeDigest()">Închide</button>
+    </div>
+  </div>
+</div>
+
 <div class="modal" id="guideModal" onclick="if(event.target===this)closeGuide()">
   <div class="modal-content" style="max-height:80vh;overflow-y:auto">
     <div class="modal-ttl" id="guideTitle">Exercițiu</div>
@@ -819,6 +844,16 @@ input:checked + .slider:before{transform:translateX(20px);background:var(--acc)}
     <a class="video-btn" id="guideVideoBtn" target="_blank" rel="noopener">▶️ Vezi demonstrație video (YouTube)</a>
     <button class="btn btn-ghost" style="margin-top:10px;margin-bottom:0" onclick="closeGuide()">Închide</button>
   </div>
+</div>
+
+<div class="rest-timer" id="rirPrompt" style="bottom:calc(140px + env(safe-area-inset-bottom));background:linear-gradient(135deg,#0e1822,#a78bfa);border-top-color:var(--purple)">
+  <div class="rest-timer-info">
+    <div style="font-size:13px;font-weight:800;color:#fff" id="rirPromptTitle">Cât de greu a fost?</div>
+    <div class="rest-timer-lbl">ajută Smart Coach să calibreze</div>
+  </div>
+  <button class="rest-timer-btn" onclick="saveRIR('easy')">🥱 Ușor</button>
+  <button class="rest-timer-btn" onclick="saveRIR('ok')">💪 OK</button>
+  <button class="rest-timer-btn" onclick="saveRIR('hard')">😮‍💨 Limită</button>
 </div>
 
 <div class="rest-timer" id="restTimer">
@@ -1072,6 +1107,11 @@ function addRow(row){
       return !(r.type==='exnote' && r.date===row.date && r.exercise===row.exercise);
     });
   }
+  if(row.type==='rir'){
+    s.rows=s.rows.filter(function(r){
+      return !(r.type==='rir' && r.date===row.date && r.exercise===row.exercise);
+    });
+  }
   if(row.type==='masuratoare'){
     // o măsurătoare per zi — suprascriem
     s.rows=s.rows.filter(function(r){
@@ -1231,6 +1271,7 @@ function showTab(name,btn){
   if(name==='progres'){
     renderMeasurements();
     syncMeasFormState();
+    renderPhotos();
     renderBodyChart();
     renderRecompChart();
     renderExerciseChart();
@@ -1269,7 +1310,8 @@ function initHeader(){
   var now=new Date();
   var days=['DUMINICĂ','LUNI','MARȚI','MIERCURI','JOI','VINERI','SÂMBĂTĂ'];
   document.getElementById('hdrTitle').textContent=days[now.getDay()];
-  document.getElementById('hdrDate').textContent=now.toLocaleDateString('ro-RO',{day:'numeric',month:'long',year:'numeric'});
+  var streak=getActivityStreak();
+  document.getElementById('hdrDate').innerHTML=now.toLocaleDateString('ro-RO',{day:'numeric',month:'long',year:'numeric'})+(streak>=2?' · <span style="color:#fb923c;font-weight:800">🔥 '+streak+' zile</span>':'');
   // Sub-titlul reflectă programul REAL al userului
   var sub=document.querySelector('.hdr-sub');
   if(sub){
@@ -1372,8 +1414,19 @@ function renderToday(){
   html+='🎯 Focus: <strong style="color:var(--acc2)">'+coachFocus.label+'</strong>';
   html+='</div>';
 
-  // Banner DELOAD în săptămâna 8
-  if(coachWeek===8){
+  // Sugestie AUTO-DELOAD (stagnare multiplă + energie scăzută)
+  var deloadSuggest=checkAutoDeloadSuggest();
+  if(deloadSuggest){
+    html+='<div style="background:rgba(167,139,250,.12);border:1px solid rgba(167,139,250,.45);border-radius:10px;padding:12px;margin-bottom:12px;font-size:12px;line-height:1.5;color:var(--text)">';
+    html+='🧘 <strong style="color:var(--purple)">Corpul cere pauză.</strong> Stagnezi la '+deloadSuggest.stagnant+' exerciții ⭐'+(deloadSuggest.energy!==null?' iar energia ta medie e '+deloadSuggest.energy.toFixed(1)+'/10':'')+'. O săptămână ușoară acum = progres mai rapid după.';
+    html+='<div style="display:flex;gap:8px;margin-top:10px">';
+    html+='<button class="btn btn-acc" style="margin:0;padding:10px;font-size:13px;flex:1" onclick="acceptManualDeload()">🧘 Accept — săptămână ușoară</button>';
+    html+='<button class="btn btn-ghost" style="margin:0;padding:10px;font-size:13px;flex:0 0 auto" onclick="dismissDeloadSuggest()">Nu acum</button>';
+    html+='</div></div>';
+  }
+
+  // Banner DELOAD în săptămâna 8 SAU deload manual acceptat
+  if(coachWeek===8||isManualDeload()){
     html+='<div style="background:rgba(167,139,250,.12);border:1px solid rgba(167,139,250,.4);color:var(--purple);border-radius:10px;padding:10px 12px;margin-bottom:12px;font-size:12px;line-height:1.5">';
     html+='🧘 <strong>SĂPTĂMÂNĂ DELOAD</strong> — recuperare activă:<br>• Fă doar <strong>3 din 4 seturi</strong> (sau 2 din 3)<br>• Greutăți la <strong>~80%</strong> · tempo curat, fără efort maxim<br>• Scop: recuperare CNS + articulații înainte de ciclul nou';
     html+='</div>';
@@ -1476,6 +1529,10 @@ function renderToday(){
       var trendBadge=trend?' <span style="color:'+trend.color+';font-weight:800" title="trend ultimele 3 sesiuni">'+trend.arrow+'</span>':'';
       if(rec){
         smartHint='<div style="background:rgba(20,184,166,.1);border-left:3px solid var(--acc);padding:4px 10px;margin:4px 14px 0;border-radius:0 6px 6px 0;font-size:11px;color:var(--text)">🎯 <strong style="color:var(--acc2)">AZI</strong>: '+rec.target+trendBadge+'</div>';
+      }
+      // Încălzire calculată (rampa) — doar dacă exercițiul nu e început
+      if(doneSets===0){
+        smartHint+=buildWarmupHint(e.name);
       }
       // Stagnation alert
       var stag=detectStagnation(e.name);
@@ -1675,6 +1732,8 @@ function saveSet(keyEnc,setNum,ei){
       if(!(setData[key][ck]&&setData[key][ck].savedOnServer)){allDone=false;break;}
     }
     if(allDone){
+      // Prompt RIR pentru ⭐ (calibrează Smart Coach)
+      if(exObj.star)setTimeout(function(){showRIRPrompt(key);},900);
       // Marchează cardul ca done
       var card=document.getElementById('ec_'+ei);
       if(card){
@@ -1882,6 +1941,27 @@ function updateRestTimerDur(){
   var v=document.getElementById('restTimerDur').value;
   localStorage.setItem('rest_timer_sec',v);
   initRestTimerUI();
+}
+
+var rirPromptEx=null;
+function showRIRPrompt(exName){
+  rirPromptEx=exName;
+  var el=document.getElementById('rirPrompt');
+  document.getElementById('rirPromptTitle').textContent='Cât de greu: '+exName.slice(0,28)+(exName.length>28?'…':'');
+  el.classList.add('show');
+  clearTimeout(el._t);
+  el._t=setTimeout(function(){el.classList.remove('show');},20000);
+}
+
+function saveRIR(val){
+  if(!rirPromptEx)return;
+  var idx=getEffectiveDayIdx();
+  addRow({date:getEffectiveDateRo(),day:schedule[idx].day,type:'rir',exercise:rirPromptEx,set:'',reps:'',kg:'',note:val});
+  var el=document.getElementById('rirPrompt');
+  el.classList.remove('show');
+  clearTimeout(el._t);
+  rirPromptEx=null;
+  showToast(val==='easy'?'Notat — data viitoare escaladam ⚡':val==='hard'?'Notat — consolidăm data viitoare':'Notat ✓',null,true);
 }
 
 function showWorkoutComplete(){
@@ -3305,6 +3385,7 @@ function mergeRemote(remote){
     if(r.type==='dimineata') return r.date+'|d|'+r.exercise;
     if(r.type==='rating') return r.date+'|r|'+r.exercise;
     if(r.type==='exnote') return r.date+'|n|'+r.exercise;
+    if(r.type==='rir') return r.date+'|q|'+r.exercise;
     if(r.type==='masuratoare') return r.date+'|m';
     return r.date+'|x|'+(r.exercise||'');
   }
@@ -3635,6 +3716,93 @@ function getKgIncrement(name){
   return 1;
 }
 
+// ── RIR (Reps In Reserve) — "cât de greu a fost" ultima sesiune ──
+function getLastRIR(exerciseName){
+  var todayRo=getEffectiveDateRo();
+  var rirRows=loadStore().rows.filter(function(r){
+    return r.type==='rir' && r.exercise===exerciseName && r.date!==todayRo;
+  }).sort(function(a,b){return (parseRoDate(b.date)||0)-(parseRoDate(a.date)||0);});
+  return rirRows.length?rirRows[0].note:null; // 'easy' | 'ok' | 'hard'
+}
+
+// ── Deload manual (acceptat din sugestia auto) ──
+function isManualDeload(){
+  var until=localStorage.getItem('manual_deload_until');
+  if(!until)return false;
+  return todayISO()<=until;
+}
+
+function acceptManualDeload(){
+  // Până duminica acestei săptămâni
+  var now=new Date();
+  var dow=now.getDay();
+  var daysToSunday=dow===0?0:(7-dow);
+  var sunday=new Date(now);sunday.setDate(now.getDate()+daysToSunday);
+  var iso=sunday.getFullYear()+'-'+String(sunday.getMonth()+1).padStart(2,'0')+'-'+String(sunday.getDate()).padStart(2,'0');
+  localStorage.setItem('manual_deload_until',iso);
+  showToast('🧘 Deload activ până duminică — ținte la 80%','var(--purple)');
+  renderToday();
+}
+
+function dismissDeloadSuggest(){
+  localStorage.setItem('deload_dismissed_until',(function(){
+    var d=new Date();d.setDate(d.getDate()+7);
+    return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+  })());
+  renderToday();
+}
+
+function checkAutoDeloadSuggest(){
+  if(isManualDeload())return null;
+  var dismissed=localStorage.getItem('deload_dismissed_until');
+  if(dismissed&&todayISO()<=dismissed)return null;
+  var week=getProgramWeek();
+  if(week>=8)return null; // deja în deload programat
+  // Numără ⭐ stagnante
+  var stars=getStarExercises();
+  var stagnant=0;
+  stars.forEach(function(s){if(detectStagnation(s.name))stagnant++;});
+  if(stagnant<2)return null;
+  // Energia medie pe ultimele 7 zile
+  var cutoff=Date.now()-7*86400000;
+  var energyVals=loadStore().rows.filter(function(r){
+    if(r.type!=='rating'||r.exercise!=='energy')return false;
+    var d=parseRoDate(r.date);return d&&d.getTime()>=cutoff;
+  }).map(function(r){return parseInt(r.note)||5;});
+  var avgEnergy=energyVals.length?energyVals.reduce(function(a,v){return a+v;},0)/energyVals.length:null;
+  // Condiție: 2+ stagnante și (energie ≤5.5 SAU fără date dar 3+ stagnante)
+  if(avgEnergy!==null&&avgEnergy<=5.5)return {stagnant:stagnant,energy:avgEnergy};
+  if(avgEnergy===null&&stagnant>=3)return {stagnant:stagnant,energy:null};
+  return null;
+}
+
+// ── Streak de activitate (zile consecutive cu ceva bifat/salvat) ──
+function getActivityStreak(){
+  var days={};
+  loadStore().rows.forEach(function(r){
+    if(r.type==='antrenament'||r.type==='dimineata'||(r.type==='checklist'&&r.note==='DA'))days[r.date]=true;
+  });
+  var streak=0;
+  var d=new Date();
+  if(!days[d.toLocaleDateString('ro-RO')])d.setDate(d.getDate()-1); // azi încă nu — start de ieri
+  for(var i=0;i<365;i++){
+    if(days[d.toLocaleDateString('ro-RO')]){streak++;d.setDate(d.getDate()-1);}
+    else break;
+  }
+  return streak;
+}
+
+// ── Încălzire calculată pentru ⭐ (rampa clasică) ──
+function buildWarmupHint(exerciseName){
+  var last=getLastPerformance(exerciseName,getEffectiveDateRo());
+  if(!last||!last.kg||last.kg<15)return ''; // sub 15kg nu are sens rampa
+  var isBara=exerciseName.toLowerCase().indexOf('bara')>=0;
+  function rnd(x){return isBara?Math.round(x/2.5)*2.5:Math.round(x);}
+  var w50=rnd(last.kg*0.5),w75=rnd(last.kg*0.75);
+  var startStr=isBara?'bara goală':'gantere foarte ușoare';
+  return '<div style="font-size:11px;color:var(--muted);padding:3px 10px;margin:2px 14px 0;border-left:2px solid rgba(245,158,11,.4);border-radius:0 4px 4px 0">🔥 Încălzire: 10× '+startStr+' → 5× '+w50+'kg → 3× '+w75+'kg → seturile de lucru</div>';
+}
+
 function getRecommendation(exerciseName,week){
   var meta=findExerciseMeta(exerciseName);
   if(!meta)return null;
@@ -3645,6 +3813,17 @@ function getRecommendation(exerciseName,week){
   var inc=getKgIncrement(exerciseName);
   // Exclude AZI ca recomandarea să fie STABILĂ în timpul sesiunii (vine din sesiunea anterioară)
   var last=getLastPerformance(exerciseName,getEffectiveDateRo());
+
+  // DELOAD MANUAL (acceptat din sugestia auto) — prioritate peste tot
+  if(isManualDeload()&&last){
+    var dlKg=Math.round(last.kg*0.8*2)/2;
+    return {action:'deload',tag:'DELOAD',last:last,
+      target:dlKg+' kg × '+last.reps+' rep, -30% seturi',
+      tip:'Deload activ — recuperare. Tempo curat, fără efort maxim.'};
+  }
+
+  // RIR din sesiunea trecută modulează agresivitatea (doar săpt. 3-6, cu date)
+  var rir=(week>=3&&week<=6&&last)?getLastRIR(exerciseName):null;
 
   if(!last){
     return {
@@ -3662,12 +3841,22 @@ function getRecommendation(exerciseName,week){
     };
   }
 
+  // RIR 'hard' (la limită) → consolidare în loc de progresie forțată
+  if(rir==='hard'){
+    return {
+      action:'stabilize',tag:'CONSOLIDARE',last:last,
+      target:last.kg+' kg × '+last.reps+' rep (repetă)',
+      tip:'Ultima sesiune a fost la limită 😮‍💨 — repetă exact, tehnica întâi. Progresul vine.'
+    };
+  }
+
   if(week<=4){
-    if(last.reps>=maxRep){
+    // RIR 'easy' → sari direct la +kg (progresia pe rep e prea lentă pentru tine)
+    if(last.reps>=maxRep||rir==='easy'){
       return {
-        action:'add_kg',tag:'+'+inc+' KG',last:last,
+        action:'add_kg',tag:'+'+inc+' KG'+(rir==='easy'?' ⚡':''),last:last,
         target:(last.kg+inc)+' kg × '+minRep+' rep',
-        tip:'Ai atins maximul de rep ('+maxRep+') → urci în greutate, scazi rep.'
+        tip:rir==='easy'?'Ultima a fost ușoară 🥱 → escaladăm direct în greutate.':'Ai atins maximul de rep ('+maxRep+') → urci în greutate, scazi rep.'
       };
     }
     var newReps=Math.min(last.reps+2,maxRep);
@@ -3679,10 +3868,11 @@ function getRecommendation(exerciseName,week){
   }
 
   if(week<=6){
+    var kgJump=rir==='easy'?inc*2:inc;
     return {
-      action:'add_kg',tag:'+'+inc+' KG',last:last,
-      target:(last.kg+inc)+' kg × '+minRep+'-'+(minRep+2)+' rep',
-      tip:'Săpt. '+week+': urci în greutate, începi de la min rep range.'
+      action:'add_kg',tag:'+'+kgJump+' KG'+(rir==='easy'?' ⚡':''),last:last,
+      target:(last.kg+kgJump)+' kg × '+minRep+'-'+(minRep+2)+' rep',
+      tip:rir==='easy'?'Ultima a fost ușoară 🥱 → salt dublu în greutate.':'Săpt. '+week+': urci în greutate, începi de la min rep range.'
     };
   }
 
@@ -4569,6 +4759,255 @@ function fireBackupReminder(){
 }
 
 // ═══════════════════════════════════════════════════════════════
+// REZUMAT SĂPTĂMÂNAL (digest) — duminică seara / luni + manual
+// ═══════════════════════════════════════════════════════════════
+var digestData=null;
+
+function buildDigestStats(offset){
+  var b=getWeekBounds(offset);
+  var rows=getRowsForWeek(offset);
+  var training=rows.filter(function(r){return r.type==='antrenament';});
+  var sessionDays={};training.forEach(function(r){sessionDays[r.date]=true;});
+  var tonnage=training.reduce(function(a,r){return a+(parseFloat(r.kg)||0)*(parseFloat(r.reps)||0);},0);
+  var prs=training.filter(function(r){return r.note&&r.note.indexOf('PR:')===0;});
+  var energyVals=rows.filter(function(r){return r.type==='rating'&&r.exercise==='energy';}).map(function(r){return parseInt(r.note)||0;});
+  var morningDone=rows.filter(function(r){return r.type==='dimineata'&&r.note==='DA';}).length;
+  // Δ măsurători: cea mai recentă din săptămână vs anterioară
+  var meas=getMeasurements();
+  var weekMeas=meas.filter(function(m){var d=parseRoDate(m.date);return d&&d>=b.monday&&d<b.sunday;});
+  var deltas=[];
+  if(weekMeas.length){
+    var latest=weekMeas[0];
+    var prev=meas.find(function(m){var d=parseRoDate(m.date);return d&&d<b.monday;});
+    if(prev){
+      if(latest.weight!=null&&prev.weight!=null)deltas.push({label:'Greutate',v:latest.weight-prev.weight,unit:'kg',goodDown:true});
+      if(latest.waist!=null&&prev.waist!=null)deltas.push({label:'Talie',v:latest.waist-prev.waist,unit:'cm',goodDown:true});
+    }
+  }
+  var fmt=function(d){return d.toLocaleDateString('ro-RO',{day:'numeric',month:'short'});};
+  var endW=new Date(b.sunday);endW.setDate(endW.getDate()-1);
+  return {
+    period:fmt(b.monday)+' — '+fmt(endW),
+    sessions:Object.keys(sessionDays).length,
+    sets:training.length,
+    tonnage:Math.round(tonnage),
+    prs:prs.length,
+    energyAvg:energyVals.length?(energyVals.reduce(function(a,v){return a+v;},0)/energyVals.length).toFixed(1):null,
+    morningDone:morningDone,
+    streak:getActivityStreak(),
+    deltas:deltas
+  };
+}
+
+function showWeeklyDigest(offset){
+  var d=buildDigestStats(offset||0);
+  digestData=d;
+  document.getElementById('digestPeriod').textContent=d.period;
+  var html='';
+  html+='<div class="wiz-preview-stat"><span>💪 Sesiuni antrenament</span><strong style="color:var(--acc)">'+d.sessions+'</strong></div>';
+  html+='<div class="wiz-preview-stat"><span>📊 Seturi salvate</span><strong>'+d.sets+'</strong></div>';
+  html+='<div class="wiz-preview-stat"><span>🏋️ Volum total ridicat</span><strong>'+d.tonnage.toLocaleString('ro-RO')+' kg</strong></div>';
+  if(d.prs)html+='<div class="wiz-preview-stat"><span>🏆 Recorduri noi</span><strong style="color:var(--green)">'+d.prs+'</strong></div>';
+  if(d.energyAvg)html+='<div class="wiz-preview-stat"><span>⚡ Energie medie</span><strong>'+d.energyAvg+'/10</strong></div>';
+  if(d.morningDone)html+='<div class="wiz-preview-stat"><span>☀️ Bife dimineață</span><strong>'+d.morningDone+'</strong></div>';
+  if(d.streak>=2)html+='<div class="wiz-preview-stat"><span>🔥 Streak activ</span><strong style="color:#fb923c">'+d.streak+' zile</strong></div>';
+  d.deltas.forEach(function(dl){
+    var good=dl.goodDown?dl.v<0:dl.v>0;
+    html+='<div class="wiz-preview-stat"><span>📏 '+dl.label+'</span><strong style="color:'+(good?'var(--green)':'var(--acc2)')+'">'+(dl.v>0?'+':'')+dl.v.toFixed(1)+' '+dl.unit+'</strong></div>';
+  });
+  if(!d.sets)html+='<p style="color:var(--muted);text-align:center;padding:12px 0">Săptămână fără antrenamente înregistrate.</p>';
+  document.getElementById('digestBody').innerHTML=html;
+  document.getElementById('digestModal').classList.add('show');
+}
+
+function closeDigest(){document.getElementById('digestModal').classList.remove('show');}
+
+function digestAsText(){
+  var d=digestData;if(!d)return '';
+  var t='🏋️ SĂPTĂMÂNA MEA ('+d.period+')\n';
+  t+='💪 '+d.sessions+' antrenamente · '+d.sets+' seturi · '+d.tonnage.toLocaleString('ro-RO')+' kg ridicate\n';
+  if(d.prs)t+='🏆 '+d.prs+' recorduri personale noi\n';
+  if(d.streak>=2)t+='🔥 '+d.streak+' zile consecutive de activitate\n';
+  d.deltas.forEach(function(dl){t+='📏 '+dl.label+': '+(dl.v>0?'+':'')+dl.v.toFixed(1)+' '+dl.unit+'\n';});
+  t+='— Fitness Jurnal';
+  return t;
+}
+
+function copyDigestText(){
+  var t=digestAsText();
+  if(navigator.clipboard&&navigator.clipboard.writeText){
+    navigator.clipboard.writeText(t).then(function(){showToast('Copiat — lipește oriunde 📋');});
+  }else{fallbackCopy(t);}
+}
+
+function downloadDigestImage(){
+  var d=digestData;if(!d)return;
+  var W=1080,H=1350;
+  var cv=document.createElement('canvas');cv.width=W;cv.height=H;
+  var ctx=cv.getContext('2d');
+  // fundal
+  var grad=ctx.createLinearGradient(0,0,W,H);
+  grad.addColorStop(0,'#0e1822');grad.addColorStop(1,'#0a1117');
+  ctx.fillStyle=grad;ctx.fillRect(0,0,W,H);
+  // linie accent sus
+  var grad2=ctx.createLinearGradient(0,0,W,0);
+  grad2.addColorStop(0,'#14b8a6');grad2.addColorStop(.5,'#5eead4');grad2.addColorStop(1,'#14b8a6');
+  ctx.fillStyle=grad2;ctx.fillRect(0,0,W,12);
+  ctx.textAlign='center';
+  ctx.fillStyle='#5eead4';ctx.font='700 40px sans-serif';
+  ctx.fillText('SĂPTĂMÂNA MEA',W/2,120);
+  ctx.fillStyle='#7d8d9a';ctx.font='400 34px sans-serif';
+  ctx.fillText(d.period,W/2,175);
+  // stats mari
+  var y=300;
+  function bigStat(emoji,val,label){
+    ctx.fillStyle='#e6edf3';ctx.font='800 88px sans-serif';
+    ctx.fillText(emoji+' '+val,W/2,y);
+    ctx.fillStyle='#7d8d9a';ctx.font='400 34px sans-serif';
+    ctx.fillText(label,W/2,y+50);
+    y+=170;
+  }
+  bigStat('💪',d.sessions,'antrenamente');
+  bigStat('📊',d.sets+' seturi','· '+d.tonnage.toLocaleString('ro-RO')+' kg ridicate');
+  if(d.prs)bigStat('🏆',d.prs,'recorduri personale noi');
+  if(d.streak>=2)bigStat('🔥',d.streak+' zile','streak de activitate');
+  d.deltas.slice(0,2).forEach(function(dl){
+    bigStat('📏',(dl.v>0?'+':'')+dl.v.toFixed(1)+' '+dl.unit,dl.label.toLowerCase());
+  });
+  ctx.fillStyle='#14b8a6';ctx.font='700 30px sans-serif';
+  ctx.fillText('— Fitness Jurnal · 8 săptămâni —',W/2,H-60);
+  cv.toBlob(function(blob){
+    var url=URL.createObjectURL(blob);
+    var a=document.createElement('a');
+    a.href=url;a.download='saptamana-mea.png';
+    document.body.appendChild(a);a.click();document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    showToast('Imagine salvată — share pe Insta/WhatsApp 📸');
+  },'image/png');
+}
+
+function maybeShowWeeklyDigest(){
+  var now=new Date();
+  var dow=now.getDay();
+  var trigger=(dow===0&&now.getHours()>=17)||dow===1;
+  if(!trigger)return;
+  var b=getWeekBounds(dow===1?-1:0);
+  var weekKey=b.monday.toISOString().slice(0,10);
+  if(localStorage.getItem('digest_shown_week')===weekKey)return;
+  var offset=dow===1?-1:0;
+  var d=buildDigestStats(offset);
+  if(d.sets<3)return; // nu sărbătorim săptămâni goale
+  localStorage.setItem('digest_shown_week',weekKey);
+  setTimeout(function(){showWeeklyDigest(offset);},1500);
+}
+
+// ═══════════════════════════════════════════════════════════════
+// POZE DE PROGRES — IndexedDB local
+// ═══════════════════════════════════════════════════════════════
+function photoDb(){
+  return new Promise(function(resolve,reject){
+    var req=indexedDB.open('fitness-photos',1);
+    req.onupgradeneeded=function(){
+      req.result.createObjectStore('photos',{keyPath:'id',autoIncrement:true});
+    };
+    req.onsuccess=function(){resolve(req.result);};
+    req.onerror=function(){reject(req.error);};
+  });
+}
+
+function addProgressPhoto(ev){
+  var f=ev.target.files[0];if(!f)return;
+  ev.target.value='';
+  // Comprim la max 1080px, JPEG
+  var img=new Image();
+  img.onload=function(){
+    var maxDim=1080;
+    var scale=Math.min(1,maxDim/Math.max(img.width,img.height));
+    var cv=document.createElement('canvas');
+    cv.width=Math.round(img.width*scale);cv.height=Math.round(img.height*scale);
+    cv.getContext('2d').drawImage(img,0,0,cv.width,cv.height);
+    URL.revokeObjectURL(img.src);
+    cv.toBlob(function(blob){
+      photoDb().then(function(db){
+        var tx=db.transaction('photos','readwrite');
+        tx.objectStore('photos').add({dateISO:todayISO(),dateRo:today(),blob:blob});
+        tx.oncomplete=function(){
+          showToast('Poză salvată 📸 (doar pe telefonul tău)');
+          renderPhotos();
+        };
+      });
+    },'image/jpeg',0.85);
+  };
+  img.src=URL.createObjectURL(f);
+}
+
+function getAllPhotos(){
+  return photoDb().then(function(db){
+    return new Promise(function(resolve){
+      var req=db.transaction('photos','readonly').objectStore('photos').getAll();
+      req.onsuccess=function(){resolve(req.result||[]);};
+      req.onerror=function(){resolve([]);};
+    });
+  });
+}
+
+function deletePhoto(id){
+  if(!confirm('Ștergi această poză?'))return;
+  photoDb().then(function(db){
+    var tx=db.transaction('photos','readwrite');
+    tx.objectStore('photos').delete(id);
+    tx.oncomplete=function(){showToast('Poză ștearsă');renderPhotos();};
+  });
+}
+
+var _photoUrls=[];
+function renderPhotos(){
+  var grid=document.getElementById('photoGrid');
+  var cmp=document.getElementById('photoCompare');
+  if(!grid)return;
+  // Curăț URL-urile vechi (memorie)
+  _photoUrls.forEach(function(u){URL.revokeObjectURL(u);});
+  _photoUrls=[];
+  getAllPhotos().then(function(photos){
+    photos.sort(function(a,b){return a.dateISO<b.dateISO?1:-1;}); // noi primele
+    if(!photos.length){
+      grid.innerHTML='';
+      cmp.innerHTML='';
+      return;
+    }
+    // Compare: prima vs ultima (dacă >=2)
+    if(photos.length>=2){
+      var newest=photos[0],oldest=photos[photos.length-1];
+      var u1=URL.createObjectURL(oldest.blob),u2=URL.createObjectURL(newest.blob);
+      _photoUrls.push(u1,u2);
+      cmp.innerHTML='<div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:8px">'+
+        '<div><img src="'+u1+'" style="width:100%;border-radius:10px;border:1px solid var(--bd)"><div style="font-size:10px;color:var(--muted);text-align:center;margin-top:2px">ÎNAINTE · '+oldest.dateRo+'</div></div>'+
+        '<div><img src="'+u2+'" style="width:100%;border-radius:10px;border:1px solid var(--acc)"><div style="font-size:10px;color:var(--acc2);text-align:center;margin-top:2px">ACUM · '+newest.dateRo+'</div></div>'+
+        '</div>';
+    }else{cmp.innerHTML='';}
+    grid.innerHTML=photos.map(function(p){
+      var u=URL.createObjectURL(p.blob);
+      _photoUrls.push(u);
+      return '<div style="position:relative"><img src="'+u+'" style="width:100%;aspect-ratio:3/4;object-fit:cover;border-radius:8px;border:1px solid var(--bd)">'+
+        '<button onclick="deletePhoto('+p.id+')" style="position:absolute;top:4px;right:4px;background:rgba(0,0,0,.6);border:none;color:#f87a8c;border-radius:6px;width:24px;height:24px;cursor:pointer;font-size:12px">✕</button>'+
+        '<div style="font-size:9px;color:var(--muted);text-align:center;margin-top:2px">'+p.dateRo+'</div></div>';
+    }).join('');
+  });
+}
+
+function checkPhotoOverdue(){
+  getAllPhotos().then(function(photos){
+    if(!photos.length)return; // fără poze — nu presăm userii noi
+    photos.sort(function(a,b){return a.dateISO<b.dateISO?1:-1;});
+    var last=new Date(photos[0].dateISO);
+    var days=Math.floor((Date.now()-last.getTime())/86400000);
+    if(days>=30){
+      showToast('📸 Ultima poză de progres: acum '+days+' zile — fă una nouă în Progres','var(--acc2)');
+    }
+  });
+}
+
+// ═══════════════════════════════════════════════════════════════
 // INSTALL HINT
 // ═══════════════════════════════════════════════════════════════
 function dismissInstallHint(){
@@ -4966,6 +5405,12 @@ window.addEventListener('load',function(){
 
   // Verifică dacă măsurătorile sunt vechi (>7 zile) — important pentru recomp
   setTimeout(checkMeasurementOverdue,1400);
+
+  // Rezumat săptămânal (duminică seara / luni, o dată pe săptămână)
+  maybeShowWeeklyDigest();
+
+  // Reminder poze de progres (>30 zile)
+  setTimeout(checkPhotoOverdue,2500);
 
   // Notificări — re-programare la fiecare deschidere
   var ncfg=getNotifCfg();
