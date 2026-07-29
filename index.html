@@ -402,6 +402,29 @@ input:checked + .slider:before{transform:translateX(20px);background:var(--acc)}
   <div id="nutMeals"></div>
   <div id="nutNote"></div>
 
+  <div class="stitle">🧬 De ce aceste numere?</div>
+  <div class="card" id="nutScienceCard">
+    <div class="card-hd" onclick="document.getElementById('nutScienceCard').classList.toggle('open')">
+      <div class="card-ico" style="background:rgba(167,139,250,.15)">🔬</div>
+      <div style="flex:1"><div class="card-ttl">Știința din spatele țintelor</div><div class="card-sub">proteine · grăsimi · carbo · deficit · timing</div></div>
+      <div class="card-chev">▼</div>
+    </div>
+    <div class="card-bd"><div style="padding-top:10px;font-size:12px;line-height:1.65;color:var(--text)">
+      <p style="margin-bottom:10px"><strong style="color:#f87171">🥩 Proteine (1.8-2.2 g/kg corp)</strong><br>
+      Meta-analiza pe 49 de studii: creșterea musculară urcă odată cu proteina până la ~1.6 g/kg, cu marjă de siguranță până la 2.2 la cei antrenați <em>(Morton 2018, Br J Sports Med)</em>. În deficit caloric ai nevoie de MAI multă — proteina e scutul mușchiului când slăbești <em>(Helms 2014)</em>. Bonus: e cel mai sățios macronutrient — ~25% din caloriile ei se ard doar digerând-o.</p>
+      <p style="margin-bottom:10px"><strong style="color:#fbbf24">🥑 Grăsimi (~0.9 g/kg — nu mai puțin)</strong><br>
+      Dietele foarte sărace în grăsimi (sub ~20% din calorii) scad testosteronul — hormonul care construiește mușchi, la ambele sexe <em>(Whittaker 2021, meta-analiză)</em>. Grăsimile transportă și vitaminele A, D, E, K. De-asta nu-ți dăm niciodată sub acest prag.</p>
+      <p style="margin-bottom:10px"><strong style="color:#38bdf8">🍚 Carbohidrați (restul caloriilor)</strong><br>
+      Combustibilul seturilor grele — glicogenul din mușchi. Fără ei, seturile 3-4 se prăbușesc. Carbii NU îngrașă prin ei înșiși — surplusul caloric TOTAL îngrașă <em>(Hall 2017, studii metabolice controlate)</em>.</p>
+      <p style="margin-bottom:10px"><strong style="color:var(--acc)">📉 De ce deficit MODERAT, nu drastic</strong><br>
+      La pierdere de ~0.7% din greutate/săptămână sportivii au păstrat mușchiul; la 1.4%/săpt. au pierdut și mușchi <em>(Garthe 2011)</em>. Mai încet = mai definit la final. De-asta app-ul refuză să-ți dea sub 1200/1500 kcal.</p>
+      <p style="margin-bottom:10px"><strong style="color:var(--acc2)">⏰ "Fereastra anabolică" e un mit (aproape)</strong><br>
+      Nu trebuie shake-ul în 30 min după antrenament — contează TOTALUL zilnic de proteine, distribuit rezonabil în 3-4 mese <em>(Schoenfeld 2013)</em>. Postul intermitent e doar o unealtă de control al caloriilor — funcționează dacă ție îți convine.</p>
+      <p><strong style="color:var(--blue)">💧 Apa (35 ml/kg — standardul EFSA)</strong><br>
+      Deshidratarea de doar 2% îți scade vizibil forța și concentrarea la antrenament. Ținta ta e calculată exact pe greutatea ta.</p>
+    </div></div>
+  </div>
+
   <div id="nutVariationWrap">
   <div class="stitle">🐟 Variație săptămânală (1 zi/săpt)</div>
   <div class="meal-card" style="border-color:rgba(56,189,248,.35)">
