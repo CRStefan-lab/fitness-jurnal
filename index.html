@@ -90,6 +90,10 @@ body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSy
 .empty-state-action{display:inline-block;color:var(--acc);text-decoration:underline;cursor:pointer;margin-top:8px;font-weight:700}
 .add-custom-row{display:flex;gap:8px;align-items:center;background:var(--s2);border:1px dashed rgba(20,184,166,.3);border-radius:10px;padding:10px;margin-top:10px;cursor:pointer}
 .add-custom-row:active{background:rgba(20,184,166,.06)}
+.guide-btn{background:rgba(56,189,248,.12);border:1px solid rgba(56,189,248,.35);color:var(--blue);width:30px;height:30px;border-radius:8px;font-size:14px;cursor:pointer;flex-shrink:0;display:flex;align-items:center;justify-content:center;padding:0;font-family:inherit}
+.guide-btn:active{background:rgba(56,189,248,.3)}
+.video-btn{display:block;width:100%;background:rgba(244,63,94,.1);border:1px solid rgba(244,63,94,.35);color:#f87a8c;border-radius:10px;padding:11px;font-size:13px;font-weight:800;cursor:pointer;font-family:inherit;text-align:center;text-decoration:none;margin-top:10px}
+.video-btn:active{background:rgba(244,63,94,.25)}
 /* Wizard onboarding */
 .wiz-title{font-size:20px;font-weight:900;color:var(--acc);margin-bottom:4px}
 .wiz-sub{font-size:12px;color:var(--muted);margin-bottom:16px;line-height:1.5}
@@ -416,7 +420,7 @@ input:checked + .slider:before{transform:translateX(20px);background:var(--acc)}
   <div class="rules-box">
     <div style="font-size:10px;font-weight:800;color:var(--purple);letter-spacing:2px;margin-bottom:10px">REGULI ZILNICE</div>
     <div class="rule-row">🚫 Zero dulciuri — banană dacă ai poftă de dulce</div>
-    <div class="rule-row">💧 Minimum 2.5L apă pe zi</div>
+    <div class="rule-row" id="ruleApa">💧 Minimum 3L apă pe zi</div>
     <div class="rule-row">☕ Cafea/ceai fără zahăr în fereastra de fasting</div>
     <div class="rule-row">⚖️ Cântărește mâncarea — estimările sunt greșite</div>
     <div class="rule-row">📏 Măsoară talia săptămânal, nu greutatea zilnic</div>
@@ -781,6 +785,16 @@ input:checked + .slider:before{transform:translateX(20px);background:var(--acc)}
 <div class="onboarding" id="onboarding">
   <div class="onboarding-card" style="text-align:left;max-height:88vh;overflow-y:auto;width:100%;max-width:380px;position:relative">
     <div id="wizardContent"></div>
+  </div>
+</div>
+
+<div class="modal" id="guideModal" onclick="if(event.target===this)closeGuide()">
+  <div class="modal-content" style="max-height:80vh;overflow-y:auto">
+    <div class="modal-ttl" id="guideTitle">Exercițiu</div>
+    <div class="modal-sub" id="guideTag"></div>
+    <div id="guideBody" style="font-size:13px;line-height:1.6"></div>
+    <a class="video-btn" id="guideVideoBtn" target="_blank" rel="noopener">▶️ Vezi demonstrație video (YouTube)</a>
+    <button class="btn btn-ghost" style="margin-top:10px;margin-bottom:0" onclick="closeGuide()">Închide</button>
   </div>
 </div>
 
@@ -1463,6 +1477,7 @@ function renderToday(){
     html+='<div style="color:'+(e.star?'var(--acc2)':'transparent')+';font-size:13px;width:18px;flex-shrink:0">'+(e.star?'⭐':'·')+'</div>';
     html+='<div style="flex:1;min-width:0"><div class="card-ttl">'+e.name+'</div><div class="card-sub">'+e.sets+' seturi · Țintă: '+e.target+' rep</div></div>';
     html+=progressBadge;
+    html+='<button class="guide-btn" onclick="event.stopPropagation();openGuideByName(\''+sk+'\')" title="Cum se face">📖</button>';
     html+='<div class="card-chev">▼</div></div>';
     html+=smartHint;
     var exNote=(exNoteData[key]||'');
@@ -1893,6 +1908,81 @@ function toggleCheck(id,el){
 }
 
 // ═══════════════════════════════════════════════════════════════
+// GHID EXERCIȚII — modal accesibil de peste tot + video demo
+// ═══════════════════════════════════════════════════════════════
+var MORNING_GUIDES={
+  morn_flotari_lente:{name:'Flotări lente',how:'Flotare clasică dar cu tempo foarte lent: 3 sec coborâre, 1 sec pauză jos, 1 sec urcare. Corpul drept ca o scândură.',tip:'Scopul e ÎNVĂȚAREA mișcării, nu oboseala. Oprește-te cu 2-3 repetări înainte de eșec.'},
+  morn_pike_pushup:{name:'Pike push-up',how:'Din poziția V inversat (fese sus), cobori capul spre podea îndoind coatele, apoi împingi înapoi.',tip:'Pregătește umerii pentru împinsul de seară.'},
+  morn_mob_umeri:{name:'Mobilitate umeri',how:'Cercuri ample cu brațele (10 înainte + 10 înapoi), apoi brațele pe perete și aluneci în sus/jos (wall slides), apoi întinderi ușoare ale pieptului în cadru de ușă.',tip:'Lent și fără durere — cauți mobilitate, nu forțare.'},
+  morn_kegel:{name:'Kegel',how:'Contractă mușchii planșeului pelvin (cei cu care ai opri urinarea) 3-5 sec, relaxează 3 sec. Repetă 10-15 ori.',tip:'Nu contracta fesierii sau abdomenul. Nimeni nu vede că îl faci — poți oriunde.'},
+  morn_fandari:{name:'Fandări în loc',how:'Pas mare în spate, cobori genunchiul spre podea, revii împingând în călcâiul din față. Alternezi picioarele.',tip:'Trunchiul drept, mișcare controlată.'},
+  morn_glute_bridge:{name:'Glute bridge',how:'Pe spate, genunchii îndoiți, împingi șoldurile sus strângând fesierii, ții 1 sec, cobori lent.',tip:'Activează fesierii pentru antrenamentul de seară.'},
+  morn_plank:{name:'Plank',how:'Pe coate, corpul drept de la cap la călcâie. Menții poziția respirând normal.',tip:'Fesierii și abdomenul contractate — nu lăsa șoldurile să cadă.'},
+  morn_dead_bug:{name:'Dead bug',how:'Pe spate, brațele spre tavan, genunchii la 90°. Cobori simultan brațul drept și piciorul stâng, revii, alternezi.',tip:'Lomba lipită de podea TOT timpul.'},
+  morn_plank_leg_raise:{name:'Plank + ridicări picioare',how:'Din plank, ridici un picior 10-15 cm, ții 2 sec, alternezi. Sau: plank 30 sec + 10 ridicări de picioare culcat.',tip:'Șoldurile stabile, nu se rotesc.'},
+  morn_mob_general:{name:'Mobilitate full body',how:'Cat-cow (spate rotund/arcuit în 4 labe) ×10, rotiri de șolduri ×10, cercuri brațe ×10.',tip:'Trezește toate articulațiile în 3 minute.'},
+  morn_ramat_usor:{name:'Ramat ușor sprijinit',how:'Pieptul pe bancă înclinată, gantere UȘOARE (jumătate din greutatea de seară), tragi spre șolduri strângând omoplații.',tip:'Pattern, nu efort — înveți mișcarea pentru seară.'},
+  morn_reverse_fly:{name:'Reverse fly ușor',how:'Aplecat la 45°, gantere ușoare, deschizi brațele lateral strângând omoplații.',tip:'Greutate mică, formă perfectă.'},
+  morn_dead_hang:{name:'Dead hang',how:'Atârnat de bară (sau cadru ușă solid) cu brațele întinse, corpul relaxat, 20-30 sec.',tip:'Decompresie pentru coloană + mobilitate umeri. Excelent după somn.'},
+  morn_hip_hinge:{name:'Hip hinge (fără greutate)',how:'Mâinile pe coapse, împingi șoldurile înapoi cu spatele drept până simți întindere în spatele picioarelor, revii strângând fesierii.',tip:'Pattern-ul pentru îndreptări — mișcarea vine din șolduri, nu din genunchi.'},
+  morn_flotari_inguste:{name:'Flotări înguste',how:'Flotare cu mâinile apropiate sub piept, coatele lipite de corp.',tip:'Pe genunchi dacă e prea greu.'},
+  morn_plank_lateral:{name:'Plank lateral',how:'Lateral pe un cot, corpul drept, șoldurile sus. 30 sec pe fiecare parte.',tip:'Corpul ca o linie dreaptă — nu lăsa șoldul să cadă.'},
+  morn_stretch_full:{name:'Stretching full body',how:'Întinderi statice 20-30 sec fiecare: coapse față/spate, fesieri, piept, umeri, spate. Fără arcuire, respiri adânc.',tip:'Ziua de recovery = investiție în următoarea săptămână.'},
+  morn_mob_articulatii:{name:'Mobilitate umeri/șolduri',how:'90/90 pentru șolduri (șezut, ambele picioare la 90°, rotești), cercuri ample brațe, wall slides.',tip:'Zonele care înțepenesc cel mai repede la birou.'},
+  morn_plimbare:{name:'Plimbare exterior',how:'Mers în ritm moderat 20-30 min, ideal dimineața pentru lumină naturală.',tip:'Lumina de dimineață reglează somnul + arzi calorii fără efort.'},
+  morn_superman:{name:'Superman',how:'Pe burtă, ridici simultan brațele și picioarele, ții 2 sec, cobori lent.',tip:'Privirea în podea, gâtul neutru.'},
+  morn_scapular:{name:'Scapular push-ups',how:'În poziție de flotare cu brațele ÎNTINSE, doar strângi și depărtezi omoplații (mișcare mică).',tip:'Trezește mușchii dintre omoplați pentru ziua de spate.'},
+  morn_mob_toracic:{name:'Mobilitate toracică',how:'În 4 labe, o mână la ceafă, rotești cotul spre tavan și înapoi ×8/parte. Apoi cat-cow ×10.',tip:'Rotația toracică bună = ramat sigur.'}
+};
+
+function openGuideByName(nameEnc){
+  var name=decodeURIComponent(nameEnc);
+  var g=ghidEx.find(function(x){return x.name===name;});
+  var title=document.getElementById('guideTitle');
+  var tag=document.getElementById('guideTag');
+  var body=document.getElementById('guideBody');
+  title.textContent=name;
+  if(g){
+    tag.textContent=g.tag||'';
+    body.innerHTML=
+      '<div class="g-row"><div class="g-lbl">Start</div><div>'+g.start+'</div></div>'+
+      '<div class="g-row"><div class="g-lbl">Mișcare</div><div>'+g.move+'</div></div>'+
+      '<div class="g-row"><div class="g-lbl" style="color:var(--red)">❌</div><div style="color:var(--red)">'+g.err+'</div></div>'+
+      '<div class="g-row"><div class="g-lbl" style="color:var(--green)">✅</div><div style="color:var(--green);font-style:italic">'+g.tip+'</div></div>';
+  }else{
+    tag.textContent='';
+    body.innerHTML='<p style="color:var(--muted)">Descrie mișcarea controlat, tempo 2-1-2, fără durere. Vezi video-ul pentru demonstrație completă.</p>';
+  }
+  document.getElementById('guideVideoBtn').href='https://www.youtube.com/results?search_query='+encodeURIComponent(name+' tutorial forma corecta');
+  document.getElementById('guideModal').classList.add('show');
+}
+
+function openMorningGuide(id){
+  var g=MORNING_GUIDES[id];
+  var title=document.getElementById('guideTitle');
+  var tag=document.getElementById('guideTag');
+  var body=document.getElementById('guideBody');
+  if(g){
+    title.textContent='☀️ '+g.name;
+    tag.textContent='Rutina de dimineață · pattern, nu efort maxim';
+    body.innerHTML=
+      '<div class="g-row"><div class="g-lbl">Cum</div><div>'+g.how+'</div></div>'+
+      '<div class="g-row"><div class="g-lbl" style="color:var(--green)">✅</div><div style="color:var(--green);font-style:italic">'+g.tip+'</div></div>';
+    document.getElementById('guideVideoBtn').href='https://www.youtube.com/results?search_query='+encodeURIComponent(g.name+' exercise tutorial');
+  }else{
+    title.textContent='Exercițiu dimineață';
+    tag.textContent='';
+    body.innerHTML='<p style="color:var(--muted)">Execută controlat, fără durere.</p>';
+    document.getElementById('guideVideoBtn').href='https://www.youtube.com/results?search_query='+encodeURIComponent(id.replace('morn_','')+' exercise');
+  }
+  document.getElementById('guideModal').classList.add('show');
+}
+
+function closeGuide(){
+  document.getElementById('guideModal').classList.remove('show');
+}
+
+// ═══════════════════════════════════════════════════════════════
 // MORNING ROUTINE
 // ═══════════════════════════════════════════════════════════════
 function buildMorningCard(idx){
@@ -1914,6 +2004,7 @@ function buildMorningCard(idx){
     html+='<div class="chk-box">'+(isDone?'✓':'')+'</div>';
     html+='<div class="morning-name">'+ex.name+'</div>';
     html+='<div class="morning-target">'+ex.target+'</div>';
+    html+='<button class="guide-btn" style="width:26px;height:26px;font-size:12px" onclick="event.stopPropagation();openMorningGuide(\''+ex.id+'\')" title="Cum se face">❓</button>';
     html+='</div>';
   });
   html+='</div></div>';
@@ -2012,6 +2103,9 @@ function renderNutritionAuto(){
   html+='</div></div>';
   meals.innerHTML=html;
   document.getElementById('nutNote').innerHTML=(customMeta&&customMeta.goalNotes)?'<div class="note-box">💡 '+customMeta.goalNotes+'</div>':'';
+  // Sincronizez regulile cu țintele calculate (o singură sursă de adevăr)
+  var ruleApa=document.getElementById('ruleApa');
+  if(ruleApa)ruleApa.textContent='💧 Apă: '+n.waterL+'L pe zi (calculat pe corpul tău)';
 }
 
 function initNutritie(){
@@ -3365,6 +3459,7 @@ function initGhid(){
     html+='<div class="g-row"><div class="g-lbl">Mișcare</div><div>'+ex.move+'</div></div>';
     html+='<div class="g-row"><div class="g-lbl" style="color:var(--red)">❌</div><div style="color:var(--red)">'+ex.err+'</div></div>';
     html+='<div class="g-row"><div class="g-lbl" style="color:var(--green)">✅</div><div style="color:var(--green);font-style:italic">'+ex.tip+'</div></div>';
+    html+='<a class="video-btn" href="https://www.youtube.com/results?search_query='+encodeURIComponent(ex.name+' tutorial forma corecta')+'" target="_blank" rel="noopener" onclick="event.stopPropagation()">▶️ Vezi demonstrație video</a>';
     html+='</div></div>';
   });
   cont.innerHTML=html;
@@ -4641,9 +4736,10 @@ function renderWizard(){
     html+='<div class="wiz-label">Câte zile pe săptămână te poți antrena?</div>';
     html+='<div class="wiz-row">'+wizChoiceBtn('days','3','3 zile','Full Body ×3')+wizChoiceBtn('days','4','4 zile','Push/Legs/Pull/Full')+'</div>';
     html+='<div class="wiz-label">Obiectivul principal</div>';
-    html+=wizChoiceBtn('goal','slabit','🔥 Slăbit','Deficit caloric ~20% + antrenament greu ca să pierzi grăsime, nu mușchi');
-    html+=wizChoiceBtn('goal','recomp','⚖️ Recompoziție','Slăbești ȘI construiești mușchi simultan. Deficit moderat. Cel mai popular.');
-    html+=wizChoiceBtn('goal','masa','💪 Masă musculară','Surplus caloric lejer + progresie constantă la greutăți');
+    html+=wizChoiceBtn('goal','slabit','🔥 Slăbit','Vrei în primul rând să dai jos kilograme. Antrenamentul greu îți apără mușchii cât slăbești.');
+    html+=wizChoiceBtn('goal','recomp','✨ Tonifiere / Recompoziție','Vrei să fii ferm(ă) și definit(ă): mai puțină grăsime + mușchi conturat. Alegerea potrivită pentru majoritatea.');
+    html+=wizChoiceBtn('goal','masa','💪 Masă musculară','Vrei să fii vizibil mai mare și mai puternic(ă). Mănânci puțin peste necesar.');
+    html+='<div style="font-size:11px;color:var(--acc2);text-align:center;margin-top:4px">💡 Nu ești sigur(ă)? Alege Tonifiere — poți schimba oricând din Setări.</div>';
     html+='<div class="wiz-err" id="wizErr"></div>';
     html+='<div class="wiz-nav"><button class="btn btn-ghost btn-back" onclick="wizBack()">←</button><button class="btn btn-acc" onclick="wizNext()">Continuă →</button></div>';
   }
