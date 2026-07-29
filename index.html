@@ -829,7 +829,7 @@ var exercises={
   miercuri:{label:'Recovery — Pași + Core',icon:'🚶',duration:'Ușor',list:[
     {star:false,name:'Pași parcurși (țintă 6.000–8.000)',sets:1,target:'—'},
     {star:false,name:'Plank + Ridicări picioare',sets:2,target:'2 runde'}]},
-  joi:{label:'Spate / Biceps',icon:'🔙',duration:'~45 min',list:[
+  joi:{label:'Spate / Biceps',icon:'💪',duration:'~45 min',list:[
     {star:true,name:'Bent-over row cu bara',sets:4,target:'8–12'},
     {star:false,name:'Pullover cu ganteră pe bancă plată',sets:3,target:'10–15'},
     {star:false,name:'Reverse fly cu gantere',sets:3,target:'12–15'},
@@ -1231,8 +1231,20 @@ function showTab(name,btn){
 function initHeader(){
   var now=new Date();
   var days=['DUMINICĂ','LUNI','MARȚI','MIERCURI','JOI','VINERI','SÂMBĂTĂ'];
-  document.getElementById('hdrTitle').textContent=days[now.getDay()]+' — BLOC FRIENDLY';
+  document.getElementById('hdrTitle').textContent=days[now.getDay()];
   document.getElementById('hdrDate').textContent=now.toLocaleDateString('ro-RO',{day:'numeric',month:'long',year:'numeric'});
+  // Sub-titlul reflectă programul REAL al userului
+  var sub=document.querySelector('.hdr-sub');
+  if(sub){
+    if(isCustomProgram){
+      var p=getProfile();
+      var eqL={bodyweight:'Bodyweight',home_min:'Gantere + bancă'+(p.hasBara?' + bară':''),gym:'Sală'}[p.equipment]||'';
+      var goalL={slabit:'Slăbit',recomp:'Recomp',masa:'Masă'}[p.goal]||'';
+      sub.textContent=eqL+(goalL?' · '+goalL:'')+' · '+(p.days||4)+' zile/săpt';
+    }else{
+      sub.textContent='Bancă · Gantere · Bară · Fără zgomot';
+    }
+  }
 }
 
 // ═══════════════════════════════════════════════════════════════
@@ -1316,7 +1328,7 @@ function renderToday(){
   html+='<div class="azi-stat"><div class="azi-stat-val" style="color:var(--acc)">'+setsToday+'/'+totalSetsExpected+'</div><div class="azi-stat-lbl">💪 Sets</div></div>';
   html+='<div class="azi-stat"><div class="azi-stat-val" style="color:var(--acc2)">'+morningDone+'/'+morningTotal+'</div><div class="azi-stat-lbl">☀️ Dim</div></div>';
   html+='<div class="azi-stat"><div class="azi-stat-val" style="color:var(--green)">'+checkDone+'/'+checkItems.length+'</div><div class="azi-stat-lbl">✅ Check</div></div>';
-  html+='<div class="azi-stat"><div class="azi-stat-val" style="color:var(--text);font-size:13px">S'+coachWeek+'/8</div><div class="azi-stat-lbl">📍 Săpt</div></div>';
+  html+='<div class="azi-stat"><div class="azi-stat-val" style="color:var(--text)">'+coachWeek+'/8</div><div class="azi-stat-lbl">📍 Săpt</div></div>';
   html+='</div>';
 
   html+='<div style="background:linear-gradient(135deg,rgba(20,184,166,.08),transparent);border-left:3px solid var(--acc);border-radius:0 8px 8px 0;padding:6px 12px;margin-bottom:12px;font-size:11px">';
@@ -1343,7 +1355,7 @@ function renderToday(){
   // Cântar rapid zilnic
   var todayWeight=getTodayWeight();
   html+='<div class="rating-row"><div class="rating-emoji">⚖️</div><div class="rating-label">Greutate azi</div>';
-  html+='<input type="number" step="0.1" inputmode="decimal" class="set-in" style="width:70px" id="quickWeight" placeholder="kg" value="'+(todayWeight||'')+'" onchange="saveQuickWeight(this.value)">';
+  html+='<input type="number" step="0.1" inputmode="decimal" class="set-in" style="width:70px" id="quickWeight" placeholder="84.5" value="'+(todayWeight||'')+'" onchange="saveQuickWeight(this.value)">';
   html+='<span style="font-size:11px;color:var(--muted);margin-left:4px">kg</span></div>';
   html+='</div>';
 

@@ -226,7 +226,7 @@ var SPLIT_4DAY={
       {pattern:'lunge',star:false,sets:3,target:'8/picior'},
       {pattern:'gambe',star:false,sets:3,target:'15–20'}]},
     {key:'miercuri',label:'Recovery — Pași + Core',icon:'🚶',type:'recovery',slots:[]},
-    {key:'joi',label:'Spate / Biceps',icon:'🔙',type:'pull',slots:[
+    {key:'joi',label:'Spate / Biceps',icon:'💪',type:'pull',slots:[
       {pattern:'pull',star:true,sets:4,target:'8–12'},
       {pattern:'pull',star:false,sets:3,target:'10–15'},
       {pattern:'spate_post',star:false,sets:3,target:'12–15'},
