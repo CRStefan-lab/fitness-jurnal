@@ -5,6 +5,21 @@ App personal devenit multi-user, în drum spre Google Play. Limba: **română on
 - **Live**: https://crstefan-lab.github.io/fitness-jurnal/ (GitHub Pages, repo `CRStefan-lab/fitness-jurnal`)
 - **Push pe `main` = deploy instant** — PWA-ul tuturor userilor se auto-actualizează (banner "Versiune nouă")
 
+## Stare curentă (iulie 2026, SW `fitness-v44`)
+
+Aplicația e **feature-complete** ca "antrenor în buzunar", construită integral în sesiuni Claude Code:
+- Jurnal complet (seturi rep×kg, pre-fill, steppers, PR detection, edit/backdate, note per exercițiu)
+- Smart Coach adaptiv: progresie 8 săpt. + cicluri, modulare RIR (ușor/ok/limită), auto-deload la stagnare+energie mică, încălzire calculată, ținte explicite și la accesorii ("Opțional azi: X rep × Y kg")
+- Onboarding wizard 7 pași → program generat (generator.js, 67 exerciții, 3 profile echipament, dovezi 2020-2025)
+- Nutriție: calculator TDEE/macros pt useri generați + mesele hardcodate pt owner + secțiune "De ce aceste numere?" cu citări
+- Progres: măsurători + BF% Navy (M/F) + grafice + recomp verdict + poze progres (IndexedDB) + PR-uri + 1RM
+- Retenție: streak 🔥 în header, digest săptămânal cu imagine share-abilă (canvas PNG)
+- Ghid: modal 📖/❓ pe orice exercițiu (inclusiv 22 matinale) + link video YouTube + principii dovedite
+- Rest timer fundal (deadline-based) + beep + mod auto 90s/150s⭐
+- Utilizatori activi reali: owner (legacy) + iubita + prieteni (programe generate) — feedback-ul lor a condus ultimele fix-uri
+
+**Următoarea fază (nefăcută): LANSAREA** — vezi Roadmap jos. Blocant: numele aplicației (owner-ul nu a decis).
+
 ## Fișiere
 
 | Fișier | Rol |
@@ -55,9 +70,12 @@ App personal devenit multi-user, în drum spre Google Play. Limba: **română on
 
 Biblioteca și sfaturile citează studii reale: Maeo 2021/2023 (leg curl șezând, triceps overhead), Kassiano 2023/2025 (gambe stretch, biceps incline/preacher), Plotkin 2023 (hip thrust≈squat), Rodríguez-Ridao 2020 (înclinat 30°), Morton 2018 + Helms/Whittaker/Garthe/Schoenfeld/Hall (nutriție), Singer 2024 (pauze), Pelland 2025 (volum). NU exagera stretch-ul (tiebreaker, nu multiplicator).
 
-## Roadmap rămas
+## Roadmap rămas (faza LANSARE — plan detaliat)
 
-1. Nume aplicație + iconiță (decizie amânată de owner)
-2. Privacy policy (pagină pe GitHub Pages; datele stau 100% local — "no data collected")
-3. Ambalare TWA (PWABuilder) + cont Play Console (25$) → Google Play
-4. Post-lansare: AdMob în rest timer (doar în TWA), eventual engleză
+1. **Nume aplicație** — brainstorm cu owner-ul; verifică disponibilitatea pe Play Store; apoi: title în index.html/manifest, iconiță nouă (SVG inline în manifest, actual e 🏋️ pe gradient teal), eventual splash
+2. **Privacy policy** — pagină simplă `privacy.html` în repo (GitHub Pages o servește); conținut: toate datele stau local pe device (localStorage/IndexedDB), zero colectare/server/tracking, backup-ul e responsabilitatea userului; necesară pentru Play Console
+3. **TWA packaging** — PWABuilder.com pe URL-ul live → generează AAB semnat; necesită `assetlinks.json` în repo la `.well-known/`; manifest-ul actual e valid PWA
+4. **Play Console** — cont developer 25$ o dată; listing (screenshots din preview 375px, descriere RO), data safety = "no data collected", content rating questionnaire (fitness, fără user content), disclaimer medical există deja în wizard
+5. **Post-lansare**: AdMob în rest timer (DOAR în wrapper TWA, nu în PWA), eventual engleză (i18n), teste cu utilizatori noi
+
+Avantaj TWA: app-ul din Play e înveliș peste PWA — push pe main = update instant la toți, fără review Google per update.
