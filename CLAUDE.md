@@ -58,7 +58,7 @@ Aplicația e **feature-complete** ca "antrenor în buzunar", construită integra
 
 ## Arhitectura logică (în index.html)
 
-- **Smart Coach**: `getRecommendation(ex, week)` — progresie pe săptămâni (1-2 baseline, 3-4 +rep, 5-6 +kg, 7 +set, 8 deload), modulată de RIR (easy→escaladare ⚡, hard→consolidare) și deload manual. `getLastPerformance(ex, excludeDate)` EXCLUDE ziua curentă (stabilitate în sesiune).
+- **Smart Coach**: `getRecommendation(ex, week, plannedSets)` — progresie pe săptămâni (1-2 baseline, 3-4 +rep, 5-6 +kg, 7 +set, 8 deload), modulată de RIR (easy→escaladare ⚡, hard→consolidare) și deload manual. `getLastPerformance(ex, excludeDate)` EXCLUDE ziua curentă (stabilitate în sesiune). Săpt. 7: setul extra e DOAR la primul ⭐ al zilei (caller-ul pasează `plannedSets`>0) — cardul din Azi primește slot S5 real (`aziAddSetIdx` + `effectiveSets(e,ei)`, folosite în render/saveSet/stats); restul ⭐ primesc „MENȚINE".
 - **Cicluri**: `getCycleInfo()` — după săpt. 8 → ciclul 2 etc.; buton "Începe ciclul nou".
 - **Accesorii (non-⭐)**: `getAccessoryRec` — double progression cu ținte explicite "Opțional azi: X rep × Y kg".
 - **Onboarding wizard**: `openWizard(prefill)` — 7 pași → `ProgramGenerator.generateProgram(profile)` → salvare + reload. X de închidere doar în reconfigure mode.
