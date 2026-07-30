@@ -1,6 +1,6 @@
 // Service Worker — network-first pentru HTML (updates vizibile imediat)
 // cache-first pentru restul (viteză)
-const CACHE = 'fitness-v45-setari-teme-personalizare';
+const CACHE = 'fitness-v46-set-extra-sapt7';
 const PRECACHE = ['./', './index.html', './manifest.json', './generator.js'];
 
 self.addEventListener('install', e => {

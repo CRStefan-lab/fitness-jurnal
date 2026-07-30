@@ -97,6 +97,7 @@ body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSy
 .set-box{display:flex;align-items:center;gap:8px;background:var(--s2);border-radius:10px;padding:10px 10px;border:2px solid var(--bd);transition:border-color .2s,background .2s}
 .set-box.dirty{border-color:rgba(245,158,11,.5);background:rgba(245,158,11,.04)}
 .set-box.saved{border-color:var(--green);background:rgba(34,197,94,.06)}
+.set-box.extra:not(.saved){border-style:dashed;border-color:rgba(var(--acc-rgb),.55)}
 .card.card-done{border-color:rgba(34,197,94,.5);background:linear-gradient(135deg,rgba(34,197,94,.04),transparent)}
 .progress-badge{font-size:10px;font-weight:800;padding:3px 8px;border-radius:6px;margin-right:6px;flex-shrink:0;letter-spacing:.3px}
 .progress-badge.partial{background:rgba(245,158,11,.15);color:#fbbf24}
@@ -1446,6 +1447,9 @@ function initHeader(){
 // ═══════════════════════════════════════════════════════════════
 // TAB AZI — ANTRENAMENT + CHECKLIST
 // ═══════════════════════════════════════════════════════════════
+// Săpt. 7 (+1 set): index-ul exercițiului din ziua curentă care primește setul extra
+var aziAddSetIdx=-1;
+function effectiveSets(e,ei){return e.sets+(ei===aziAddSetIdx?1:0);}
 function renderToday(){
   var realIdx=todayIdx();
   var idx=getEffectiveDayIdx(),sch=schedule[idx];
@@ -1502,13 +1506,23 @@ function renderToday(){
   // Quick stats sus — vezi imediat ce ai făcut azi
   var coachWeek=getProgramWeek();
   var coachFocus=WEEK_FOCUS[coachWeek-1]||WEEK_FOCUS[7];
+  // Săpt. 7: primul ⭐ al zilei primește +1 set (slot S5 în card)
+  aziAddSetIdx=-1;
+  for(var fsi=0;fsi<ex.list.length;fsi++){
+    if(ex.list[fsi].star){
+      var fsRec=getRecommendation(ex.list[fsi].name,coachWeek,ex.list[fsi].sets);
+      if(fsRec&&fsRec.action==='add_set')aziAddSetIdx=fsi;
+      break;
+    }
+  }
   // Calculează stats pentru ziua selectată
   var setsToday=0,totalSetsExpected=0,morningDone=0,morningTotal=0,checkDone=0;
-  ex.list.forEach(function(eItem){
-    totalSetsExpected+=eItem.sets;
+  ex.list.forEach(function(eItem,eIdx){
+    var effS=effectiveSets(eItem,eIdx);
+    totalSetsExpected+=effS;
     var k=eItem.name;
     if(setData[k]){
-      for(var ss=1;ss<=eItem.sets;ss++){
+      for(var ss=1;ss<=effS;ss++){
         if(setData[k][ss]&&setData[k][ss].savedOnServer)setsToday++;
       }
     }
@@ -1577,7 +1591,7 @@ function renderToday(){
     var fkey=ex.list[fi].name;
     if(!setData[fkey])setData[fkey]={};
     var allDone=true;
-    for(var fs=1;fs<=ex.list[fi].sets;fs++){
+    for(var fs=1;fs<=effectiveSets(ex.list[fi],fi);fs++){
       if(!(setData[fkey][fs]&&setData[fkey][fs].savedOnServer)){allDone=false;break;}
     }
     if(!allDone){firstIncompleteIdx=fi;break;}
@@ -1586,15 +1600,16 @@ function renderToday(){
   ex.list.forEach(function(e,ei){
     var key=e.name;
     if(!setData[key])setData[key]={};
+    var effSets=effectiveSets(e,ei);
     // Contor seturi salvate pentru badge progres
     var doneSets=0;
-    for(var ds=1;ds<=e.sets;ds++){
+    for(var ds=1;ds<=effSets;ds++){
       var dsData=setData[key][ds];
       if(dsData&&dsData.savedOnServer)doneSets++;
     }
-    var allCompleted=doneSets===e.sets;
+    var allCompleted=doneSets===effSets;
     var setsHtml='<div class="sets-row">';
-    for(var s=1;s<=e.sets;s++){
+    for(var s=1;s<=effSets;s++){
       var saved=setData[key][s]||{};
       var isSaved=saved.savedOnServer;
       var sk=encodeURIComponent(key);
@@ -1625,8 +1640,8 @@ function renderToday(){
           saved=setData[key][s];
         }
       }
-      setsHtml+='<div class="set-box'+(isSaved?' saved':'')+'" id="sb_'+ei+'_'+s+'">';
-      setsHtml+='<div class="set-lbl">'+(isSaved?'✓ S':'S')+s+'</div>';
+      setsHtml+='<div class="set-box'+(isSaved?' saved':'')+(s>e.sets?' extra':'')+'" id="sb_'+ei+'_'+s+'"'+(s>e.sets?' title="Set extra — săpt. 7"':'')+'>';
+      setsHtml+='<div class="set-lbl">'+(isSaved?'✓ S':'S')+s+(s>e.sets?'<div style="font-size:8px;color:var(--acc2);letter-spacing:.5px">+1</div>':'')+'</div>';
       setsHtml+='<div class="set-inputs">';
       setsHtml+='<input class="set-in" type="number" inputmode="numeric" min="0" max="99" placeholder="rep" value="'+(saved.reps||'')+'" oninput="upSet(\''+sk+'\','+s+',\'reps\',this.value,this)">';
       setsHtml+='<div class="stepper"><button class="stepper-btn" onclick="stepInput(\''+sk+'\','+s+',\'reps\',1,'+ei+')">+</button><button class="stepper-btn" onclick="stepInput(\''+sk+'\','+s+',\'reps\',-1,'+ei+')">−</button></div>';
@@ -1641,7 +1656,7 @@ function renderToday(){
     // Smart Coach hint pentru ⭐ + accesorii (double progression)
     var smartHint='';
     if(e.star){
-      var rec=getRecommendation(e.name,coachWeek);
+      var rec=getRecommendation(e.name,coachWeek,ei===aziAddSetIdx?e.sets:0);
       var trend=getTrend(e.name);
       var trendBadge=trend?' <span style="color:'+trend.color+';font-weight:800" title="trend ultimele 3 sesiuni">'+trend.arrow+'</span>':'';
       if(rec){
@@ -1666,14 +1681,14 @@ function renderToday(){
     var autoOpen=(ei===firstIncompleteIdx);
     var cardClasses='card'+(allCompleted?' card-done':'')+(autoOpen?' open':'');
     var progressBadge='';
-    if(doneSets>0||e.sets>0){
-      progressBadge='<span class="progress-badge '+(allCompleted?'complete':'partial')+'">'+doneSets+'/'+e.sets+(allCompleted?' ✓':'')+'</span>';
+    if(doneSets>0||effSets>0){
+      progressBadge='<span class="progress-badge '+(allCompleted?'complete':'partial')+'">'+doneSets+'/'+effSets+(allCompleted?' ✓':'')+'</span>';
     }
     html+='<div class="'+cardClasses+'" id="ec_'+ei+'">';
     html+='<div class="card-hd" onclick="document.getElementById(\'ec_'+ei+'\').classList.toggle(\'open\')">';
     html+='<div style="color:'+(e.star?'var(--acc2)':'transparent')+';font-size:13px;width:18px;flex-shrink:0">'+(e.star?'⭐':'·')+'</div>';
     var targetLbl=/^[\d]+([–—-][\d]+)?$/.test(String(e.target).trim())?e.target+' rep':e.target;
-    html+='<div style="flex:1;min-width:0"><div class="card-ttl">'+e.name+'</div><div class="card-sub">'+e.sets+' seturi · Țintă: '+targetLbl+'</div></div>';
+    html+='<div style="flex:1;min-width:0"><div class="card-ttl">'+e.name+'</div><div class="card-sub">'+(ei===aziAddSetIdx?effSets+' seturi ('+e.sets+'+1 azi)':e.sets+' seturi')+' · Țintă: '+targetLbl+'</div></div>';
     html+=progressBadge;
     html+='<button class="guide-btn" onclick="event.stopPropagation();openGuideByName(\''+sk+'\')" title="Cum se face">📖</button>';
     html+='<div class="card-chev">▼</div></div>';
@@ -1845,8 +1860,9 @@ function saveSet(keyEnc,setNum,ei){
     }
     // Check dacă exercițiul e complet → mark + colapsare + auto-advance la next exercise
     var exObj=exercises[schedule[idx].exDay].list[ei];
+    var effDone=effectiveSets(exObj,ei);
     var allDone=true;
-    for(var ck=1;ck<=exObj.sets;ck++){
+    for(var ck=1;ck<=effDone;ck++){
       if(!(setData[key][ck]&&setData[key][ck].savedOnServer)){allDone=false;break;}
     }
     if(allDone){
@@ -1857,7 +1873,7 @@ function saveSet(keyEnc,setNum,ei){
       if(card){
         card.classList.add('card-done');
         var pb=card.querySelector('.progress-badge');
-        if(pb){pb.className='progress-badge complete';pb.textContent=exObj.sets+'/'+exObj.sets+' ✓';}
+        if(pb){pb.className='progress-badge complete';pb.textContent=effDone+'/'+effDone+' ✓';}
       }
       // Avansează la următor exercițiu nesalvat
       setTimeout(function(){
@@ -1866,7 +1882,7 @@ function saveSet(keyEnc,setNum,ei){
         for(var ne=ei+1;ne<allEx.length;ne++){
           var nKey=allEx[ne].name;
           var nDone=true;
-          for(var cs=1;cs<=allEx[ne].sets;cs++){
+          for(var cs=1;cs<=effectiveSets(allEx[ne],ne);cs++){
             if(!(setData[nKey]&&setData[nKey][cs]&&setData[nKey][cs].savedOnServer)){nDone=false;break;}
           }
           if(!nDone){nextEx=ne;break;}
@@ -2088,10 +2104,10 @@ function showWorkoutComplete(){
   var sch=schedule[idx];
   var ex=exercises[sch.exDay];
   var totalSets=0,totalTonnage=0;
-  ex.list.forEach(function(e){
+  ex.list.forEach(function(e,ei){
     var key=e.name;
     if(!setData[key])return;
-    for(var s=1;s<=e.sets;s++){
+    for(var s=1;s<=effectiveSets(e,ei);s++){
       var sd=setData[key][s];
       if(sd&&sd.savedOnServer){
         totalSets++;
@@ -2433,11 +2449,17 @@ function initProgram(){
     html+='<div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px">'+statusBadge+'<div class="card-chev">▼</div></div>';
     html+='</div>';
     html+='<div class="card-bd"><div style="padding-top:10px">';
-    ex.list.forEach(function(e){
+    var dayFirstStar=-1;
+    for(var dfs=0;dfs<ex.list.length;dfs++){if(ex.list[dfs].star){dayFirstStar=dfs;break;}}
+    ex.list.forEach(function(e,eIdx){
       var smartTarget='';
+      var extraPill=0;
       if(e.star){
-        var rec=getRecommendation(e.name,week);
-        if(rec)smartTarget='<div style="font-size:11px;color:var(--acc2);margin-top:2px">🎯 '+rec.target+'</div>';
+        var rec=getRecommendation(e.name,week,eIdx===dayFirstStar?e.sets:0);
+        if(rec){
+          smartTarget='<div style="font-size:11px;color:var(--acc2);margin-top:2px">🎯 '+rec.target+'</div>';
+          if(rec.action==='add_set')extraPill=1;
+        }
       }else{
         var accRec=getAccessoryRec(e.name,e);
         if(accRec){
@@ -2447,7 +2469,7 @@ function initProgram(){
       html+='<div style="display:flex;align-items:flex-start;gap:8px;padding:8px 0;border-bottom:1px solid var(--bd);font-size:13px">';
       html+='<div style="color:'+(e.star?'var(--acc2)':'transparent')+';width:18px;flex-shrink:0;padding-top:1px">'+(e.star?'⭐':'·')+'</div>';
       html+='<div style="flex:1"><div style="font-weight:500">'+e.name+'</div>'+smartTarget+'</div>';
-      html+='<div style="font-size:11px;color:var(--acc);background:rgba(var(--acc-rgb),.1);padding:2px 7px;border-radius:20px;flex-shrink:0;align-self:flex-start;margin-top:1px">'+e.sets+'×'+e.target+'</div>';
+      html+='<div style="font-size:11px;color:var(--acc);background:rgba(var(--acc-rgb),.1);padding:2px 7px;border-radius:20px;flex-shrink:0;align-self:flex-start;margin-top:1px">'+(e.sets+extraPill)+'×'+e.target+(extraPill?' ↗':'')+'</div>';
       html+='</div>';
     });
     html+='</div></div></div>';
@@ -2954,7 +2976,7 @@ function buildWeekSummary(){
   out+='Săptămâna program: '+curWeek+'/8 — Focus: '+(WEEK_FOCUS[curWeek-1]||WEEK_FOCUS[7]).label+'\n\n';
   var stars=getStarExercises();
   stars.forEach(function(s){
-    var rec=getRecommendation(s.name,curWeek);
+    var rec=getRecommendation(s.name,curWeek,s.firstStar?s.sets:0);
     if(!rec)return;
     out+='⭐ '+s.name+' ['+s.dayLabel+']\n';
     if(rec.last) out+='  Ultima: '+rec.last.reps+' rep × '+rec.last.kg+' kg ('+rec.last.date+')\n';
@@ -3956,7 +3978,7 @@ function buildWarmupHint(exerciseName){
   return '<div style="font-size:11px;color:var(--muted);padding:3px 10px;margin:2px 14px 0;border-left:2px solid rgba(245,158,11,.4);border-radius:0 4px 4px 0">🔥 Încălzire: 10× '+startStr+' → 5× '+w50+'kg → 3× '+w75+'kg → seturile de lucru</div>';
 }
 
-function getRecommendation(exerciseName,week){
+function getRecommendation(exerciseName,week,plannedSets){
   var meta=findExerciseMeta(exerciseName);
   if(!meta)return null;
   var ex=meta.ex;
@@ -4030,10 +4052,18 @@ function getRecommendation(exerciseName,week){
   }
 
   if(week===7){
+    // Setul extra se face DOAR la primul ⭐ al zilei — caller-ul spune dacă exercițiul îl primește (plannedSets>0)
+    if(plannedSets){
+      return {
+        action:'add_set',tag:'+1 SET',last:last,
+        target:'se adaugă 1 set → '+last.reps+' rep × '+last.kg+' kg × '+(plannedSets+1)+' seturi',
+        tip:'Săpt. 7: volum. Aceleași greutăți și rep-uri, dar '+(plannedSets+1)+' seturi în loc de '+plannedSets+'.'
+      };
+    }
     return {
-      action:'add_set',tag:'+1 SET',last:last,
-      target:last.kg+' kg × '+last.reps+' rep — adaugă 1 serie',
-      tip:'Săpt. 7: aceeași greutate, dar +1 set la primul ⭐ al zilei.'
+      action:'hold',tag:'MENȚINE',last:last,
+      target:last.reps+' rep × '+last.kg+' kg (menține)',
+      tip:'Săpt. 7: setul extra e doar la primul ⭐ al zilei — aici menții greutatea și rep-urile.'
     };
   }
 
@@ -4076,8 +4106,12 @@ function getTrend(exerciseName){
 function getStarExercises(){
   var stars=[];
   Object.keys(exercises).forEach(function(dk){
+    var seenStar=false;
     exercises[dk].list.forEach(function(e){
-      if(e.star)stars.push({name:e.name,dayLabel:exercises[dk].label,dayKey:dk});
+      if(e.star){
+        stars.push({name:e.name,dayLabel:exercises[dk].label,dayKey:dk,sets:e.sets,firstStar:!seenStar});
+        seenStar=true;
+      }
     });
   });
   return stars;
@@ -4174,7 +4208,7 @@ function renderRecommendations(){
   var stars=getStarExercises();
   var html='';
   stars.forEach(function(s){
-    var rec=getRecommendation(s.name,week);
+    var rec=getRecommendation(s.name,week,s.firstStar?s.sets:0);
     if(!rec)return;
     var hasData=!!rec.last;
     html+='<div class="recom-item '+(hasData?'has-data':'no-data')+'">';
