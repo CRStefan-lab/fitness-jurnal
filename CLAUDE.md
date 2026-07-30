@@ -5,7 +5,7 @@ App personal devenit multi-user, în drum spre Google Play. Limba: **română on
 - **Live**: https://crstefan-lab.github.io/fitness-jurnal/ (GitHub Pages, repo `CRStefan-lab/fitness-jurnal`)
 - **Push pe `main` = deploy instant** — PWA-ul tuturor userilor se auto-actualizează (banner "Versiune nouă")
 
-## Stare curentă (iulie 2026, SW `fitness-v44`)
+## Stare curentă (iulie 2026, SW `fitness-v45`)
 
 Aplicația e **feature-complete** ca "antrenor în buzunar", construită integral în sesiuni Claude Code:
 - Jurnal complet (seturi rep×kg, pre-fill, steppers, PR detection, edit/backdate, note per exercițiu)
@@ -15,6 +15,7 @@ Aplicația e **feature-complete** ca "antrenor în buzunar", construită integra
 - Progres: măsurători + BF% Navy (M/F) + grafice + recomp verdict + poze progres (IndexedDB) + PR-uri + 1RM
 - Retenție: streak 🔥 în header, digest săptămânal cu imagine share-abilă (canvas PNG)
 - Ghid: modal 📖/❓ pe orice exercițiu (inclusiv 22 matinale) + link video YouTube + principii dovedite
+- Personalizare: nume în header, 6 teme de accent (CSS vars `--acc-rgb`/`--acc2-rgb`, `html[data-theme]`, cheie `app_theme`), sex M/F în setări; Setări reorganizate în 7 grupuri pliabile (`.sgroup`), Zona periculoasă ultima
 - Rest timer fundal (deadline-based) + beep + mod auto 90s/150s⭐
 - Utilizatori activi reali: owner (legacy) + iubita + prieteni (programe generate) — feedback-ul lor a condus ultimele fix-uri
 
@@ -49,7 +50,8 @@ Aplicația e **feature-complete** ca "antrenor în buzunar", construită integra
   - `rating` {exercise:'energy'|'sleep', note:'1'-'10'}
   - `masuratoare` {weight, waist, neck, hip, chest, biceps, thigh, calf, note}
 - `custom_program` = output-ul `generateProgram()` (exercises/schedule/morningRoutines/nutrition/checklist/ghid/meta) — aplicat la load peste definițiile statice
-- `user_profile` = {sex, age, height, weight, experience, equipment, hasBara, days, goal, morningRoutine}
+- `user_profile` = {sex, age, height, weight, experience, equipment, hasBara, days, goal, morningRoutine, name}
+- `app_theme` = id temă accent ('' implicit / ocean / mov / roz / foc / verde) — aplicată de snippet-ul din `<head>` + `applyTheme()`; graficele/canvas folosesc `themeAcc()`/`themeAcc2()`
 - `legacy_program`='1' = grandfathered · `program_cycle_start` = deload/cicluri · `manual_deload_until` = deload acceptat
 - Poze de progres: IndexedDB `fitness-photos` · FSA handle (desktop): IndexedDB `fitness-fsa`
 - Dedup: `addRow()` șterge rândul existent cu aceeași cheie (vezi `mergeRemote key()`)

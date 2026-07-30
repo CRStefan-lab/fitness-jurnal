@@ -9,6 +9,7 @@
 <meta name="apple-mobile-web-app-title" content="Fitness">
 <link rel="manifest" href="./manifest.json">
 <title>Fitness Jurnal</title>
+<script>try{var _t=localStorage.getItem('app_theme');if(_t)document.documentElement.setAttribute('data-theme',_t);}catch(e){}</script>
 <style>
 :root{
   --bg:#0a1117;
@@ -16,9 +17,11 @@
   --s2:#1a2530;
   --bd:#273340;
   --acc:#14b8a6;        /* teal-500 */
-  --acc-soft:#14b8a626;
+  --acc-rgb:20,184,166;
+  --acc-soft:rgba(var(--acc-rgb),.15);
   --acc-dim:#0d8a80;
   --acc2:#5eead4;       /* teal-300 accent bright */
+  --acc2-rgb:94,234,212;
   --blue:#38bdf8;
   --green:#22c55e;
   --red:#f43f5e;
@@ -26,8 +29,14 @@
   --text:#e6edf3;
   --muted:#7d8d9a;
   --r:12px;
-  --shadow-acc:0 0 24px rgba(20,184,166,.22);
+  --shadow-acc:0 0 24px rgba(var(--acc-rgb),.22);
 }
+/* Teme de accent — selectabile din Setări → Profil & personalizare */
+html[data-theme="ocean"]{--acc:#0ea5e9;--acc-rgb:14,165,233;--acc-dim:#0369a1;--acc2:#7dd3fc;--acc2-rgb:125,211,252}
+html[data-theme="mov"]{--acc:#8b5cf6;--acc-rgb:139,92,246;--acc-dim:#6d28d9;--acc2:#c4b5fd;--acc2-rgb:196,181,253}
+html[data-theme="roz"]{--acc:#ec4899;--acc-rgb:236,72,153;--acc-dim:#be185d;--acc2:#f9a8d4;--acc2-rgb:249,168,212}
+html[data-theme="foc"]{--acc:#f59e0b;--acc-rgb:245,158,11;--acc-dim:#b45309;--acc2:#fcd34d;--acc2-rgb:252,211,77}
+html[data-theme="verde"]{--acc:#22c55e;--acc-rgb:34,197,94;--acc-dim:#15803d;--acc2:#86efac;--acc2-rgb:134,239,172}
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif;font-size:15px;padding-bottom:calc(90px + env(safe-area-inset-bottom))}
 .hdr{background:linear-gradient(140deg,#0e1822 0%,#111d28 55%,#0a1117 100%);padding:calc(env(safe-area-inset-top) + 14px) 64px 14px 16px;border-bottom:1px solid var(--bd);position:relative}
@@ -40,7 +49,7 @@ body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSy
 .sync-badge:active{opacity:.7}
 .settings-gear{position:absolute;top:calc(env(safe-area-inset-top) + 14px);right:14px;background:var(--s2);border:1px solid var(--bd);border-radius:10px;width:38px;height:38px;display:flex;align-items:center;justify-content:center;font-size:18px;cursor:pointer;color:var(--text)}
 .settings-gear:active{background:var(--bd);border-color:var(--acc)}
-.sb-on{background:rgba(20,184,166,.15);color:var(--acc);border-color:rgba(20,184,166,.3)}
+.sb-on{background:rgba(var(--acc-rgb),.15);color:var(--acc);border-color:rgba(var(--acc-rgb),.3)}
 .sb-off{background:rgba(125,141,154,.12);color:var(--muted)}
 .sb-err{background:rgba(244,63,94,.15);color:var(--red);border-color:rgba(244,63,94,.3)}
 .bnav{position:fixed;bottom:0;left:0;right:0;background:rgba(14,22,32,.96);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border-top:1px solid var(--bd);display:flex;z-index:200;padding-bottom:env(safe-area-inset-bottom)}
@@ -53,6 +62,28 @@ body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSy
 .sec.act{display:block}
 .stitle{font-size:11px;font-weight:800;letter-spacing:2px;color:var(--acc);text-transform:uppercase;margin:14px 0 8px;display:flex;align-items:center;gap:8px}
 .stitle::after{content:'';flex:1;height:1px;background:var(--bd)}
+/* Setări — grupuri pliabile */
+.sgroup{background:var(--s1);border:1px solid var(--bd);border-radius:var(--r);margin-bottom:10px;overflow:hidden}
+.sgroup-hd{display:flex;align-items:center;gap:11px;padding:13px 14px;cursor:pointer;user-select:none}
+.sgroup-hd:active{background:var(--s2)}
+.sgroup-ico{width:34px;height:34px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:17px;flex-shrink:0;background:rgba(var(--acc-rgb),.12)}
+.sgroup-ttl{font-weight:800;font-size:14px}
+.sgroup-sub{font-size:11px;color:var(--muted);margin-top:1px}
+.sgroup-chev{color:var(--muted);font-size:11px;transition:transform .2s;flex-shrink:0;margin-left:auto}
+.sgroup.open .sgroup-chev{transform:rotate(180deg)}
+.sgroup-bd{display:none;padding:2px 14px 14px;border-top:1px solid var(--bd)}
+.sgroup.open .sgroup-bd{display:block}
+.sgroup.danger .sgroup-ico{background:rgba(244,63,94,.12)}
+.sgroup.danger{border-color:rgba(244,63,94,.35)}
+.sgroup-bd .stitle{margin-top:16px}
+.sgroup-bd .stitle:first-child{margin-top:12px}
+.sgroup-bd .notif-row{background:var(--s2)}
+/* Selector temă de culoare */
+.theme-row{display:flex;gap:10px;flex-wrap:wrap;padding:6px 0 2px}
+.theme-swatch{width:40px;height:40px;border-radius:50%;cursor:pointer;border:3px solid transparent;padding:0;flex-shrink:0;position:relative;transition:transform .15s,border-color .15s}
+.theme-swatch:active{transform:scale(.92)}
+.theme-swatch.sel{border-color:var(--text);transform:scale(1.08)}
+.theme-swatch.sel::after{content:'✓';position:absolute;inset:0;display:flex;align-items:center;justify-content:center;color:#fff;font-size:15px;font-weight:900;text-shadow:0 1px 3px rgba(0,0,0,.6)}
 .card{background:var(--s1);border-radius:var(--r);border:1px solid var(--bd);margin-bottom:10px;overflow:hidden}
 .card-hd{display:flex;align-items:center;gap:10px;padding:12px 14px;cursor:pointer;user-select:none}
 .card-ico{width:32px;height:32px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0}
@@ -70,9 +101,9 @@ body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSy
 .progress-badge{font-size:10px;font-weight:800;padding:3px 8px;border-radius:6px;margin-right:6px;flex-shrink:0;letter-spacing:.3px}
 .progress-badge.partial{background:rgba(245,158,11,.15);color:#fbbf24}
 .progress-badge.complete{background:rgba(34,197,94,.2);color:var(--green)}
-.repeat-btn{background:rgba(94,234,212,.12);border:1px solid rgba(94,234,212,.4);border-radius:8px;color:var(--acc2);font-size:11px;font-weight:700;cursor:pointer;padding:6px 8px;font-family:inherit;flex-shrink:0;letter-spacing:.2px}
-.repeat-btn:active{background:rgba(94,234,212,.25)}
-.azi-stats{display:flex;gap:8px;background:linear-gradient(135deg,rgba(20,184,166,.06),transparent);border:1px solid rgba(20,184,166,.2);border-radius:10px;padding:8px 12px;margin-bottom:10px;font-size:11px;align-items:center;justify-content:space-around}
+.repeat-btn{background:rgba(var(--acc2-rgb),.12);border:1px solid rgba(var(--acc2-rgb),.4);border-radius:8px;color:var(--acc2);font-size:11px;font-weight:700;cursor:pointer;padding:6px 8px;font-family:inherit;flex-shrink:0;letter-spacing:.2px}
+.repeat-btn:active{background:rgba(var(--acc2-rgb),.25)}
+.azi-stats{display:flex;gap:8px;background:linear-gradient(135deg,rgba(var(--acc-rgb),.06),transparent);border:1px solid rgba(var(--acc-rgb),.2);border-radius:10px;padding:8px 12px;margin-bottom:10px;font-size:11px;align-items:center;justify-content:space-around}
 .azi-stat{text-align:center;flex:1}
 .azi-stat-val{font-size:16px;font-weight:900;color:var(--text);line-height:1.1}
 .azi-stat-lbl{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-top:1px}
@@ -88,8 +119,8 @@ body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSy
 .onboarding-steps{text-align:left;font-size:13px;line-height:1.6;margin-bottom:18px}
 .onboarding-steps li{margin-bottom:6px}
 .empty-state-action{display:inline-block;color:var(--acc);text-decoration:underline;cursor:pointer;margin-top:8px;font-weight:700}
-.add-custom-row{display:flex;gap:8px;align-items:center;background:var(--s2);border:1px dashed rgba(20,184,166,.3);border-radius:10px;padding:10px;margin-top:10px;cursor:pointer}
-.add-custom-row:active{background:rgba(20,184,166,.06)}
+.add-custom-row{display:flex;gap:8px;align-items:center;background:var(--s2);border:1px dashed rgba(var(--acc-rgb),.3);border-radius:10px;padding:10px;margin-top:10px;cursor:pointer}
+.add-custom-row:active{background:rgba(var(--acc-rgb),.06)}
 .guide-btn{background:rgba(56,189,248,.12);border:1px solid rgba(56,189,248,.35);color:var(--blue);width:30px;height:30px;border-radius:8px;font-size:14px;cursor:pointer;flex-shrink:0;display:flex;align-items:center;justify-content:center;padding:0;font-family:inherit}
 .guide-btn:active{background:rgba(56,189,248,.3)}
 .video-btn{display:block;width:100%;background:rgba(244,63,94,.1);border:1px solid rgba(244,63,94,.35);color:#f87a8c;border-radius:10px;padding:11px;font-size:13px;font-weight:800;cursor:pointer;font-family:inherit;text-align:center;text-decoration:none;margin-top:10px}
@@ -102,7 +133,7 @@ body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSy
 .wiz-progress-dot.done{background:var(--acc)}
 .wiz-label{font-size:11px;font-weight:800;letter-spacing:1px;color:var(--acc2);text-transform:uppercase;margin:14px 0 8px}
 .wiz-choice{display:block;width:100%;background:var(--s2);border:2px solid var(--bd);border-radius:12px;padding:12px 14px;margin-bottom:8px;cursor:pointer;font-family:inherit;text-align:left;color:var(--text)}
-.wiz-choice.sel{border-color:var(--acc);background:rgba(20,184,166,.1)}
+.wiz-choice.sel{border-color:var(--acc);background:rgba(var(--acc-rgb),.1)}
 .wiz-choice-title{font-size:14px;font-weight:800}
 .wiz-choice-sub{font-size:11px;color:var(--muted);margin-top:2px;line-height:1.4}
 .wiz-row{display:flex;gap:8px}
@@ -119,7 +150,7 @@ body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSy
 .wiz-preview-stat{display:flex;justify-content:space-between;padding:7px 0;border-bottom:1px solid var(--bd);font-size:13px}
 .wiz-preview-stat:last-child{border-bottom:none}
 /* Rest timer sticky bar */
-.rest-timer{position:fixed;left:0;right:0;bottom:calc(72px + env(safe-area-inset-bottom));background:linear-gradient(135deg,#0e1822,#14b8a6);border-top:2px solid var(--acc);z-index:180;display:none;align-items:center;gap:12px;padding:10px 16px;box-shadow:0 -4px 20px rgba(0,0,0,.4)}
+.rest-timer{position:fixed;left:0;right:0;bottom:calc(72px + env(safe-area-inset-bottom));background:linear-gradient(135deg,#0e1822,var(--acc));border-top:2px solid var(--acc);z-index:180;display:none;align-items:center;gap:12px;padding:10px 16px;box-shadow:0 -4px 20px rgba(0,0,0,.4)}
 .rest-timer.show{display:flex}
 .rest-timer-icon{font-size:22px}
 .rest-timer-info{flex:1}
@@ -198,8 +229,8 @@ body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSy
 .ghid-nm{font-weight:700;font-size:14px;display:flex;align-items:center;gap:8px}
 .gtag{font-size:10px;padding:2px 7px;border-radius:20px;font-weight:600;flex-shrink:0}
 .g-bara{background:rgba(56,189,248,.2);color:var(--blue)}
-.g-gantere{background:rgba(20,184,166,.15);color:var(--acc)}
-.g-bodyweight{background:rgba(94,234,212,.15);color:var(--acc2)}
+.g-gantere{background:rgba(var(--acc-rgb),.15);color:var(--acc)}
+.g-bodyweight{background:rgba(var(--acc2-rgb),.15);color:var(--acc2)}
 .ghid-body{display:none;margin-top:10px;border-top:1px solid var(--bd);padding-top:10px}
 .ghid-item.open .ghid-body{display:block}
 .g-row{display:flex;gap:8px;margin-bottom:6px;font-size:13px;line-height:1.4}
@@ -215,7 +246,7 @@ body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSy
 .btn-row .btn{margin-bottom:0;flex:1}
 .toast{position:fixed;bottom:calc(90px + env(safe-area-inset-bottom));left:50%;transform:translateX(-50%) translateY(16px);background:#0e1822;border:1px solid var(--green);color:var(--green);padding:10px 20px;border-radius:30px;font-size:13px;font-weight:800;opacity:0;transition:all .3s;z-index:999;pointer-events:none;white-space:nowrap;max-width:90vw;box-shadow:0 8px 24px rgba(0,0,0,.3);letter-spacing:.3px}
 .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
-.install-hint{background:rgba(20,184,166,.1);border:1px solid rgba(20,184,166,.3);border-radius:10px;padding:10px 12px;margin:14px;font-size:12px;color:var(--acc);line-height:1.5;display:none}
+.install-hint{background:rgba(var(--acc-rgb),.1);border:1px solid rgba(var(--acc-rgb),.3);border-radius:10px;padding:10px 12px;margin:14px;font-size:12px;color:var(--acc);line-height:1.5;display:none}
 .install-hint.show{display:block}
 .install-hint button{background:none;border:none;color:var(--muted);float:right;cursor:pointer;font-size:18px;margin-top:-4px}
 .week-nav{display:flex;align-items:center;gap:8px;background:var(--s1);border:1px solid var(--bd);border-radius:var(--r);padding:8px;margin-bottom:10px}
@@ -250,7 +281,7 @@ body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSy
 .setup-box code{background:var(--bg);padding:1px 4px;border-radius:3px;font-size:11px;color:var(--acc);font-family:ui-monospace,Menlo,Consolas,monospace}
 .nb{font-size:9px}
 .nb .ico{font-size:18px}
-.seg{display:flex;gap:4px;background:var(--s1);border:1px solid var(--bd);border-radius:10px;padding:3px;margin-bottom:10px;overflow-x:auto;scrollbar-width:none}
+.seg{display:flex;flex-wrap:wrap;gap:4px;background:var(--s1);border:1px solid var(--bd);border-radius:10px;padding:3px;margin-bottom:10px}
 .seg::-webkit-scrollbar{display:none}
 .seg-btn{flex:0 0 auto;background:transparent;border:none;color:var(--muted);font-family:inherit;font-size:11px;font-weight:700;padding:8px 12px;border-radius:7px;cursor:pointer;white-space:nowrap;letter-spacing:.3px}
 .seg-btn.act{background:var(--acc);color:#fff}
@@ -272,20 +303,20 @@ body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSy
 .sw input{opacity:0;width:0;height:0}
 .slider{position:absolute;cursor:pointer;inset:0;background:var(--s2);border:1px solid var(--bd);border-radius:26px;transition:.2s}
 .slider:before{position:absolute;content:"";height:18px;width:18px;left:3px;bottom:3px;background:var(--muted);border-radius:50%;transition:.2s}
-input:checked + .slider{background:rgba(20,184,166,.3);border-color:var(--acc)}
+input:checked + .slider{background:rgba(var(--acc-rgb),.3);border-color:var(--acc)}
 input:checked + .slider:before{transform:translateX(20px);background:var(--acc)}
 .time-input{background:var(--bg);border:1px solid var(--bd);border-radius:8px;color:var(--text);font-family:inherit;font-size:14px;padding:8px 10px;width:100px}
 .days-pick{display:flex;gap:4px;margin-top:6px}
 .day-pill{flex:1;background:var(--s2);border:1px solid var(--bd);border-radius:8px;padding:6px;text-align:center;cursor:pointer;font-size:11px;font-weight:700;color:var(--muted)}
-.day-pill.on{background:rgba(20,184,166,.15);border-color:var(--acc);color:var(--acc)}
-.recom-header{background:linear-gradient(135deg,rgba(20,184,166,.12),rgba(94,234,212,.06));border:1px solid rgba(20,184,166,.3);border-radius:var(--r);padding:14px;margin-bottom:10px}
+.day-pill.on{background:rgba(var(--acc-rgb),.15);border-color:var(--acc);color:var(--acc)}
+.recom-header{background:linear-gradient(135deg,rgba(var(--acc-rgb),.12),rgba(var(--acc2-rgb),.06));border:1px solid rgba(var(--acc-rgb),.3);border-radius:var(--r);padding:14px;margin-bottom:10px}
 .recom-week{font-size:18px;font-weight:900;color:var(--acc);letter-spacing:.5px}
 .recom-focus{font-size:12px;color:var(--text);margin-top:4px}
 .recom-focus strong{color:var(--acc2)}
 .recom-progress{display:flex;gap:3px;margin-top:10px}
 .recom-progress-bar{flex:1;height:5px;background:var(--s2);border-radius:3px}
 .recom-progress-bar.done{background:var(--acc)}
-.recom-progress-bar.current{background:var(--acc2);box-shadow:0 0 8px rgba(94,234,212,.5)}
+.recom-progress-bar.current{background:var(--acc2);box-shadow:0 0 8px rgba(var(--acc2-rgb),.5)}
 .recom-item{background:var(--s1);border:1px solid var(--bd);border-radius:var(--r);padding:12px 14px;margin-bottom:8px}
 .recom-item.has-data{border-left:3px solid var(--acc)}
 .recom-item.no-data{border-left:3px solid var(--muted);opacity:.85}
@@ -293,7 +324,7 @@ input:checked + .slider:before{transform:translateX(20px);background:var(--acc)}
 .recom-current{font-size:12px;color:var(--muted);margin:3px 0}
 .recom-target{font-size:13px;color:var(--acc2);font-weight:700;margin:5px 0;display:flex;align-items:center;gap:6px}
 .recom-tip{font-size:11px;color:var(--muted);font-style:italic;margin-top:6px;line-height:1.4}
-.recom-action-tag{display:inline-block;font-size:9px;letter-spacing:.5px;padding:2px 6px;border-radius:4px;background:rgba(20,184,166,.15);color:var(--acc);font-weight:700;margin-left:6px}
+.recom-action-tag{display:inline-block;font-size:9px;letter-spacing:.5px;padding:2px 6px;border-radius:4px;background:rgba(var(--acc-rgb),.15);color:var(--acc);font-weight:700;margin-left:6px}
 .edit-btn{background:none;border:none;color:var(--muted);cursor:pointer;font-size:13px;padding:2px 6px;margin-left:4px;font-family:inherit}
 .hist-set{cursor:pointer;transition:background .15s}
 .hist-set:active{background:rgba(34,197,94,.25)}
@@ -313,25 +344,25 @@ input:checked + .slider:before{transform:translateX(20px);background:var(--acc)}
 .date-picker-row input[type="date"]:focus{outline:none;border-color:var(--acc)}
 .date-quick-btn{background:var(--s2);border:1px solid var(--bd);border-radius:9px;color:var(--muted);font-family:inherit;font-size:11px;font-weight:800;padding:8px 10px;cursor:pointer;letter-spacing:.3px;flex-shrink:0}
 .date-quick-btn:active{border-color:var(--acc);color:var(--acc)}
-.date-quick-btn.act{background:rgba(20,184,166,.15);border-color:var(--acc);color:var(--acc)}
+.date-quick-btn.act{background:rgba(var(--acc-rgb),.15);border-color:var(--acc);color:var(--acc)}
 .day-picker{display:flex;gap:4px;margin-bottom:12px}
 .dp-btn{flex:1;background:var(--s2);border:1px solid var(--bd);color:var(--muted);border-radius:9px;padding:10px 0;font-size:12px;font-weight:800;cursor:pointer;font-family:inherit;letter-spacing:.3px;transition:all .15s;position:relative}
-.dp-btn.today{border-color:rgba(94,234,212,.4);color:var(--acc2)}
+.dp-btn.today{border-color:rgba(var(--acc2-rgb),.4);color:var(--acc2)}
 .dp-btn.today::before{content:'•';position:absolute;top:1px;right:4px;color:var(--acc2);font-size:14px;line-height:1}
 .dp-btn.selected{background:linear-gradient(135deg,var(--acc) 0%,var(--acc-dim) 100%);color:#05201d;border-color:var(--acc);box-shadow:var(--shadow-acc)}
 .dp-btn.selected.today::before{color:#05201d}
 .override-banner{background:rgba(245,158,11,.1);border:1px solid rgba(245,158,11,.4);color:#f5a623;border-radius:10px;padding:10px 12px;font-size:12px;margin-bottom:12px;display:flex;align-items:center;gap:8px;line-height:1.4}
 .override-banner strong{color:#fbbf24}
 .override-banner button{background:none;border:none;color:#fbbf24;text-decoration:underline;font-weight:800;cursor:pointer;font-family:inherit;font-size:12px;padding:0;margin-left:auto;flex-shrink:0}
-.morning-card{background:linear-gradient(135deg,rgba(94,234,212,.08),rgba(20,184,166,.05));border:1px solid rgba(94,234,212,.25);border-radius:var(--r);margin-bottom:12px;overflow:hidden}
+.morning-card{background:linear-gradient(135deg,rgba(var(--acc2-rgb),.08),rgba(var(--acc-rgb),.05));border:1px solid rgba(var(--acc2-rgb),.25);border-radius:var(--r);margin-bottom:12px;overflow:hidden}
 .morning-hd{display:flex;align-items:center;gap:10px;padding:12px 14px;cursor:pointer;user-select:none}
 .morning-hd .sun{font-size:20px;flex-shrink:0}
 .morning-ttl{font-weight:800;font-size:14px;flex:1;color:var(--acc2)}
 .morning-sub{font-size:10px;color:var(--muted);margin-top:2px;font-weight:500}
-.morning-count{background:rgba(94,234,212,.15);border:1px solid rgba(94,234,212,.3);color:var(--acc2);font-size:11px;font-weight:800;padding:3px 8px;border-radius:20px;flex-shrink:0}
+.morning-count{background:rgba(var(--acc2-rgb),.15);border:1px solid rgba(var(--acc2-rgb),.3);color:var(--acc2);font-size:11px;font-weight:800;padding:3px 8px;border-radius:20px;flex-shrink:0}
 .morning-chev{color:var(--muted);font-size:11px;transition:transform .2s;flex-shrink:0}
 .morning-card.open .morning-chev{transform:rotate(180deg)}
-.morning-bd{display:none;padding:0 14px 14px;border-top:1px solid rgba(94,234,212,.15)}
+.morning-bd{display:none;padding:0 14px 14px;border-top:1px solid rgba(var(--acc2-rgb),.15)}
 .morning-card.open .morning-bd{display:block}
 .morning-item{display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid var(--bd);cursor:pointer}
 .morning-item:last-child{border-bottom:none}
@@ -353,7 +384,7 @@ input:checked + .slider:before{transform:translateX(20px);background:var(--acc)}
 </head>
 <body>
 <div class="hdr">
-  <div class="hdr-lbl">FITNESS JURNAL · 8 SĂPTĂMÂNI <span id="syncBadge" class="sync-badge sb-off" onclick="showTab('setari')" title="Setări & Sync">LOCAL</span></div>
+  <div class="hdr-lbl"><span id="hdrLblText">FITNESS JURNAL · 8 SĂPTĂMÂNI</span> <span id="syncBadge" class="sync-badge sb-off" onclick="showTab('setari')" title="Setări & Sync">LOCAL</span></div>
   <div class="hdr-title" id="hdrTitle">BLOC FRIENDLY</div>
   <div class="hdr-sub">Bancă · Gantere · Bară · Fără zgomot</div>
   <div class="hdr-date" id="hdrDate"></div>
@@ -365,7 +396,7 @@ input:checked + .slider:before{transform:translateX(20px);background:var(--acc)}
   💡 <strong>Adaugă pe telefon:</strong> Share → "Add to Home Screen" (iOS) sau meniu → "Install app" (Android)
 </div>
 
-<div class="install-hint" id="updateBanner" style="background:rgba(20,184,166,.12);border-color:rgba(20,184,166,.4);color:var(--acc)">
+<div class="install-hint" id="updateBanner" style="background:rgba(var(--acc-rgb),.12);border-color:rgba(var(--acc-rgb),.4);color:var(--acc)">
   🚀 <strong>Versiune nouă disponibilă!</strong> <button onclick="applyUpdate()" style="color:var(--acc);font-weight:800;text-decoration:underline;background:none;border:none;cursor:pointer;padding:0 4px">Actualizează →</button>
 </div>
 
@@ -588,192 +619,269 @@ input:checked + .slider:before{transform:translateX(20px);background:var(--acc)}
 </div>
 
 <div id="tab-setari" class="sec">
-  <div class="stitle">⚙️ Setări & sync</div>
+  <div class="stitle">⚙️ Setări</div>
 
-  <div class="stitle" id="shareTitle">⚡ Share backup rapid</div>
-  <p style="font-size:12px;color:var(--muted);margin-bottom:10px;line-height:1.5" id="shareDesc">
-    Un tap → meniul de share al telefonului → trimite datele către Drive, Mail, Telegram, orice. Zero setup.
-  </p>
-  <button class="btn btn-acc" onclick="shareBackup()">📤 Share backup (Drive / Mail / ...)</button>
-  <div class="btn-row" style="margin-top:6px">
-    <button class="btn btn-ghost" style="font-size:12px;padding:8px" onclick="emailBackup()">✉️ Trimite pe email</button>
-    <button class="btn btn-ghost" style="font-size:12px;padding:8px" onclick="showShareDiag()">🔧 Diagnostic</button>
-  </div>
-  <p style="font-size:11px;color:var(--acc2);margin:6px 0 0;line-height:1.5;text-align:center" id="shareHint" style="display:none">
-    💡 <strong>Pe mobile = sincronizarea ta.</strong> Apasă Share o dată pe săptămână → salvează în Drive.
-  </p>
+  <div class="sgroup open" id="sgProfil">
+    <div class="sgroup-hd" onclick="this.parentElement.classList.toggle('open')">
+      <div class="sgroup-ico">👤</div>
+      <div style="flex:1;min-width:0"><div class="sgroup-ttl">Profil & personalizare</div><div class="sgroup-sub">Nume, corp, temă de culoare</div></div>
+      <div class="sgroup-chev">▼</div>
+    </div>
+    <div class="sgroup-bd">
+      <div class="stitle">👋 Numele tău</div>
+      <input class="meas-in" type="text" id="profileName" placeholder="ex: Robert" maxlength="20" autocomplete="off" onchange="saveProfile()" style="font-size:15px;padding:9px 10px">
+      <p style="font-size:11px;color:var(--muted);margin:6px 0 0">Apare în header — jurnalul tău, cu numele tău.</p>
 
-  <div id="fsaWrapper" style="display:none">
-    <div class="stitle">🗂️ Sincronizare fișier (desktop)</div>
-    <div class="drive-card" id="fsaCard">
-      <div class="drive-status" id="fsaStatus">⚪ Deconectat</div>
-      <div class="drive-sub" id="fsaSub">
-        Conectează app-ul la un fișier JSON din Drive. Schimbările se salvează automat în fișier și sync-ul între device-uri se face prin Drive.
+      <div class="stitle">📏 Corp</div>
+      <div class="meas-grid">
+        <div class="meas-field">
+          <div class="meas-lbl">Înălțime</div>
+          <div class="meas-input-row"><input class="meas-in" type="number" id="profileHeight" placeholder="cm" onchange="saveProfile()"><span class="meas-unit">cm</span></div>
+        </div>
+        <div class="meas-field">
+          <div class="meas-lbl">Vârstă</div>
+          <div class="meas-input-row"><input class="meas-in" type="number" id="profileAge" placeholder="ani" onchange="saveProfile()"><span class="meas-unit">ani</span></div>
+        </div>
       </div>
-      <div id="fsaActions"></div>
-      <a class="setup-link" onclick="document.getElementById('fsaSetupBox').classList.toggle('show')">Cum funcționează? ▾</a>
-      <div class="setup-box" id="fsaSetupBox">
-        <strong>Workflow recomandat:</strong>
-        <ol>
-          <li><strong>Pe telefon</strong> (la sală): introduci datele → salvează local. Săptămânal: <code>📤 Share backup</code> → Drive</li>
-          <li><strong>Pe laptop</strong> (pentru analiză): apeși <strong>📁 Alege fișier</strong> → alegi <code>fitness-data.json</code> din folder-ul tău Drive (ex: <code>G:\My Drive\Fitness\</code>)</li>
-          <li>App-ul citește fișierul + scrie automat orice modificare (debounce 2s)</li>
-          <li>Drive-ul sincronizează fișierul între device-uri la nivel de OS</li>
-          <li>La fiecare 30 sec app-ul verifică schimbări externe → merge automat</li>
-        </ol>
-        <p style="margin-top:8px;color:var(--muted);font-size:11px">
-          🔒 Fără token, fără cont. Funcționează pe Chrome/Edge desktop.
-        </p>
+      <div class="notif-row">
+        <div style="flex:1">
+          <div class="notif-lbl">Sex</div>
+          <div class="notif-sub">Pentru formula BF% Navy (diferă M/F)</div>
+        </div>
+        <select id="profileSex" class="time-input" style="width:auto" onchange="saveProfile()">
+          <option value="M">Masculin</option>
+          <option value="F">Feminin</option>
+        </select>
+      </div>
+      <p style="font-size:11px;color:var(--muted);margin:0 0 4px">Folosite pentru calcul BF% (Navy) și estimare TDEE.</p>
+
+      <div class="stitle">🎨 Temă de culoare</div>
+      <div class="theme-row" id="themeRow"></div>
+      <p style="font-size:11px;color:var(--muted);margin:8px 0 0">Schimbă culoarea de accent a întregii aplicații — instant, pe acest device.</p>
+    </div>
+  </div>
+
+  <div class="sgroup" id="sgProgram">
+    <div class="sgroup-hd" onclick="this.parentElement.classList.toggle('open')">
+      <div class="sgroup-ico">🏋️</div>
+      <div style="flex:1;min-width:0"><div class="sgroup-ttl">Programul meu</div><div class="sgroup-sub" id="sgProgramSub">Plan antrenament & obiectiv</div></div>
+      <div class="sgroup-chev">▼</div>
+    </div>
+    <div class="sgroup-bd">
+      <div class="rules-box" style="margin:12px 0 10px">
+        <div class="rule-row" id="myProgramInfo">—</div>
+      </div>
+      <button class="btn btn-ghost" onclick="openWizard(true)" id="myProgramBtn">🔄 Reia wizard-ul (modifică programul)</button>
+      <p style="font-size:11px;color:var(--muted);margin-bottom:2px;line-height:1.4">
+        Istoricul și PR-urile tale rămân intacte la regenerare — se schimbă doar planul de exerciții/nutriție.
+      </p>
+    </div>
+  </div>
+
+  <div class="sgroup" id="sgTimer">
+    <div class="sgroup-hd" onclick="this.parentElement.classList.toggle('open')">
+      <div class="sgroup-ico">⏱️</div>
+      <div style="flex:1;min-width:0"><div class="sgroup-ttl">Rest timer</div><div class="sgroup-sub" id="sgTimerSub">Pauză între seturi</div></div>
+      <div class="sgroup-chev">▼</div>
+    </div>
+    <div class="sgroup-bd">
+      <div class="notif-row" style="margin-top:12px">
+        <div style="flex:1">
+          <div class="notif-lbl">Timer pauză după set</div>
+          <div class="notif-sub" id="restTimerStatus">Activ · 90s</div>
+        </div>
+        <label class="sw"><input type="checkbox" id="restTimerToggle" onchange="toggleRestTimer()"><span class="slider"></span></label>
+      </div>
+      <div class="notif-row" id="restTimerDurRow">
+        <div style="flex:1">
+          <div class="notif-lbl">Durată</div>
+          <div class="notif-sub">Recomandat: 90s hipertrofie</div>
+        </div>
+        <select id="restTimerDur" class="time-input" style="width:auto" onchange="updateRestTimerDur()">
+          <option value="auto">Auto (90s / 2½min ⭐)</option>
+          <option value="60">60s</option>
+          <option value="90">90s</option>
+          <option value="120">120s</option>
+          <option value="150">150s</option>
+          <option value="180">180s</option>
+        </select>
+      </div>
+      <div class="notif-row" id="restTimerSoundRow">
+        <div style="flex:1">
+          <div class="notif-lbl">🔊 Sunet la final</div>
+          <div class="notif-sub">Beep triplu când pauza s-a terminat</div>
+        </div>
+        <label class="sw"><input type="checkbox" id="restTimerSound" onchange="toggleRestTimerSound()"><span class="slider"></span></label>
+      </div>
+      <p style="font-size:11px;color:var(--muted);margin-top:4px;line-height:1.5">
+        💡 Timerul merge și când minimizezi app-ul (calculează pe ceas, nu pe cronometru). Dacă ai notificările activate, primești și notificare cu vibrație când expiră în fundal.<br>
+        🔊 <strong style="color:var(--acc2)">Sunetul folosește volumul MEDIA al telefonului</strong> — dă volumul media mai tare la sală (nu cel de sonerie). Testează cu toggle-ul de mai sus.
+      </p>
+    </div>
+  </div>
+
+  <div class="sgroup" id="sgNotif">
+    <div class="sgroup-hd" onclick="this.parentElement.classList.toggle('open')">
+      <div class="sgroup-ico">🔔</div>
+      <div style="flex:1;min-width:0"><div class="sgroup-ttl">Notificări</div><div class="sgroup-sub" id="sgNotifSub">Reminder antrenament & backup</div></div>
+      <div class="sgroup-chev">▼</div>
+    </div>
+    <div class="sgroup-bd">
+      <div class="notif-row" style="margin-top:12px">
+        <div style="flex:1">
+          <div class="notif-lbl">Reminder zilnic</div>
+          <div class="notif-sub" id="notifStatus">Dezactivat</div>
+        </div>
+        <label class="sw"><input type="checkbox" id="notifToggle" onchange="toggleNotif()"><span class="slider"></span></label>
+      </div>
+      <div id="notifConfig" style="display:none">
+        <div class="notif-row">
+          <div style="flex:1">
+            <div class="notif-lbl">Oră</div>
+            <div class="notif-sub">Când îți amintim</div>
+          </div>
+          <input type="time" class="time-input" id="notifTime" value="19:00" onchange="updateNotifCfg()">
+        </div>
+        <div class="notif-row" style="flex-direction:column;align-items:stretch">
+          <div class="notif-lbl">Zile</div>
+          <div class="days-pick" id="notifDays"></div>
+        </div>
+        <div class="notif-row" style="flex-direction:column;align-items:stretch;gap:6px">
+          <div class="notif-lbl">Mesaj</div>
+          <div class="notif-sub" id="notifMsgPreview">—</div>
+          <button class="btn btn-ghost" style="margin:4px 0 0" onclick="testNotif()">🔔 Trimite notificare test</button>
+        </div>
+      </div>
+      <p style="font-size:11px;color:var(--muted);margin-top:8px;line-height:1.5">
+        ⚠️ Notificările merg când app-ul e deschis sau instalat ca PWA. Pe iOS trebuie neapărat instalat pe Home Screen.
+      </p>
+
+      <div class="notif-row" style="margin-top:12px">
+        <div style="flex:1">
+          <div class="notif-lbl">💾 Reminder backup</div>
+          <div class="notif-sub" id="backupReminderStatus">Dezactivat</div>
+        </div>
+        <label class="sw"><input type="checkbox" id="backupReminderToggle" onchange="toggleBackupReminder()"><span class="slider"></span></label>
+      </div>
+      <div id="backupReminderConfig" style="display:none">
+        <div class="notif-row">
+          <div style="flex:1">
+            <div class="notif-lbl">Frecvență</div>
+            <div class="notif-sub">Săptămânal = recomandat (acumulează mai puține fișiere)</div>
+          </div>
+          <select id="backupReminderFreq" class="time-input" style="width:auto" onchange="updateBackupReminderCfg()">
+            <option value="weekly">Săptămânal (Duminică)</option>
+            <option value="daily">Zilnic</option>
+            <option value="monthly">Lunar (1 a lunii)</option>
+          </select>
+        </div>
+        <div class="notif-row">
+          <div style="flex:1">
+            <div class="notif-lbl">Oră</div>
+            <div class="notif-sub">Recomandat: după ce termini ziua</div>
+          </div>
+          <input type="time" class="time-input" id="backupReminderTime" value="22:00" onchange="updateBackupReminderCfg()">
+        </div>
       </div>
     </div>
   </div>
 
-  <div class="stitle">🔔 Notificări</div>
-  <div class="notif-row">
-    <div style="flex:1">
-      <div class="notif-lbl">Reminder zilnic</div>
-      <div class="notif-sub" id="notifStatus">Dezactivat</div>
+  <div class="sgroup" id="sgBackup">
+    <div class="sgroup-hd" onclick="this.parentElement.classList.toggle('open')">
+      <div class="sgroup-ico">💾</div>
+      <div style="flex:1;min-width:0"><div class="sgroup-ttl">Backup & sincronizare</div><div class="sgroup-sub">Share, fișier local, sync desktop</div></div>
+      <div class="sgroup-chev">▼</div>
     </div>
-    <label class="sw"><input type="checkbox" id="notifToggle" onchange="toggleNotif()"><span class="slider"></span></label>
-  </div>
-  <div id="notifConfig" style="display:none">
-    <div class="notif-row">
-      <div style="flex:1">
-        <div class="notif-lbl">Oră</div>
-        <div class="notif-sub">Când îți amintim</div>
+    <div class="sgroup-bd">
+      <div class="stitle" id="shareTitle">⚡ Share backup rapid</div>
+      <p style="font-size:12px;color:var(--muted);margin-bottom:10px;line-height:1.5" id="shareDesc">
+        Un tap → meniul de share al telefonului → trimite datele către Drive, Mail, Telegram, orice. Zero setup.
+      </p>
+      <button class="btn btn-acc" onclick="shareBackup()">📤 Share backup (Drive / Mail / ...)</button>
+      <div class="btn-row" style="margin-top:6px">
+        <button class="btn btn-ghost" style="font-size:12px;padding:8px" onclick="emailBackup()">✉️ Trimite pe email</button>
+        <button class="btn btn-ghost" style="font-size:12px;padding:8px" onclick="showShareDiag()">🔧 Diagnostic</button>
       </div>
-      <input type="time" class="time-input" id="notifTime" value="19:00" onchange="updateNotifCfg()">
-    </div>
-    <div class="notif-row" style="flex-direction:column;align-items:stretch">
-      <div class="notif-lbl">Zile</div>
-      <div class="days-pick" id="notifDays"></div>
-    </div>
-    <div class="notif-row" style="flex-direction:column;align-items:stretch;gap:6px">
-      <div class="notif-lbl">Mesaj</div>
-      <div class="notif-sub" id="notifMsgPreview">—</div>
-      <button class="btn btn-ghost" style="margin:4px 0 0" onclick="testNotif()">🔔 Trimite notificare test</button>
-    </div>
-  </div>
-  <p style="font-size:11px;color:var(--muted);margin-top:8px;line-height:1.5">
-    ⚠️ Notificările merg când app-ul e deschis sau instalat ca PWA. Pe iOS trebuie neapărat instalat pe Home Screen.
-  </p>
+      <p style="font-size:11px;color:var(--acc2);margin:6px 0 0;line-height:1.5;text-align:center" id="shareHint" style="display:none">
+        💡 <strong>Pe mobile = sincronizarea ta.</strong> Apasă Share o dată pe săptămână → salvează în Drive.
+      </p>
 
-  <div class="notif-row" style="margin-top:12px">
-    <div style="flex:1">
-      <div class="notif-lbl">💾 Reminder backup</div>
-      <div class="notif-sub" id="backupReminderStatus">Dezactivat</div>
-    </div>
-    <label class="sw"><input type="checkbox" id="backupReminderToggle" onchange="toggleBackupReminder()"><span class="slider"></span></label>
-  </div>
-  <div id="backupReminderConfig" style="display:none">
-    <div class="notif-row">
-      <div style="flex:1">
-        <div class="notif-lbl">Frecvență</div>
-        <div class="notif-sub">Săptămânal = recomandat (acumulează mai puține fișiere)</div>
+      <div class="stitle">💾 Backup local (fișier)</div>
+      <p style="font-size:12px;color:var(--muted);margin-bottom:10px;line-height:1.5">
+        Fișier salvat cu numele <code style="background:var(--bg);padding:1px 4px;border-radius:3px;font-size:11px;color:var(--acc)">fitness-data dd.mm.yyyy.json</code> (un fișier per zi, vezi data clar).
+      </p>
+      <div class="btn-row">
+        <button class="btn btn-ghost" onclick="downloadJSON()">⬇️ Descarcă</button>
+        <button class="btn btn-ghost" onclick="document.getElementById('fileImport').click()">⬆️ Importă</button>
       </div>
-      <select id="backupReminderFreq" class="time-input" style="width:auto" onchange="updateBackupReminderCfg()">
-        <option value="weekly">Săptămânal (Duminică)</option>
-        <option value="daily">Zilnic</option>
-        <option value="monthly">Lunar (1 a lunii)</option>
-      </select>
-    </div>
-    <div class="notif-row">
-      <div style="flex:1">
-        <div class="notif-lbl">Oră</div>
-        <div class="notif-sub">Recomandat: după ce termini ziua</div>
+      <input type="file" id="fileImport" accept="application/json" style="display:none" onchange="importJSON(event)">
+
+      <div id="fsaWrapper" style="display:none">
+        <div class="stitle">🗂️ Sincronizare fișier (desktop)</div>
+        <div class="drive-card" id="fsaCard">
+          <div class="drive-status" id="fsaStatus">⚪ Deconectat</div>
+          <div class="drive-sub" id="fsaSub">
+            Conectează app-ul la un fișier JSON din Drive. Schimbările se salvează automat în fișier și sync-ul între device-uri se face prin Drive.
+          </div>
+          <div id="fsaActions"></div>
+          <a class="setup-link" onclick="document.getElementById('fsaSetupBox').classList.toggle('show')">Cum funcționează? ▾</a>
+          <div class="setup-box" id="fsaSetupBox">
+            <strong>Workflow recomandat:</strong>
+            <ol>
+              <li><strong>Pe telefon</strong> (la sală): introduci datele → salvează local. Săptămânal: <code>📤 Share backup</code> → Drive</li>
+              <li><strong>Pe laptop</strong> (pentru analiză): apeși <strong>📁 Alege fișier</strong> → alegi <code>fitness-data.json</code> din folder-ul tău Drive (ex: <code>G:\My Drive\Fitness\</code>)</li>
+              <li>App-ul citește fișierul + scrie automat orice modificare (debounce 2s)</li>
+              <li>Drive-ul sincronizează fișierul între device-uri la nivel de OS</li>
+              <li>La fiecare 30 sec app-ul verifică schimbări externe → merge automat</li>
+            </ol>
+            <p style="margin-top:8px;color:var(--muted);font-size:11px">
+              🔒 Fără token, fără cont. Funcționează pe Chrome/Edge desktop.
+            </p>
+          </div>
+        </div>
       </div>
-      <input type="time" class="time-input" id="backupReminderTime" value="22:00" onchange="updateBackupReminderCfg()">
+      <p style="font-size:11px;color:var(--muted);margin-top:12px;text-align:center">
+        <span id="storageInfo"></span>
+      </p>
     </div>
   </div>
 
-  <div class="stitle">⏱️ Rest timer</div>
-  <div class="notif-row">
-    <div style="flex:1">
-      <div class="notif-lbl">Timer pauză după set</div>
-      <div class="notif-sub" id="restTimerStatus">Activ · 90s</div>
+  <div class="sgroup" id="sgInfo">
+    <div class="sgroup-hd" onclick="this.parentElement.classList.toggle('open')">
+      <div class="sgroup-ico">ℹ️</div>
+      <div style="flex:1;min-width:0"><div class="sgroup-ttl">Despre aplicație</div><div class="sgroup-sub">Versiune, update, status</div></div>
+      <div class="sgroup-chev">▼</div>
     </div>
-    <label class="sw"><input type="checkbox" id="restTimerToggle" onchange="toggleRestTimer()"><span class="slider"></span></label>
-  </div>
-  <div class="notif-row" id="restTimerDurRow">
-    <div style="flex:1">
-      <div class="notif-lbl">Durată</div>
-      <div class="notif-sub">Recomandat: 90s hipertrofie</div>
-    </div>
-    <select id="restTimerDur" class="time-input" style="width:auto" onchange="updateRestTimerDur()">
-      <option value="auto">Auto (90s / 2½min ⭐)</option>
-      <option value="60">60s</option>
-      <option value="90">90s</option>
-      <option value="120">120s</option>
-      <option value="150">150s</option>
-      <option value="180">180s</option>
-    </select>
-  </div>
-  <div class="notif-row" id="restTimerSoundRow">
-    <div style="flex:1">
-      <div class="notif-lbl">🔊 Sunet la final</div>
-      <div class="notif-sub">Beep triplu când pauza s-a terminat</div>
-    </div>
-    <label class="sw"><input type="checkbox" id="restTimerSound" onchange="toggleRestTimerSound()"><span class="slider"></span></label>
-  </div>
-  <p style="font-size:11px;color:var(--muted);margin-top:4px;line-height:1.5">
-    💡 Timerul merge și când minimizezi app-ul (calculează pe ceas, nu pe cronometru). Dacă ai notificările activate, primești și notificare cu vibrație când expiră în fundal.<br>
-    🔊 <strong style="color:var(--acc2)">Sunetul folosește volumul MEDIA al telefonului</strong> — dă volumul media mai tare la sală (nu cel de sonerie). Testează cu toggle-ul de mai sus.
-  </p>
-
-  <div class="stitle">💾 Backup local (fișier)</div>
-  <p style="font-size:12px;color:var(--muted);margin-bottom:10px;line-height:1.5">
-    Fișier salvat cu numele <code style="background:var(--bg);padding:1px 4px;border-radius:3px;font-size:11px;color:var(--acc)">fitness-data dd.mm.yyyy.json</code> (un fișier per zi, vezi data clar).
-  </p>
-  <div class="btn-row">
-    <button class="btn btn-ghost" onclick="downloadJSON()">⬇️ Descarcă</button>
-    <button class="btn btn-ghost" onclick="document.getElementById('fileImport').click()">⬆️ Importă</button>
-  </div>
-  <input type="file" id="fileImport" accept="application/json" style="display:none" onchange="importJSON(event)">
-
-  <div class="stitle">⚠️ Zona periculoasă</div>
-  <button class="btn btn-danger" onclick="resetAll()">🗑️ Șterge toate datele</button>
-  <p style="font-size:11px;color:var(--muted);margin-top:14px;text-align:center">
-    <span id="storageInfo"></span>
-  </p>
-
-  <div class="stitle">🏋️ Programul meu</div>
-  <div class="rules-box" style="margin-bottom:10px">
-    <div class="rule-row" id="myProgramInfo">—</div>
-  </div>
-  <button class="btn btn-ghost" onclick="openWizard(true)" id="myProgramBtn">🔄 Reia wizard-ul (modifică programul)</button>
-  <p style="font-size:11px;color:var(--muted);margin-bottom:12px;line-height:1.4">
-    Istoricul și PR-urile tale rămân intacte la regenerare — se schimbă doar planul de exerciții/nutriție.
-  </p>
-
-  <div class="stitle">📏 Profil corp</div>
-  <div class="meas-grid">
-    <div class="meas-field">
-      <div class="meas-lbl">Înălțime</div>
-      <div class="meas-input-row"><input class="meas-in" type="number" id="profileHeight" placeholder="cm" onchange="saveProfile()"><span class="meas-unit">cm</span></div>
-    </div>
-    <div class="meas-field">
-      <div class="meas-lbl">Vârstă</div>
-      <div class="meas-input-row"><input class="meas-in" type="number" id="profileAge" placeholder="ani" onchange="saveProfile()"><span class="meas-unit">ani</span></div>
+    <div class="sgroup-bd">
+      <div class="rules-box" style="margin:12px 0 10px">
+        <div class="rule-row">📦 Versiune curentă: <strong id="infoSw" style="color:var(--acc)">—</strong></div>
+        <div class="rule-row" style="color:var(--muted);font-size:11px;line-height:1.4">
+          App-ul verifică automat update-uri când îl deschizi sau intri pe el. Dacă apare banner "Versiune nouă disponibilă" → apasă "Actualizează".
+        </div>
+      </div>
+      <button class="btn btn-ghost" onclick="manualUpdateCheck()">🔄 Verifică update acum</button>
+      <div class="rules-box">
+        <div class="rule-row">📱 PWA instalat: <strong id="infoPwa" style="color:var(--text)">verific...</strong></div>
+        <div class="rule-row">🔔 Notificări: <strong id="infoNotif" style="color:var(--text)">verific...</strong></div>
+        <div class="rule-row">☁️ Sync: <strong id="infoSync" style="color:var(--text)">verific...</strong></div>
+        <div class="rule-row">📊 Înregistrări: <strong id="infoRows" style="color:var(--text)">—</strong></div>
+        <div class="rule-row">🔗 <a href="https://github.com/CRStefan-lab/fitness-jurnal" target="_blank" style="color:var(--blue)">github.com/CRStefan-lab/fitness-jurnal</a></div>
+      </div>
     </div>
   </div>
-  <p style="font-size:11px;color:var(--muted);margin-bottom:12px">Folosit pentru calcul BF% (Navy) și estimare TDEE.</p>
 
-  <div class="stitle">🚀 Versiune app</div>
-  <div class="rules-box" style="margin-bottom:10px">
-    <div class="rule-row">📦 Versiune curentă: <strong id="infoSw" style="color:var(--acc)">—</strong></div>
-    <div class="rule-row" style="color:var(--muted);font-size:11px;line-height:1.4">
-      App-ul verifică automat update-uri când îl deschizi sau intri pe el. Dacă apare banner "Versiune nouă disponibilă" → apasă "Actualizează".
+  <div class="sgroup danger" id="sgDanger">
+    <div class="sgroup-hd" onclick="this.parentElement.classList.toggle('open')">
+      <div class="sgroup-ico">⚠️</div>
+      <div style="flex:1;min-width:0"><div class="sgroup-ttl">Zona periculoasă</div><div class="sgroup-sub">Ștergere definitivă a datelor</div></div>
+      <div class="sgroup-chev">▼</div>
     </div>
-  </div>
-  <button class="btn btn-ghost" onclick="manualUpdateCheck()">🔄 Verifică update acum</button>
-
-  <div class="stitle">ℹ️ Info</div>
-  <div class="rules-box">
-    <div class="rule-row">📱 PWA instalat: <strong id="infoPwa" style="color:var(--text)">verific...</strong></div>
-    <div class="rule-row">🔔 Notificări: <strong id="infoNotif" style="color:var(--text)">verific...</strong></div>
-    <div class="rule-row">☁️ Sync: <strong id="infoSync" style="color:var(--text)">verific...</strong></div>
-    <div class="rule-row">📊 Înregistrări: <strong id="infoRows" style="color:var(--text)">—</strong></div>
-    <div class="rule-row">🔗 <a href="https://github.com/CRStefan-lab/fitness-jurnal" target="_blank" style="color:var(--blue)">github.com/CRStefan-lab/fitness-jurnal</a></div>
+    <div class="sgroup-bd">
+      <p style="font-size:11px;color:var(--muted);margin:12px 0 10px;line-height:1.5">
+        Șterge tot ce e salvat pe acest device (jurnal, program, măsurători). Fă un backup înainte — nu există undo.
+      </p>
+      <button class="btn btn-danger" onclick="resetAll()">🗑️ Șterge toate datele</button>
+    </div>
   </div>
 </div>
 
@@ -1288,6 +1396,9 @@ function showTab(name,btn){
     var p=getProfile();
     var ph=document.getElementById('profileHeight');if(ph)ph.value=p.height;
     var pa=document.getElementById('profileAge');if(pa)pa.value=p.age;
+    var pn=document.getElementById('profileName');if(pn)pn.value=p.name||'';
+    var ps=document.getElementById('profileSex');if(ps)ps.value=p.sex||'M';
+    renderThemeRow();
     // Programul meu
     var mpi=document.getElementById('myProgramInfo');
     if(mpi){
@@ -1310,6 +1421,12 @@ function initHeader(){
   var now=new Date();
   var days=['DUMINICĂ','LUNI','MARȚI','MIERCURI','JOI','VINERI','SÂMBĂTĂ'];
   document.getElementById('hdrTitle').textContent=days[now.getDay()];
+  // Personalizare: numele userului în label-ul din header
+  var lblT=document.getElementById('hdrLblText');
+  if(lblT){
+    var pName=getProfile().name;
+    lblT.textContent=pName?'FITNESS JURNAL · '+pName.toUpperCase():'FITNESS JURNAL · 8 SĂPTĂMÂNI';
+  }
   var streak=getActivityStreak();
   document.getElementById('hdrDate').innerHTML=now.toLocaleDateString('ro-RO',{day:'numeric',month:'long',year:'numeric'})+(streak>=2?' · <span style="color:#fb923c;font-weight:800">🔥 '+streak+' zile</span>':'');
   // Sub-titlul reflectă programul REAL al userului
@@ -1410,7 +1527,7 @@ function renderToday(){
   html+='<div class="azi-stat"><div class="azi-stat-val" style="color:var(--text)">'+coachWeek+'/8</div><div class="azi-stat-lbl">📍 Săpt</div></div>';
   html+='</div>';
 
-  html+='<div style="background:linear-gradient(135deg,rgba(20,184,166,.08),transparent);border-left:3px solid var(--acc);border-radius:0 8px 8px 0;padding:6px 12px;margin-bottom:12px;font-size:11px">';
+  html+='<div style="background:linear-gradient(135deg,rgba(var(--acc-rgb),.08),transparent);border-left:3px solid var(--acc);border-radius:0 8px 8px 0;padding:6px 12px;margin-bottom:12px;font-size:11px">';
   html+='🎯 Focus: <strong style="color:var(--acc2)">'+coachFocus.label+'</strong>';
   html+='</div>';
 
@@ -1450,8 +1567,8 @@ function renderToday(){
   html+='</div>';
 
   html+='<div class="stitle">'+ex.icon+' Antrenament'+(dateOverride||dayOverride?' · '+schedule[idx].day:' seară')+'</div>';
-  html+='<div class="card" style="margin-bottom:12px;border-color:rgba(20,184,166,.35)">';
-  html+='<div class="card-hd" style="cursor:default"><div class="card-ico" style="background:rgba(20,184,166,.15);font-size:18px">'+ex.icon+'</div>';
+  html+='<div class="card" style="margin-bottom:12px;border-color:rgba(var(--acc-rgb),.35)">';
+  html+='<div class="card-hd" style="cursor:default"><div class="card-ico" style="background:rgba(var(--acc-rgb),.15);font-size:18px">'+ex.icon+'</div>';
   html+='<div><div class="card-ttl">'+ex.label+'</div><div class="card-sub">'+ex.duration+' &nbsp;·&nbsp; ⭐ = progres &nbsp;·&nbsp; Tempo 2–1–2</div></div></div></div>';
 
   // Găsim primul exercițiu cu seturi nesalvate (auto-expand)
@@ -1528,7 +1645,7 @@ function renderToday(){
       var trend=getTrend(e.name);
       var trendBadge=trend?' <span style="color:'+trend.color+';font-weight:800" title="trend ultimele 3 sesiuni">'+trend.arrow+'</span>':'';
       if(rec){
-        smartHint='<div style="background:rgba(20,184,166,.1);border-left:3px solid var(--acc);padding:4px 10px;margin:4px 14px 0;border-radius:0 6px 6px 0;font-size:11px;color:var(--text)">🎯 <strong style="color:var(--acc2)">AZI</strong>: '+rec.target+trendBadge+'</div>';
+        smartHint='<div style="background:rgba(var(--acc-rgb),.1);border-left:3px solid var(--acc);padding:4px 10px;margin:4px 14px 0;border-radius:0 6px 6px 0;font-size:11px;color:var(--text)">🎯 <strong style="color:var(--acc2)">AZI</strong>: '+rec.target+trendBadge+'</div>';
       }
       // Încălzire calculată (rampa) — doar dacă exercițiul nu e început
       if(doneSets===0){
@@ -2301,9 +2418,9 @@ function initProgram(){
       statusBadge='<span style="background:rgba(34,197,94,.2);color:var(--green);font-size:10px;font-weight:800;padding:2px 7px;border-radius:6px">✓ '+doneExercises+'/'+totalExercises+'</span>';
       borderColor='rgba(34,197,94,.4)';
     }else if(isToday){
-      statusBadge='<span style="background:rgba(20,184,166,.2);color:var(--acc);font-size:10px;font-weight:800;padding:2px 7px;border-radius:6px">⏳ AZI</span>';
+      statusBadge='<span style="background:rgba(var(--acc-rgb),.2);color:var(--acc);font-size:10px;font-weight:800;padding:2px 7px;border-radius:6px">⏳ AZI</span>';
       borderColor='var(--acc)';
-      bgTint='background:linear-gradient(135deg,rgba(20,184,166,.06),transparent);';
+      bgTint='background:linear-gradient(135deg,rgba(var(--acc-rgb),.06),transparent);';
     }else if(isPast){
       statusBadge='<span style="background:rgba(125,141,154,.15);color:var(--muted);font-size:10px;font-weight:800;padding:2px 7px;border-radius:6px">— SĂRIT</span>';
     }else{
@@ -2311,7 +2428,7 @@ function initProgram(){
     }
 
     html+='<div class="card" id="pc_'+di+'" style="border-color:'+borderColor+';'+bgTint+'"><div class="card-hd" onclick="document.getElementById(\'pc_'+di+'\').classList.toggle(\'open\')">';
-    html+='<div class="card-ico" style="background:rgba(20,184,166,.12)">'+ex.icon+'</div>';
+    html+='<div class="card-ico" style="background:rgba(var(--acc-rgb),.12)">'+ex.icon+'</div>';
     html+='<div style="flex:1"><div class="card-ttl">'+dayLabel+' — '+ex.label+'</div><div class="card-sub">'+ex.duration+'</div></div>';
     html+='<div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px">'+statusBadge+'<div class="card-chev">▼</div></div>';
     html+='</div>';
@@ -2330,7 +2447,7 @@ function initProgram(){
       html+='<div style="display:flex;align-items:flex-start;gap:8px;padding:8px 0;border-bottom:1px solid var(--bd);font-size:13px">';
       html+='<div style="color:'+(e.star?'var(--acc2)':'transparent')+';width:18px;flex-shrink:0;padding-top:1px">'+(e.star?'⭐':'·')+'</div>';
       html+='<div style="flex:1"><div style="font-weight:500">'+e.name+'</div>'+smartTarget+'</div>';
-      html+='<div style="font-size:11px;color:var(--acc);background:rgba(20,184,166,.1);padding:2px 7px;border-radius:20px;flex-shrink:0;align-self:flex-start;margin-top:1px">'+e.sets+'×'+e.target+'</div>';
+      html+='<div style="font-size:11px;color:var(--acc);background:rgba(var(--acc-rgb),.1);padding:2px 7px;border-radius:20px;flex-shrink:0;align-self:flex-start;margin-top:1px">'+e.sets+'×'+e.target+'</div>';
       html+='</div>';
     });
     html+='</div></div></div>';
@@ -2447,7 +2564,7 @@ function renderMeasurements(){
           else bfDelta='<span class="delta-down"> +'+bfDiff.toFixed(1)+'</span>';
         }
       }
-      html+='<span class="meas-v" style="border:1px solid var(--acc);background:rgba(20,184,166,.1)"><strong style="color:var(--acc2)">🎯 BF% est.:</strong> '+bf+'%'+bfDelta+'</span>';
+      html+='<span class="meas-v" style="border:1px solid var(--acc);background:rgba(var(--acc-rgb),.1)"><strong style="color:var(--acc2)">🎯 BF% est.:</strong> '+bf+'%'+bfDelta+'</span>';
       // Masă slabă
       if(r.weight){
         var leanMass=r.weight*(1-bf/100);
@@ -2588,7 +2705,7 @@ function renderHistoric(){
 
     // Sumar morning + checklist (compact)
     if(morningTotal||dayData.checks.length){
-      html+='<div class="hist-ex" style="background:rgba(20,184,166,.04);font-size:11px;color:var(--muted)">';
+      html+='<div class="hist-ex" style="background:rgba(var(--acc-rgb),.04);font-size:11px;color:var(--muted)">';
       if(morningTotal)html+='☀️ Dimineață: '+morningDone+'/'+morningTotal+' bifate';
       if(morningTotal&&dayData.checks.length)html+=' · ';
       if(dayData.checks.length){
@@ -3053,10 +3170,45 @@ function saveProfile(){
   var p=getProfile();
   if(h.value)p.height=parseFloat(h.value)||p.height;
   if(a.value)p.age=parseInt(a.value)||p.age;
+  var n=document.getElementById('profileName');
+  if(n){var nv=n.value.replace(/\s+/g,' ').trim().slice(0,20);if(nv)p.name=nv;else delete p.name;}
+  var s=document.getElementById('profileSex');
+  if(s&&s.value)p.sex=s.value;
   localStorage.setItem('user_profile',JSON.stringify(p));
+  initHeader();
   // Re-render measurements ca să updateze BF%
   if(document.getElementById('tab-progres').classList.contains('act'))renderMeasurements();
 }
+
+// ─── Teme de accent (personalizare) ───
+var THEMES=[
+  {id:'',lbl:'Turcoaz',color:'#14b8a6'},
+  {id:'ocean',lbl:'Ocean',color:'#0ea5e9'},
+  {id:'mov',lbl:'Mov',color:'#8b5cf6'},
+  {id:'roz',lbl:'Roz',color:'#ec4899'},
+  {id:'foc',lbl:'Chihlimbar',color:'#f59e0b'},
+  {id:'verde',lbl:'Verde',color:'#22c55e'}
+];
+function applyTheme(t){
+  if(t)document.documentElement.setAttribute('data-theme',t);
+  else document.documentElement.removeAttribute('data-theme');
+}
+function setTheme(t){
+  if(t)localStorage.setItem('app_theme',t);else localStorage.removeItem('app_theme');
+  applyTheme(t);
+  renderThemeRow();
+  showToast('Temă aplicată 🎨');
+}
+function renderThemeRow(){
+  var row=document.getElementById('themeRow');if(!row)return;
+  var cur=localStorage.getItem('app_theme')||'';
+  row.innerHTML=THEMES.map(function(t){
+    return '<button class="theme-swatch'+(t.id===cur?' sel':'')+'" style="background:'+t.color+'" title="'+t.lbl+'" aria-label="Temă '+t.lbl+'" onclick="setTheme(\''+t.id+'\')"></button>';
+  }).join('');
+}
+// Culorile temei curente, pentru grafice SVG și canvas (unde var() nu merge)
+function themeAcc(){var v=getComputedStyle(document.documentElement).getPropertyValue('--acc').trim();return v||'#14b8a6';}
+function themeAcc2(){var v=getComputedStyle(document.documentElement).getPropertyValue('--acc2').trim();return v||'#5eead4';}
 
 // Navy method BF% (SI / cm-kg) — formule diferite pe sex
 // Femei: necesită și circumferința șoldurilor
@@ -3421,7 +3573,7 @@ function updateFsaUI(needReconnect){
     if(shareHint){
       shareHint.style.display='block';
       shareHint.removeAttribute('style');
-      shareHint.style.cssText='font-size:11px;color:var(--acc2);margin:8px 0 0;line-height:1.5;text-align:center;padding:8px 12px;background:rgba(94,234,212,.08);border:1px solid rgba(94,234,212,.25);border-radius:10px';
+      shareHint.style.cssText='font-size:11px;color:var(--acc2);margin:8px 0 0;line-height:1.5;text-align:center;padding:8px 12px;background:rgba(var(--acc2-rgb),.08);border:1px solid rgba(var(--acc2-rgb),.25);border-radius:10px';
     }
     return;
   }
@@ -4061,7 +4213,7 @@ function renderLineChart(containerId, points, opts){
   if(minX===maxX){minX-=86400000;maxX+=86400000;}
   function sx(v){return padL+((v-minX)/(maxX-minX))*plotW;}
   function sy(v){return padT+plotH-((v-minY)/(maxY-minY))*plotH;}
-  var color=opts.color||'#14b8a6';
+  var color=opts.color||themeAcc();
   var grid='';
   for(var i=0;i<=3;i++){
     var y=padT+(i/3)*plotH;
@@ -4143,7 +4295,7 @@ function renderBodyChart(){
     document.getElementById('bodyStats').innerHTML='';
     return;
   }
-  var color=metric==='weight'?'#14b8a6':'#38bdf8';
+  var color=metric==='weight'?themeAcc():'#38bdf8';
   renderLineChart('bodyChart',points,{color:color,hint:'măsurători '+field.label.toLowerCase()});
   // Stats
   var stats=document.getElementById('bodyStats');
@@ -4203,7 +4355,7 @@ function renderDualChart(containerId,series1,series2,opts){
   var firstD=new Date(minX),lastD=new Date(maxX);
   var svg='<svg viewBox="0 0 '+W+' '+H+'" width="100%" height="'+H+'" preserveAspectRatio="none">';
   svg+=grid;
-  svg+=lineFor(series1,opts.color1||'#14b8a6');
+  svg+=lineFor(series1,opts.color1||themeAcc());
   svg+=lineFor(series2,opts.color2||'#22c55e');
   svg+='<text x="'+padL+'" y="'+(H-6)+'" fill="#7d8d9a" font-size="9">'+fd(firstD)+'</text>';
   svg+='<text x="'+(padL+plotW)+'" y="'+(H-6)+'" fill="#7d8d9a" font-size="9" text-anchor="end">'+fd(lastD)+'</text>';
@@ -4356,7 +4508,7 @@ function renderPRList(){
   }
   var html='';
   records.forEach(function(pr){
-    html+='<div class="hist-day" style="margin-bottom:8px"><div class="hist-day-hd" style="background:rgba(94,234,212,.06)">';
+    html+='<div class="hist-day" style="margin-bottom:8px"><div class="hist-day-hd" style="background:rgba(var(--acc2-rgb),.06)">';
     html+='<span>'+(pr.star?'⭐ ':'')+pr.exercise+'</span>';
     html+='<span style="color:var(--acc2);font-size:11px">🏆 1RM '+pr.orm.toFixed(1)+'kg</span></div>';
     html+='<div class="hist-ex" style="font-size:12px;color:var(--muted)">';
@@ -4852,10 +5004,10 @@ function downloadDigestImage(){
   ctx.fillStyle=grad;ctx.fillRect(0,0,W,H);
   // linie accent sus
   var grad2=ctx.createLinearGradient(0,0,W,0);
-  grad2.addColorStop(0,'#14b8a6');grad2.addColorStop(.5,'#5eead4');grad2.addColorStop(1,'#14b8a6');
+  grad2.addColorStop(0,themeAcc());grad2.addColorStop(.5,themeAcc2());grad2.addColorStop(1,themeAcc());
   ctx.fillStyle=grad2;ctx.fillRect(0,0,W,12);
   ctx.textAlign='center';
-  ctx.fillStyle='#5eead4';ctx.font='700 40px sans-serif';
+  ctx.fillStyle=themeAcc2();ctx.font='700 40px sans-serif';
   ctx.fillText('SĂPTĂMÂNA MEA',W/2,120);
   ctx.fillStyle='#7d8d9a';ctx.font='400 34px sans-serif';
   ctx.fillText(d.period,W/2,175);
@@ -4875,7 +5027,7 @@ function downloadDigestImage(){
   d.deltas.slice(0,2).forEach(function(dl){
     bigStat('📏',(dl.v>0?'+':'')+dl.v.toFixed(1)+' '+dl.unit,dl.label.toLowerCase());
   });
-  ctx.fillStyle='#14b8a6';ctx.font='700 30px sans-serif';
+  ctx.fillStyle=themeAcc();ctx.font='700 30px sans-serif';
   ctx.fillText('— Fitness Jurnal · 8 săptămâni —',W/2,H-60);
   cv.toBlob(function(blob){
     var url=URL.createObjectURL(blob);
