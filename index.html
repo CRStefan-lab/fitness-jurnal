@@ -900,7 +900,7 @@ var exercises={
     {star:false,name:'Ridicări pe vârfuri',sets:3,target:'15–20'}]},
   miercuri:{label:'Recovery — Pași + Core',icon:'🚶',duration:'Ușor',list:[
     {star:false,name:'Pași parcurși (țintă 6.000–8.000)',sets:1,target:'—'},
-    {star:false,name:'Plank + Ridicări picioare',sets:2,target:'2 runde'}]},
+    {star:false,name:'Plank + Ridicări picioare',sets:2,target:'30–45 sec + 10–15 rep'}]},
   joi:{label:'Spate / Biceps',icon:'💪',duration:'~45 min',list:[
     {star:true,name:'Bent-over row cu bara',sets:4,target:'8–12'},
     {star:false,name:'Pullover cu ganteră pe bancă plată',sets:3,target:'10–15'},
@@ -959,7 +959,7 @@ var ghidEx=[
   {name:'Hip Hinge cu gantere (dimineață)',tag:'gantere',start:'Stând drept, gantere pe coapse, genunchi ușor îndoiți.',move:'Împingi șoldurile înapoi (NU cobori genunchi). Spatele drept. Cobori până întindere biceps femural. Revii strângând fesierii.',err:'Rotunjești spatele. Îndoi genunchii prea mult (devine squat).',tip:'Pattern pentru RDL/Deadlift seara. Îl faci cu 50% din greutatea serii.'},
   {name:'Flotări înguste (dimineață)',tag:'bodyweight',start:'Flotare clasică dar mâinile aproape una de alta (formă de diamant sau index-ii se ating).',move:'Cobori coatele lipite de corp. Împingi sus. Mai mult triceps, mai puțin piept.',err:'Coatele se evazează (devine flotare normală).',tip:'Activare triceps + core. Dacă e greu, fă pe genunchi.'},
   {name:'Dead Hang (dimineață)',tag:'bodyweight',start:'Atârnat de o bară, ușă solidă sau bandă fixată — brațele întinse, corpul relaxat.',move:'Menții poziția. Respiri normal. Activezi ușor omoplații (nu stai "mort" cu umerii în urechi).',err:'Umerii la urechi. Corpul se balansează.',tip:'Decompresie coloană + mobilitate umeri. Excelent după o zi la birou.'},
-  {name:'Kegel (pelvis)',tag:'bodyweight',start:'Identifică mușchii planșeului pelvin — cei pe care îi contracți când vrei să oprești urinarea. Sau "tragi" testiculele în sus fără să contracți fesierii.',move:'Contractă 3-5 sec, relaxează 3 sec. 10-15 repetări × 3 serii. Poți face pe scaun, în pat, oricând.',err:'Contracți fesierii sau abdomenul în loc de planșeul pelvin. Ții respirația.',tip:'Discret, fără echipament. Beneficii: postură pelvină, control urinar, performanță sexuală, stabilitate core profund.'}
+  {name:'Kegel (pelvis)',tag:'bodyweight',start:'Identifică mușchii planșeului pelvin — cei pe care îi contracți când vrei să oprești urinarea (același reper pentru femei și bărbați). Contracția se simte în interior, ca o "ridicare" ușoară.',move:'Contractă 3-5 sec, relaxează 3 sec. 10-15 repetări × 3 serii. Poți face pe scaun, în pat, oricând.',err:'Contracți fesierii sau abdomenul în loc de planșeul pelvin. Ții respirația.',tip:'Pentru TOATE vârstele și ambele sexe. Femei: prevenirea incontinenței, esențial postnatal. Bărbați: control urinar, funcție sexuală. Discret — poți oriunde.'}
 ];
 
 var checkItems=[
@@ -1555,7 +1555,8 @@ function renderToday(){
     html+='<div class="'+cardClasses+'" id="ec_'+ei+'">';
     html+='<div class="card-hd" onclick="document.getElementById(\'ec_'+ei+'\').classList.toggle(\'open\')">';
     html+='<div style="color:'+(e.star?'var(--acc2)':'transparent')+';font-size:13px;width:18px;flex-shrink:0">'+(e.star?'⭐':'·')+'</div>';
-    html+='<div style="flex:1;min-width:0"><div class="card-ttl">'+e.name+'</div><div class="card-sub">'+e.sets+' seturi · Țintă: '+e.target+' rep</div></div>';
+    var targetLbl=/^[\d]+([–—-][\d]+)?$/.test(String(e.target).trim())?e.target+' rep':e.target;
+    html+='<div style="flex:1;min-width:0"><div class="card-ttl">'+e.name+'</div><div class="card-sub">'+e.sets+' seturi · Țintă: '+targetLbl+'</div></div>';
     html+=progressBadge;
     html+='<button class="guide-btn" onclick="event.stopPropagation();openGuideByName(\''+sk+'\')" title="Cum se face">📖</button>';
     html+='<div class="card-chev">▼</div></div>';

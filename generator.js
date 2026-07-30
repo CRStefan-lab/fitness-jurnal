@@ -463,7 +463,7 @@ function generateProgram(profile){
     if(day.type==='recovery'){
       exercises[day.key]={label:day.label,icon:day.icon,duration:'Ușor',list:[
         {star:false,name:'Pași parcurși (țintă zilnică)',sets:1,target:'—'},
-        {star:false,name:'Plank + Dead bug',sets:2,target:'2 runde'}
+        {star:false,name:'Plank + Dead bug',sets:2,target:'30 sec + 10/parte'}
       ]};
       morningRoutines[day.key]=MORNING_TEMPLATES.recovery;
       return;
