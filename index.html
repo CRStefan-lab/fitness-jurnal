@@ -159,6 +159,12 @@ body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSy
 .rest-timer-lbl{font-size:10px;color:rgba(255,255,255,.7);letter-spacing:1px;text-transform:uppercase}
 .rest-timer-btn{background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.3);color:#fff;border-radius:8px;font-size:12px;font-weight:700;padding:8px 12px;cursor:pointer;font-family:inherit;flex-shrink:0}
 .rest-timer-btn:active{background:rgba(255,255,255,.3)}
+/* RIR: textul pe rândul 1 (lățime completă), butoanele pe rândul 2 — altfel coloana de text e strivită */
+#rirPrompt{flex-direction:column;align-items:stretch;gap:9px;padding:12px 14px}
+#rirPrompt #rirPromptTitle{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#rirPrompt .rest-timer-lbl{margin-top:2px;letter-spacing:.4px;text-transform:none}
+.rir-btns{display:flex;gap:8px}
+.rir-btns .rest-timer-btn{flex:1;padding:10px 4px;text-align:center}
 .rest-timer.done{background:linear-gradient(135deg,#0e1822,#22c55e);border-top-color:var(--green)}
 /* Steppers +/- pentru inputuri */
 .stepper{display:flex;flex-direction:column;gap:2px;flex-shrink:0}
@@ -963,10 +969,12 @@ input:checked + .slider:before{transform:translateX(20px);background:var(--acc)}
     <div style="font-size:13px;font-weight:800;color:#fff" id="rirPromptTitle">Cât de greu a fost?</div>
     <div class="rest-timer-lbl">1 tap → ținta săpt. viitoare se ajustează la tine</div>
   </div>
-  <button class="rest-timer-btn" onclick="saveRIR('easy')">🥱 Ușor</button>
-  <button class="rest-timer-btn" onclick="saveRIR('ok')">💪 OK</button>
-  <button class="rest-timer-btn" onclick="saveRIR('hard')">😮‍💨 Limită</button>
-  <button class="rest-timer-btn" style="padding:8px 9px;opacity:.55;flex-shrink:0" onclick="dismissRIR()" title="Sar peste">✕</button>
+  <div class="rir-btns">
+    <button class="rest-timer-btn" onclick="saveRIR('easy')">🥱 Ușor</button>
+    <button class="rest-timer-btn" onclick="saveRIR('ok')">💪 OK</button>
+    <button class="rest-timer-btn" onclick="saveRIR('hard')">😮‍💨 Limită</button>
+    <button class="rest-timer-btn" style="flex:0 0 auto;padding:8px 11px;opacity:.55" onclick="dismissRIR()" title="Sar peste">✕</button>
+  </div>
 </div>
 
 <div class="rest-timer" id="restTimer">
