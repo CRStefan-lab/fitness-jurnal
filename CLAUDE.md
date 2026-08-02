@@ -16,6 +16,7 @@ Aplicația e **feature-complete** ca "antrenor în buzunar", construită integra
 - Retenție: streak 🔥 în header, digest săptămânal cu imagine share-abilă (canvas PNG)
 - Ghid: modal 📖/❓ pe orice exercițiu (inclusiv 22 matinale) + link video YouTube + principii dovedite; ghidurile matinale au câmp `easier` (scara de regresii „Prea greu?"); generatorul dă începătorilor variante matinale regresate (`MORNING_EASY_SWAP`/`morningFor`, aceleași id-uri); la exerciții fără istoric, hint START explică protocolul de găsire a greutății; Setări are search bar (`filterSetari`, fără diacritice)
 - Personalizare: nume în header, 6 teme de accent (CSS vars `--acc-rgb`/`--acc2-rgb`, `html[data-theme]`, cheie `app_theme`), sex M/F în setări; Setări reorganizate în 7 grupuri pliabile (`.sgroup`), Zona periculoasă ultima
+- Design "Pro HUD" (v54): Chakra Petch self-hostat în `fonts/` (4 woff2, precache în SW) pe titluri/cifre; pastile colorate statistici (`.azi-stat.as1-4`); toggle aspect întunecat/deschis (`html[data-mode="light"]`, cheie `app_mode`, `applyMode()`/`setMode()`, snippet pre-paint în head; pe light `--acc2` devine `--acc-dim` pt contrast); mockup-uri explorare în `design-preview.html` (gitignored)
 - Rest timer fundal (deadline-based) + beep + mod auto 90s/150s⭐
 - Utilizatori activi reali: owner (legacy) + iubita + prieteni (programe generate) — feedback-ul lor a condus ultimele fix-uri
 

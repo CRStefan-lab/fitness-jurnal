@@ -9,8 +9,13 @@
 <meta name="apple-mobile-web-app-title" content="Fitness">
 <link rel="manifest" href="./manifest.json">
 <title>Fitness Jurnal</title>
-<script>try{var _t=localStorage.getItem('app_theme');if(_t)document.documentElement.setAttribute('data-theme',_t);}catch(e){}</script>
+<script>try{var _t=localStorage.getItem('app_theme');if(_t)document.documentElement.setAttribute('data-theme',_t);var _m=localStorage.getItem('app_mode');if(_m)document.documentElement.setAttribute('data-mode',_m);}catch(e){}</script>
 <style>
+/* Chakra Petch — self-hostat (offline PWA), doar cifre/titluri HUD */
+@font-face{font-family:'Chakra Petch';font-style:normal;font-weight:600;font-display:swap;src:url('./fonts/chakra-600-latin.woff2') format('woff2');unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD}
+@font-face{font-family:'Chakra Petch';font-style:normal;font-weight:600;font-display:swap;src:url('./fonts/chakra-600-latin-ext.woff2') format('woff2');unicode-range:U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+0304,U+0308,U+0329,U+1D00-1DBF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C0,U+2113,U+2C60-2C7F,U+A720-A7FF}
+@font-face{font-family:'Chakra Petch';font-style:normal;font-weight:700;font-display:swap;src:url('./fonts/chakra-700-latin.woff2') format('woff2');unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD}
+@font-face{font-family:'Chakra Petch';font-style:normal;font-weight:700;font-display:swap;src:url('./fonts/chakra-700-latin-ext.woff2') format('woff2');unicode-range:U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+0304,U+0308,U+0329,U+1D00-1DBF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C0,U+2113,U+2C60-2C7F,U+A720-A7FF}
 :root{
   --bg:#0a1117;
   --s1:#121b24;
@@ -37,14 +42,33 @@ html[data-theme="mov"]{--acc:#8b5cf6;--acc-rgb:139,92,246;--acc-dim:#6d28d9;--ac
 html[data-theme="roz"]{--acc:#ec4899;--acc-rgb:236,72,153;--acc-dim:#be185d;--acc2:#f9a8d4;--acc2-rgb:249,168,212}
 html[data-theme="foc"]{--acc:#f59e0b;--acc-rgb:245,158,11;--acc-dim:#b45309;--acc2:#fcd34d;--acc2-rgb:252,211,77}
 html[data-theme="verde"]{--acc:#22c55e;--acc-rgb:34,197,94;--acc-dim:#15803d;--acc2:#86efac;--acc2-rgb:134,239,172}
+/* Aspect deschis (toggle în Setări) — acc2 devine varianta închisă ca să rămână lizibil pe alb */
+html[data-mode="light"]{--bg:#f5f7f9;--s1:#ffffff;--s2:#eef1f5;--bd:#e2e8ee;--text:#182430;--muted:#66788b;--acc2:var(--acc-dim);--acc2-rgb:var(--acc-rgb);--shadow-acc:0 0 24px rgba(var(--acc-rgb),.16)}
+html[data-mode="light"] body{background:var(--bg)}
+html[data-mode="light"] .hdr{background:#ffffff}
+html[data-mode="light"] .hdr-title{color:#13202b}
+html[data-mode="light"] .bnav{background:rgba(255,255,255,.96)}
+html[data-mode="light"] .card{box-shadow:0 6px 16px rgba(30,50,70,.08)}
+html[data-mode="light"] .card.open{box-shadow:0 6px 16px rgba(30,50,70,.08),0 0 0 3px rgba(var(--acc-rgb),.10)}
+html[data-mode="light"] .onboarding{background:rgba(233,238,243,.96)}
+html[data-mode="light"] .toast{background:#ffffff;box-shadow:0 8px 24px rgba(30,50,70,.18)}
+html[data-mode="light"] .set-box.dirty{background:rgba(245,158,11,.07)}
+/* Tipografie HUD — Chakra Petch pe titluri și cifre */
+.hdr-lbl,.hdr-date,.stitle,.azi-stat-val,.rest-timer-time,.set-in,.wiz-title,.onboarding-title{font-family:'Chakra Petch','Segoe UI',Arial,sans-serif}
+.hdr-title{font-family:'Chakra Petch','Segoe UI',Arial,sans-serif;font-weight:700;letter-spacing:.5px}
+.rest-timer-time{font-weight:700}
+/* Toggle aspect (întunecat/deschis) */
+.mode-row{display:flex;gap:8px;padding:4px 0 2px}
+.mode-btn{flex:1;background:var(--s2);border:2px solid var(--bd);border-radius:10px;color:var(--text);padding:10px;font-family:inherit;font-weight:700;font-size:13px;cursor:pointer}
+.mode-btn.sel{border-color:var(--acc);background:rgba(var(--acc-rgb),.1)}
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif;font-size:15px;padding-bottom:calc(90px + env(safe-area-inset-bottom))}
 .hdr{background:linear-gradient(140deg,#0e1822 0%,#111d28 55%,#0a1117 100%);padding:calc(env(safe-area-inset-top) + 14px) 64px 14px 16px;border-bottom:1px solid var(--bd);position:relative}
 .hdr::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent 0%,var(--acc) 30%,var(--acc2) 50%,var(--acc) 70%,transparent 100%);opacity:.7}
-.hdr-lbl{font-size:10px;letter-spacing:3px;color:var(--acc);margin-bottom:4px;font-weight:800;text-transform:uppercase}
-.hdr-title{font-size:24px;font-weight:900;line-height:1.1;letter-spacing:-.3px}
+.hdr-lbl{font-size:10px;letter-spacing:3px;color:var(--acc);margin-bottom:4px;font-weight:600;text-transform:uppercase}
+.hdr-title{font-size:24px;font-weight:700;line-height:1.1;letter-spacing:.5px}
 .hdr-sub{font-size:12px;color:var(--muted);margin-top:4px}
-.hdr-date{font-size:11px;color:var(--acc2);margin-top:6px;font-weight:700;letter-spacing:.3px}
+.hdr-date{font-size:11px;color:var(--acc2);margin-top:6px;font-weight:600;letter-spacing:1.2px}
 .sync-badge{display:inline-block;font-size:9px;padding:3px 7px;border-radius:4px;margin-left:6px;font-weight:700;letter-spacing:.5px;vertical-align:middle;cursor:pointer;border:1px solid transparent}
 .sync-badge:active{opacity:.7}
 .settings-gear{position:absolute;top:calc(env(safe-area-inset-top) + 14px);right:14px;background:var(--s2);border:1px solid var(--bd);border-radius:10px;width:38px;height:38px;display:flex;align-items:center;justify-content:center;font-size:18px;cursor:pointer;color:var(--text)}
@@ -60,7 +84,7 @@ body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSy
 .nb.act::after{content:'';position:absolute;bottom:0;left:30%;right:30%;height:2px;background:var(--acc);border-radius:2px}
 .sec{display:none;padding:14px}
 .sec.act{display:block}
-.stitle{font-size:11px;font-weight:800;letter-spacing:2px;color:var(--acc);text-transform:uppercase;margin:14px 0 8px;display:flex;align-items:center;gap:8px}
+.stitle{font-size:11px;font-weight:600;letter-spacing:2px;color:var(--acc);text-transform:uppercase;margin:14px 0 8px;display:flex;align-items:center;gap:8px}
 .stitle::after{content:'';flex:1;height:1px;background:var(--bd)}
 /* Setări — grupuri pliabile */
 .sgroup{background:var(--s1);border:1px solid var(--bd);border-radius:var(--r);margin-bottom:10px;overflow:hidden}
@@ -84,7 +108,8 @@ body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSy
 .theme-swatch:active{transform:scale(.92)}
 .theme-swatch.sel{border-color:var(--text);transform:scale(1.08)}
 .theme-swatch.sel::after{content:'✓';position:absolute;inset:0;display:flex;align-items:center;justify-content:center;color:#fff;font-size:15px;font-weight:900;text-shadow:0 1px 3px rgba(0,0,0,.6)}
-.card{background:var(--s1);border-radius:var(--r);border:1px solid var(--bd);margin-bottom:10px;overflow:hidden}
+.card{background:var(--s1);border-radius:var(--r);border:1px solid var(--bd);margin-bottom:10px;overflow:hidden;box-shadow:inset 0 1px 0 rgba(255,255,255,.045),0 8px 22px rgba(0,0,0,.24)}
+.card.open{border-color:rgba(var(--acc-rgb),.4);box-shadow:inset 0 1px 0 rgba(255,255,255,.045),0 0 18px rgba(var(--acc-rgb),.11),0 8px 22px rgba(0,0,0,.24)}
 .card-hd{display:flex;align-items:center;gap:10px;padding:12px 14px;cursor:pointer;user-select:none}
 .card-ico{width:32px;height:32px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0}
 .card-ttl{font-weight:700;font-size:14px;flex:1}
@@ -104,10 +129,18 @@ body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSy
 .progress-badge.complete{background:rgba(34,197,94,.2);color:var(--green)}
 .repeat-btn{background:rgba(var(--acc2-rgb),.12);border:1px solid rgba(var(--acc2-rgb),.4);border-radius:8px;color:var(--acc2);font-size:11px;font-weight:700;cursor:pointer;padding:6px 8px;font-family:inherit;flex-shrink:0;letter-spacing:.2px}
 .repeat-btn:active{background:rgba(var(--acc2-rgb),.25)}
-.azi-stats{display:flex;gap:8px;background:linear-gradient(135deg,rgba(var(--acc-rgb),.06),transparent);border:1px solid rgba(var(--acc-rgb),.2);border-radius:10px;padding:8px 12px;margin-bottom:10px;font-size:11px;align-items:center;justify-content:space-around}
-.azi-stat{text-align:center;flex:1}
-.azi-stat-val{font-size:16px;font-weight:900;color:var(--text);line-height:1.1}
-.azi-stat-lbl{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-top:1px}
+.azi-stats{display:flex;gap:8px;margin-bottom:10px;font-size:11px;align-items:stretch}
+.azi-stat{text-align:center;flex:1;border-radius:12px;padding:8px 0 7px}
+.azi-stat-val{font-size:16px;font-weight:700;color:var(--text);line-height:1.1}
+.azi-stat-lbl{font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-top:2px}
+.azi-stat.as1{background:rgba(255,107,94,.13)}.azi-stat.as1 .azi-stat-val{color:#ff9a8c}
+.azi-stat.as2{background:rgba(63,174,78,.15)}.azi-stat.as2 .azi-stat-val{color:#82e08e}
+.azi-stat.as3{background:rgba(139,92,246,.16)}.azi-stat.as3 .azi-stat-val{color:#bda1f9}
+.azi-stat.as4{background:rgba(59,130,246,.15)}.azi-stat.as4 .azi-stat-val{color:#8cbcfa}
+html[data-mode="light"] .azi-stat.as1{background:#ffe9e6}html[data-mode="light"] .azi-stat.as1 .azi-stat-val{color:#c93a2b}
+html[data-mode="light"] .azi-stat.as2{background:#e1f4e2}html[data-mode="light"] .azi-stat.as2 .azi-stat-val{color:#237436}
+html[data-mode="light"] .azi-stat.as3{background:#ebe4fc}html[data-mode="light"] .azi-stat.as3 .azi-stat-val{color:#6234cf}
+html[data-mode="light"] .azi-stat.as4{background:#e0edff}html[data-mode="light"] .azi-stat.as4 .azi-stat-val{color:#1f5cbd}
 .date-toggle{display:flex;align-items:center;justify-content:space-between;padding:8px 12px;background:var(--s1);border:1px solid var(--bd);border-radius:10px;margin-bottom:10px;cursor:pointer;font-size:12px;color:var(--muted)}
 .date-toggle-act{color:#fbbf24;border-color:rgba(245,158,11,.4)}
 .date-drawer{display:none;margin-bottom:10px}
@@ -115,7 +148,7 @@ body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSy
 .onboarding{position:fixed;inset:0;background:rgba(10,17,23,.95);backdrop-filter:blur(8px);z-index:1500;display:none;align-items:center;justify-content:center;padding:24px}
 .onboarding.show{display:flex}
 .onboarding-card{background:var(--s1);border:1px solid var(--acc);border-radius:var(--r);padding:24px;max-width:340px;text-align:center}
-.onboarding-title{font-size:22px;font-weight:900;color:var(--acc);margin-bottom:8px}
+.onboarding-title{font-size:22px;font-weight:700;color:var(--acc);margin-bottom:8px}
 .onboarding-sub{font-size:13px;color:var(--muted);margin-bottom:16px;line-height:1.5}
 .onboarding-steps{text-align:left;font-size:13px;line-height:1.6;margin-bottom:18px}
 .onboarding-steps li{margin-bottom:6px}
@@ -127,7 +160,7 @@ body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSy
 .video-btn{display:block;width:100%;background:rgba(244,63,94,.1);border:1px solid rgba(244,63,94,.35);color:#f87a8c;border-radius:10px;padding:11px;font-size:13px;font-weight:800;cursor:pointer;font-family:inherit;text-align:center;text-decoration:none;margin-top:10px}
 .video-btn:active{background:rgba(244,63,94,.25)}
 /* Wizard onboarding */
-.wiz-title{font-size:20px;font-weight:900;color:var(--acc);margin-bottom:4px}
+.wiz-title{font-size:20px;font-weight:700;color:var(--acc);margin-bottom:4px}
 .wiz-sub{font-size:12px;color:var(--muted);margin-bottom:16px;line-height:1.5}
 .wiz-progress{display:flex;gap:4px;margin-bottom:16px}
 .wiz-progress-dot{flex:1;height:4px;border-radius:2px;background:var(--s2)}
@@ -155,7 +188,7 @@ body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSy
 .rest-timer.show{display:flex}
 .rest-timer-icon{font-size:22px}
 .rest-timer-info{flex:1}
-.rest-timer-time{font-size:24px;font-weight:900;color:#fff;line-height:1;font-variant-numeric:tabular-nums}
+.rest-timer-time{font-size:24px;font-weight:700;color:#fff;line-height:1;font-variant-numeric:tabular-nums}
 .rest-timer-lbl{font-size:10px;color:rgba(255,255,255,.7);letter-spacing:1px;text-transform:uppercase}
 .rest-timer-btn{background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.3);color:#fff;border-radius:8px;font-size:12px;font-weight:700;padding:8px 12px;cursor:pointer;font-family:inherit;flex-shrink:0}
 .rest-timer-btn:active{background:rgba(255,255,255,.3)}
@@ -667,6 +700,10 @@ input:checked + .slider:before{transform:translateX(20px);background:var(--acc)}
       <div class="stitle">🎨 Temă de culoare</div>
       <div class="theme-row" id="themeRow"></div>
       <p style="font-size:11px;color:var(--muted);margin:8px 0 0">Schimbă culoarea de accent a întregii aplicații — instant, pe acest device.</p>
+
+      <div class="stitle">🌗 Aspect</div>
+      <div class="mode-row" id="modeRow"></div>
+      <p style="font-size:11px;color:var(--muted);margin:8px 0 0">Deschis = mai lizibil ziua · Întunecat = ideal seara la sală. Se salvează pe acest device.</p>
     </div>
   </div>
 
@@ -1412,6 +1449,7 @@ function showTab(name,btn){
     var pn=document.getElementById('profileName');if(pn)pn.value=p.name||'';
     var ps=document.getElementById('profileSex');if(ps)ps.value=p.sex||'M';
     renderThemeRow();
+    renderModeRow();
     // Programul meu
     var mpi=document.getElementById('myProgramInfo');
     if(mpi){
@@ -1547,10 +1585,10 @@ function renderToday(){
   for(var k in checkData){if(checkData[k])checkDone++;}
 
   html+='<div class="azi-stats">';
-  html+='<div class="azi-stat"><div class="azi-stat-val" style="color:var(--acc)">'+setsToday+'/'+totalSetsExpected+'</div><div class="azi-stat-lbl">💪 Sets</div></div>';
-  html+='<div class="azi-stat"><div class="azi-stat-val" style="color:var(--acc2)">'+morningDone+'/'+morningTotal+'</div><div class="azi-stat-lbl">☀️ Dim</div></div>';
-  html+='<div class="azi-stat"><div class="azi-stat-val" style="color:var(--green)">'+checkDone+'/'+checkItems.length+'</div><div class="azi-stat-lbl">✅ Check</div></div>';
-  html+='<div class="azi-stat"><div class="azi-stat-val" style="color:var(--text)">'+coachWeek+'/8</div><div class="azi-stat-lbl">📍 Săpt</div></div>';
+  html+='<div class="azi-stat as1"><div class="azi-stat-val">'+setsToday+'/'+totalSetsExpected+'</div><div class="azi-stat-lbl">💪 Sets</div></div>';
+  html+='<div class="azi-stat as2"><div class="azi-stat-val">'+morningDone+'/'+morningTotal+'</div><div class="azi-stat-lbl">☀️ Dim</div></div>';
+  html+='<div class="azi-stat as3"><div class="azi-stat-val">'+checkDone+'/'+checkItems.length+'</div><div class="azi-stat-lbl">✅ Check</div></div>';
+  html+='<div class="azi-stat as4"><div class="azi-stat-val">'+coachWeek+'/8</div><div class="azi-stat-lbl">📍 Săpt</div></div>';
   html+='</div>';
 
   html+='<div style="background:linear-gradient(135deg,rgba(var(--acc-rgb),.08),transparent);border-left:3px solid var(--acc);border-radius:0 8px 8px 0;padding:6px 12px;margin-bottom:12px;font-size:11px">';
@@ -3255,6 +3293,27 @@ function renderThemeRow(){
     return '<button class="theme-swatch'+(t.id===cur?' sel':'')+'" style="background:'+t.color+'" title="'+t.lbl+'" aria-label="Temă '+t.lbl+'" onclick="setTheme(\''+t.id+'\')"></button>';
   }).join('');
 }
+// ─── Aspect: întunecat (implicit) / deschis ───
+function applyMode(m){
+  if(m)document.documentElement.setAttribute('data-mode',m);
+  else document.documentElement.removeAttribute('data-mode');
+  var tc=document.querySelector('meta[name="theme-color"]');
+  if(tc)tc.setAttribute('content',m==='light'?'#f5f7f9':'#0e1822');
+}
+function setMode(m){
+  if(m)localStorage.setItem('app_mode',m);else localStorage.removeItem('app_mode');
+  applyMode(m);
+  renderModeRow();
+  showToast(m==='light'?'Aspect deschis ☀️':'Aspect întunecat 🌙',null,true);
+}
+function renderModeRow(){
+  var row=document.getElementById('modeRow');if(!row)return;
+  var cur=localStorage.getItem('app_mode')||'';
+  row.innerHTML=
+    '<button class="mode-btn'+(cur===''?' sel':'')+'" onclick="setMode(\'\')">🌙 Întunecat</button>'+
+    '<button class="mode-btn'+(cur==='light'?' sel':'')+'" onclick="setMode(\'light\')">☀️ Deschis</button>';
+}
+
 // Culorile temei curente, pentru grafice SVG și canvas (unde var() nu merge)
 function themeAcc(){var v=getComputedStyle(document.documentElement).getPropertyValue('--acc').trim();return v||'#14b8a6';}
 function themeAcc2(){var v=getComputedStyle(document.documentElement).getPropertyValue('--acc2').trim();return v||'#5eead4';}
@@ -5579,6 +5638,7 @@ function manualUpdateCheck(){
 // INIT
 // ═══════════════════════════════════════════════════════════════
 window.addEventListener('load',function(){
+  applyMode(localStorage.getItem('app_mode')||''); // sincronizează meta theme-color cu aspectul salvat
   initHeader();
   currentNutDay=todayIdx();
   lastDetectedDay=todayIdx();

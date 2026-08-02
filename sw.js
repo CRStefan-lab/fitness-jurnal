@@ -1,7 +1,9 @@
 // Service Worker — network-first pentru HTML (updates vizibile imediat)
 // cache-first pentru restul (viteză)
-const CACHE = 'fitness-v53-rir-layout-fix';
-const PRECACHE = ['./', './index.html', './manifest.json', './generator.js'];
+const CACHE = 'fitness-v54-prohud-light-dark';
+const PRECACHE = ['./', './index.html', './manifest.json', './generator.js',
+  './fonts/chakra-600-latin.woff2', './fonts/chakra-600-latin-ext.woff2',
+  './fonts/chakra-700-latin.woff2', './fonts/chakra-700-latin-ext.woff2'];
 
 self.addEventListener('install', e => {
   e.waitUntil(
