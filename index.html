@@ -961,7 +961,7 @@ input:checked + .slider:before{transform:translateX(20px);background:var(--acc)}
 <div class="rest-timer" id="rirPrompt" style="bottom:calc(140px + env(safe-area-inset-bottom));background:linear-gradient(135deg,#0e1822,#a78bfa);border-top-color:var(--purple)">
   <div class="rest-timer-info">
     <div style="font-size:13px;font-weight:800;color:#fff" id="rirPromptTitle">Cât de greu a fost?</div>
-    <div class="rest-timer-lbl">ajută Smart Coach să calibreze</div>
+    <div class="rest-timer-lbl">1 tap → ținta săpt. viitoare se ajustează la tine</div>
   </div>
   <button class="rest-timer-btn" onclick="saveRIR('easy')">🥱 Ușor</button>
   <button class="rest-timer-btn" onclick="saveRIR('ok')">💪 OK</button>
@@ -2100,6 +2100,8 @@ function dismissRIR(){
   el.classList.remove('show');
   clearTimeout(el._t);
   rirPromptEx=null;
+  // Alegere informată: userul află exact ce pierde când sare peste
+  showToast('Sărit — săpt. viitoare primești ținta standard, fără ajustare la tine',null,true);
 }
 
 function saveRIR(val){

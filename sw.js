@@ -1,6 +1,6 @@
 // Service Worker — network-first pentru HTML (updates vizibile imediat)
 // cache-first pentru restul (viteză)
-const CACHE = 'fitness-v51-rir-persistent';
+const CACHE = 'fitness-v52-rir-scop-explicit';
 const PRECACHE = ['./', './index.html', './manifest.json', './generator.js'];
 
 self.addEventListener('install', e => {
