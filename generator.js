@@ -217,11 +217,11 @@ var SPLIT_4DAY={
       {pattern:'push_h',star:true,sets:4,target:'6–10'},
       {pattern:'push_v',star:true,sets:3,target:'8–12'},
       {pattern:'izo_umeri',star:false,sets:3,target:'12–15'},
-      {pattern:'izo_piept',star:false,sets:3,target:'10–15'},
+      {pattern:'izo_piept',star:false,sets:3,target:'10–15',optional:true},
       {pattern:'triceps',star:false,sets:3,target:'10–15'}]},
     {key:'marti',label:'Picioare',icon:'🦵',type:'lower',slots:[
       {pattern:'squat',star:true,sets:4,target:'8–12'},
-      {pattern:'squat',star:false,sets:3,target:'10–12'},
+      {pattern:'squat',star:false,sets:3,target:'10–12',optional:true},
       {pattern:'hinge',star:true,sets:4,target:'8–12'},
       {pattern:'lunge',star:false,sets:3,target:'8/picior'},
       {pattern:'gambe',star:false,sets:3,target:'15–20'}]},
@@ -470,7 +470,18 @@ function generateProgram(profile){
     }
     var usedIds=[];
     var list=[];
-    var slots=day.slots.slice(0,Math.max(maxEx,day.slots.filter(function(s){return s.star;}).length));
+    // Tăiere inteligentă la limita de exerciții/zi: sacrificăm întâi sloturile 'optional',
+    // nu pe cele care definesc eticheta zilei (ex. tricepsul la Piept/Umeri/Triceps)
+    var slots=day.slots;
+    var excess=slots.length-maxEx;
+    if(excess>0){
+      var kept=[];
+      slots.forEach(function(s){
+        if(excess>0&&s.optional&&!s.star){excess--;return;}
+        kept.push(s);
+      });
+      slots=kept;
+    }
     slots.forEach(function(slot){
       if(list.length>=maxEx&&!slot.star)return;
       var ex=pickExercise(pool,slot,usedIds);

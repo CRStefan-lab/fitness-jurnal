@@ -131,7 +131,31 @@ var p1=G.generateProgram(PERSONAS[0].p);
 var p2=G.generateProgram(PERSONAS[0].p);
 assert(JSON.stringify(p1.exercises)===JSON.stringify(p2.exercises),'determinist: aceleași inputs → același program');
 
-// 13. Programul TĂU (referință) conține exercițiile cheie așteptate
+// 13. Split 4 zile: eticheta zilei = conținutul, inclusiv la începători (maxEx=4)
+// Bug istoric: slice-ul tăia ultimul slot → luni fără triceps, marți fără gambe
+console.log('▸ Split 4 zile — acoperire etichetă (începător + intermediar)');
+[['incepator','home_min'],['incepator','bodyweight'],['incepator','gym'],['intermediar','home_min'],['intermediar','gym']].forEach(function(cfg){
+  var r=G.generateProgram({sex:'F',age:30,height:165,weight:62,experience:cfg[0],equipment:cfg[1],hasBara:false,days:4,goal:'slabit',morningRoutine:true});
+  assert(!r.errors,'4 zile '+cfg.join('/')+': fără erori');
+  if(r.errors)return;
+  var patterns=function(dayKey){
+    return r.exercises[dayKey].list.map(function(e){
+      var db=G.EXERCISE_DB.find(function(x){return x.id===e.exId;});
+      return db?db.pattern:null;
+    });
+  };
+  assert(patterns('luni').indexOf('triceps')>=0,cfg.join('/')+': luni (Piept/Umeri/Triceps) are exercițiu de triceps');
+  assert(patterns('luni').indexOf('push_h')>=0,cfg.join('/')+': luni are împins orizontal');
+  // bodyweight n-are izo_umeri la nivel 1 — fallback-ul legitim e spate_post (Y-T raises)
+  var umeri=patterns('luni');
+  assert(umeri.indexOf('izo_umeri')>=0||umeri.indexOf('spate_post')>=0,cfg.join('/')+': luni are izolare umeri (sau fallback spate_post)');
+  assert(patterns('marti').indexOf('gambe')>=0,cfg.join('/')+': marți (Picioare) are gambe');
+  assert(patterns('marti').indexOf('squat')>=0,cfg.join('/')+': marți are squat');
+  assert(patterns('marti').indexOf('hinge')>=0,cfg.join('/')+': marți are hinge');
+});
+console.log('');
+
+// 14. Programul TĂU (referință) conține exercițiile cheie așteptate
 var ref=G.generateProgram(PERSONAS[0].p);
 var refNames=[];
 Object.keys(ref.exercises).forEach(function(k){ref.exercises[k].list.forEach(function(e){refNames.push(e.name);});});
