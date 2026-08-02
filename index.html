@@ -621,6 +621,8 @@ input:checked + .slider:before{transform:translateX(20px);background:var(--acc)}
 
 <div id="tab-setari" class="sec">
   <div class="stitle">⚙️ Setări</div>
+  <input class="meas-in" type="search" id="setariSearch" placeholder="🔍 Caută în setări (timer, temă, backup...)" autocomplete="off" oninput="filterSetari(this.value)" style="font-size:14px;padding:10px 12px;margin-bottom:10px;border-radius:10px">
+  <div id="setariNoResults" style="display:none;font-size:12px;color:var(--muted);text-align:center;padding:14px">Nimic găsit — încearcă alt cuvânt (ex: notificări, sunet, nume, șterge)</div>
 
   <div class="sgroup open" id="sgProfil">
     <div class="sgroup-hd" onclick="this.parentElement.classList.toggle('open')">
@@ -1662,6 +1664,10 @@ function renderToday(){
       var trendBadge=trend?' <span style="color:'+trend.color+';font-weight:800" title="trend ultimele 3 sesiuni">'+trend.arrow+'</span>':'';
       if(rec){
         smartHint='<div style="background:rgba(var(--acc-rgb),.1);border-left:3px solid var(--acc);padding:4px 10px;margin:4px 14px 0;border-radius:0 6px 6px 0;font-size:11px;color:var(--text)">🎯 <strong style="color:var(--acc2)">AZI</strong>: '+rec.target+trendBadge+'</div>';
+        // Prima dată la exercițiu: protocolul de găsire a greutății de start
+        if(rec.action==='start'){
+          smartHint+='<div style="background:rgba(125,141,154,.06);border-left:2px solid var(--muted);padding:4px 10px;margin:4px 14px 0;border-radius:0 4px 4px 0;font-size:11px;color:var(--muted);line-height:1.5">💡 <strong style="color:var(--text)">Cum găsești greutatea:</strong> set 1 cu cea mai mică opțiune (gantere mici / bara goală). La final mai puteai face lejer 5+ repetări? Urcă puțin la setul următor. Când termini setul cu doar 2-3 repetări „în rezervor" — aia e greutatea ta; de data viitoare Smart Coach preia de aici. Prea greu chiar și cu minimul? Deschide 📖 — există variantă mai ușoară.</div>';
+        }
       }
       // Încălzire calculată (rampa) — doar dacă exercițiul nu e început
       if(doneSets===0){
@@ -2149,26 +2155,26 @@ function toggleCheck(id,el){
 // GHID EXERCIȚII — modal accesibil de peste tot + video demo
 // ═══════════════════════════════════════════════════════════════
 var MORNING_GUIDES={
-  morn_flotari_lente:{name:'Flotări lente',how:'Flotare clasică dar cu tempo foarte lent: 3 sec coborâre, 1 sec pauză jos, 1 sec urcare. Corpul drept ca o scândură.',tip:'Scopul e ÎNVĂȚAREA mișcării, nu oboseala. Oprește-te cu 2-3 repetări înainte de eșec.'},
-  morn_pike_pushup:{name:'Pike push-up',how:'Din poziția V inversat (fese sus), cobori capul spre podea îndoind coatele, apoi împingi înapoi.',tip:'Pregătește umerii pentru împinsul de seară.'},
+  morn_flotari_lente:{name:'Flotări lente',how:'Flotare clasică dar cu tempo foarte lent: 3 sec coborâre, 1 sec pauză jos, 1 sec urcare. Corpul drept ca o scândură.',tip:'Scopul e ÎNVĂȚAREA mișcării, nu oboseala. Oprește-te cu 2-3 repetări înainte de eșec.',easier:'Scara: la perete → pe blat/masă → pe genunchi → complete. Coboară o treaptă când nu-ți ies repetările cu formă curată; urci înapoi când le faci pe toate lejer.'},
+  morn_pike_pushup:{name:'Pike push-up',how:'Din poziția V inversat (fese sus), cobori capul spre podea îndoind coatele, apoi împingi înapoi.',tip:'Pregătește umerii pentru împinsul de seară.',easier:'Pe genunchi (fesele mai jos, pași mai mici) sau doar ține poziția V 20 sec — pattern-ul contează, nu adâncimea.'},
   morn_mob_umeri:{name:'Mobilitate umeri',how:'Cercuri ample cu brațele (10 înainte + 10 înapoi), apoi brațele pe perete și aluneci în sus/jos (wall slides), apoi întinderi ușoare ale pieptului în cadru de ușă.',tip:'Lent și fără durere — cauți mobilitate, nu forțare.'},
   morn_kegel:{name:'Kegel',how:'Contractă mușchii planșeului pelvin (cei cu care ai opri urinarea) 3-5 sec, relaxează 3 sec. Repetă 10-15 ori.',tip:'Nu contracta fesierii sau abdomenul. Nimeni nu vede că îl faci — poți oriunde.'},
-  morn_fandari:{name:'Fandări în loc',how:'Pas mare în spate, cobori genunchiul spre podea, revii împingând în călcâiul din față. Alternezi picioarele.',tip:'Trunchiul drept, mișcare controlată.'},
+  morn_fandari:{name:'Fandări în loc',how:'Pas mare în spate, cobori genunchiul spre podea, revii împingând în călcâiul din față. Alternezi picioarele.',tip:'Trunchiul drept, mișcare controlată.',easier:'Ține-te de perete sau de un scaun pentru echilibru și coboară doar cât e confortabil — adâncimea vine cu timpul.'},
   morn_glute_bridge:{name:'Glute bridge',how:'Pe spate, genunchii îndoiți, împingi șoldurile sus strângând fesierii, ții 1 sec, cobori lent.',tip:'Activează fesierii pentru antrenamentul de seară.'},
-  morn_plank:{name:'Plank',how:'Pe coate, corpul drept de la cap la călcâie. Menții poziția respirând normal.',tip:'Fesierii și abdomenul contractate — nu lăsa șoldurile să cadă.'},
+  morn_plank:{name:'Plank',how:'Pe coate, corpul drept de la cap la călcâie. Menții poziția respirând normal.',tip:'Fesierii și abdomenul contractate — nu lăsa șoldurile să cadă.',easier:'Pe genunchi (linie dreaptă de la genunchi la cap) sau intervale scurte: 3×15 sec cu pauză.'},
   morn_dead_bug:{name:'Dead bug',how:'Pe spate, brațele spre tavan, genunchii la 90°. Cobori simultan brațul drept și piciorul stâng, revii, alternezi.',tip:'Lomba lipită de podea TOT timpul.'},
-  morn_plank_leg_raise:{name:'Plank + ridicări picioare',how:'Din plank, ridici un picior 10-15 cm, ții 2 sec, alternezi. Sau: plank 30 sec + 10 ridicări de picioare culcat.',tip:'Șoldurile stabile, nu se rotesc.'},
+  morn_plank_leg_raise:{name:'Plank + ridicări picioare',how:'Din plank, ridici un picior 10-15 cm, ții 2 sec, alternezi. Sau: plank 30 sec + 10 ridicări de picioare culcat.',tip:'Șoldurile stabile, nu se rotesc.',easier:'Fă doar plank simplu (pe genunchi dacă e nevoie) — ridicările de picioare vin când ții plank-ul stabil 30 sec.'},
   morn_mob_general:{name:'Mobilitate full body',how:'Cat-cow (spate rotund/arcuit în 4 labe) ×10, rotiri de șolduri ×10, cercuri brațe ×10.',tip:'Trezește toate articulațiile în 3 minute.'},
-  morn_ramat_usor:{name:'Ramat ușor sprijinit',how:'Pieptul pe bancă înclinată, gantere UȘOARE (jumătate din greutatea de seară), tragi spre șolduri strângând omoplații.',tip:'Pattern, nu efort — înveți mișcarea pentru seară.'},
-  morn_reverse_fly:{name:'Reverse fly ușor',how:'Aplecat la 45°, gantere ușoare, deschizi brațele lateral strângând omoplații.',tip:'Greutate mică, formă perfectă.'},
-  morn_dead_hang:{name:'Dead hang',how:'Atârnat de bară (sau cadru ușă solid) cu brațele întinse, corpul relaxat, 20-30 sec.',tip:'Decompresie pentru coloană + mobilitate umeri. Excelent după somn.'},
+  morn_ramat_usor:{name:'Ramat ușor sprijinit',how:'Pieptul pe bancă înclinată, gantere UȘOARE (jumătate din greutatea de seară), tragi spre șolduri strângând omoplații.',tip:'Pattern, nu efort — înveți mișcarea pentru seară.',easier:'Cele mai mici gantere pe care le ai — sau chiar fără greutate, doar mișcarea cu omoplații. Aici contează pattern-ul.'},
+  morn_reverse_fly:{name:'Reverse fly ușor',how:'Aplecat la 45°, gantere ușoare, deschizi brațele lateral strângând omoplații.',tip:'Greutate mică, formă perfectă.',easier:'Fără gantere: doar deschide brațele cu omoplații strânși — activarea e aceeași.'},
+  morn_dead_hang:{name:'Dead hang',how:'Atârnat de bară (sau cadru ușă solid) cu brațele întinse, corpul relaxat, 20-30 sec.',tip:'Decompresie pentru coloană + mobilitate umeri. Excelent după somn.',easier:'Ține vârfurile picioarelor pe sol sau pe un scaun și lasă în brațe doar o parte din greutate.'},
   morn_hip_hinge:{name:'Hip hinge (fără greutate)',how:'Mâinile pe coapse, împingi șoldurile înapoi cu spatele drept până simți întindere în spatele picioarelor, revii strângând fesierii.',tip:'Pattern-ul pentru îndreptări — mișcarea vine din șolduri, nu din genunchi.'},
-  morn_flotari_inguste:{name:'Flotări înguste',how:'Flotare cu mâinile apropiate sub piept, coatele lipite de corp.',tip:'Pe genunchi dacă e prea greu.'},
-  morn_plank_lateral:{name:'Plank lateral',how:'Lateral pe un cot, corpul drept, șoldurile sus. 30 sec pe fiecare parte.',tip:'Corpul ca o linie dreaptă — nu lăsa șoldul să cadă.'},
+  morn_flotari_inguste:{name:'Flotări înguste',how:'Flotare cu mâinile apropiate sub piept, coatele lipite de corp.',tip:'Coatele lipite de corp — tricepsul face treaba.',easier:'Scara: la perete → pe blat → pe genunchi → complete.'},
+  morn_plank_lateral:{name:'Plank lateral',how:'Lateral pe un cot, corpul drept, șoldurile sus. 30 sec pe fiecare parte.',tip:'Corpul ca o linie dreaptă — nu lăsa șoldul să cadă.',easier:'Pe genunchi (genunchiul de jos pe podea) sau 2×15 sec pe parte.'},
   morn_stretch_full:{name:'Stretching full body',how:'Întinderi statice 20-30 sec fiecare: coapse față/spate, fesieri, piept, umeri, spate. Fără arcuire, respiri adânc.',tip:'Ziua de recovery = investiție în următoarea săptămână.'},
   morn_mob_articulatii:{name:'Mobilitate umeri/șolduri',how:'90/90 pentru șolduri (șezut, ambele picioare la 90°, rotești), cercuri ample brațe, wall slides.',tip:'Zonele care înțepenesc cel mai repede la birou.'},
   morn_plimbare:{name:'Plimbare exterior',how:'Mers în ritm moderat 20-30 min, ideal dimineața pentru lumină naturală.',tip:'Lumina de dimineață reglează somnul + arzi calorii fără efort.'},
-  morn_superman:{name:'Superman',how:'Pe burtă, ridici simultan brațele și picioarele, ții 2 sec, cobori lent.',tip:'Privirea în podea, gâtul neutru.'},
+  morn_superman:{name:'Superman',how:'Pe burtă, ridici simultan brațele și picioarele, ții 2 sec, cobori lent.',tip:'Privirea în podea, gâtul neutru.',easier:'Ridică doar brațele (picioarele rămân jos), sau alternativ: braț drept + picior stâng, apoi invers.'},
   morn_scapular:{name:'Scapular push-ups',how:'În poziție de flotare cu brațele ÎNTINSE, doar strângi și depărtezi omoplații (mișcare mică).',tip:'Trezește mușchii dintre omoplați pentru ziua de spate.'},
   morn_mob_toracic:{name:'Mobilitate toracică',how:'În 4 labe, o mână la ceafă, rotești cotul spre tavan și înapoi ×8/parte. Apoi cat-cow ×10.',tip:'Rotația toracică bună = ramat sigur.'}
 };
@@ -2205,7 +2211,8 @@ function openMorningGuide(id){
     tag.textContent='Rutina de dimineață · pattern, nu efort maxim';
     body.innerHTML=
       '<div class="g-row"><div class="g-lbl">Cum</div><div>'+g.how+'</div></div>'+
-      '<div class="g-row"><div class="g-lbl" style="color:var(--green)">✅</div><div style="color:var(--green);font-style:italic">'+g.tip+'</div></div>';
+      '<div class="g-row"><div class="g-lbl" style="color:var(--green)">✅</div><div style="color:var(--green);font-style:italic">'+g.tip+'</div></div>'+
+      (g.easier?'<div class="g-row"><div class="g-lbl" style="color:var(--acc2)">🪜</div><div style="color:var(--acc2)"><strong>Prea greu?</strong> '+g.easier+'</div></div>':'');
     document.getElementById('guideVideoBtn').href='https://www.youtube.com/results?search_query='+encodeURIComponent(g.name+' exercise tutorial');
   }else{
     title.textContent='Exercițiu dimineață';
@@ -2245,6 +2252,7 @@ function buildMorningCard(idx){
     html+='<button class="guide-btn" style="width:26px;height:26px;font-size:12px" onclick="event.stopPropagation();openMorningGuide(\''+ex.id+'\')" title="Cum se face">❓</button>';
     html+='</div>';
   });
+  html+='<div style="font-size:11px;color:var(--muted);padding:8px 2px 2px;line-height:1.4">💡 Nu-ți ies repetările? Deschide ❓ — fiecare exercițiu are variantă mai ușoară. Înveți pattern-ul, nu forțezi.</div>';
   html+='</div></div>';
   return html;
 }
@@ -3233,6 +3241,33 @@ function renderThemeRow(){
 function themeAcc(){var v=getComputedStyle(document.documentElement).getPropertyValue('--acc').trim();return v||'#14b8a6';}
 function themeAcc2(){var v=getComputedStyle(document.documentElement).getPropertyValue('--acc2').trim();return v||'#5eead4';}
 
+// ─── Căutare în Setări — filtrează grupurile după text (fără diacritice) ───
+function normDiac(s){
+  s=(s||'').toLowerCase();
+  var map={'ă':'a','â':'a','î':'i','ș':'s','ş':'s','ț':'t','ţ':'t'};
+  return s.replace(/[ăâîșşțţ]/g,function(c){return map[c]||c;});
+}
+function filterSetari(q){
+  q=normDiac(q).trim();
+  var groups=document.querySelectorAll('#tab-setari .sgroup');
+  var hits=0;
+  groups.forEach(function(g){
+    if(!q){
+      g.style.display='';
+      g.classList.remove('open');
+      if(g.id==='sgProfil')g.classList.add('open');
+      hits++;
+      return;
+    }
+    var match=normDiac(g.textContent).indexOf(q)>=0;
+    g.style.display=match?'':'none';
+    g.classList.toggle('open',match);
+    if(match)hits++;
+  });
+  var nores=document.getElementById('setariNoResults');
+  if(nores)nores.style.display=(q&&!hits)?'block':'none';
+}
+
 // Navy method BF% (SI / cm-kg) — formule diferite pe sex
 // Femei: necesită și circumferința șoldurilor
 function calcBFNavy(waistCm,neckCm,heightCm,sex,hipCm){
@@ -4004,8 +4039,8 @@ function getRecommendation(exerciseName,week,plannedSets){
   if(!last){
     return {
       action:'start',tag:'START',
-      target:'Începe cu greutate ușoară',
-      tip:'Țintă: '+minRep+'-'+maxRep+' rep curat. Tempo 2-1-2.'
+      target:'Începe cu greutate ușoară (💡 cum o găsești — mai jos)',
+      tip:'Set 1 cu cea mai mică opțiune (gantere mici / bara goală). Mai puteai face lejer 5+ repetări? Urcă puțin la setul următor. Te oprești unde rămân doar 2-3 „în rezervor" — aia e greutatea ta de start.'
     };
   }
 

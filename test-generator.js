@@ -191,7 +191,19 @@ var rBad=G.generateProgram(Object.assign({},basisP,{emphasis:'brate'}));
 assert(rBad.errors&&rBad.errors.length,'emphasis invalid → eroare');
 console.log('');
 
-// 15. Programul TĂU (referință) conține exercițiile cheie așteptate
+// 15. Dimineața pe nivel: începătorii primesc variante regresate, intermediarii nu
+console.log('▸ Dimineață — regresii pentru începători');
+var mBeg=G.generateProgram(Object.assign({},basisP,{experience:'incepator'}));
+var mInt=G.generateProgram(Object.assign({},basisP,{experience:'intermediar'}));
+assert(mBeg.morningRoutines.luni.list.some(function(e){return e.name.indexOf('genunchi')>=0;}),'începător: flotările de dimineață sunt pe genunchi');
+assert(mInt.morningRoutines.luni.list.some(function(e){return e.name==='Flotări lente';}),'intermediar: flotări clasice dimineața');
+assert(mBeg.morningRoutines.luni.list.length===mInt.morningRoutines.luni.list.length,'aceleași sloturi de dimineață la ambele niveluri');
+mBeg.morningRoutines.luni.list.forEach(function(e){
+  assert(mInt.morningRoutines.luni.list.some(function(x){return x.id===e.id;}),'id-ul '+e.id+' există la ambele niveluri (ghidurile funcționează)');
+});
+console.log('');
+
+// 16. Programul TĂU (referință) conține exercițiile cheie așteptate
 var ref=G.generateProgram(PERSONAS[0].p);
 var refNames=[];
 Object.keys(ref.exercises).forEach(function(k){ref.exercises[k].list.forEach(function(e){refNames.push(e.name);});});

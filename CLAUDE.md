@@ -14,7 +14,7 @@ Aplicația e **feature-complete** ca "antrenor în buzunar", construită integra
 - Nutriție: calculator TDEE/macros pt useri generați + mesele hardcodate pt owner + secțiune "De ce aceste numere?" cu citări
 - Progres: măsurători + BF% Navy (M/F) + grafice + recomp verdict + poze progres (IndexedDB) + PR-uri + 1RM
 - Retenție: streak 🔥 în header, digest săptămânal cu imagine share-abilă (canvas PNG)
-- Ghid: modal 📖/❓ pe orice exercițiu (inclusiv 22 matinale) + link video YouTube + principii dovedite
+- Ghid: modal 📖/❓ pe orice exercițiu (inclusiv 22 matinale) + link video YouTube + principii dovedite; ghidurile matinale au câmp `easier` (scara de regresii „Prea greu?"); generatorul dă începătorilor variante matinale regresate (`MORNING_EASY_SWAP`/`morningFor`, aceleași id-uri); la exerciții fără istoric, hint START explică protocolul de găsire a greutății; Setări are search bar (`filterSetari`, fără diacritice)
 - Personalizare: nume în header, 6 teme de accent (CSS vars `--acc-rgb`/`--acc2-rgb`, `html[data-theme]`, cheie `app_theme`), sex M/F în setări; Setări reorganizate în 7 grupuri pliabile (`.sgroup`), Zona periculoasă ultima
 - Rest timer fundal (deadline-based) + beep + mod auto 90s/150s⭐
 - Utilizatori activi reali: owner (legacy) + iubita + prieteni (programe generate) — feedback-ul lor a condus ultimele fix-uri

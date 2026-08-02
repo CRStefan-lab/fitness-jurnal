@@ -332,6 +332,27 @@ var MORNING_TEMPLATES={
 };
 
 /* ───────────────────────────────────────────────────────────────
+   DIMINEAȚĂ PE NIVEL — începătorii primesc direct varianta regresată
+   (pattern-ul e identic; nu-i punem să descopere singuri că trebuie
+   să coboare o treaptă). Id-urile rămân aceleași → ghidurile merg.
+   ─────────────────────────────────────────────────────────────── */
+var MORNING_EASY_SWAP={
+  morn_flotari_lente:{name:'Flotări pe genunchi (lente)',target:'3×8–10'},
+  morn_pike_pushup:{name:'Pike push-up pe genunchi',target:'2×6–8'},
+  morn_flotari_inguste:{name:'Flotări înguste pe genunchi',target:'2×8 rep'},
+  morn_plank:{name:'Plank (pe genunchi la nevoie)',target:'2×30 sec'},
+  morn_plank_lateral:{name:'Plank lateral pe genunchi',target:'2×20 sec/parte'}
+};
+function morningFor(type,profile){
+  var t=MORNING_TEMPLATES[type]||MORNING_TEMPLATES.full;
+  if(profile.experience!=='incepator')return t;
+  return {label:t.label,sub:t.sub,duration:t.duration,list:t.list.map(function(it){
+    var sw=MORNING_EASY_SWAP[it.id];
+    return sw?{id:it.id,name:sw.name,target:sw.target}:it;
+  })};
+}
+
+/* ───────────────────────────────────────────────────────────────
    SELECȚIE EXERCIȚII
    ─────────────────────────────────────────────────────────────── */
 function poolFor(profile){
@@ -501,7 +522,7 @@ function generateProgram(profile){
         {star:false,name:'Pași parcurși (țintă zilnică)',sets:1,target:'—'},
         {star:false,name:'Plank + Dead bug',sets:2,target:'30 sec + 10/parte'}
       ]};
-      morningRoutines[day.key]=MORNING_TEMPLATES.recovery;
+      morningRoutines[day.key]=morningFor('recovery',profile);
       return;
     }
     var usedIds=[];
@@ -537,7 +558,7 @@ function generateProgram(profile){
     });
     var durationMin=list.length*9+8;
     exercises[day.key]={label:day.label,icon:day.icon,duration:'~'+durationMin+' min',list:list};
-    morningRoutines[day.key]=MORNING_TEMPLATES[day.type]||MORNING_TEMPLATES.full;
+    morningRoutines[day.key]=morningFor(day.type,profile);
   });
 
   var nutrition=calcNutrition(profile);
