@@ -3,3 +3,5 @@ Thumbs.db
 *.log
 .vscode/
 .idea/
+# explorări de design locale — nu se publică
+design-preview.html
