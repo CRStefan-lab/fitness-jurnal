@@ -966,6 +966,7 @@ input:checked + .slider:before{transform:translateX(20px);background:var(--acc)}
   <button class="rest-timer-btn" onclick="saveRIR('easy')">🥱 Ușor</button>
   <button class="rest-timer-btn" onclick="saveRIR('ok')">💪 OK</button>
   <button class="rest-timer-btn" onclick="saveRIR('hard')">😮‍💨 Limită</button>
+  <button class="rest-timer-btn" style="padding:8px 9px;opacity:.55;flex-shrink:0" onclick="dismissRIR()" title="Sar peste">✕</button>
 </div>
 
 <div class="rest-timer" id="restTimer">
@@ -2090,8 +2091,15 @@ function showRIRPrompt(exName){
   var el=document.getElementById('rirPrompt');
   document.getElementById('rirPromptTitle').textContent='Cât de greu: '+exName.slice(0,28)+(exName.length>28?'…':'');
   el.classList.add('show');
+  // Fără auto-hide: rămâne până răspunzi sau închizi cu ✕ — altfel calibrarea se pierdea din greșeală
   clearTimeout(el._t);
-  el._t=setTimeout(function(){el.classList.remove('show');},20000);
+}
+
+function dismissRIR(){
+  var el=document.getElementById('rirPrompt');
+  el.classList.remove('show');
+  clearTimeout(el._t);
+  rirPromptEx=null;
 }
 
 function saveRIR(val){
