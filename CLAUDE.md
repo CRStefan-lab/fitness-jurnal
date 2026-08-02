@@ -10,7 +10,7 @@ App personal devenit multi-user, în drum spre Google Play. Limba: **română on
 Aplicația e **feature-complete** ca "antrenor în buzunar", construită integral în sesiuni Claude Code:
 - Jurnal complet (seturi rep×kg, pre-fill, steppers, PR detection, edit/backdate, note per exercițiu)
 - Smart Coach adaptiv: progresie 8 săpt. + cicluri, modulare RIR (ușor/ok/limită), auto-deload la stagnare+energie mică, încălzire calculată, ținte explicite și la accesorii ("Opțional azi: X rep × Y kg")
-- Onboarding wizard 7 pași → program generat (generator.js, 67 exerciții, 3 profile echipament, dovezi 2020-2025)
+- Onboarding wizard 7 pași → program generat (generator.js, 67 exerciții, 3 profile echipament, dovezi 2020-2025); pas 5 include accent `emphasis` ('echilibrat'|'glute' — glute: marți devine „Picioare & Fesieri" cu hip thrust în loc de al 2-lea squat pe 4 zile, Full Body A primește glute în loc de core pe 3 zile; `buildSplit()` clonează template-urile, nu le muta direct)
 - Nutriție: calculator TDEE/macros pt useri generați + mesele hardcodate pt owner + secțiune "De ce aceste numere?" cu citări
 - Progres: măsurători + BF% Navy (M/F) + grafice + recomp verdict + poze progres (IndexedDB) + PR-uri + 1RM
 - Retenție: streak 🔥 în header, digest săptămânal cu imagine share-abilă (canvas PNG)

@@ -1406,7 +1406,7 @@ function showTab(name,btn){
       if(isCustomProgram){
         var goalL={slabit:'Slăbit',recomp:'Recompoziție',masa:'Masă'}[p.goal]||p.goal||'—';
         var eqL={bodyweight:'Bodyweight',home_min:'Gantere+bancă'+(p.hasBara?'+bară':''),gym:'Sală'}[p.equipment]||'—';
-        mpi.innerHTML='✨ <strong style="color:var(--acc)">Program personalizat</strong> · '+goalL+' · '+eqL+' · '+(p.days||'?')+' zile/săpt · '+(p.experience==='incepator'?'Începător':'Intermediar');
+        mpi.innerHTML='✨ <strong style="color:var(--acc)">Program personalizat</strong> · '+goalL+' · '+eqL+' · '+(p.days||'?')+' zile/săpt · '+(p.experience==='incepator'?'Începător':'Intermediar')+(p.emphasis==='glute'?' · 🍑 Accent fesieri':'');
       }else{
         mpi.innerHTML='📘 <strong style="color:var(--text)">Program standard</strong> (gantere+bancă+bară · 4 zile · recompoziție)';
       }
@@ -5205,7 +5205,7 @@ function dismissInstallHint(){
 // ═══════════════════════════════════════════════════════════════
 // ONBOARDING WIZARD — generează program personalizat
 // ═══════════════════════════════════════════════════════════════
-var wizState={step:0,data:{sex:null,age:'',height:'',weight:'',experience:null,equipment:null,hasBara:false,days:null,goal:null,morningRoutine:true},generated:null};
+var wizState={step:0,data:{sex:null,age:'',height:'',weight:'',experience:null,equipment:null,hasBara:false,days:null,goal:null,emphasis:'echilibrat',morningRoutine:true},generated:null};
 var WIZ_STEPS=7;
 
 function maybeShowOnboarding(){
@@ -5232,6 +5232,7 @@ function openWizard(prefill){
     wizState.data.hasBara=!!p.hasBara;
     wizState.data.days=p.days||null;
     wizState.data.goal=p.goal||null;
+    wizState.data.emphasis=p.emphasis||'echilibrat';
     wizState.data.morningRoutine=p.morningRoutine!==false;
   }
   wizState.step=0;
@@ -5285,7 +5286,7 @@ function wizNext(){
     var res=ProgramGenerator.generateProgram({
       sex:d.sex,age:d.age,height:d.height,weight:d.weight,
       experience:d.experience,equipment:d.equipment,hasBara:d.hasBara,
-      days:d.days,goal:d.goal,morningRoutine:d.morningRoutine
+      days:d.days,goal:d.goal,emphasis:d.emphasis||'echilibrat',morningRoutine:d.morningRoutine
     });
     if(res.errors){wizErr('Eroare: '+res.errors.join(', '));return;}
     wizState.generated=res;
@@ -5307,7 +5308,7 @@ function wizFinish(){
   localStorage.setItem('user_profile',JSON.stringify({
     sex:d.sex,age:d.age,height:d.height,weight:d.weight,
     experience:d.experience,equipment:d.equipment,hasBara:d.hasBara,
-    days:d.days,goal:d.goal,morningRoutine:d.morningRoutine
+    days:d.days,goal:d.goal,emphasis:d.emphasis||'echilibrat',morningRoutine:d.morningRoutine
   }));
   localStorage.setItem('onboarding_done','1');
   localStorage.removeItem('legacy_program');
@@ -5393,7 +5394,11 @@ function renderWizard(){
     html+='<div class="wiz-nav"><button class="btn btn-ghost btn-back" onclick="wizBack()">←</button><button class="btn btn-acc" onclick="wizNext()">Continuă →</button></div>';
   }
   else if(s===5){
-    html+='<div class="wiz-title">Rutina de dimineață</div>';
+    html+='<div class="wiz-title">Ultimele preferințe</div>';
+    html+='<div class="wiz-label">Accent antrenament</div>';
+    html+=wizChoiceBtn('emphasis','echilibrat','⚖️ Echilibrat','Tot corpul în proporții egale — alegerea potrivită pentru majoritatea.');
+    html+=wizChoiceBtn('emphasis','glute','🍑 Picioare & fesieri','Mai mult volum pe fesieri și picioare (hip thrust în plus), restul corpului menținut. Preferință, nu obligație — mușchii cresc la fel.');
+    html+='<div class="wiz-label">Rutina de dimineață</div>';
     html+='<div class="wiz-sub">10 minute dimineața: înveți tiparul mișcării pe care o încarci seara + mobilitate. Diferențiatorul acestui program — recomandat.</div>';
     html+='<div class="wiz-row">';
     html+='<button class="wiz-choice'+(d.morningRoutine?' sel':'')+'" onclick="wizSet(\'morningRoutine\',\'true\')"><div class="wiz-choice-title">☀️ Da</div><div class="wiz-choice-sub">recomandat</div></button>';

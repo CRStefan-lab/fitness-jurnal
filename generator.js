@@ -267,6 +267,41 @@ var SPLIT_3DAY={
 };
 
 /* ───────────────────────────────────────────────────────────────
+   ACCENT (preferință, nu sex): 'echilibrat' = template-urile ca atare;
+   'glute' = mai mult volum picioare-fesieri, în limitele 10-20 seturi/mușchi
+   (Pelland 2025). Hip thrust ≈ squat pentru fesieri (Plotkin 2023).
+   Template-urile NU se mută — clonăm înainte de modificare.
+   ─────────────────────────────────────────────────────────────── */
+function buildSplit(profile){
+  var base=profile.days===4?SPLIT_4DAY:SPLIT_3DAY;
+  var split={days:base.days.map(function(day){
+    return {key:day.key,label:day.label,icon:day.icon,type:day.type,
+      slots:day.slots.map(function(s){
+        return {pattern:s.pattern,star:s.star,sets:s.sets,target:s.target,optional:!!s.optional};
+      })};
+  }),schedule:base.schedule.slice()};
+  if(profile.emphasis==='glute'){
+    split.days.forEach(function(day){
+      if(day.key==='marti'&&profile.days===4){
+        // Ziua de picioare: al 2-lea squat → hip thrust; la începători se taie lunge-ul, nu glute-ul
+        day.label='Picioare & Fesieri';
+        day.slots.forEach(function(s){
+          if(s.pattern==='squat'&&!s.star){s.pattern='glute';s.target='10–15';s.optional=false;}
+          else if(s.pattern==='lunge')s.optional=true;
+        });
+      }
+      if(day.key==='luni'&&profile.days===3){
+        // Full Body A: core → glute (core rămâne în recovery + rutina de dimineață)
+        day.slots.forEach(function(s){
+          if(s.pattern==='core'){s.pattern='glute';s.target='10–15';}
+        });
+      }
+    });
+  }
+  return split;
+}
+
+/* ───────────────────────────────────────────────────────────────
    RUTINE DIMINEAȚĂ — pe tipul zilei (pattern learning, universal)
    ─────────────────────────────────────────────────────────────── */
 var MORNING_TEMPLATES={
@@ -450,9 +485,10 @@ function generateProgram(profile){
   if([3,4].indexOf(profile.days)<0)errors.push('zile: doar 3 sau 4 în v1');
   if(['slabit','recomp','masa'].indexOf(profile.goal)<0)errors.push('obiectiv invalid');
   if(['incepator','intermediar'].indexOf(profile.experience)<0)errors.push('experiență invalidă');
+  if(profile.emphasis!==undefined&&['echilibrat','glute'].indexOf(profile.emphasis)<0)errors.push('accent invalid');
   if(errors.length)return {errors:errors};
 
-  var split=profile.days===4?SPLIT_4DAY:SPLIT_3DAY;
+  var split=buildSplit(profile);
   var pool=poolFor(profile);
   var exercises={};
   var morningRoutines={};

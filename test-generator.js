@@ -155,7 +155,43 @@ console.log('▸ Split 4 zile — acoperire etichetă (începător + intermediar
 });
 console.log('');
 
-// 14. Programul TĂU (referință) conține exercițiile cheie așteptate
+// 14. Accent picioare-fesieri (preferință, nu sex)
+console.log('▸ Accent glute — 4 zile și 3 zile, începător + intermediar');
+var basisP={sex:'F',age:30,height:165,weight:62,experience:'incepator',equipment:'home_min',hasBara:false,days:4,goal:'slabit',morningRoutine:true};
+[['incepator',4],['intermediar',4],['incepator',3],['intermediar',3]].forEach(function(cfg){
+  var p=Object.assign({},basisP,{experience:cfg[0],days:cfg[1],emphasis:'glute'});
+  var r=G.generateProgram(p);
+  assert(!r.errors,'glute '+cfg.join('/')+': fără erori');
+  if(r.errors)return;
+  var patterns=function(dayKey){
+    return r.exercises[dayKey].list.map(function(e){
+      var db=G.EXERCISE_DB.find(function(x){return x.id===e.exId;});
+      return db?db.pattern:null;
+    });
+  };
+  var allPatterns=[];
+  Object.keys(r.exercises).forEach(function(k){allPatterns=allPatterns.concat(patterns(k));});
+  var gluteCount=allPatterns.filter(function(x){return x==='glute';}).length;
+  assert(gluteCount>=2,'glute '+cfg.join('/')+': minim 2 exerciții glute/săpt (are '+gluteCount+')');
+  if(cfg[1]===4){
+    assert(r.exercises.marti.label.indexOf('Fesieri')>=0,'glute '+cfg.join('/')+': eticheta marți = Picioare & Fesieri');
+    assert(patterns('marti').indexOf('glute')>=0,'glute '+cfg.join('/')+': marți conține glute');
+    assert(patterns('marti').indexOf('squat')>=0,'glute '+cfg.join('/')+': marți păstrează squat');
+    assert(patterns('marti').indexOf('gambe')>=0,'glute '+cfg.join('/')+': marți păstrează gambe');
+    assert(patterns('luni').indexOf('triceps')>=0,'glute '+cfg.join('/')+': luni păstrează triceps');
+  }else{
+    assert(patterns('luni').indexOf('glute')>=0,'glute '+cfg.join('/')+': Full Body A conține glute');
+  }
+});
+// echilibrat / lipsă = identic cu comportamentul de dinainte (backwards compat)
+var rDefault=G.generateProgram(basisP);
+var rEchilibrat=G.generateProgram(Object.assign({},basisP,{emphasis:'echilibrat'}));
+assert(JSON.stringify(rDefault.exercises)===JSON.stringify(rEchilibrat.exercises),'emphasis lipsă ≡ echilibrat (backwards compat)');
+var rBad=G.generateProgram(Object.assign({},basisP,{emphasis:'brate'}));
+assert(rBad.errors&&rBad.errors.length,'emphasis invalid → eroare');
+console.log('');
+
+// 15. Programul TĂU (referință) conține exercițiile cheie așteptate
 var ref=G.generateProgram(PERSONAS[0].p);
 var refNames=[];
 Object.keys(ref.exercises).forEach(function(k){ref.exercises[k].list.forEach(function(e){refNames.push(e.name);});});
