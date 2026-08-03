@@ -1441,7 +1441,9 @@ function showToast(msg,color,subtle){
   }
   t.classList.add('show');
   clearTimeout(t._timer);
-  t._timer=setTimeout(function(){t.classList.remove('show');},subtle?900:2200);
+  // Durată adaptivă: mesajele lungi stau cât să poată fi citite (~45ms/caracter)
+  var dur=Math.min(5000,Math.max(subtle?900:1800,700+msg.length*45));
+  t._timer=setTimeout(function(){t.classList.remove('show');},dur);
 }
 
 function showTab(name,btn){
@@ -2340,7 +2342,7 @@ function dismissRIR(){
   clearTimeout(el._t);
   rirPromptEx=null;
   // Alegere informată: userul află exact ce pierde când sare peste
-  showToast('Sărit — săpt. viitoare primești ținta standard, fără ajustare la tine',null,true);
+  showToast('Sărit — săpt. viitoare primești ținta standard, fără ajustare la tine');
 }
 
 function saveRIR(val){
@@ -2351,7 +2353,7 @@ function saveRIR(val){
   el.classList.remove('show');
   clearTimeout(el._t);
   rirPromptEx=null;
-  showToast(val==='easy'?'Notat — data viitoare escaladam ⚡':val==='hard'?'Notat — consolidăm data viitoare':'Notat ✓',null,true);
+  showToast(val==='easy'?'Notat 🥱 — data viitoare escaladăm ⚡':val==='hard'?'Notat 😮‍💨 — data viitoare consolidăm (repeți exact)':'Notat 💪 — progresia continuă normal');
 }
 
 function showWorkoutComplete(){
