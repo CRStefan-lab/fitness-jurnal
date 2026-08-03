@@ -770,9 +770,20 @@ input:checked + .slider:before{transform:translateX(20px);background:var(--acc)}
       <div class="notif-row" id="restTimerSoundRow">
         <div style="flex:1">
           <div class="notif-lbl">🔊 Sunet la final</div>
-          <div class="notif-sub">Beep triplu când pauza s-a terminat</div>
+          <div class="notif-sub">Melodie când pauza s-a terminat</div>
         </div>
         <label class="sw"><input type="checkbox" id="restTimerSound" onchange="toggleRestTimerSound()"><span class="slider"></span></label>
+      </div>
+      <div class="notif-row" id="restTimerMelodyRow">
+        <div style="flex:1">
+          <div class="notif-lbl">🎵 Melodia</div>
+          <div class="notif-sub">La schimbare o auzi instant (preview)</div>
+        </div>
+        <select id="restTimerMelody" class="time-input" style="width:auto" onchange="changeMelody()">
+          <option value="clopotel">Clopoțel (blând)</option>
+          <option value="digital">Digital (discret)</option>
+          <option value="melodie">Alertă (sală zgomotoasă)</option>
+        </select>
       </div>
       <p style="font-size:11px;color:var(--muted);margin-top:4px;line-height:1.5">
         💡 Timerul merge și când minimizezi app-ul (calculează pe ceas, nu pe cronometru). Dacă ai notificările activate, primești și notificare cu vibrație când expiră în fundal.<br>
@@ -2003,46 +2014,87 @@ function getRestTimerCfg(){
   };
 }
 
-// Melodia de final de pauză (~3.4s): 2 grupuri Do-Do-Sol + final ascendent Mi-Sol-Do7 lung.
-// Partajată de ambele căi de redare (element <audio> + fallback WebAudio).
-var BEEP_NOTES=[
-  {f:1046.5,t:0.00,d:0.16},{f:1046.5,t:0.22,d:0.16},{f:1568.0,t:0.44,d:0.24},
-  {f:1046.5,t:0.92,d:0.16},{f:1046.5,t:1.14,d:0.16},{f:1568.0,t:1.36,d:0.24},
-  {f:1318.5,t:1.88,d:0.15},{f:1568.0,t:2.08,d:0.15},{f:2093.0,t:2.28,d:0.55},
-  {f:2093.0,t:2.98,d:0.32}
-];
-var BEEP_LEN=3.4;
+// ─── Sunet final de pauză: 3 melodii selectabile (~3.4s), sintetizate local ───
+// iPhone: WebAudio urmează comutatorul de SILENȚIOS → redăm prin element <audio>
+// (canal MEDIA = merge pe silențios, la volumul media). WebAudio rămâne fallback.
+var MELODIES={
+  clopotel:{len:3.5,wave:'bell',notes:[
+    {f:1046.5,t:0.00,d:1.0},{f:1318.5,t:0.38,d:1.0},{f:1568.0,t:0.76,d:1.1},
+    {f:2093.0,t:1.20,d:1.5},{f:1568.0,t:2.40,d:1.0},{f:2093.0,t:2.46,d:1.0}]},
+  digital:{len:3.3,wave:'soft',notes:[
+    {f:1244.5,t:0.00,d:0.11},{f:1244.5,t:0.17,d:0.11},
+    {f:1244.5,t:0.90,d:0.11},{f:1244.5,t:1.07,d:0.11},
+    {f:1244.5,t:1.80,d:0.11},{f:1244.5,t:1.97,d:0.11},
+    {f:1661.2,t:2.60,d:0.55}]},
+  melodie:{len:3.4,wave:'square',notes:[
+    {f:1046.5,t:0.00,d:0.16},{f:1046.5,t:0.22,d:0.16},{f:1568.0,t:0.44,d:0.24},
+    {f:1046.5,t:0.92,d:0.16},{f:1046.5,t:1.14,d:0.16},{f:1568.0,t:1.36,d:0.24},
+    {f:1318.5,t:1.88,d:0.15},{f:1568.0,t:2.08,d:0.15},{f:2093.0,t:2.28,d:0.55},
+    {f:2093.0,t:2.98,d:0.32}]}
+};
+function getMelodyId(){var m=localStorage.getItem('rest_timer_melody');return MELODIES[m]?m:'clopotel';}
 
-// iPhone: WebAudio e tratat ca "sound effect" → urmează comutatorul de SILENȚIOS, nu volumul media.
-// Redăm prin element <audio> (canal MEDIA → merge și pe silențios, la volumul media),
-// cu WAV sintetizat local (offline-safe). WebAudio rămâne fallback.
-var beepAudio=null,beepPrimed=false;
-function buildBeepAudio(){
-  if(beepAudio)return;
+function wavUrl(data,sr){
+  var len=data.length,buf=new ArrayBuffer(44+len*2),dv=new DataView(buf);
+  var wstr=function(o,s){for(var i=0;i<s.length;i++)dv.setUint8(o+i,s.charCodeAt(i));};
+  wstr(0,'RIFF');dv.setUint32(4,36+len*2,true);wstr(8,'WAVE');wstr(12,'fmt ');
+  dv.setUint32(16,16,true);dv.setUint16(20,1,true);dv.setUint16(22,1,true);
+  dv.setUint32(24,sr,true);dv.setUint32(28,sr*2,true);dv.setUint16(32,2,true);dv.setUint16(34,16,true);
+  wstr(36,'data');dv.setUint32(40,len*2,true);
+  for(var j=0;j<len;j++){var x=Math.max(-1,Math.min(1,data[j]));dv.setInt16(44+j*2,x*32767,true);}
+  return URL.createObjectURL(new Blob([buf],{type:'audio/wav'}));
+}
+
+var beepCache={};
+function buildBeepAudio(id){
+  id=id||getMelodyId();
+  if(beepCache[id])return beepCache[id];
   try{
-    var sr=22050,len=Math.ceil(sr*BEEP_LEN),data=new Float32Array(len);
-    BEEP_NOTES.forEach(function(n){
+    var m=MELODIES[id],sr=22050,len=Math.ceil(sr*m.len),data=new Float32Array(len);
+    m.notes.forEach(function(n){
       var s0=Math.floor(n.t*sr),s1=Math.min(len,Math.floor((n.t+n.d)*sr));
       for(var i=s0;i<s1;i++){
-        var tt=(i-s0)/sr;
-        var env=Math.min(1,tt/0.012)*Math.min(1,Math.max(0,(n.d-tt))/0.05);
-        if(env>1)env=1;
-        var ph=2*Math.PI*tt;
-        // două square-uri ușor dezacordate = percepție mai tare decât sine
-        var v=(Math.sign(Math.sin(ph*n.f))+Math.sign(Math.sin(ph*n.f*1.004)))*0.5;
-        data[i]+=v*env*0.42;
+        var tt=(i-s0)/sr,ph=2*Math.PI*tt,v,env;
+        if(m.wave==='bell'){
+          // clopoțel: sinus + armonice, decay exponențial — blând
+          env=Math.min(1,tt/0.006)*Math.exp(-3.2*tt/n.d);
+          v=(Math.sin(ph*n.f)+0.5*Math.sin(ph*n.f*2)+0.22*Math.sin(ph*n.f*3))*0.5;
+        }else if(m.wave==='soft'){
+          // digital: square îmblânzit (tanh) — discret
+          env=Math.min(1,tt/0.01)*Math.min(1,Math.max(0,(n.d-tt))/0.04);if(env>1)env=1;
+          v=Math.tanh(3*Math.sin(ph*n.f))*0.8;
+        }else{
+          // alertă: două square-uri dezacordate — penetrant
+          env=Math.min(1,tt/0.012)*Math.min(1,Math.max(0,(n.d-tt))/0.05);if(env>1)env=1;
+          v=(Math.sign(Math.sin(ph*n.f))+Math.sign(Math.sin(ph*n.f*1.004)))*0.5;
+        }
+        data[i]+=v*env*(m.wave==='bell'?0.5:0.42);
       }
     });
-    var buf=new ArrayBuffer(44+len*2),dv=new DataView(buf);
-    var wstr=function(o,s){for(var i=0;i<s.length;i++)dv.setUint8(o+i,s.charCodeAt(i));};
-    wstr(0,'RIFF');dv.setUint32(4,36+len*2,true);wstr(8,'WAVE');wstr(12,'fmt ');
-    dv.setUint32(16,16,true);dv.setUint16(20,1,true);dv.setUint16(22,1,true);
-    dv.setUint32(24,sr,true);dv.setUint32(28,sr*2,true);dv.setUint16(32,2,true);dv.setUint16(34,16,true);
-    wstr(36,'data');dv.setUint32(40,len*2,true);
-    for(var j=0;j<len;j++){var x=Math.max(-1,Math.min(1,data[j]));dv.setInt16(44+j*2,x*32767,true);}
-    beepAudio=new Audio(URL.createObjectURL(new Blob([buf],{type:'audio/wav'})));
-    beepAudio.preload='auto';
+    var a=new Audio(wavUrl(data,sr));a.preload='auto';
+    beepCache[id]=a;
+    return a;
+  }catch(e){return null;}
+}
+
+// iOS suspendă JS-ul cu ecranul blocat → melodia n-ar mai suna. O sesiune audio
+// silențioasă ținută în loop cât durează pauza păstrează pagina activă.
+var IS_IOS=/iP(hone|ad|od)/.test(navigator.userAgent)||(navigator.platform==='MacIntel'&&navigator.maxTouchPoints>1);
+var keepAliveAudio=null;
+function startKeepAlive(){
+  if(!IS_IOS)return;
+  try{
+    if(!keepAliveAudio){
+      keepAliveAudio=new Audio(wavUrl(new Float32Array(8000),8000)); // 1s liniște, loop
+      keepAliveAudio.loop=true;
+    }
+    keepAliveAudio.currentTime=0;
+    var p=keepAliveAudio.play();
+    if(p&&p.catch)p.catch(function(){});
   }catch(e){}
+}
+function stopKeepAlive(){
+  if(keepAliveAudio){try{keepAliveAudio.pause();}catch(e){}}
 }
 
 // AudioContext + deblocarea elementului <audio> — pe un gest de user (tap); apelat din saveSet
@@ -2051,33 +2103,41 @@ function ensureAudio(){
     try{audioCtx=new (window.AudioContext||window.webkitAudioContext)();}catch(e){}
   }
   if(audioCtx&&audioCtx.state==='suspended'){audioCtx.resume().catch(function(){});}
-  buildBeepAudio();
+  var a=buildBeepAudio();
   // "Prime": o redare mută în gestul de tap → iOS permite apoi play() din timer
-  if(beepAudio&&!beepPrimed){
-    beepPrimed=true;
+  if(a&&!a._primed){
+    a._primed=true;
     try{
-      beepAudio.muted=true;
-      var p=beepAudio.play();
+      a.muted=true;
+      var p=a.play();
       if(p&&p.then){
-        p.then(function(){beepAudio.pause();beepAudio.currentTime=0;beepAudio.muted=false;})
-         .catch(function(){beepAudio.muted=false;beepPrimed=false;});
-      }else{beepAudio.muted=false;}
-    }catch(e){beepAudio.muted=false;beepPrimed=false;}
+        p.then(function(){a.pause();a.currentTime=0;a.muted=false;})
+         .catch(function(){a.muted=false;a._primed=false;});
+      }else{a.muted=false;}
+    }catch(e){a.muted=false;a._primed=false;}
   }
 }
 
 function playBeep(){
   if(!getRestTimerCfg().sound)return;
-  buildBeepAudio();
-  if(beepAudio){
+  var a=buildBeepAudio();
+  if(a){
     try{
-      beepAudio.currentTime=0;
-      var p=beepAudio.play();
+      a.currentTime=0;
+      var p=a.play();
       if(p&&p.catch)p.catch(function(){playBeepOsc();});
       return;
     }catch(e){}
   }
   playBeepOsc();
+}
+
+function changeMelody(){
+  var sel=document.getElementById('restTimerMelody');
+  if(!sel)return;
+  localStorage.setItem('rest_timer_melody',sel.value);
+  ensureAudio(); // suntem într-un gest — construiește și deblochează noua melodie
+  playBeep();    // preview instant
 }
 
 // Tasta Enter/„next" din tastatură: rep → kg → salvează setul → rep-ul setului următor.
@@ -2112,12 +2172,12 @@ document.addEventListener('keydown',function(ev){
   }
 });
 
-// Fallback WebAudio — aceeași melodie
+// Fallback WebAudio — aceeași melodie (varianta square, indiferent de selecție)
 function playBeepOsc(){
   if(!audioCtx)return;
   try{
     var t=audioCtx.currentTime;
-    BEEP_NOTES.forEach(function(n){
+    MELODIES[getMelodyId()].notes.forEach(function(n){
       [0,4].forEach(function(det){
         var o=audioCtx.createOscillator(),g=audioCtx.createGain();
         o.connect(g);g.connect(audioCtx.destination);
@@ -2144,6 +2204,7 @@ function startRestTimer(isStar){
   restTimerState.total=secs;
   restTimerState.deadline=Date.now()+secs*1000;
   restTimerState.finished=false;
+  if(cfg.sound)startKeepAlive(); // iOS: ține pagina activă cu ecranul blocat, ca melodia să sune
   var el=document.getElementById('restTimer');
   el.classList.remove('done');
   el.classList.add('show');
@@ -2184,6 +2245,7 @@ function restTimerDone(){
   document.getElementById('restTimerTime').textContent='Gata!';
   document.getElementById('restTimerLbl').textContent='Următorul set';
   playBeep();
+  setTimeout(stopKeepAlive,4500); // după ce melodia s-a terminat
   if(navigator.vibrate)navigator.vibrate([300,100,300,100,500]);
   // Dacă app-ul e minimizat → notificare (necesită permisiunea de notificări activată)
   if(document.hidden&&'Notification' in window&&Notification.permission==='granted'&&navigator.serviceWorker){
@@ -2205,6 +2267,7 @@ function restTimerAdjust(delta){
 function stopRestTimer(){
   clearInterval(restTimerState.interval);
   restTimerState.deadline=null;
+  stopKeepAlive();
   document.getElementById('restTimer').classList.remove('show');
 }
 
@@ -2219,6 +2282,10 @@ function initRestTimerUI(){
   if(soundRow)soundRow.style.display=cfg.enabled?'':'none';
   var soundChk=document.getElementById('restTimerSound');
   if(soundChk)soundChk.checked=cfg.sound;
+  var melRow=document.getElementById('restTimerMelodyRow');
+  if(melRow)melRow.style.display=(cfg.enabled&&cfg.sound)?'':'none';
+  var melSel=document.getElementById('restTimerMelody');
+  if(melSel)melSel.value=getMelodyId();
   document.getElementById('restTimerStatus').textContent=cfg.enabled?('Activ · '+(cfg.auto?'auto 90s/150s⭐':cfg.seconds+'s')+(cfg.sound?' · 🔊':'')):'Dezactivat';
 }
 
