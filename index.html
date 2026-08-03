@@ -780,6 +780,8 @@ input:checked + .slider:before{transform:translateX(20px);background:var(--acc)}
           <div class="notif-sub">La schimbare o auzi instant (preview)</div>
         </div>
         <select id="restTimerMelody" class="time-input" style="width:auto" onchange="changeMelody()">
+          <option value="marimba">Marimba (cald)</option>
+          <option value="dingdong">Ding-dong (sonerie)</option>
           <option value="clopotel">Clopoțel (blând)</option>
           <option value="digital">Digital (discret)</option>
           <option value="melodie">Alertă (sală zgomotoasă)</option>
@@ -2019,6 +2021,12 @@ function getRestTimerCfg(){
 // iPhone: WebAudio urmează comutatorul de SILENȚIOS → redăm prin element <audio>
 // (canal MEDIA = merge pe silențios, la volumul media). WebAudio rămâne fallback.
 var MELODIES={
+  marimba:{len:3.5,wave:'marimba',notes:[
+    {f:523.25,t:0.00,d:0.6},{f:659.25,t:0.26,d:0.6},{f:783.99,t:0.52,d:0.7},{f:1046.5,t:0.78,d:1.3},
+    {f:783.99,t:2.10,d:0.5},{f:1046.5,t:2.40,d:1.05}]},
+  dingdong:{len:3.6,wave:'bell',notes:[
+    {f:659.25,t:0.00,d:1.4},{f:523.25,t:0.80,d:1.8},
+    {f:659.25,t:2.20,d:1.0},{f:523.25,t:2.75,d:0.85}]},
   clopotel:{len:3.5,wave:'bell',notes:[
     {f:1046.5,t:0.00,d:1.0},{f:1318.5,t:0.38,d:1.0},{f:1568.0,t:0.76,d:1.1},
     {f:2093.0,t:1.20,d:1.5},{f:1568.0,t:2.40,d:1.0},{f:2093.0,t:2.46,d:1.0}]},
@@ -2033,7 +2041,7 @@ var MELODIES={
     {f:1318.5,t:1.88,d:0.15},{f:1568.0,t:2.08,d:0.15},{f:2093.0,t:2.28,d:0.55},
     {f:2093.0,t:2.98,d:0.32}]}
 };
-function getMelodyId(){var m=localStorage.getItem('rest_timer_melody');return MELODIES[m]?m:'clopotel';}
+function getMelodyId(){var m=localStorage.getItem('rest_timer_melody');return MELODIES[m]?m:'marimba';}
 
 function wavUrl(data,sr){
   var len=data.length,buf=new ArrayBuffer(44+len*2),dv=new DataView(buf);
@@ -2056,7 +2064,12 @@ function buildBeepAudio(id){
       var s0=Math.floor(n.t*sr),s1=Math.min(len,Math.floor((n.t+n.d)*sr));
       for(var i=s0;i<s1;i++){
         var tt=(i-s0)/sr,ph=2*Math.PI*tt,v,env;
-        if(m.wave==='bell'){
+        if(m.wave==='marimba'){
+          // marimba: sinus + partial 1:4 caracteristic (bare de lemn), atac blând 8ms,
+          // decay rapid — registru jos = zona plăcută a urechii
+          env=Math.min(1,tt/0.008)*Math.exp(-4.2*tt/n.d);
+          v=(Math.sin(ph*n.f)+0.45*Math.sin(ph*n.f*4)*Math.exp(-9*tt))*0.62;
+        }else if(m.wave==='bell'){
           // clopoțel: sinus + armonice, decay exponențial — blând
           env=Math.min(1,tt/0.006)*Math.exp(-3.2*tt/n.d);
           v=(Math.sin(ph*n.f)+0.5*Math.sin(ph*n.f*2)+0.22*Math.sin(ph*n.f*3))*0.5;
@@ -2415,6 +2428,13 @@ var MORNING_GUIDES={
   morn_mob_toracic:{name:'Mobilitate toracică',how:'În 4 labe, o mână la ceafă, rotești cotul spre tavan și înapoi ×8/parte. Apoi cat-cow ×10.',tip:'Rotația toracică bună = ramat sigur.'}
 };
 
+// Exerciții unde diferența stânga/dreapta contează (izolări de braț, unilaterale de picior)
+var UNILATERAL_RX=/biceps|curl|triceps|lateral|fandăr|lunge|step-?back|step-?up|bulgar|split squat|un braț|o mână|concentr|kickback/i;
+function unilateralHintRow(name){
+  if(!UNILATERAL_RX.test(name))return '';
+  return '<div class="g-row"><div class="g-lbl" style="color:var(--acc2)">⚖️</div><div style="color:var(--acc2)"><strong>Partea slabă conduce:</strong> începe cu partea mai slabă, iar cea puternică face exact aceleași rep × kg — niciodată mai mult. Decalajul se închide singur.</div></div>';
+}
+
 function openGuideByName(nameEnc){
   var name=decodeURIComponent(nameEnc);
   var g=ghidEx.find(function(x){return x.name===name;});
@@ -2428,10 +2448,11 @@ function openGuideByName(nameEnc){
       '<div class="g-row"><div class="g-lbl">Start</div><div>'+g.start+'</div></div>'+
       '<div class="g-row"><div class="g-lbl">Mișcare</div><div>'+g.move+'</div></div>'+
       '<div class="g-row"><div class="g-lbl" style="color:var(--red)">❌</div><div style="color:var(--red)">'+g.err+'</div></div>'+
-      '<div class="g-row"><div class="g-lbl" style="color:var(--green)">✅</div><div style="color:var(--green);font-style:italic">'+g.tip+'</div></div>';
+      '<div class="g-row"><div class="g-lbl" style="color:var(--green)">✅</div><div style="color:var(--green);font-style:italic">'+g.tip+'</div></div>'+
+      unilateralHintRow(name);
   }else{
     tag.textContent='';
-    body.innerHTML='<p style="color:var(--muted)">Descrie mișcarea controlat, tempo 2-1-2, fără durere. Vezi video-ul pentru demonstrație completă.</p>';
+    body.innerHTML='<p style="color:var(--muted)">Descrie mișcarea controlat, tempo 2-1-2, fără durere. Vezi video-ul pentru demonstrație completă.</p>'+unilateralHintRow(name);
   }
   document.getElementById('guideVideoBtn').href='https://www.youtube.com/results?search_query='+encodeURIComponent(name+' tutorial forma corecta');
   document.getElementById('guideModal').classList.add('show');
