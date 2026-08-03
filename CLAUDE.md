@@ -61,7 +61,7 @@ Aplicația e **feature-complete** ca "antrenor în buzunar", construită integra
 
 - **Smart Coach**: `getRecommendation(ex, week, plannedSets)` — progresie pe săptămâni (1-2 baseline, 3-4 +rep, 5-6 +kg, 7 +set, 8 deload), modulată de RIR (easy→escaladare ⚡, hard→consolidare) și deload manual. `getLastPerformance(ex, excludeDate)` EXCLUDE ziua curentă (stabilitate în sesiune). Săpt. 7: setul extra e DOAR la primul ⭐ al zilei (caller-ul pasează `plannedSets`>0) — cardul din Azi primește slot S5 real (`aziAddSetIdx` + `effectiveSets(e,ei)`, folosite în render/saveSet/stats); restul ⭐ primesc „MENȚINE".
 - **Cicluri**: `getCycleInfo()` — după săpt. 8 → ciclul 2 etc.; buton "Începe ciclul nou".
-- **Accesorii (non-⭐)**: `getAccessoryRec` — double progression cu ținte explicite "Opțional azi: X rep × Y kg".
+- **Accesorii (non-⭐)**: `getAccessoryRec` — double progression cu ținte explicite "Opțional azi: X rep × Y kg", modulată de RIR (hard→repetă, easy→+2 rep/⚡). Prompt-ul RIR apare la ORICE exercițiu cu progresie (`isRIRRelevant` exclude pași/stretching/mobilitate/plank).
 - **Onboarding wizard**: `openWizard(prefill)` — 7 pași → `ProgramGenerator.generateProgram(profile)` → salvare + reload. X de închidere doar în reconfigure mode.
 - **Nutriție**: legacy = mesele hardcodate (TON/PUI/OMAD); custom = calculator (Mifflin-St Jeor, afișat de `renderNutritionAuto`).
 - **BF% Navy**: `calcBFNavy(waist,neck,height,sex,hip)` — femeile au formulă cu șolduri.

@@ -1935,8 +1935,8 @@ function saveSet(keyEnc,setNum,ei){
       if(!(setData[key][ck]&&setData[key][ck].savedOnServer)){allDone=false;break;}
     }
     if(allDone){
-      // Prompt RIR pentru ⭐ (calibrează Smart Coach)
-      if(exObj.star)setTimeout(function(){showRIRPrompt(key);},900);
+      // Prompt RIR la orice exercițiu cu progresie (⭐ = Smart Coach, accesorii = double progression)
+      if(isRIRRelevant(key))setTimeout(function(){showRIRPrompt(key);},900);
       // Marchează cardul ca done
       var card=document.getElementById('ec_'+ei);
       if(card){
@@ -4020,6 +4020,12 @@ function getKgIncrement(name){
 }
 
 // ── RIR (Reps In Reserve) — "cât de greu a fost" ultima sesiune ──
+// RIR are sens doar la exerciții cu progresie — nu la recovery (pași, stretching, plank etc.)
+function isRIRRelevant(name){
+  var nm=(name||'').toLowerCase();
+  return !(nm.indexOf('pași')>=0||nm.indexOf('stretch')>=0||nm.indexOf('mobilitate')>=0||nm.indexOf('plank')===0||nm.indexOf('dead bug')>=0);
+}
+
 function getLastRIR(exerciseName){
   var todayRo=getEffectiveDateRo();
   var rirRows=loadStore().rows.filter(function(r){
@@ -4290,6 +4296,17 @@ function getAccessoryRec(exerciseName,exMeta){
   if(!last.kg||last.kg<=0)return null;
 
   var inc=getAccessoryIncrement(exerciseName,maxRep);
+  // RIR-ul din sesiunea trecută modulează și accesoriile (hard→repetă, easy→escaladează)
+  var rir=getLastRIR(exerciseName);
+  if(rir==='hard'){
+    return {
+      type:'hold',
+      lastStr:last.reps+'×'+last.kg+'kg',
+      targetStr:last.reps+' rep × '+last.kg+' kg',
+      why:'ultima a fost la limită 😮‍💨 — repetă, consolidezi',
+      color:'#fbbf24'
+    };
+  }
   // Returnează ȚINTA EXPLICITĂ (rep × kg concrete), nu doar delta —
   // ca userul să știe exact ce să facă azi, fără calcul mental.
   if(last.reps>=maxRep){
@@ -4297,16 +4314,18 @@ function getAccessoryRec(exerciseName,exMeta){
       type:'at_max',
       lastStr:last.reps+'×'+last.kg+'kg ✓ max',
       targetStr:minRep+' rep × '+(last.kg+inc)+' kg',
-      why:'ai atins maximul → +'+inc+' kg',
+      why:'ai atins maximul → +'+inc+' kg'+(rir==='easy'?' ⚡':''),
       color:'var(--green)'
     };
   }
   if(last.reps>=minRep){
+    var addRep=rir==='easy'?2:1;
+    var newReps=Math.min(last.reps+addRep,maxRep);
     return {
       type:'in_range',
       lastStr:last.reps+'×'+last.kg+'kg',
-      targetStr:(last.reps+1)+' rep × '+last.kg+' kg',
-      why:'+1 rep față de ultima',
+      targetStr:newReps+' rep × '+last.kg+' kg',
+      why:'+'+(newReps-last.reps)+' rep'+(rir==='easy'?' (a fost ușor ⚡)':' față de ultima'),
       color:'var(--acc2)'
     };
   }
