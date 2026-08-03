@@ -160,7 +160,7 @@ html[data-mode="light"] .azi-stat.as4{background:#e0edff}html[data-mode="light"]
 .date-toggle-act{color:#fbbf24;border-color:rgba(245,158,11,.4)}
 .date-drawer{display:none;margin-bottom:10px}
 .date-drawer.open{display:block}
-.onboarding{position:fixed;inset:0;background:rgba(10,17,23,.95);backdrop-filter:blur(8px);z-index:1500;display:none;align-items:center;justify-content:center;padding:24px}
+.onboarding{position:fixed;inset:0;background:rgba(10,17,23,.95);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);z-index:1500;display:none;align-items:center;justify-content:center;padding:24px}
 .onboarding.show{display:flex}
 .onboarding-card{background:var(--s1);border:1px solid var(--acc);border-radius:var(--r);padding:24px;max-width:340px;text-align:center}
 .onboarding-title{font-size:22px;font-weight:700;color:var(--acc);margin-bottom:8px}
@@ -974,9 +974,9 @@ input:checked + .slider:before{transform:translateX(20px);background:var(--acc)}
     <div class="modal-ttl" id="editTtl">Editează set</div>
     <div class="modal-sub" id="editSub"></div>
     <div class="modal-inputs">
-      <input id="editReps" type="number" inputmode="numeric" min="0" max="99" placeholder="rep">
+      <input id="editReps" type="number" inputmode="numeric" enterkeyhint="next" min="0" max="99" placeholder="rep">
       <span style="color:var(--muted);font-weight:700">rep ×</span>
-      <input id="editKg" type="number" inputmode="decimal" step="0.5" min="0" max="999" placeholder="kg">
+      <input id="editKg" type="number" inputmode="decimal" enterkeyhint="done" step="0.5" min="0" max="999" placeholder="kg">
       <span style="color:var(--muted);font-weight:600">kg</span>
     </div>
     <div class="modal-btns">
@@ -1708,10 +1708,10 @@ function renderToday(){
       setsHtml+='<div class="set-box'+(isSaved?' saved':'')+(s>e.sets?' extra':'')+'" id="sb_'+ei+'_'+s+'"'+(s>e.sets?' title="Set extra — săpt. 7"':'')+'>';
       setsHtml+='<div class="set-lbl">'+(isSaved?'✓ S':'S')+s+(s>e.sets?'<div style="font-size:8px;color:var(--acc2);letter-spacing:.5px">+1</div>':'')+'</div>';
       setsHtml+='<div class="set-inputs">';
-      setsHtml+='<input class="set-in" type="number" inputmode="numeric" min="0" max="99" placeholder="rep" value="'+(saved.reps||'')+'" oninput="upSet(\''+sk+'\','+s+',\'reps\',this.value,this)">';
+      setsHtml+='<input class="set-in" type="number" inputmode="numeric" enterkeyhint="next" min="0" max="99" placeholder="rep" value="'+(saved.reps||'')+'" oninput="upSet(\''+sk+'\','+s+',\'reps\',this.value,this)">';
       setsHtml+='<div class="stepper"><button class="stepper-btn" onclick="stepInput(\''+sk+'\','+s+',\'reps\',1,'+ei+')">+</button><button class="stepper-btn" onclick="stepInput(\''+sk+'\','+s+',\'reps\',-1,'+ei+')">−</button></div>';
       setsHtml+='<span class="set-sep">×</span>';
-      setsHtml+='<input class="set-in" type="number" inputmode="decimal" step="0.5" min="0" max="999" placeholder="kg" value="'+(saved.kg||'')+'" oninput="upSet(\''+sk+'\','+s+',\'kg\',this.value,this)">';
+      setsHtml+='<input class="set-in" type="number" inputmode="decimal" enterkeyhint="done" step="0.5" min="0" max="999" placeholder="kg" value="'+(saved.kg||'')+'" oninput="upSet(\''+sk+'\','+s+',\'kg\',this.value,this)">';
       setsHtml+='<div class="stepper"><button class="stepper-btn" onclick="stepInput(\''+sk+'\','+s+',\'kg\',1,'+ei+')">+</button><button class="stepper-btn" onclick="stepInput(\''+sk+'\','+s+',\'kg\',-1,'+ei+')">−</button></div>';
       setsHtml+='</div>';
       setsHtml+='<button class="set-btn" onclick="saveSet(\''+sk+'\','+s+','+ei+')">'+(isSaved?'✓':'💾')+'</button></div>';
@@ -2003,35 +2003,132 @@ function getRestTimerCfg(){
   };
 }
 
-// AudioContext trebuie creat pe un gest de user (tap) — apelat din saveSet
+// Melodia de final de pauză (~3.4s): 2 grupuri Do-Do-Sol + final ascendent Mi-Sol-Do7 lung.
+// Partajată de ambele căi de redare (element <audio> + fallback WebAudio).
+var BEEP_NOTES=[
+  {f:1046.5,t:0.00,d:0.16},{f:1046.5,t:0.22,d:0.16},{f:1568.0,t:0.44,d:0.24},
+  {f:1046.5,t:0.92,d:0.16},{f:1046.5,t:1.14,d:0.16},{f:1568.0,t:1.36,d:0.24},
+  {f:1318.5,t:1.88,d:0.15},{f:1568.0,t:2.08,d:0.15},{f:2093.0,t:2.28,d:0.55},
+  {f:2093.0,t:2.98,d:0.32}
+];
+var BEEP_LEN=3.4;
+
+// iPhone: WebAudio e tratat ca "sound effect" → urmează comutatorul de SILENȚIOS, nu volumul media.
+// Redăm prin element <audio> (canal MEDIA → merge și pe silențios, la volumul media),
+// cu WAV sintetizat local (offline-safe). WebAudio rămâne fallback.
+var beepAudio=null,beepPrimed=false;
+function buildBeepAudio(){
+  if(beepAudio)return;
+  try{
+    var sr=22050,len=Math.ceil(sr*BEEP_LEN),data=new Float32Array(len);
+    BEEP_NOTES.forEach(function(n){
+      var s0=Math.floor(n.t*sr),s1=Math.min(len,Math.floor((n.t+n.d)*sr));
+      for(var i=s0;i<s1;i++){
+        var tt=(i-s0)/sr;
+        var env=Math.min(1,tt/0.012)*Math.min(1,Math.max(0,(n.d-tt))/0.05);
+        if(env>1)env=1;
+        var ph=2*Math.PI*tt;
+        // două square-uri ușor dezacordate = percepție mai tare decât sine
+        var v=(Math.sign(Math.sin(ph*n.f))+Math.sign(Math.sin(ph*n.f*1.004)))*0.5;
+        data[i]+=v*env*0.42;
+      }
+    });
+    var buf=new ArrayBuffer(44+len*2),dv=new DataView(buf);
+    var wstr=function(o,s){for(var i=0;i<s.length;i++)dv.setUint8(o+i,s.charCodeAt(i));};
+    wstr(0,'RIFF');dv.setUint32(4,36+len*2,true);wstr(8,'WAVE');wstr(12,'fmt ');
+    dv.setUint32(16,16,true);dv.setUint16(20,1,true);dv.setUint16(22,1,true);
+    dv.setUint32(24,sr,true);dv.setUint32(28,sr*2,true);dv.setUint16(32,2,true);dv.setUint16(34,16,true);
+    wstr(36,'data');dv.setUint32(40,len*2,true);
+    for(var j=0;j<len;j++){var x=Math.max(-1,Math.min(1,data[j]));dv.setInt16(44+j*2,x*32767,true);}
+    beepAudio=new Audio(URL.createObjectURL(new Blob([buf],{type:'audio/wav'})));
+    beepAudio.preload='auto';
+  }catch(e){}
+}
+
+// AudioContext + deblocarea elementului <audio> — pe un gest de user (tap); apelat din saveSet
 function ensureAudio(){
   if(!audioCtx){
     try{audioCtx=new (window.AudioContext||window.webkitAudioContext)();}catch(e){}
   }
   if(audioCtx&&audioCtx.state==='suspended'){audioCtx.resume().catch(function(){});}
+  buildBeepAudio();
+  // "Prime": o redare mută în gestul de tap → iOS permite apoi play() din timer
+  if(beepAudio&&!beepPrimed){
+    beepPrimed=true;
+    try{
+      beepAudio.muted=true;
+      var p=beepAudio.play();
+      if(p&&p.then){
+        p.then(function(){beepAudio.pause();beepAudio.currentTime=0;beepAudio.muted=false;})
+         .catch(function(){beepAudio.muted=false;beepPrimed=false;});
+      }else{beepAudio.muted=false;}
+    }catch(e){beepAudio.muted=false;beepPrimed=false;}
+  }
 }
 
 function playBeep(){
   if(!getRestTimerCfg().sound)return;
+  buildBeepAudio();
+  if(beepAudio){
+    try{
+      beepAudio.currentTime=0;
+      var p=beepAudio.play();
+      if(p&&p.catch)p.catch(function(){playBeepOsc();});
+      return;
+    }catch(e){}
+  }
+  playBeepOsc();
+}
+
+// Tasta Enter/„next" din tastatură: rep → kg → salvează setul → rep-ul setului următor.
+// Delegat global — merge și în modalul de editare.
+document.addEventListener('keydown',function(ev){
+  if(ev.key!=='Enter')return;
+  var el=ev.target;
+  if(!el||!el.classList)return;
+  if(el.classList.contains('set-in')){
+    ev.preventDefault();
+    var box=el.closest('.set-box');
+    if(!box)return;
+    var ins=box.querySelectorAll('.set-in');
+    if(el===ins[0]&&ins[1]){
+      ins[1].focus();if(ins[1].select)ins[1].select();
+    }else{
+      var btn=box.querySelector('.set-btn');
+      if(btn)btn.click();
+      var next=box.nextElementSibling;
+      if(next&&next.classList.contains('set-box')){
+        var ni=next.querySelector('.set-in');
+        if(ni){ni.focus();if(ni.select)ni.select();}
+      }else{el.blur();}
+    }
+  }else if(el.id==='editReps'){
+    ev.preventDefault();
+    var k=document.getElementById('editKg');
+    if(k){k.focus();if(k.select)k.select();}
+  }else if(el.id==='editKg'){
+    ev.preventDefault();
+    saveEdit();
+  }
+});
+
+// Fallback WebAudio — aceeași melodie
+function playBeepOsc(){
   if(!audioCtx)return;
   try{
     var t=audioCtx.currentTime;
-    // 6 beep-uri în 2 grupe pe ~1.6s — square wave (penetrant) + 2 oscilatoare
-    // ușor dezacordate per beep = percepție mult mai tare decât sine simplu
-    var pattern=[0,0.22,0.44, 0.95,1.17,1.39];
-    pattern.forEach(function(off,i){
-      var freq=(i%3===2)?1568:1046; // al 3-lea din grup mai înalt (Sol6 vs Do6)
+    BEEP_NOTES.forEach(function(n){
       [0,4].forEach(function(det){
         var o=audioCtx.createOscillator(),g=audioCtx.createGain();
         o.connect(g);g.connect(audioCtx.destination);
         o.type='square';
-        o.frequency.value=freq;
+        o.frequency.value=n.f;
         o.detune.value=det;
-        g.gain.setValueAtTime(0.0001,t+off);
-        g.gain.exponentialRampToValueAtTime(0.45,t+off+0.015);
-        g.gain.setValueAtTime(0.45,t+off+0.13);
-        g.gain.exponentialRampToValueAtTime(0.0001,t+off+0.21);
-        o.start(t+off);o.stop(t+off+0.23);
+        g.gain.setValueAtTime(0.0001,t+n.t);
+        g.gain.exponentialRampToValueAtTime(0.45,t+n.t+0.015);
+        g.gain.setValueAtTime(0.45,t+n.t+n.d-0.05);
+        g.gain.exponentialRampToValueAtTime(0.0001,t+n.t+n.d);
+        o.start(t+n.t);o.stop(t+n.t+n.d+0.02);
       });
     });
   }catch(e){}
