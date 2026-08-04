@@ -1570,6 +1570,15 @@ function initHeader(){
 // ═══════════════════════════════════════════════════════════════
 // TAB AZI — ANTRENAMENT + CHECKLIST
 // ═══════════════════════════════════════════════════════════════
+// Rezumatul zilei: starea pliat/depliat per dată (doar pe durata sesiunii)
+var summaryCollapsed={};
+function toggleDaySummary(){
+  var c=document.getElementById('daySummaryCard');
+  if(!c)return;
+  c.classList.toggle('open');
+  summaryCollapsed[getEffectiveDateRo()]=!c.classList.contains('open');
+}
+
 // Săpt. 7 (+1 set): index-ul exercițiului din ziua curentă care primește setul extra
 var aziAddSetIdx=-1;
 function effectiveSets(e,ei){return e.sets+(ei===aziAddSetIdx?1:0);}
@@ -1639,14 +1648,17 @@ function renderToday(){
     }
   }
   // Calculează stats pentru ziua selectată
-  var setsToday=0,totalSetsExpected=0,morningDone=0,morningTotal=0,checkDone=0;
+  var setsToday=0,totalSetsExpected=0,morningDone=0,morningTotal=0,checkDone=0,tonnageToday=0;
   ex.list.forEach(function(eItem,eIdx){
     var effS=effectiveSets(eItem,eIdx);
     totalSetsExpected+=effS;
     var k=eItem.name;
     if(setData[k]){
       for(var ss=1;ss<=effS;ss++){
-        if(setData[k][ss]&&setData[k][ss].savedOnServer)setsToday++;
+        if(setData[k][ss]&&setData[k][ss].savedOnServer){
+          setsToday++;
+          tonnageToday+=(parseFloat(setData[k][ss].kg)||0)*(parseFloat(setData[k][ss].reps)||0);
+        }
       }
     }
   });
@@ -1826,6 +1838,61 @@ function renderToday(){
     var kgHint=kgConv?'<div style="font-size:10px;color:var(--muted);padding:10px 2px 0">⚖️ '+kgConv+'</div>':'';
     html+='<div class="card-bd"><div>'+kgHint+setsHtml+noteHtml+'</div></div></div>';
   });
+
+  // Rezumatul zilei — apare când TOATE seturile zilei sunt salvate; persistă (recalculat din date)
+  if(totalSetsExpected>0&&setsToday>=totalSetsExpected){
+    var sumDateRo=getEffectiveDateRo();
+    var dayRows=getRowsForDate(sumDateRo).filter(function(r){return r.type==='antrenament';});
+    var prs=dayRows.filter(function(r){return r.note&&r.note.indexOf('PR:')===0;});
+    // dedup: un singur PR per exercițiu+tip, cu setul cel mai bun
+    var prBest={};
+    prs.forEach(function(r){
+      var k=r.exercise+'|'+r.note;
+      var score=(parseFloat(r.kg)||0)*1000+(parseFloat(r.reps)||0);
+      if(!prBest[k]||score>prBest[k].score)prBest[k]={r:r,score:score};
+    });
+    var prKeys=Object.keys(prBest);
+    // sesiunea anterioară cu aceleași exerciții (aceeași zi de program, săptămânile trecute)
+    var sumNames={};ex.list.forEach(function(e){sumNames[e.name]=1;});
+    var prevByDate={};var todayD=parseRoDate(sumDateRo);
+    loadStore().rows.forEach(function(r){
+      if(r.type!=='antrenament'||!sumNames[r.exercise]||r.date===sumDateRo)return;
+      var d=parseRoDate(r.date);
+      if(!d||!todayD||d>=todayD)return;
+      (prevByDate[r.date]=prevByDate[r.date]||[]).push(r);
+    });
+    var prevDates=Object.keys(prevByDate).sort(function(a,b){return parseRoDate(b)-parseRoDate(a);});
+    var prevTon=0,prevDate=null;
+    if(prevDates.length){
+      prevDate=prevDates[0];
+      prevByDate[prevDate].forEach(function(r){prevTon+=(parseFloat(r.kg)||0)*(parseFloat(r.reps)||0);});
+    }
+    var sumCollapsed=summaryCollapsed[sumDateRo]===true;
+    html+='<div class="card'+(sumCollapsed?'':' open')+'" id="daySummaryCard" style="border-color:rgba(34,197,94,.5);background:linear-gradient(135deg,rgba(34,197,94,.05),transparent)">';
+    html+='<div class="card-hd" onclick="toggleDaySummary()">';
+    html+='<div class="card-ico" style="background:rgba(34,197,94,.15)">🎉</div>';
+    html+='<div style="flex:1;min-width:0"><div class="card-ttl">Rezumatul zilei — antrenament complet!</div><div class="card-sub">'+setsToday+' seturi'+(tonnageToday>0?' · '+Math.round(tonnageToday)+' kg tonaj':'')+(prKeys.length?' · 🏆 '+prKeys.length+' PR':'')+'</div></div>';
+    html+='<div class="card-chev">▼</div></div>';
+    html+='<div class="card-bd"><div style="padding-top:10px;font-size:12.5px;line-height:1.9">';
+    html+='💪 <strong>'+ex.list.length+'</strong> exerciții · <strong>'+setsToday+'</strong> seturi'+(tonnageToday>0?' · <strong>'+Math.round(tonnageToday)+' kg</strong> ridicați în total':'')+'<br>';
+    if(prevDate&&prevTon>0&&tonnageToday>0){
+      var tonDelta=tonnageToday-prevTon;
+      var tonPct=Math.round(tonDelta/prevTon*100);
+      html+='📊 vs. sesiunea din '+prevDate+': <strong style="color:'+(tonDelta>=0?'var(--green)':'#fbbf24')+'">'+(tonDelta>=0?'+':'')+Math.round(tonDelta)+' kg ('+(tonPct>=0?'+':'')+tonPct+'%)</strong><br>';
+    }
+    if(prKeys.length){
+      html+='🏆 PR-uri azi:<br>';
+      prKeys.forEach(function(k){
+        var r=prBest[k].r;
+        var prLbl={kg:'greutate max',reps:'rep max',volume:'volum max'}[r.note.slice(3)]||r.note.slice(3);
+        html+='&nbsp;&nbsp;• '+r.exercise+' — '+r.reps+'×'+r.kg+'kg <span style="color:var(--acc2)">('+prLbl+')</span><br>';
+      });
+    }
+    var sumStreak=getActivityStreak();
+    if(sumStreak>=2)html+='🔥 Streak: <strong>'+sumStreak+' zile</strong><br>';
+    html+='<span style="color:var(--muted)">😴 Recuperarea începe acum: proteinele + somnul de 7+ ore fac creșterea.</span>';
+    html+='</div></div></div>';
+  }
 
   // Buton "Adaugă exercițiu custom"
   html+='<div class="add-custom-row" onclick="addCustomExerciseDialog()"><span style="font-size:18px">➕</span><div style="flex:1"><div style="font-weight:700;font-size:13px;color:var(--acc2)">Adaugă exercițiu suplimentar</div><div style="font-size:11px;color:var(--muted)">Pentru ceva în plus față de program (doar azi)</div></div></div>';
@@ -2437,6 +2504,12 @@ function showWorkoutComplete(){
   var prCount=todayRows.filter(function(r){return r.note&&r.note.indexOf('PR:')===0;}).length;
   showToast('🎉 Antrenament complet! '+totalSets+' sets · '+totalTonnage.toFixed(0)+' kg total'+(prCount?' · 🏆 '+prCount+' PR':''),'var(--green)');
   if(navigator.vibrate)navigator.vibrate([200,100,200,100,200]);
+  // Re-randează ca să apară cardul persistent "Rezumatul zilei" + scroll la el
+  setTimeout(function(){
+    renderToday();
+    var c=document.getElementById('daySummaryCard');
+    if(c)c.scrollIntoView({behavior:'smooth',block:'center'});
+  },1200);
 }
 
 function renderChecklist(){
