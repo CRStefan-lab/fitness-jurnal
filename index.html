@@ -2164,15 +2164,18 @@ function ensureAudio(){
   }
   if(audioCtx&&audioCtx.state==='suspended'){audioCtx.resume().catch(function(){});}
   var a=buildBeepAudio();
-  // "Prime": o redare mută în gestul de tap → iOS permite apoi play() din timer
+  // "Prime": o redare mută în gestul de tap → iOS permite apoi play() din timer.
+  // _skipPause: dacă între timp a pornit o redare reală, priming-ul NU o mai oprește.
   if(a&&!a._primed){
     a._primed=true;
     try{
-      a.muted=true;
+      a.muted=true;a._skipPause=false;
       var p=a.play();
       if(p&&p.then){
-        p.then(function(){a.pause();a.currentTime=0;a.muted=false;})
-         .catch(function(){a.muted=false;a._primed=false;});
+        p.then(function(){
+          if(!a._skipPause){a.pause();a.currentTime=0;}
+          a.muted=false;
+        }).catch(function(){a.muted=false;a._primed=false;});
       }else{a.muted=false;}
     }catch(e){a.muted=false;a._primed=false;}
   }
@@ -2183,9 +2186,12 @@ function playBeep(){
   var a=buildBeepAudio();
   if(a){
     try{
+      a._skipPause=true;  // redare reală — priming-ul în zbor să n-o pună pe pauză
+      a.muted=false;
       a.currentTime=0;
       var p=a.play();
-      if(p&&p.catch)p.catch(function(){playBeepOsc();});
+      if(p&&p.then){p.then(function(){a._primed=true;}).catch(function(){playBeepOsc();});}
+      else{a._primed=true;}
       return;
     }catch(e){}
   }
@@ -2196,8 +2202,16 @@ function changeMelody(){
   var sel=document.getElementById('restTimerMelody');
   if(!sel)return;
   localStorage.setItem('rest_timer_melody',sel.value);
-  ensureAudio(); // suntem într-un gest — construiește și deblochează noua melodie
-  playBeep();    // preview instant
+  // oprește orice altă melodie rămasă în redare
+  Object.keys(beepCache).forEach(function(k){
+    if(k!==sel.value&&beepCache[k]){try{beepCache[k].pause();beepCache[k].currentTime=0;}catch(e){}}
+  });
+  // Preview direct în gestul de tap — redarea însăși deblochează elementul (fără priming concurent)
+  var a=buildBeepAudio(sel.value);
+  if(a){
+    a._primed=true;a._skipPause=true;a.muted=false;
+    try{a.currentTime=0;var p=a.play();if(p&&p.catch)p.catch(function(){});}catch(e){}
+  }
 }
 
 // Tasta Enter/„next" din tastatură: rep → kg → salvează setul → rep-ul setului următor.
@@ -2232,24 +2246,25 @@ document.addEventListener('keydown',function(ev){
   }
 });
 
-// Fallback WebAudio — aceeași melodie (varianta square, indiferent de selecție)
+// Fallback WebAudio — respectă caracterul melodiei alese: sinus blând pentru
+// melodiile calme, square DOAR pentru "Alertă" (înainte totul cădea pe square
+// la volum dublu → "se aude tare și diferit de Setări")
 function playBeepOsc(){
   if(!audioCtx)return;
   try{
+    var m=MELODIES[getMelodyId()];
+    var isSquare=m.wave==='square';
+    var peak=isSquare?0.35:0.5;
     var t=audioCtx.currentTime;
-    MELODIES[getMelodyId()].notes.forEach(function(n){
-      [0,4].forEach(function(det){
-        var o=audioCtx.createOscillator(),g=audioCtx.createGain();
-        o.connect(g);g.connect(audioCtx.destination);
-        o.type='square';
-        o.frequency.value=n.f;
-        o.detune.value=det;
-        g.gain.setValueAtTime(0.0001,t+n.t);
-        g.gain.exponentialRampToValueAtTime(0.45,t+n.t+0.015);
-        g.gain.setValueAtTime(0.45,t+n.t+n.d-0.05);
-        g.gain.exponentialRampToValueAtTime(0.0001,t+n.t+n.d);
-        o.start(t+n.t);o.stop(t+n.t+n.d+0.02);
-      });
+    m.notes.forEach(function(n){
+      var o=audioCtx.createOscillator(),g=audioCtx.createGain();
+      o.connect(g);g.connect(audioCtx.destination);
+      o.type=isSquare?'square':'sine';
+      o.frequency.value=n.f;
+      g.gain.setValueAtTime(0.0001,t+n.t);
+      g.gain.exponentialRampToValueAtTime(peak,t+n.t+0.02);
+      g.gain.exponentialRampToValueAtTime(0.0001,t+n.t+n.d);
+      o.start(t+n.t);o.stop(t+n.t+n.d+0.02);
     });
   }catch(e){}
 }
