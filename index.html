@@ -539,105 +539,147 @@ input:checked + .slider:before{transform:translateX(20px);background:var(--acc)}
 <div id="tab-program" class="sec"><div id="prog-content"></div></div>
 
 <div id="tab-progres" class="sec">
-  <div class="stitle">📏 Măsurători corp</div>
-  <div class="date-toggle" id="measFormToggle" onclick="toggleMeasForm()">
-    <span>📏 <strong style="color:var(--text)" id="measFormLabel">Adaugă măsurătoare</strong></span>
-    <span id="measFormChev">▾</span>
-  </div>
-  <div class="date-drawer" id="measFormWrap">
-  <div class="meas-date">
-    <div class="meas-lbl">DATA</div>
-    <input class="meas-in" type="date" id="measDate">
-  </div>
-  <div class="meas-grid">
-    <div class="meas-field">
-      <div class="meas-lbl">⚖️ Greutate</div>
-      <div class="meas-input-row"><input class="meas-in" type="number" step="0.1" inputmode="decimal" id="mWeight" placeholder="kg"><span class="meas-unit">kg</span></div>
-    </div>
-    <div class="meas-field">
-      <div class="meas-lbl">Talie</div>
-      <div class="meas-input-row"><input class="meas-in" type="number" step="0.5" inputmode="decimal" id="mWaist" placeholder="cm"><span class="meas-unit">cm</span></div>
-    </div>
-    <div class="meas-field">
-      <div class="meas-lbl">Piept</div>
-      <div class="meas-input-row"><input class="meas-in" type="number" step="0.5" inputmode="decimal" id="mChest" placeholder="cm"><span class="meas-unit">cm</span></div>
-    </div>
-    <div class="meas-field">
-      <div class="meas-lbl">Braț (contractat)</div>
-      <div class="meas-input-row"><input class="meas-in" type="number" step="0.5" inputmode="decimal" id="mBiceps" placeholder="cm"><span class="meas-unit">cm</span></div>
-    </div>
-    <div class="meas-field">
-      <div class="meas-lbl">Coapsă</div>
-      <div class="meas-input-row"><input class="meas-in" type="number" step="0.5" inputmode="decimal" id="mThigh" placeholder="cm"><span class="meas-unit">cm</span></div>
-    </div>
-    <div class="meas-field">
-      <div class="meas-lbl">Șolduri</div>
-      <div class="meas-input-row"><input class="meas-in" type="number" step="0.5" inputmode="decimal" id="mHip" placeholder="cm"><span class="meas-unit">cm</span></div>
-    </div>
-    <div class="meas-field">
-      <div class="meas-lbl">Gât</div>
-      <div class="meas-input-row"><input class="meas-in" type="number" step="0.5" inputmode="decimal" id="mNeck" placeholder="cm"><span class="meas-unit">cm</span></div>
-    </div>
-    <div class="meas-field">
-      <div class="meas-lbl">Gambă</div>
-      <div class="meas-input-row"><input class="meas-in" type="number" step="0.5" inputmode="decimal" id="mCalf" placeholder="cm"><span class="meas-unit">cm</span></div>
-    </div>
-  </div>
-  <div class="meas-field" style="margin-bottom:10px">
-    <div class="meas-lbl">Notă (opțional)</div>
-    <input class="meas-in" type="text" id="mNote" placeholder="ex: după antrenament, dimineața, etc.">
-  </div>
-  <button class="btn btn-acc" onclick="saveMeasurement()">💾 Salvează măsurătorile</button>
-  </div>
-  <div id="measHistory"></div>
+  <div class="stitle">📈 Progres</div>
 
-  <div class="stitle">📸 Poze de progres</div>
-  <p style="font-size:11px;color:var(--muted);margin-bottom:8px;line-height:1.4">
-    Cântarul minte, oglinda minte — pozele nu. O poză pe lună, aceeași poziție și lumină. Stocate DOAR pe telefonul tău.
-  </p>
-  <button class="btn btn-ghost" onclick="document.getElementById('photoInput').click()">➕ Adaugă poză de progres</button>
-  <input type="file" id="photoInput" accept="image/*" capture="environment" style="display:none" onchange="addProgressPhoto(event)">
-  <div id="photoCompare"></div>
-  <div id="photoGrid" style="display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-top:8px"></div>
-
-  <div class="stitle">📈 Grafice evoluție corp</div>
-  <div class="seg" id="metricSeg"></div>
-  <div class="seg" id="rangeSeg">
-    <button class="seg-btn" data-range="4">4 săpt.</button>
-    <button class="seg-btn act" data-range="8">8 săpt.</button>
-    <button class="seg-btn" data-range="13">3 luni</button>
-    <button class="seg-btn" data-range="0">Tot</button>
-  </div>
-  <div class="chart-wrap">
-    <div id="bodyChart"></div>
-    <div class="chart-stats" id="bodyStats"></div>
+  <div class="sgroup open" id="pgExercitii">
+    <div class="sgroup-hd" onclick="this.parentElement.classList.toggle('open');pgRerender('pgExercitii')">
+      <div class="sgroup-ico">🏋️</div>
+      <div style="flex:1;min-width:0"><div class="sgroup-ttl">Progres exerciții</div><div class="sgroup-sub">Evoluție kg / volum + recorduri personale</div></div>
+      <div class="sgroup-chev">▼</div>
+    </div>
+    <div class="sgroup-bd">
+      <div style="height:12px"></div>
+      <select class="select-box" id="exerSelect">
+        <option value="">— Alege exercițiu —</option>
+      </select>
+      <div class="seg" id="exerMetricSeg">
+        <button class="seg-btn act" data-em="maxkg">Max kg</button>
+        <button class="seg-btn" data-em="volume">Volum (Σ rep×kg)</button>
+        <button class="seg-btn" data-em="avgreps">Rep medii</button>
+      </div>
+      <div class="seg" id="exerRangeSeg">
+        <button class="seg-btn" data-xr="8">8 săpt.</button>
+        <button class="seg-btn act" data-xr="13">3 luni</button>
+        <button class="seg-btn" data-xr="26">6 luni</button>
+        <button class="seg-btn" data-xr="0">Tot</button>
+      </div>
+      <div class="chart-wrap">
+        <div id="exerChart"></div>
+        <div class="chart-stats" id="exerStats"></div>
+      </div>
+      <div class="stitle">🏆 Recorduri personale</div>
+      <div id="prList"></div>
+    </div>
   </div>
 
-  <div class="stitle">⚖️ Recomp: greutate vs masă slabă</div>
-  <p style="font-size:11px;color:var(--muted);margin-bottom:8px;line-height:1.4">
-    🟠 greutate · 🟢 masă slabă. Ideal: greutatea scade, masa slabă rămâne stabilă/crește = pierzi grăsime, nu mușchi.
-  </p>
-  <div class="chart-wrap">
-    <div id="recompChart"></div>
-    <div class="chart-stats" id="recompStats"></div>
+  <div class="sgroup" id="pgMasuratori">
+    <div class="sgroup-hd" onclick="this.parentElement.classList.toggle('open');pgRerender('pgMasuratori')">
+      <div class="sgroup-ico">📏</div>
+      <div style="flex:1;min-width:0"><div class="sgroup-ttl">Măsurători corp</div><div class="sgroup-sub" id="pgMasSub">Adaugă + istoric cu BF% estimat</div></div>
+      <div class="sgroup-chev">▼</div>
+    </div>
+    <div class="sgroup-bd">
+      <div style="height:12px"></div>
+      <div class="date-toggle" id="measFormToggle" onclick="toggleMeasForm()">
+        <span>📏 <strong style="color:var(--text)" id="measFormLabel">Adaugă măsurătoare</strong></span>
+        <span id="measFormChev">▾</span>
+      </div>
+      <div class="date-drawer" id="measFormWrap">
+      <div class="meas-date">
+        <div class="meas-lbl">DATA</div>
+        <input class="meas-in" type="date" id="measDate">
+      </div>
+      <div class="meas-grid">
+        <div class="meas-field">
+          <div class="meas-lbl">⚖️ Greutate</div>
+          <div class="meas-input-row"><input class="meas-in" type="number" step="0.1" inputmode="decimal" id="mWeight" placeholder="kg"><span class="meas-unit">kg</span></div>
+        </div>
+        <div class="meas-field">
+          <div class="meas-lbl">Talie</div>
+          <div class="meas-input-row"><input class="meas-in" type="number" step="0.5" inputmode="decimal" id="mWaist" placeholder="cm"><span class="meas-unit">cm</span></div>
+        </div>
+        <div class="meas-field">
+          <div class="meas-lbl">Piept</div>
+          <div class="meas-input-row"><input class="meas-in" type="number" step="0.5" inputmode="decimal" id="mChest" placeholder="cm"><span class="meas-unit">cm</span></div>
+        </div>
+        <div class="meas-field">
+          <div class="meas-lbl">Braț (contractat)</div>
+          <div class="meas-input-row"><input class="meas-in" type="number" step="0.5" inputmode="decimal" id="mBiceps" placeholder="cm"><span class="meas-unit">cm</span></div>
+        </div>
+        <div class="meas-field">
+          <div class="meas-lbl">Coapsă</div>
+          <div class="meas-input-row"><input class="meas-in" type="number" step="0.5" inputmode="decimal" id="mThigh" placeholder="cm"><span class="meas-unit">cm</span></div>
+        </div>
+        <div class="meas-field">
+          <div class="meas-lbl">Șolduri</div>
+          <div class="meas-input-row"><input class="meas-in" type="number" step="0.5" inputmode="decimal" id="mHip" placeholder="cm"><span class="meas-unit">cm</span></div>
+        </div>
+        <div class="meas-field">
+          <div class="meas-lbl">Gât</div>
+          <div class="meas-input-row"><input class="meas-in" type="number" step="0.5" inputmode="decimal" id="mNeck" placeholder="cm"><span class="meas-unit">cm</span></div>
+        </div>
+        <div class="meas-field">
+          <div class="meas-lbl">Gambă</div>
+          <div class="meas-input-row"><input class="meas-in" type="number" step="0.5" inputmode="decimal" id="mCalf" placeholder="cm"><span class="meas-unit">cm</span></div>
+        </div>
+      </div>
+      <div class="meas-field" style="margin-bottom:10px">
+        <div class="meas-lbl">Notă (opțional)</div>
+        <input class="meas-in" type="text" id="mNote" placeholder="ex: după antrenament, dimineața, etc.">
+      </div>
+      <button class="btn btn-acc" onclick="saveMeasurement()">💾 Salvează măsurătorile</button>
+      </div>
+      <div id="measHistory"></div>
+    </div>
   </div>
 
-  <div class="stitle">🏋️ Progres exercițiu</div>
-  <select class="select-box" id="exerSelect">
-    <option value="">— Alege exercițiu —</option>
-  </select>
-  <div class="seg" id="exerMetricSeg">
-    <button class="seg-btn act" data-em="maxkg">Max kg</button>
-    <button class="seg-btn" data-em="volume">Volum (Σ rep×kg)</button>
-    <button class="seg-btn" data-em="avgreps">Rep medii</button>
-  </div>
-  <div class="chart-wrap">
-    <div id="exerChart"></div>
-    <div class="chart-stats" id="exerStats"></div>
+  <div class="sgroup" id="pgCorp">
+    <div class="sgroup-hd" onclick="this.parentElement.classList.toggle('open');pgRerender('pgCorp')">
+      <div class="sgroup-ico">📊</div>
+      <div style="flex:1;min-width:0"><div class="sgroup-ttl">Grafice corp</div><div class="sgroup-sub">Greutate, talie, BF% + verdictul recomp</div></div>
+      <div class="sgroup-chev">▼</div>
+    </div>
+    <div class="sgroup-bd">
+      <div style="height:12px"></div>
+      <div class="seg" id="metricSeg"></div>
+      <div class="seg" id="rangeSeg">
+        <button class="seg-btn" data-range="4">4 săpt.</button>
+        <button class="seg-btn act" data-range="8">8 săpt.</button>
+        <button class="seg-btn" data-range="13">3 luni</button>
+        <button class="seg-btn" data-range="0">Tot</button>
+      </div>
+      <div class="chart-wrap">
+        <div id="bodyChart"></div>
+        <div class="chart-stats" id="bodyStats"></div>
+      </div>
+
+      <div class="stitle">⚖️ Recomp: greutate vs masă slabă</div>
+      <p style="font-size:11px;color:var(--muted);margin-bottom:8px;line-height:1.4">
+        🟠 greutate · 🟢 masă slabă. Ideal: greutatea scade, masa slabă rămâne stabilă/crește = pierzi grăsime, nu mușchi.
+      </p>
+      <div class="chart-wrap">
+        <div id="recompChart"></div>
+        <div class="chart-stats" id="recompStats"></div>
+      </div>
+    </div>
   </div>
 
-  <div class="stitle">🏆 Recorduri personale</div>
-  <div id="prList"></div>
+  <div class="sgroup" id="pgPoze">
+    <div class="sgroup-hd" onclick="this.parentElement.classList.toggle('open');pgRerender('pgPoze')">
+      <div class="sgroup-ico">📸</div>
+      <div style="flex:1;min-width:0"><div class="sgroup-ttl">Poze de progres</div><div class="sgroup-sub">Compară în timp — stocate doar pe telefonul tău</div></div>
+      <div class="sgroup-chev">▼</div>
+    </div>
+    <div class="sgroup-bd">
+      <p style="font-size:11px;color:var(--muted);margin:12px 0 8px;line-height:1.4">
+        Cântarul minte, oglinda minte — pozele nu. O poză pe lună, aceeași poziție și lumină.
+      </p>
+      <button class="btn btn-ghost" onclick="document.getElementById('photoInput').click()">➕ Adaugă poză de progres</button>
+      <input type="file" id="photoInput" accept="image/*" capture="environment" style="display:none" onchange="addProgressPhoto(event)">
+      <div id="photoCompare"></div>
+      <div id="photoGrid" style="display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-top:8px"></div>
+    </div>
+  </div>
 
   <p style="font-size:11px;color:var(--muted);margin-top:16px;line-height:1.5;text-align:center">
     🔔 Notificări · ☁️ Sync · 💾 Backup — găsești toate în <a onclick="showTab('setari')" style="color:var(--acc);cursor:pointer;text-decoration:underline">Setări ⚙️</a>
@@ -2855,7 +2897,8 @@ function renderMeasurements(){
   }
   var profile=getProfile();
   var html='<div class="meas-history" style="margin-top:10px">';
-  history.slice(0,12).forEach(function(r,i){
+  var visible=measShowAll?history:history.slice(0,6);
+  visible.forEach(function(r,i){
     var next=history[i+1]; // următoarea = mai veche
     html+='<div class="meas-hist-row"><div class="meas-hist-date">📅 '+r.date+(r.note?' · <span style="color:var(--muted);font-weight:400">'+r.note+'</span>':'')+'</div>';
     html+='<div class="meas-hist-vals">';
@@ -2892,12 +2935,14 @@ function renderMeasurements(){
     }
     html+='</div></div>';
   });
-  if(history.length>12){
-    html+='<div style="padding:10px;text-align:center;color:var(--muted);font-size:11px">+ '+(history.length-12)+' măsurători mai vechi (vezi în export)</div>';
+  if(history.length>6){
+    html+='<button class="btn btn-ghost" style="font-size:12px;padding:9px" onclick="measShowAll=!measShowAll;renderMeasurements()">'+
+      (measShowAll?'▲ Arată doar recentele':'▼ Arată toate ('+history.length+')')+'</button>';
   }
   html+='</div>';
   cont.innerHTML=html;
 }
+var measShowAll=false;
 
 // ═══════════════════════════════════════════════════════════════
 // ISTORIC — NAVIGARE SĂPTĂMÂNI
@@ -4638,7 +4683,17 @@ function renderLineChart(containerId, points, opts){
 // ═══════════════════════════════════════════════════════════════
 // PROGRES — EVOLUȚIE CORP
 // ═══════════════════════════════════════════════════════════════
-var progresState={metric:'weight',range:8,exerMetric:'maxkg',selectedExer:''};
+var progresState={metric:'weight',range:8,exerMetric:'maxkg',exerRange:13,selectedExer:''};
+
+// Re-randează graficele unui grup din Progres când e deschis (SVG-urile măsoară lățimea containerului)
+function pgRerender(id){
+  var g=document.getElementById(id);
+  if(!g||!g.classList.contains('open'))return;
+  if(id==='pgExercitii'){renderExerciseChart();renderPRList();}
+  else if(id==='pgCorp'){renderBodyChart();renderRecompChart();}
+  else if(id==='pgMasuratori'){renderMeasurements();syncMeasFormState();}
+  else if(id==='pgPoze'){renderPhotos();}
+}
 
 function initMetricSeg(){
   var seg=document.getElementById('metricSeg');
@@ -4823,6 +4878,14 @@ function initExerSelect(){
       renderExerciseChart();
     };
   });
+  document.getElementById('exerRangeSeg').querySelectorAll('.seg-btn').forEach(function(b){
+    b.onclick=function(){
+      progresState.exerRange=parseInt(b.dataset.xr);
+      document.getElementById('exerRangeSeg').querySelectorAll('.seg-btn').forEach(function(x){x.classList.remove('act');});
+      b.classList.add('act');
+      renderExerciseChart();
+    };
+  });
 }
 
 function renderExerciseChart(){
@@ -4849,7 +4912,7 @@ function renderExerciseChart(){
     else if(progresState.exerMetric==='avgreps'){val=sets.reduce(function(a,s){return a+s.reps;},0)/sets.length;}
     return {x:parseRoDate(d),y:val};
   }).filter(function(p){return p.x&&!isNaN(p.y);});
-  points=filterByRange(points,progresState.range);
+  points=filterByRange(points,progresState.exerRange);
   var unit=progresState.exerMetric==='maxkg'?'kg':(progresState.exerMetric==='volume'?'kg·rep':'rep');
   renderLineChart('exerChart',points,{color:'#22c55e',hint:'seturi la '+ex});
   if(!points.length){stats.innerHTML='';return;}
