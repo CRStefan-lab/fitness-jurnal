@@ -1780,7 +1780,9 @@ function renderToday(){
     html+=smartHint;
     var exNote=(exNoteData[key]||'');
     var noteHtml='<input class="set-note-input" type="text" placeholder="📝 Notă (ex: umăr ok, ușor azi...)" value="'+exNote.replace(/"/g,'&quot;')+'" onchange="saveExNote(\''+sk+'\',this.value)">';
-    html+='<div class="card-bd"><div>'+setsHtml+noteHtml+'</div></div></div>';
+    var kgConv=kgConventionFor(e);
+    var kgHint=kgConv?'<div style="font-size:10px;color:var(--muted);padding:10px 2px 0">⚖️ '+kgConv+'</div>':'';
+    html+='<div class="card-bd"><div>'+kgHint+setsHtml+noteHtml+'</div></div></div>';
   });
 
   // Buton "Adaugă exercițiu custom"
@@ -2430,11 +2432,38 @@ var MORNING_GUIDES={
   morn_mob_toracic:{name:'Mobilitate toracică',how:'În 4 labe, o mână la ceafă, rotești cotul spre tavan și înapoi ×8/parte. Apoi cat-cow ×10.',tip:'Rotația toracică bună = ramat sigur.'}
 };
 
+// Convenția kg per exercițiu — răspunde la "trec greutatea unei gantere sau suma?"
+// Preferă echipamentul din DB (exId); fallback pe nume (legacy/custom).
+function kgConventionFor(e){
+  var eq=null;
+  if(e&&e.exId&&window.ProgramGenerator&&ProgramGenerator.EXERCISE_DB){
+    var db=ProgramGenerator.EXERCISE_DB.find(function(x){return x.id===e.exId;});
+    if(db)eq=db.equipment;
+  }
+  if(eq){
+    if(eq.indexOf('gantere')>=0)return 'kg = greutatea UNEI gantere (nu suma celor două)';
+    if(eq.indexOf('bara')>=0)return 'kg = totalul barei, cu discuri incluse';
+    if(eq.indexOf('cablu')>=0||eq.indexOf('aparate')>=0)return 'kg = cifra de pe plăcuțele aparatului';
+    if(eq.length===0)return 'kg = doar greutatea adăugată (vestă/disc) — gol dacă lucrezi cu corpul';
+  }
+  var nm=((e&&e.name)||'').toLowerCase();
+  if(/ganter|goblet/.test(nm))return 'kg = greutatea UNEI gantere (nu suma celor două)';
+  if(/\bbara\b|\bbară\b|bent-over|deadlift|îndreptări/.test(nm))return 'kg = totalul barei, cu discuri incluse';
+  if(/cablu|helcometru|aparat|pushdown/.test(nm))return 'kg = cifra de pe plăcuțele aparatului';
+  if(/flotăr|tracțiuni|dips|pike|genuflexiuni/.test(nm))return 'kg = doar greutatea adăugată (vestă/disc) — gol dacă lucrezi cu corpul';
+  return null;
+}
+
 // Exerciții unde diferența stânga/dreapta contează (izolări de braț, unilaterale de picior)
 var UNILATERAL_RX=/biceps|curl|triceps|lateral|fandăr|lunge|step-?back|step-?up|bulgar|split squat|un braț|o mână|concentr|kickback/i;
 function unilateralHintRow(name){
   if(!UNILATERAL_RX.test(name))return '';
   return '<div class="g-row"><div class="g-lbl" style="color:var(--acc2)">⚖️</div><div style="color:var(--acc2)"><strong>Partea slabă conduce:</strong> începe cu partea mai slabă, iar cea puternică face exact aceleași rep × kg — niciodată mai mult. Decalajul se închide singur.</div></div>';
+}
+function kgConventionRow(name){
+  var msg=kgConventionFor({name:name});
+  if(!msg)return '';
+  return '<div class="g-row"><div class="g-lbl" style="color:var(--acc)">kg</div><div><strong>Ce treci la kg:</strong> '+msg+'</div></div>';
 }
 
 function openGuideByName(nameEnc){
@@ -2451,10 +2480,10 @@ function openGuideByName(nameEnc){
       '<div class="g-row"><div class="g-lbl">Mișcare</div><div>'+g.move+'</div></div>'+
       '<div class="g-row"><div class="g-lbl" style="color:var(--red)">❌</div><div style="color:var(--red)">'+g.err+'</div></div>'+
       '<div class="g-row"><div class="g-lbl" style="color:var(--green)">✅</div><div style="color:var(--green);font-style:italic">'+g.tip+'</div></div>'+
-      unilateralHintRow(name);
+      kgConventionRow(name)+unilateralHintRow(name);
   }else{
     tag.textContent='';
-    body.innerHTML='<p style="color:var(--muted)">Descrie mișcarea controlat, tempo 2-1-2, fără durere. Vezi video-ul pentru demonstrație completă.</p>'+unilateralHintRow(name);
+    body.innerHTML='<p style="color:var(--muted)">Descrie mișcarea controlat, tempo 2-1-2, fără durere. Vezi video-ul pentru demonstrație completă.</p>'+kgConventionRow(name)+unilateralHintRow(name);
   }
   document.getElementById('guideVideoBtn').href='https://www.youtube.com/results?search_query='+encodeURIComponent(name+' tutorial forma corecta');
   document.getElementById('guideModal').classList.add('show');
