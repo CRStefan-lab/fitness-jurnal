@@ -1023,6 +1023,16 @@ input:checked + .slider:before{transform:translateX(20px);background:var(--acc)}
   <div class="stitle">Ghid exerciții</div>
   <p style="font-size:12px;color:var(--muted);margin-bottom:12px">Apasă pentru detalii complete · sfaturile marcate cu autori = dovezi din studii</p>
   <div id="ghid-content"></div>
+
+  <div class="stitle">📚 Biblioteca completă</div>
+  <div class="card" id="libCard">
+    <div class="card-hd" onclick="toggleLib()">
+      <div class="card-ico" style="background:rgba(var(--acc-rgb),.12)">📚</div>
+      <div style="flex:1;min-width:0"><div class="card-ttl">Toate exercițiile din bibliotecă</div><div class="card-sub">inclusiv cele care nu-s în programul tău · grupate pe mușchi</div></div>
+      <div class="card-chev">▼</div>
+    </div>
+    <div class="card-bd"><div id="libContent" style="padding-top:10px"></div></div>
+  </div>
 </div>
 
 <div class="modal" id="editModal" onclick="if(event.target===this)closeEdit()">
@@ -2579,7 +2589,7 @@ var MORNING_GUIDES={
   morn_plank_leg_raise:{name:'Plank + ridicări picioare',how:'Din plank, ridici un picior 10-15 cm, ții 2 sec, alternezi. Sau: plank 30 sec + 10 ridicări de picioare culcat.',tip:'Șoldurile stabile, nu se rotesc.',easier:'Fă doar plank simplu (pe genunchi dacă e nevoie) — ridicările de picioare vin când ții plank-ul stabil 30 sec.'},
   morn_mob_general:{name:'Mobilitate full body',how:'Cat-cow (spate rotund/arcuit în 4 labe) ×10, rotiri de șolduri ×10, cercuri brațe ×10.',tip:'Trezește toate articulațiile în 3 minute.'},
   morn_ramat_usor:{name:'Ramat ușor sprijinit',how:'Pieptul pe bancă înclinată, gantere UȘOARE (jumătate din greutatea de seară), tragi spre șolduri strângând omoplații.',tip:'Pattern, nu efort — înveți mișcarea pentru seară.',easier:'Cele mai mici gantere pe care le ai — sau chiar fără greutate, doar mișcarea cu omoplații. Aici contează pattern-ul.'},
-  morn_reverse_fly:{name:'Reverse fly ușor',how:'Aplecat la 45°, gantere ușoare, deschizi brațele lateral strângând omoplații.',tip:'Greutate mică, formă perfectă.',easier:'Fără gantere: doar deschide brațele cu omoplații strânși — activarea e aceeași.'},
+  morn_reverse_fly:{name:'Reverse fly ușor',how:'Aplecat cu trunchiul cât mai aproape de paralel cu podeaua (minim 45°), gantere ușoare, coatele ușor îndoite și fixe — deschizi brațele lateral strângând omoplații.',tip:'Cu cât ești mai orizontal, cu atât lucrează umărul posterior (la 45° preia trapezul). Degetele mari în sus. Greutate mică, formă perfectă.',easier:'Fără gantere: doar deschide brațele cu omoplații strânși — activarea e aceeași.'},
   morn_dead_hang:{name:'Dead hang',how:'Atârnat de bară (sau cadru ușă solid) cu brațele întinse, corpul relaxat, 20-30 sec.',tip:'Decompresie pentru coloană + mobilitate umeri. Excelent după somn.',easier:'Ține vârfurile picioarelor pe sol sau pe un scaun și lasă în brațe doar o parte din greutate.'},
   morn_hip_hinge:{name:'Hip hinge (fără greutate)',how:'Mâinile pe coapse, împingi șoldurile înapoi cu spatele drept până simți întindere în spatele picioarelor, revii strângând fesierii.',tip:'Pattern-ul pentru îndreptări — mișcarea vine din șolduri, nu din genunchi.'},
   morn_flotari_inguste:{name:'Flotări înguste',how:'Flotare cu mâinile apropiate sub piept, coatele lipite de corp.',tip:'Coatele lipite de corp — tricepsul face treaba.',easier:'Scara: la perete → pe blat → pe genunchi → complete.'},
@@ -2674,6 +2684,28 @@ function swapAlternativesHtml(name){
   return h;
 }
 
+// Biblioteca completă din tabul Ghid — randare lazy la prima deschidere
+function toggleLib(){
+  var c=document.getElementById('libCard');
+  if(!c)return;
+  c.classList.toggle('open');
+  var cont=document.getElementById('libContent');
+  if(c.classList.contains('open')&&cont&&!cont.innerHTML&&window.ProgramGenerator){
+    var byMuscle={};
+    ProgramGenerator.EXERCISE_DB.forEach(function(x){
+      (byMuscle[x.muscle]=byMuscle[x.muscle]||[]).push(x);
+    });
+    var h='';
+    Object.keys(byMuscle).sort().forEach(function(m){
+      h+='<div style="font-size:10px;font-weight:700;letter-spacing:1.5px;color:var(--acc);text-transform:uppercase;margin:10px 0 4px">'+m+' ('+byMuscle[m].length+')</div>';
+      byMuscle[m].forEach(function(x){
+        h+='<div style="padding:7px 0;border-bottom:1px solid var(--bd);font-size:13px;cursor:pointer;display:flex;justify-content:space-between;gap:8px" onclick="openGuideByName(\''+encodeURIComponent(x.name)+'\')"><span>'+x.name+'</span><span style="color:var(--muted);font-size:11px;flex-shrink:0">📖</span></div>';
+      });
+    });
+    cont.innerHTML=h;
+  }
+}
+
 function swapExercise(origEnc,newId){
   var orig=decodeURIComponent(origEnc);
   var msg;
@@ -2694,7 +2726,17 @@ function swapExercise(origEnc,newId){
 
 function openGuideByName(nameEnc){
   var name=decodeURIComponent(nameEnc);
-  var g=ghidEx.find(function(x){return x.name===name;});
+  // Ghidul vine LIVE din biblioteca de exerciții (texte mereu actuale, chiar dacă
+  // programul stocat are un snapshot vechi); ghidEx rămâne fallback pt legacy/custom
+  var g=null;
+  if(window.ProgramGenerator){
+    var dbg=ProgramGenerator.EXERCISE_DB.find(function(x){return x.name===name;});
+    if(dbg&&dbg.ghid){
+      var eqLbl=dbg.equipment.length===0?'bodyweight':(dbg.equipment.indexOf('bara')>=0?'bară':(dbg.equipment.indexOf('cablu')>=0||dbg.equipment.indexOf('aparate')>=0?'aparat':'gantere'));
+      g={name:dbg.name,tag:eqLbl,start:dbg.ghid.start,move:dbg.ghid.move,err:dbg.ghid.err,tip:dbg.ghid.tip};
+    }
+  }
+  if(!g)g=ghidEx.find(function(x){return x.name===name;});
   var title=document.getElementById('guideTitle');
   var tag=document.getElementById('guideTag');
   var body=document.getElementById('guideBody');
