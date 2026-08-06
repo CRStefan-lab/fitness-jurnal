@@ -1280,6 +1280,36 @@ var customMeta=null;
 })();
 
 // ═══════════════════════════════════════════════════════════════
+// ÎNLOCUIRE EXERCIȚII — "nu-mi place X, vreau altceva" (persistent)
+// exercise_swaps = { "Nume original din program": "id din EXERCISE_DB" }
+// Aplicat peste program la fiecare load; istoricul vechiului rămâne intact.
+// ═══════════════════════════════════════════════════════════════
+var swapOriginalByName={}; // numele curent (afișat) → numele original al slotului
+function getSwaps(){try{return JSON.parse(localStorage.getItem('exercise_swaps')||'{}');}catch(e){return {};}}
+(function applyExerciseSwaps(){
+  try{
+    var swaps=getSwaps();
+    if(!Object.keys(swaps).length||!window.ProgramGenerator)return;
+    var DB=ProgramGenerator.EXERCISE_DB;
+    Object.keys(exercises).forEach(function(dk){
+      (exercises[dk].list||[]).forEach(function(item){
+        var newId=swaps[item.name];
+        if(!newId)return;
+        var db=DB.find(function(x){return x.id===newId;});
+        if(!db)return;
+        swapOriginalByName[db.name]=item.name;
+        item.exId=db.id;
+        item.name=db.name;
+        if(ghidEx&&!ghidEx.some(function(g){return g.name===db.name;})){
+          var eqLabel=db.equipment.length===0?'bodyweight':(db.equipment.indexOf('bara')>=0?'bară':(db.equipment.indexOf('cablu')>=0||db.equipment.indexOf('aparate')>=0?'aparat':'gantere'));
+          ghidEx.push({name:db.name,tag:eqLabel,start:db.ghid.start,move:db.ghid.move,err:db.ghid.err,tip:db.ghid.tip});
+        }
+      });
+    });
+  }catch(e){console.error('applyExerciseSwaps failed',e);}
+})();
+
+// ═══════════════════════════════════════════════════════════════
 // STORAGE
 // ═══════════════════════════════════════════════════════════════
 var STORAGE_KEY='fitness_jurnal_v1';
@@ -2596,6 +2626,72 @@ function kgConventionRow(name){
   return '<div class="g-row"><div class="g-lbl" style="color:var(--acc)">kg</div><div><strong>Ce treci la kg:</strong> '+msg+'</div></div>';
 }
 
+// Alternative pentru "nu-mi place exercițiul ăsta" — același pattern, echipamentul userului
+function swapAlternativesHtml(name){
+  if(!window.ProgramGenerator)return '';
+  var DB=ProgramGenerator.EXERCISE_DB;
+  var cur=DB.find(function(x){return x.name===name;});
+  if(!cur||!cur.ghid)return ''; // exercițiu în afara bibliotecii (legacy custom) → fără alternative
+  var origName=swapOriginalByName[name]||name;
+  // e în programul activ? (nu oferim swap pentru exerciții doar din ghid)
+  var itemStar=null,inProgram=false;
+  Object.keys(exercises).forEach(function(dk){
+    (exercises[dk].list||[]).forEach(function(it){
+      if(it.name===name){inProgram=true;itemStar=!!it.star;}
+    });
+  });
+  if(!inProgram)return '';
+  var prof=getProfile();
+  var eqProfile=prof.equipment;
+  var avail;
+  if(eqProfile&&ProgramGenerator.EQUIPMENT_PROFILES[eqProfile]){
+    avail=ProgramGenerator.EQUIPMENT_PROFILES[eqProfile].available.slice();
+    if(eqProfile==='home_min'&&prof.hasBara)avail.push('bara');
+  }else{
+    avail=['gantere','banca','bara']; // programul legacy standard
+  }
+  var usedNames={};
+  Object.keys(exercises).forEach(function(dk){(exercises[dk].list||[]).forEach(function(it){usedNames[it.name]=1;});});
+  var isBeginner=prof.experience==='incepator';
+  var alts=DB.filter(function(x){
+    if(x.pattern!==cur.pattern||x.id===cur.id)return false;
+    if(usedNames[x.name])return false;
+    for(var i=0;i<x.equipment.length;i++)if(avail.indexOf(x.equipment[i])<0)return false;
+    if(x.gymOnly&&eqProfile!=='gym')return false;
+    if(isBeginner&&(x.level>1||x.risky))return false;
+    if(itemStar&&!x.starEligible)return false;
+    return true;
+  }).sort(function(a,b){return a.prio-b.prio;}).slice(0,3);
+  if(!alts.length&&!swapOriginalByName[name])return '';
+  var h='<div class="g-row"><div class="g-lbl" style="color:#fbbf24">↔</div><div><strong>Nu-ți place?</strong> Înlocuiește-l permanent (istoricul lui rămâne salvat):<br>';
+  alts.forEach(function(a){
+    h+='<button class="btn btn-ghost" style="font-size:12px;padding:8px;margin:6px 0 0" onclick="swapExercise(\''+encodeURIComponent(origName)+'\',\''+a.id+'\')">↔ '+a.name+'</button>';
+  });
+  if(swapOriginalByName[name]){
+    h+='<button class="btn btn-ghost" style="font-size:12px;padding:8px;margin:6px 0 0;color:var(--muted)" onclick="swapExercise(\''+encodeURIComponent(origName)+'\',null)">↩ Revino la: '+origName+'</button>';
+  }
+  h+='</div></div>';
+  return h;
+}
+
+function swapExercise(origEnc,newId){
+  var orig=decodeURIComponent(origEnc);
+  var msg;
+  if(newId){
+    var db=ProgramGenerator.EXERCISE_DB.find(function(x){return x.id===newId;});
+    if(!db)return;
+    msg='Înlocuiești „'+orig+'" cu „'+db.name+'"?\n\nSchimbarea e permanentă (până revii), pe acest device. Istoricul vechiului exercițiu rămâne salvat.';
+  }else{
+    msg='Revii la exercițiul original „'+orig+'"?';
+  }
+  if(!confirm(msg))return;
+  var s=getSwaps();
+  if(newId)s[orig]=newId;else delete s[orig];
+  localStorage.setItem('exercise_swaps',JSON.stringify(s));
+  showToast(newId?'Exercițiu înlocuit ✓':'Revenit la original ✓');
+  setTimeout(function(){location.reload();},700);
+}
+
 function openGuideByName(nameEnc){
   var name=decodeURIComponent(nameEnc);
   var g=ghidEx.find(function(x){return x.name===name;});
@@ -2610,10 +2706,10 @@ function openGuideByName(nameEnc){
       '<div class="g-row"><div class="g-lbl">Mișcare</div><div>'+g.move+'</div></div>'+
       '<div class="g-row"><div class="g-lbl" style="color:var(--red)">❌</div><div style="color:var(--red)">'+g.err+'</div></div>'+
       '<div class="g-row"><div class="g-lbl" style="color:var(--green)">✅</div><div style="color:var(--green);font-style:italic">'+g.tip+'</div></div>'+
-      kgConventionRow(name)+unilateralHintRow(name);
+      kgConventionRow(name)+unilateralHintRow(name)+swapAlternativesHtml(name);
   }else{
     tag.textContent='';
-    body.innerHTML='<p style="color:var(--muted)">Descrie mișcarea controlat, tempo 2-1-2, fără durere. Vezi video-ul pentru demonstrație completă.</p>'+kgConventionRow(name)+unilateralHintRow(name);
+    body.innerHTML='<p style="color:var(--muted)">Descrie mișcarea controlat, tempo 2-1-2, fără durere. Vezi video-ul pentru demonstrație completă.</p>'+kgConventionRow(name)+unilateralHintRow(name)+swapAlternativesHtml(name);
   }
   document.getElementById('guideVideoBtn').href='https://www.youtube.com/results?search_query='+encodeURIComponent(name+' tutorial forma corecta');
   document.getElementById('guideModal').classList.add('show');
