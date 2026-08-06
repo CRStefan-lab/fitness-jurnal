@@ -1642,7 +1642,7 @@ function renderToday(){
   aziAddSetIdx=-1;
   for(var fsi=0;fsi<ex.list.length;fsi++){
     if(ex.list[fsi].star){
-      var fsRec=getRecommendation(ex.list[fsi].name,coachWeek,ex.list[fsi].sets);
+      var fsRec=getRecommendation(ex.list[fsi].name,coachWeek,ex.list[fsi].sets,true);
       if(fsRec&&fsRec.action==='add_set')aziAddSetIdx=fsi;
       break;
     }
@@ -1791,7 +1791,7 @@ function renderToday(){
     // Smart Coach hint pentru ⭐ + accesorii (double progression)
     var smartHint='';
     if(e.star){
-      var rec=getRecommendation(e.name,coachWeek,ei===aziAddSetIdx?e.sets:0);
+      var rec=getRecommendation(e.name,coachWeek,e.sets,ei===aziAddSetIdx);
       var trend=getTrend(e.name);
       var trendBadge=trend?' <span style="color:'+trend.color+';font-weight:800" title="trend ultimele 3 sesiuni">'+trend.arrow+'</span>':'';
       if(rec){
@@ -2882,7 +2882,7 @@ function initProgram(){
       var smartTarget='';
       var extraPill=0;
       if(e.star){
-        var rec=getRecommendation(e.name,week,eIdx===dayFirstStar?e.sets:0);
+        var rec=getRecommendation(e.name,week,e.sets,eIdx===dayFirstStar);
         if(rec){
           smartTarget='<div style="font-size:11px;color:var(--acc2);margin-top:2px">🎯 '+rec.target+'</div>';
           if(rec.action==='add_set')extraPill=1;
@@ -3406,7 +3406,7 @@ function buildWeekSummary(){
   out+='Săptămâna program: '+curWeek+'/8 — Focus: '+(WEEK_FOCUS[curWeek-1]||WEEK_FOCUS[7]).label+'\n\n';
   var stars=getStarExercises();
   stars.forEach(function(s){
-    var rec=getRecommendation(s.name,curWeek,s.firstStar?s.sets:0);
+    var rec=getRecommendation(s.name,curWeek,s.sets,s.firstStar);
     if(!rec)return;
     out+='⭐ '+s.name+' ['+s.dayLabel+']\n';
     if(rec.last) out+='  Ultima: '+rec.last.reps+' rep × '+rec.last.kg+' kg ('+rec.last.date+')\n';
@@ -4462,7 +4462,7 @@ function buildWarmupHint(exerciseName){
   return '<div style="font-size:11px;color:var(--muted);padding:3px 10px;margin:2px 14px 0;border-left:2px solid rgba(245,158,11,.4);border-radius:0 4px 4px 0">🔥 Încălzire: 10× '+startStr+' → 5× '+w50+'kg → 3× '+w75+'kg → seturile de lucru</div>';
 }
 
-function getRecommendation(exerciseName,week,plannedSets){
+function getRecommendation(exerciseName,week,plannedSets,firstStar){
   var meta=findExerciseMeta(exerciseName);
   if(!meta)return null;
   var ex=meta.ex;
@@ -4476,8 +4476,9 @@ function getRecommendation(exerciseName,week,plannedSets){
   // DELOAD MANUAL (acceptat din sugestia auto) — prioritate peste tot
   if(isManualDeload()&&last){
     var dlKg=Math.round(last.kg*0.8*2)/2;
+    var dlS=plannedSets?Math.max(1,Math.round(plannedSets*0.7)):null;
     return {action:'deload',tag:'DELOAD',last:last,
-      target:dlKg+' kg × '+last.reps+' rep, -30% seturi',
+      target:dlKg+' kg × '+last.reps+' rep'+(dlS?' · fă doar '+dlS+' din '+plannedSets+' seturi':', -30% seturi'),
       tip:'Deload activ — recuperare. Tempo curat, fără efort maxim.'};
   }
 
@@ -4536,8 +4537,8 @@ function getRecommendation(exerciseName,week,plannedSets){
   }
 
   if(week===7){
-    // Setul extra se face DOAR la primul ⭐ al zilei — caller-ul spune dacă exercițiul îl primește (plannedSets>0)
-    if(plannedSets){
+    // Setul extra se face DOAR la primul ⭐ al zilei — caller-ul îl marchează cu firstStar
+    if(plannedSets&&firstStar){
       return {
         action:'add_set',tag:'+1 SET',last:last,
         target:'se adaugă 1 set → '+last.reps+' rep × '+last.kg+' kg × '+(plannedSets+1)+' seturi',
@@ -4553,9 +4554,10 @@ function getRecommendation(exerciseName,week,plannedSets){
 
   if(week>=8){
     var deloadKg=Math.round(last.kg*0.8*2)/2;
+    var dl8S=plannedSets?Math.max(1,Math.round(plannedSets*0.7)):null;
     return {
       action:'deload',tag:'DELOAD',last:last,
-      target:deloadKg+' kg × '+last.reps+' rep, -30% seturi',
+      target:deloadKg+' kg × '+last.reps+' rep'+(dl8S?' · fă doar '+dl8S+' din '+plannedSets+' seturi':', -30% seturi'),
       tip:'Săpt. 8: recovery activă. Tempo curat, fără efort maxim.'
     };
   }
@@ -4645,6 +4647,19 @@ function getAccessoryRec(exerciseName,exMeta){
   if(!last)return null;
   if(!last.kg||last.kg<=0)return null;
 
+  // Deload (săpt. 8 sau manual): nici accesoriile nu progresează — greutate -20%, seturi -30%
+  if(getProgramWeek()>=8||isManualDeload()){
+    var dlKgA=Math.round(last.kg*0.8*2)/2;
+    var dlSetsA=exMeta.sets?Math.max(1,Math.round(exMeta.sets*0.7)):null;
+    return {
+      type:'deload',
+      lastStr:last.reps+'×'+last.kg+'kg',
+      targetStr:last.reps+' rep × '+dlKgA+' kg'+(dlSetsA?' · '+dlSetsA+' din '+exMeta.sets+' seturi':''),
+      why:'deload — recuperare, nu progresie',
+      color:'var(--purple)'
+    };
+  }
+
   var inc=getAccessoryIncrement(exerciseName,maxRep);
   // RIR-ul din sesiunea trecută modulează și accesoriile (hard→repetă, easy→escaladează)
   var rir=getLastRIR(exerciseName);
@@ -4705,7 +4720,7 @@ function renderRecommendations(){
   var stars=getStarExercises();
   var html='';
   stars.forEach(function(s){
-    var rec=getRecommendation(s.name,week,s.firstStar?s.sets:0);
+    var rec=getRecommendation(s.name,week,s.sets,s.firstStar);
     if(!rec)return;
     var hasData=!!rec.last;
     html+='<div class="recom-item '+(hasData?'has-data':'no-data')+'">';
