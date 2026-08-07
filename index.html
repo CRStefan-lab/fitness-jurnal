@@ -138,6 +138,9 @@ body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSy
 .set-box.dirty{border-color:rgba(245,158,11,.5);background:rgba(245,158,11,.04)}
 .set-box.saved{border-color:var(--green);background:rgba(34,197,94,.06)}
 .set-box.extra:not(.saved){border-style:dashed;border-color:rgba(var(--acc-rgb),.55)}
+.set-box.half:not(.saved){border-color:var(--red);background:rgba(244,63,94,.05)}
+.set-box.half:not(.saved)::after{content:'⚠️';position:absolute;right:6px;top:-8px;font-size:11px}
+.set-box{position:relative}
 .card.card-done{border-color:rgba(34,197,94,.5);background:linear-gradient(135deg,rgba(34,197,94,.04),transparent)}
 .progress-badge{font-size:10px;font-weight:800;padding:3px 8px;border-radius:6px;margin-right:6px;flex-shrink:0;letter-spacing:.3px}
 .progress-badge.partial{background:rgba(245,158,11,.15);color:#fbbf24}
@@ -1964,6 +1967,12 @@ function upSet(keyEnc,setNum,field,val,inputEl){
       var sd=setData[key][setNum];
       if(!sd.reps && !sd.kg) box.classList.remove('dirty');
     }
+    // Marcaj "pe jumătate completat" — o valoare pusă, cealaltă lipsă
+    if(box){
+      var s2=setData[key][setNum];
+      var halfDone=(!!s2.reps&&!s2.kg&&!isBodyweightEx(key))||(!s2.reps&&!!s2.kg);
+      box.classList.toggle('half',halfDone);
+    }
   }
 }
 
@@ -2066,10 +2075,34 @@ function checkPR(exerciseName,kg,reps){
   return null;
 }
 
+// Exercițiu fără greutate proprie (bodyweight) → kg gol e legitim, nu întrebăm
+function isBodyweightEx(name){
+  var msg=kgConventionFor({name:name});
+  if(msg)return msg.indexOf('greutatea adăugată')>=0;
+  return /flotăr|tracțiuni|dips|pike|genuflexiuni bodyweight|plank|superman|scapular|hip thrust bodyweight|prosop|sub masă/i.test(name);
+}
+
 function saveSet(keyEnc,setNum,ei){
   var key=decodeURIComponent(keyEnc);
   var d=setData[key]&&setData[key][setNum];
   if(!d||(!d.reps&&!d.kg)){showToast('Introduceți rep și kg!','var(--acc2)');return;}
+  // Valoare pe jumătate completată — repetările sunt obligatorii, kg doar la exerciții cu greutăți
+  var hasReps=!!(d.reps&&parseFloat(d.reps)>0);
+  var hasKg=!!(d.kg&&parseFloat(d.kg)>0);
+  if(!hasReps){
+    showToast('⚠️ Lipsesc repetările la S'+setNum+' — completează-le înainte de salvare','var(--red)');
+    var repIn=document.querySelector('#sb_'+ei+'_'+setNum+' .set-in');
+    if(repIn){repIn.focus();if(repIn.select)repIn.select();}
+    if(navigator.vibrate)navigator.vibrate([60,40,60]);
+    return;
+  }
+  if(!hasKg&&!isBodyweightEx(key)){
+    if(!confirm('⚠️ Ai completat '+d.reps+' repetări, dar nu și kg la S'+setNum+'.\n\nSalvezi setul fără greutate (0 kg)?\n\nOK = salvez așa · Anulează = completez kg')){
+      var kgIn=document.querySelectorAll('#sb_'+ei+'_'+setNum+' .set-in')[1];
+      if(kgIn){kgIn.focus();if(kgIn.select)kgIn.select();}
+      return;
+    }
+  }
   var idx=getEffectiveDayIdx();
   var kg=parseFloat(d.kg)||0;
   var reps=parseFloat(d.reps)||0;
@@ -5280,6 +5313,17 @@ function saveEdit(){
   var reps=parseFloat(document.getElementById('editReps').value)||0;
   var kg=parseFloat(document.getElementById('editKg').value)||0;
   if(!reps&&!kg){showToast('Introduceți rep și kg','var(--acc2)');return;}
+  if(!reps){
+    showToast('⚠️ Lipsesc repetările','var(--red)');
+    var er=document.getElementById('editReps');er.focus();if(er.select)er.select();
+    return;
+  }
+  if(!kg&&!isBodyweightEx(editCtx.exercise)){
+    if(!confirm('⚠️ Ai completat '+reps+' repetări, dar nu și kg.\n\nSalvezi fără greutate (0 kg)?')){
+      var ek=document.getElementById('editKg');ek.focus();if(ek.select)ek.select();
+      return;
+    }
+  }
   var wasNew=editCtx.isNew;
   addRow({
     date:editCtx.date,day:editCtx.day,type:'antrenament',
