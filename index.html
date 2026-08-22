@@ -2635,6 +2635,101 @@ var MORNING_GUIDES={
   morn_mob_toracic:{name:'Mobilitate toracică',how:'În 4 labe, o mână la ceafă, rotești cotul spre tavan și înapoi ×8/parte. Apoi cat-cow ×10.',tip:'Rotația toracică bună = ramat sigur.'}
 };
 
+// ─── Înlocuire exerciții de dimineață (ex. "n-am bară pentru dead hang") ───
+// g = grupa funcțională; alternativele vin din aceeași grupă (pattern-ul zilei rămâne)
+// eq = echipament necesar (filtrat după profilul userului)
+var MORNING_SWAP_POOL={
+  morn_flotari_lente:{name:'Flotări lente',target:'3×6–8 rep',g:'push'},
+  morn_pike_pushup:{name:'Pike push-up',target:'2×6 rep',g:'push'},
+  morn_flotari_inguste:{name:'Flotări înguste',target:'2×8 rep',g:'push'},
+  morn_scapular:{name:'Scapular push-ups',target:'2×10 rep',g:'push'},
+  morn_ramat_usor:{name:'Ramat gantere ușoare (sprijinit)',target:'3×10 rep',g:'pull',eq:'gantere'},
+  morn_reverse_fly:{name:'Reverse fly ușor',target:'2×12 rep',g:'pull',eq:'gantere'},
+  morn_dead_hang:{name:'Dead hang (ușă/bară)',target:'2×30 sec',g:'pull'},
+  morn_superman:{name:'Superman',target:'3×10 rep',g:'pull'},
+  morn_plank:{name:'Plank',target:'2×45 sec',g:'core'},
+  morn_dead_bug:{name:'Dead bug',target:'2×10/parte',g:'core'},
+  morn_plank_lateral:{name:'Plank lateral',target:'2×30/parte',g:'core'},
+  morn_plank_leg_raise:{name:'Plank + ridicări picioare',target:'2 runde',g:'core'},
+  morn_fandari:{name:'Fandări în loc',target:'3×8/picior',g:'lower'},
+  morn_glute_bridge:{name:'Glute bridge',target:'3×10 rep',g:'lower'},
+  morn_hip_hinge:{name:'Hip hinge (fără greutate)',target:'3×10 rep',g:'lower'},
+  morn_mob_umeri:{name:'Mobilitate umeri',target:'5 min',g:'mob'},
+  morn_mob_toracic:{name:'Mobilitate toracică',target:'3 min',g:'mob'},
+  morn_mob_general:{name:'Mobilitate full body',target:'3 min',g:'mob'},
+  morn_mob_articulatii:{name:'Mobilitate umeri/șolduri',target:'5 min',g:'mob'},
+  morn_stretch_full:{name:'Stretching full body',target:'10 min',g:'mob'},
+  morn_plimbare:{name:'Plimbare exterior',target:'20–30 min',g:'mob'}
+};
+// morn_kegel nu are alternative — e obiectiv de sănătate, nu exercițiu interschimbabil
+
+var morningOrigById={}; // idNou → idOriginal (pentru butonul de revenire)
+function getMorningSwaps(){try{return JSON.parse(localStorage.getItem('morning_swaps')||'{}');}catch(e){return {};}}
+function applyMorningSwaps(){
+  var sw=getMorningSwaps();
+  morningOrigById={};
+  if(!Object.keys(sw).length||!morningRoutines)return;
+  Object.keys(morningRoutines).forEach(function(dk){
+    var r=morningRoutines[dk];
+    if(!r||!r.list)return;
+    r.list=r.list.map(function(it){
+      var nid=sw[it.id];
+      var alt=nid&&MORNING_SWAP_POOL[nid];
+      if(!alt)return it;
+      morningOrigById[nid]=it.id;
+      return {id:nid,name:alt.name,target:alt.target};
+    });
+  });
+}
+
+function morningSwapHtml(id){
+  var cur=MORNING_SWAP_POOL[id];
+  if(!cur)return ''; // kegel sau exercițiu fără grupă → fără alternative
+  var origId=morningOrigById[id]||id;
+  // ce e deja folosit azi (nu propunem duplicate în aceeași zi)
+  var used={};
+  var sch=schedule[getEffectiveDayIdx()];
+  var todayR=morningRoutines&&morningRoutines[sch.exDay];
+  if(todayR&&todayR.list)todayR.list.forEach(function(it){used[it.id]=1;});
+  var prof=getProfile();
+  var hasGantere=!prof.equipment||prof.equipment!=='bodyweight';
+  var alts=Object.keys(MORNING_SWAP_POOL).filter(function(k){
+    var a=MORNING_SWAP_POOL[k];
+    if(k===id||a.g!==cur.g||used[k])return false;
+    if(a.eq==='gantere'&&!hasGantere)return false;
+    return true;
+  }).slice(0,3);
+  if(!alts.length&&!morningOrigById[id])return '';
+  var h='<div class="g-row"><div class="g-lbl" style="color:#fbbf24">↔</div><div><strong>Nu-l poți face?</strong> Înlocuiește-l (aceeași grupă de mișcare):<br>';
+  alts.forEach(function(k){
+    h+='<button class="btn btn-ghost" style="font-size:12px;padding:8px;margin:6px 0 0" onclick="swapMorning(\''+origId+'\',\''+k+'\')">↔ '+MORNING_SWAP_POOL[k].name+' <span style="color:var(--muted)">· '+MORNING_SWAP_POOL[k].target+'</span></button>';
+  });
+  if(morningOrigById[id]){
+    var on=MORNING_SWAP_POOL[origId]?MORNING_SWAP_POOL[origId].name:origId;
+    h+='<button class="btn btn-ghost" style="font-size:12px;padding:8px;margin:6px 0 0;color:var(--muted)" onclick="swapMorning(\''+origId+'\',null)">↩ Revino la: '+on+'</button>';
+  }
+  h+='</div></div>';
+  return h;
+}
+
+function swapMorning(origId,newId){
+  var msg;
+  if(newId){
+    var a=MORNING_SWAP_POOL[newId];if(!a)return;
+    var o=MORNING_SWAP_POOL[origId];
+    msg='Înlocuiești „'+(o?o.name:origId)+'" cu „'+a.name+'" în rutina de dimineață?\n\nSe aplică peste tot unde apare, pe acest device.';
+  }else{
+    var o2=MORNING_SWAP_POOL[origId];
+    msg='Revii la „'+(o2?o2.name:origId)+'"?';
+  }
+  if(!confirm(msg))return;
+  var s=getMorningSwaps();
+  if(newId)s[origId]=newId;else delete s[origId];
+  localStorage.setItem('morning_swaps',JSON.stringify(s));
+  showToast(newId?'Exercițiu de dimineață înlocuit ✓':'Revenit la original ✓');
+  setTimeout(function(){location.reload();},700);
+}
+
 // Convenția kg per exercițiu — răspunde la "trec greutatea unei gantere sau suma?"
 // Preferă echipamentul din DB (exId); fallback pe nume (legacy/custom).
 function kgConventionFor(e){
@@ -2801,7 +2896,8 @@ function openMorningGuide(id){
     body.innerHTML=
       '<div class="g-row"><div class="g-lbl">Cum</div><div>'+g.how+'</div></div>'+
       '<div class="g-row"><div class="g-lbl" style="color:var(--green)">✅</div><div style="color:var(--green);font-style:italic">'+g.tip+'</div></div>'+
-      (g.easier?'<div class="g-row"><div class="g-lbl" style="color:var(--acc2)">🪜</div><div style="color:var(--acc2)"><strong>Prea greu?</strong> '+g.easier+'</div></div>':'');
+      (g.easier?'<div class="g-row"><div class="g-lbl" style="color:var(--acc2)">🪜</div><div style="color:var(--acc2)"><strong>Prea greu?</strong> '+g.easier+'</div></div>':'')+
+      morningSwapHtml(id);
     document.getElementById('guideVideoBtn').href='https://www.youtube.com/results?search_query='+encodeURIComponent(g.name+' exercise tutorial');
   }else{
     title.textContent='Exercițiu dimineață';
@@ -6238,6 +6334,7 @@ function manualUpdateCheck(){
 // ═══════════════════════════════════════════════════════════════
 window.addEventListener('load',function(){
   applyMode(localStorage.getItem('app_mode')||''); // sincronizează meta theme-color cu aspectul salvat
+  applyMorningSwaps(); // înlocuirile de dimineață, peste rutina activă
   initHeader();
   currentNutDay=todayIdx();
   lastDetectedDay=todayIdx();
