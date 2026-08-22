@@ -693,7 +693,18 @@ input:checked + .slider:before{transform:translateX(20px);background:var(--acc)}
 </div>
 
 <div id="tab-istoric" class="sec">
-  <div class="stitle">📊 Săptămâna afișată</div>
+  <div class="stitle">🤖 AI</div>
+  <p style="font-size:11px;color:var(--muted);margin-bottom:10px;line-height:1.5">
+    Export <strong style="color:var(--text)">complet</strong> pentru Claude sau orice AI: toate săptămânile, măsurători, BF%, stagnări, PR-uri, volum/grup, aderență.
+  </p>
+  <button class="btn btn-acc" onclick="doExport()">🤖 Generează export complet</button>
+  <button class="btn btn-ghost" onclick="copyExport()">📋 Copiază în clipboard</button>
+  <div class="export-box" id="exportBox">Apasă butonul pentru a genera exportul complet.</div>
+
+  <div class="stitle">🎉 Rezumatul săptămânii</div>
+  <button class="btn btn-ghost" onclick="showWeeklyDigest(currentWeekOffset)">🎉 Vezi rezumatul săptămânii afișate</button>
+
+  <div class="stitle">📊 Istoricul</div>
   <div class="week-nav">
     <button class="week-nav-btn" id="weekPrev" onclick="changeWeek(-1)">‹</button>
     <div class="week-nav-title">
@@ -704,17 +715,6 @@ input:checked + .slider:before{transform:translateX(20px);background:var(--acc)}
   </div>
   <div id="weekSummary" style="font-size:11px;color:var(--muted);text-align:center;margin-bottom:12px"></div>
   <div id="hist-content"></div>
-
-  <div class="stitle">🎉 Rezumatul săptămânii</div>
-  <button class="btn btn-ghost" onclick="showWeeklyDigest(currentWeekOffset)">🎉 Vezi rezumatul săptămânii afișate</button>
-
-  <div class="stitle">📤 Export pentru Claude / AI</div>
-  <p style="font-size:11px;color:var(--muted);margin-bottom:10px;line-height:1.5">
-    Export <strong style="color:var(--text)">complet</strong>: toate săptămânile, măsurători, BF%, stagnări, PR-uri, volum/grup, aderență — gata pentru AI.
-  </p>
-  <div class="export-box" id="exportBox">Apasă butonul pentru a genera exportul complet.</div>
-  <button class="btn btn-acc" onclick="doExport()">📤 Generează export complet</button>
-  <button class="btn btn-ghost" onclick="copyExport()">📋 Copiază în clipboard</button>
 
   <p style="font-size:11px;color:var(--muted);margin-top:20px;text-align:center">
     💾 Backup · ☁️ Sync · ⚡ Share → <a onclick="showTab('setari')" style="color:var(--acc);cursor:pointer;text-decoration:underline">Setări ⚙️</a>
