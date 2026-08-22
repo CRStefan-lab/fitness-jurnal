@@ -216,6 +216,19 @@ body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSy
 .skip-reasons.show{display:flex;animation:cardIn .2s ease}
 .skip-pill{background:rgba(245,158,11,.08);border:1px solid rgba(245,158,11,.35);color:#fbbf24;border-radius:20px;font-size:11.5px;font-weight:700;padding:7px 12px;cursor:pointer;font-family:inherit}
 .skip-pill:active{background:rgba(245,158,11,.22)}
+/* 3.1 — Ierarhia dramatică în Azi: eroul = primul exercițiu incomplet */
+.card.card-hero,.card.card-hero.open{position:relative;border-color:rgba(var(--acc-rgb),.65);background:linear-gradient(165deg,rgba(var(--acc-rgb),.09),rgba(var(--acc-rgb),.02) 45%,var(--s1) 80%);box-shadow:0 0 28px rgba(var(--acc-rgb),.18),0 12px 30px rgba(0,0,0,.35)}
+.card.card-hero::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--acc),var(--acc2))}
+.card.card-hero .card-ttl{font-size:15px}
+.hero-badge{font-size:8.5px;letter-spacing:1.5px;font-weight:700;color:var(--acc2);font-family:'Chakra Petch','Segoe UI',Arial,sans-serif;background:rgba(var(--acc-rgb),.12);border:1px solid rgba(var(--acc-rgb),.45);border-radius:6px;padding:3px 7px;flex-shrink:0}
+.card.card-idle:not(.open){opacity:.68}
+.card.card-done:not(.open){opacity:.62}
+.card.card-done:not(.open) .card-hd{padding-top:7px;padding-bottom:7px}
+.card.card-done:not(.open) .card-ttl{font-size:12px;color:var(--muted)}
+.card.card-done:not(.open) .card-sub{display:none}
+.card.card-done:not(.open) .hint-wrap{display:none}
+.set-box.sb-future:not(.saved){opacity:.55;border-style:dashed}
+html[data-mode="light"] .card.card-hero,html[data-mode="light"] .card.card-hero.open{box-shadow:0 0 24px rgba(var(--acc-rgb),.18),0 10px 26px rgba(30,50,70,.12)}
 .repeat-btn{background:rgba(var(--acc2-rgb),.12);border:1px solid rgba(var(--acc2-rgb),.4);border-radius:8px;color:var(--acc2);font-size:11px;font-weight:700;cursor:pointer;padding:6px 8px;font-family:inherit;flex-shrink:0;letter-spacing:.2px}
 .repeat-btn:active{background:rgba(var(--acc2-rgb),.25)}
 .azi-stats{display:flex;gap:8px;margin-bottom:10px;font-size:11px;align-items:stretch}
@@ -1859,6 +1872,15 @@ function renderToday(){
   html+='<div class="azi-stat as4"><div class="azi-stat-val">'+coachWeek+'/8</div><div class="azi-stat-lbl">📍 Săpt</div></div>';
   html+='</div>';
 
+  // Bara „PROGRESUL ZILEI" (design: canvas 3.1)
+  if(totalSetsExpected>0){
+    var dayPct=Math.min(100,Math.round(setsToday/totalSetsExpected*100));
+    html+='<div style="margin:0 0 12px">';
+    html+='<div style="display:flex;justify-content:space-between;font-size:9.5px;letter-spacing:1.5px;color:var(--muted);font-family:\'Chakra Petch\',\'Segoe UI\',Arial,sans-serif;margin-bottom:4px"><span>PROGRESUL ZILEI</span><span id="dayProgPct" style="color:var(--acc2)">'+dayPct+'%</span></div>';
+    html+='<div style="height:6px;border-radius:3px;background:var(--s2);overflow:hidden"><div id="dayProgFill" data-total="'+totalSetsExpected+'" style="height:100%;border-radius:3px;background:linear-gradient(90deg,var(--acc),var(--acc2));box-shadow:0 0 12px rgba(var(--acc-rgb),.7);width:'+dayPct+'%;transition:width .5s ease"></div></div>';
+    html+='</div>';
+  }
+
   html+='<div style="background:linear-gradient(135deg,rgba(var(--acc-rgb),.08),transparent);border-left:3px solid var(--acc);border-radius:0 8px 8px 0;padding:6px 12px;margin-bottom:12px;font-size:11px">';
   html+='🎯 Focus: <strong style="color:var(--acc2)">'+coachFocus.label+'</strong>';
   html+='</div>';
@@ -1946,6 +1968,11 @@ function renderToday(){
       return;
     }
     var allCompleted=doneSets===effSets;
+    // Primul set nesalvat — seturile de după el apar estompate („urmează")
+    var firstOpenSet=0;
+    for(var fo=1;fo<=effSets;fo++){
+      if(!(setData[key][fo]&&setData[key][fo].savedOnServer)){firstOpenSet=fo;break;}
+    }
     var setsHtml='<div class="sets-row">';
     for(var s=1;s<=effSets;s++){
       var saved=setData[key][s]||{};
@@ -1978,7 +2005,7 @@ function renderToday(){
           saved=setData[key][s];
         }
       }
-      setsHtml+='<div class="set-box'+(isSaved?' saved':'')+(s>e.sets?' extra':'')+'" id="sb_'+ei+'_'+s+'"'+(s>e.sets?' title="Set extra — săpt. 7"':'')+'>';
+      setsHtml+='<div class="set-box'+(isSaved?' saved':'')+(s>e.sets?' extra':'')+(firstOpenSet&&s>firstOpenSet&&!isSaved?' sb-future':'')+'" id="sb_'+ei+'_'+s+'"'+(s>e.sets?' title="Set extra — săpt. 7"':'')+'>';
       setsHtml+='<div class="set-lbl">'+(isSaved?'✓ S':'S')+s+(s>e.sets?'<div style="font-size:8px;color:var(--acc2);letter-spacing:.5px">+1</div>':'')+'</div>';
       setsHtml+='<div class="set-inputs">';
       setsHtml+='<input class="set-in" type="number" inputmode="numeric" enterkeyhint="next" min="0" max="99" placeholder="rep" value="'+(saved.reps||'')+'" oninput="upSet(\''+sk+'\','+s+',\'reps\',this.value,this)">';
@@ -2019,11 +2046,12 @@ function renderToday(){
         smartHint='<div style="background:rgba(125,141,154,.06);border-left:2px solid '+accRec.color+';padding:3px 10px;margin:4px 14px 0;border-radius:0 4px 4px 0;font-size:11px;color:var(--muted)">📊 Ultima: '+accRec.lastStr+' · 🎯 <strong style="color:'+accRec.color+'">Opțional azi: '+accRec.targetStr+'</strong> <span style="color:var(--muted)">('+accRec.why+')</span>'+rirHistoryBadge(e.name)+'</div>';
       }
     }
-    // Auto-expand pentru primul exercițiu incomplet
-    var autoOpen=(ei===firstIncompleteIdx);
-    var cardClasses='card'+(allCompleted?' card-done':'')+(autoOpen?' open':'');
+    // Ierarhie (3.1): eroul = primul incomplet · restul incomplete = idle (dimmed) · completele se comprimă
+    var isHero=(ei===firstIncompleteIdx);
+    var autoOpen=isHero;
+    var cardClasses='card'+(allCompleted?' card-done':'')+(autoOpen?' open':'')+(isHero?' card-hero':(!allCompleted?' card-idle':''));
     var progressBadge='';
-    if(doneSets>0||effSets>0){
+    if((doneSets>0||effSets>0)&&!(isHero&&doneSets===0)){
       progressBadge='<span class="progress-badge '+(allCompleted?'complete':'partial')+'">'+doneSets+'/'+effSets+(allCompleted?' ✓':'')+'</span>';
     }
     html+='<div class="'+cardClasses+'" id="ec_'+ei+'">';
@@ -2032,9 +2060,10 @@ function renderToday(){
     var targetLbl=/^[\d]+([–—-][\d]+)?$/.test(String(e.target).trim())?e.target+' rep':e.target;
     html+='<div style="flex:1;min-width:0"><div class="card-ttl">'+e.name+'</div><div class="card-sub">'+(ei===aziAddSetIdx?effSets+' seturi ('+e.sets+'+1 azi)':e.sets+' seturi')+' · Țintă: '+targetLbl+'</div></div>';
     html+=progressBadge;
+    if(isHero)html+='<span class="hero-badge">ÎN LUCRU</span>';
     html+='<button class="guide-btn" onclick="event.stopPropagation();openGuideByName(\''+sk+'\')" title="Cum se face">📖</button>';
     html+='<div class="card-chev">▼</div></div>';
-    html+=smartHint;
+    html+='<div class="hint-wrap">'+smartHint+'</div>';
     var exNote=(exNoteData[key]||'');
     var noteHtml='<input class="set-note-input" type="text" placeholder="📝 Notă (ex: umăr ok, ușor azi...)" value="'+exNote.replace(/"/g,'&quot;')+'" onchange="saveExNote(\''+sk+'\',this.value)">';
     var kgConv=kgConventionFor(e);
@@ -2177,6 +2206,25 @@ function renderToday(){
   cont.innerHTML=html;
   renderChecklist();
   animateHero();
+}
+
+// Bara „PROGRESUL ZILEI" — actualizată live la fiecare set salvat (fără re-render)
+function updateDayProgress(){
+  var fill=document.getElementById('dayProgFill');if(!fill)return;
+  var tot=parseInt(fill.getAttribute('data-total'))||0;
+  if(!tot)return;
+  var idx=getEffectiveDayIdx();
+  var list=exercises[schedule[idx].exDay].list.concat(customExercises[idx]||[]);
+  var done=0;
+  list.forEach(function(e,ei){
+    var effS=effectiveSets(e,ei);
+    for(var s=1;s<=effS;s++){
+      if(setData[e.name]&&setData[e.name][s]&&setData[e.name][s].savedOnServer)done++;
+    }
+  });
+  var pct=Math.min(100,Math.round(done/tot*100));
+  fill.style.width=pct+'%';
+  var lbl=document.getElementById('dayProgPct');if(lbl)lbl.textContent=pct+'%';
 }
 
 // Count-up pe tonajul-erou din „ZI COMPLETĂ" — o singură dată per zi afișată
@@ -2377,7 +2425,11 @@ function saveSet(keyEnc,setNum,ei){
       var btn=box.querySelector('.set-btn');if(btn)btn.textContent='✓';
       // Ascunde butonul repeat după save
       var repBtn=box.querySelector('.repeat-btn');if(repBtn)repBtn.remove();
+      // Următorul set nu mai e „urmează" — devine activ
+      var nfb=document.getElementById('sb_'+ei+'_'+(setNum+1));
+      if(nfb)nfb.classList.remove('sb-future');
     }
+    updateDayProgress();
     // Confirmarea = toast-ul cu Anulează (5s), inclusiv la PR
     undoCtx={key:key,setNum:setNum,ei:ei,date:dateRo,prevRow:prevRow};
     var valStr=kg>0?reps+'×'+kg+'kg':reps+' rep';
