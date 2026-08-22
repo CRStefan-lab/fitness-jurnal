@@ -125,6 +125,23 @@ body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSy
 .snap-btn{margin-left:auto;background:rgba(var(--acc-rgb),.1);border:1px solid rgba(var(--acc-rgb),.4);border-radius:8px;color:var(--acc2);font-size:11px;font-weight:700;padding:7px 11px;cursor:pointer;font-family:inherit;flex-shrink:0}
 .snap-btn:active{background:rgba(var(--acc-rgb),.25)}
 .snap-badge{font-size:9px;font-weight:800;letter-spacing:.5px;color:var(--green);background:rgba(34,197,94,.12);border-radius:5px;padding:2px 6px;margin-left:7px;vertical-align:1px}
+/* Volum pe mușchi/săptămână vs banda 10–20 (Pelland) */
+.vol-row{margin-bottom:10px}
+.vol-hd{display:flex;align-items:baseline;gap:7px;margin-bottom:4px}
+.vol-name{font-size:12px;font-weight:700;color:var(--text)}
+.vol-status{font-size:8.5px;font-weight:800;letter-spacing:.6px;padding:2px 6px;border-radius:5px}
+.vol-status.low{background:rgba(245,158,11,.12);color:#fbbf24}
+.vol-status.ok{background:rgba(34,197,94,.15);color:var(--green)}
+.vol-status.high{background:rgba(244,63,94,.14);color:#fb7185}
+.vol-val{font-family:'Chakra Petch','Segoe UI',Arial,sans-serif;font-size:14px;font-weight:700;margin-left:auto;color:var(--text)}
+.vol-val small{font-size:9px;color:var(--muted);font-weight:600;letter-spacing:.4px}
+.vol-track{position:relative;height:11px;background:var(--s2);border-radius:6px}
+.vol-band{position:absolute;top:0;bottom:0;background:rgba(34,197,94,.09);border-left:1px dashed rgba(34,197,94,.5);border-right:1px dashed rgba(34,197,94,.5)}
+.vol-fill{position:absolute;top:2px;bottom:2px;left:2px;border-radius:4px;width:0;transition:width .7s cubic-bezier(.25,.9,.3,1)}
+.vol-fill.low{background:linear-gradient(90deg,rgba(245,158,11,.45),#fbbf24)}
+.vol-fill.ok{background:linear-gradient(90deg,rgba(var(--acc-rgb),.5),var(--acc2));box-shadow:0 0 12px rgba(var(--acc-rgb),.5)}
+.vol-fill.high{background:linear-gradient(90deg,rgba(244,63,94,.45),#fb7185);box-shadow:0 0 10px rgba(244,63,94,.35)}
+@media (prefers-reduced-motion:reduce){.vol-fill{transition:none}}
 /* Selector temă de culoare */
 .theme-row{display:flex;gap:10px;flex-wrap:wrap;padding:6px 0 2px}
 .theme-swatch{width:40px;height:40px;border-radius:50%;cursor:pointer;border:3px solid transparent;padding:0;flex-shrink:0;position:relative;transition:transform .15s,border-color .15s}
@@ -744,6 +761,7 @@ input:checked + .slider:before{transform:translateX(20px);background:var(--acc)}
     <button class="week-nav-btn" id="weekNext" onclick="changeWeek(1)">›</button>
   </div>
   <div id="weekSummary" style="font-size:11px;color:var(--muted);text-align:center;margin-bottom:12px"></div>
+  <div id="volumePanel"></div>
   <div id="hist-content"></div>
 
   <p style="font-size:11px;color:var(--muted);margin-top:20px;text-align:center">
@@ -3581,6 +3599,9 @@ function renderHistoric(){
       :'Nicio activitate înregistrată';
   }
 
+  // Volum pe mușchi vs banda 10–20 — navighează cu ‹ › odată cu săptămâna
+  renderVolumePanel();
+
   if(!rows.length){
     var emptyMsg=currentWeekOffset===0
       ?'Nicio dată în această săptămână.<br><span class="empty-state-action" onclick="showTab(\'azi\',document.querySelectorAll(\'.nb\')[0])">→ Începe antrenament azi</span>'
@@ -3693,22 +3714,133 @@ function getPrimaryMuscle(exerciseName){
   return 'Altele';
 }
 
-function buildVolumePerGroup(weekOffset){
+// ═══════════════════════════════════════════════════════════════
+// VOLUM PE MUȘCHI / SĂPTĂMÂNĂ vs BANDA 10–20 (Pelland 2025)
+// Mușchiul vine din EXERCISE_DB (via exId din program, apoi nume),
+// fallback heuristica getPrimaryMuscle. Compusele numără ½ set
+// pentru mușchii secundari (după pattern-ul din DB).
+// ═══════════════════════════════════════════════════════════════
+var VOLUME_GROUPS=[
+  {id:'piept',label:'Piept',rx:/piept/i},
+  {id:'spate',label:'Spate',rx:/spate|lanț posterior/i},
+  {id:'umeri',label:'Umeri',rx:/um[ăe]r/i},
+  {id:'biceps',label:'Biceps',rx:/biceps/i},
+  {id:'triceps',label:'Triceps',rx:/triceps/i},
+  {id:'cvadriceps',label:'Cvadriceps',rx:/cvadriceps/i},
+  {id:'fesieri',label:'Fesieri & ischio',rx:/fesieri|ischio|glute|femural/i},
+  {id:'gambe',label:'Gambe',rx:/gamb|vârfuri/i},
+  {id:'core',label:'Core',rx:/core|oblici|abdomen/i}
+];
+var VOL_BAND_LO=10,VOL_BAND_HI=20;
+// Secundari per pattern (½ set) — doar contribuții clare, dovedite
+var PATTERN_SECONDARY={
+  push_h:{triceps:.5,umeri:.5},
+  push_v:{triceps:.5},
+  squat:{fesieri:.5},
+  lunge:{fesieri:.5},
+  hinge:{spate:.5},
+  pull:{biceps:.5}
+};
+function volumeGroupFor(muscleStr){
+  // La mușchi compuși ("Spate + piept") câștigă cel menționat primul
+  var best=null,bestIdx=1e9,l=String(muscleStr);
+  VOLUME_GROUPS.forEach(function(g){
+    var m=l.search(g.rx);
+    if(m>=0&&m<bestIdx){bestIdx=m;best=g.id;}
+  });
+  return best;
+}
+var _volCache={};
+function volumeInfoFor(exerciseName){
+  if(_volCache[exerciseName])return _volCache[exerciseName];
+  var db=null;
+  if(window.ProgramGenerator&&ProgramGenerator.EXERCISE_DB){
+    var meta=findExerciseMeta(exerciseName);
+    if(meta&&meta.ex&&meta.ex.exId){
+      db=ProgramGenerator.EXERCISE_DB.find(function(x){return x.id===meta.ex.exId;});
+    }
+    if(!db){
+      db=ProgramGenerator.EXERCISE_DB.find(function(x){return x.name===exerciseName;});
+    }
+  }
+  var group=null,pattern=null;
+  if(db){group=volumeGroupFor(db.muscle);pattern=db.pattern;}
+  if(!group){
+    var pm=getPrimaryMuscle(exerciseName);
+    group={'Triceps':'triceps','Biceps':'biceps','Umeri':'umeri','Spate posterior':'spate','Spate':'spate','Piept':'piept','Gambă':'gambe','Cvadriceps':'cvadriceps','Glute/Ischio':'fesieri','Core':'core'}[pm]||null;
+  }
+  var info={group:group,pattern:pattern};
+  _volCache[exerciseName]=info;
+  return info;
+}
+function buildWeeklyVolume(weekOffset){
   var rows=getRowsForWeek(weekOffset).filter(function(r){return r.type==='antrenament';});
-  var byGroup={};
+  if(!rows.length)return null;
+  var vol={},ton={};
   rows.forEach(function(r){
-    var g=getPrimaryMuscle(r.exercise);
-    if(!byGroup[g])byGroup[g]={sets:0,tonnage:0};
-    byGroup[g].sets++;
-    byGroup[g].tonnage+=(parseFloat(r.kg)||0)*(parseFloat(r.reps)||0);
+    var info=volumeInfoFor(r.exercise);
+    if(!info.group)return; // recovery/pași/stretching nu intră
+    vol[info.group]=(vol[info.group]||0)+1;
+    ton[info.group]=(ton[info.group]||0)+(parseFloat(r.kg)||0)*(parseFloat(r.reps)||0);
+    var sec=info.pattern&&PATTERN_SECONDARY[info.pattern];
+    if(sec)for(var g in sec){
+      if(g===info.group)continue;
+      vol[g]=(vol[g]||0)+sec[g];
+    }
   });
-  var keys=Object.keys(byGroup).sort(function(a,b){return byGroup[b].sets-byGroup[a].sets;});
-  if(!keys.length)return '  (fără antrenamente în săpt.)\n';
+  var groups=[],zeros=[];
+  VOLUME_GROUPS.forEach(function(g){
+    var v=vol[g.id]||0;
+    if(v>0)groups.push({id:g.id,label:g.label,val:v,tonnage:ton[g.id]||0});
+    else zeros.push(g.label);
+  });
+  return groups.length?{groups:groups,zeros:zeros}:null;
+}
+function volFmt(v){return v%1===0?String(v):v.toFixed(1);}
+function renderVolumePanel(){
+  var el=document.getElementById('volumePanel');if(!el)return;
+  var data=buildWeeklyVolume(currentWeekOffset);
+  if(!data){el.innerHTML='';return;}
+  var scale=25;
+  data.groups.forEach(function(g){if(g.val+2>scale)scale=Math.ceil(g.val)+2;});
+  var bandL=VOL_BAND_LO/scale*100,bandW=(VOL_BAND_HI-VOL_BAND_LO)/scale*100;
+  var html='<div class="card open" id="volumeCard" style="margin-bottom:12px">';
+  html+='<div class="card-hd" onclick="document.getElementById(\'volumeCard\').classList.toggle(\'open\')">';
+  html+='<div class="card-ico" style="background:rgba(var(--acc-rgb),.15)">💪</div>';
+  html+='<div style="flex:1;min-width:0"><div class="card-ttl">Volum pe mușchi</div><div class="card-sub">vs banda de creștere 10–20 seturi/săpt.</div></div>';
+  html+='<div class="card-chev">▼</div></div>';
+  html+='<div class="card-bd"><div style="padding-top:12px">';
+  data.groups.forEach(function(g){
+    var st=g.val<VOL_BAND_LO?'low':(g.val<=VOL_BAND_HI?'ok':'high');
+    var stLbl={low:'SUB ȚINTĂ',ok:'OPTIM',high:'PESTE'}[st];
+    var w=Math.min(100,g.val/scale*100);
+    html+='<div class="vol-row">';
+    html+='<div class="vol-hd"><span class="vol-name">'+g.label+'</span><span class="vol-status '+st+'">'+stLbl+'</span><span class="vol-val">'+volFmt(g.val)+' <small>SET</small></span></div>';
+    html+='<div class="vol-track"><div class="vol-band" style="left:'+bandL.toFixed(1)+'%;width:'+bandW.toFixed(1)+'%"></div><div class="vol-fill '+st+'" data-w="'+w.toFixed(1)+'"></div></div>';
+    html+='</div>';
+  });
+  if(data.zeros.length){
+    html+='<div style="font-size:10.5px;color:var(--muted);margin-top:2px">Fără volum săpt. asta: '+data.zeros.join(' · ')+'</div>';
+  }
+  html+='<div style="font-size:10.5px;color:var(--muted);margin-top:10px;line-height:1.55;border-top:1px solid var(--bd);padding-top:8px">🎯 <strong style="color:var(--acc2)">10–20 seturi/mușchi/săpt.</strong> = zona de creștere maximă (Pelland 2025, 67 studii). Compusele numără ½ pentru mușchii secundari (ex: împinsul → ½ triceps). Sub bandă = sub-optim, nu zero; peste 20 = risc pentru recuperare.</div>';
+  html+='</div></div></div>';
+  el.innerHTML=html;
+  // Barele cresc animat la afișare
+  requestAnimationFrame(function(){requestAnimationFrame(function(){
+    el.querySelectorAll('.vol-fill').forEach(function(f){f.style.width=f.getAttribute('data-w')+'%';});
+  });});
+}
+
+function buildVolumePerGroup(weekOffset){
+  // Exportul AI folosește același motor ca panoul vizual (grupe + bandă)
+  var data=buildWeeklyVolume(weekOffset);
+  if(!data)return '  (fără antrenamente în săpt.)\n';
   var out='';
-  keys.forEach(function(g){
-    var v=byGroup[g];
-    out+='  '+g+': '+v.sets+' sets · '+v.tonnage.toFixed(0)+' kg total\n';
+  data.groups.forEach(function(g){
+    var st=g.val<VOL_BAND_LO?'SUB banda 10–20':(g.val<=VOL_BAND_HI?'ÎN banda 10–20 ✓':'PESTE banda 10–20');
+    out+='  '+g.label+': '+volFmt(g.val)+' sets ['+st+']'+(g.tonnage>0?' · '+g.tonnage.toFixed(0)+' kg':'')+'\n';
   });
+  if(data.zeros.length)out+='  Fără volum: '+data.zeros.join(', ')+'\n';
   return out;
 }
 
