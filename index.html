@@ -437,6 +437,9 @@ input:checked + .slider:before{transform:translateX(20px);background:var(--acc)}
 .rating-slider{flex:2;-webkit-appearance:none;appearance:none;height:6px;background:var(--s2);border-radius:3px;outline:none}
 .rating-slider::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;width:18px;height:18px;border-radius:50%;background:var(--purple);cursor:pointer;box-shadow:0 0 6px rgba(167,139,250,.5)}
 .rating-slider::-moz-range-thumb{width:18px;height:18px;border-radius:50%;background:var(--purple);cursor:pointer;border:none}
+.rate-note-input{width:100%;background:var(--bg);border:1px solid var(--bd);border-radius:8px;color:var(--text);font-size:12px;padding:7px 10px;font-family:inherit;margin:2px 0 8px}
+.rate-note-input:focus{outline:none;border-color:var(--purple)}
+.rate-note-input::placeholder{color:var(--muted)}
 .rating-value{font-size:16px;font-weight:900;color:var(--purple);min-width:28px;text-align:right}
 </style>
 </head>
@@ -1369,6 +1372,11 @@ function addRow(row){
       return !(r.type==='dimineata' && r.date===row.date && r.exercise===row.exercise);
     });
   }
+  if(row.type==='ratenote'){
+    s.rows=s.rows.filter(function(r){
+      return !(r.type==='ratenote' && r.date===row.date && r.exercise===row.exercise);
+    });
+  }
   if(row.type==='rating'){
     s.rows=s.rows.filter(function(r){
       return !(r.type==='rating' && r.date===row.date && r.exercise===row.exercise);
@@ -1464,7 +1472,7 @@ function roToIso(ro){
 // ═══════════════════════════════════════════════════════════════
 // STATE
 // ═══════════════════════════════════════════════════════════════
-var setData={},checkData={},morningData={},ratingData={},exNoteData={},currentNutDay=0,currentWeekOffset=0;
+var setData={},checkData={},morningData={},ratingData={},rateNoteData={},exNoteData={},currentNutDay=0,currentWeekOffset=0;
 var customExercises={}; // {dayIdx: [{name,sets,target,custom:true}]} — per sesiune, nu persistent
 var currentWorkoutDay=null;  // null = folosește ziua derivată din dată. altfel = index zi override
 var currentWorkoutDate=null; // null = data de azi. altfel = ISO "yyyy-mm-dd"
@@ -1750,7 +1758,9 @@ function renderToday(){
   html+='<div class="rating-card">';
   html+='<div style="font-size:11px;font-weight:800;color:var(--purple);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:6px">📊 Stare de azi</div>';
   html+='<div class="rating-row"><div class="rating-emoji">⚡</div><div class="rating-label">Energie</div><input type="range" min="1" max="10" value="'+energyVal+'" class="rating-slider" id="ratEnergy" oninput="updateRating(\'energy\',this.value)"><div class="rating-value" id="ratEnergyVal">'+energyVal+'/10</div></div>';
+  html+='<input class="rate-note-input" type="text" id="noteEnergy" placeholder="📝 De ce? (ex: somn prost, zi grea, cafea târziu)" value="'+(rateNoteData.energy||'').replace(/"/g,'&quot;')+'" onchange="saveRateNote(\'energy\',this.value)">';
   html+='<div class="rating-row"><div class="rating-emoji">😴</div><div class="rating-label">Calitate somn</div><input type="range" min="1" max="10" value="'+sleepVal+'" class="rating-slider" id="ratSleep" oninput="updateRating(\'sleep\',this.value)"><div class="rating-value" id="ratSleepVal">'+sleepVal+'/10</div></div>';
+  html+='<input class="rate-note-input" type="text" id="noteSleep" placeholder="📝 Notă somn (ex: 5h, m-am trezit de 3 ori)" value="'+(rateNoteData.sleep||'').replace(/"/g,'&quot;')+'" onchange="saveRateNote(\'sleep\',this.value)">';
   // Cântar rapid zilnic
   var todayWeight=getTodayWeight();
   html+='<div class="rating-row"><div class="rating-emoji">⚖️</div><div class="rating-label">Greutate azi</div>';
@@ -2992,6 +3002,14 @@ function updateRating(id,val){
   addRow({date:getEffectiveDateRo(),day:schedule[idx].day,type:'rating',exercise:id,set:'',reps:'',kg:'',note:String(ratingData[id])});
 }
 
+function saveRateNote(id,val){
+  val=(val||'').trim();
+  rateNoteData[id]=val;
+  var idx=getEffectiveDayIdx();
+  addRow({date:getEffectiveDateRo(),day:schedule[idx].day,type:'ratenote',exercise:id,set:'',reps:'',kg:'',note:val});
+  if(val)showToast('Notă salvată ✓',null,true);
+}
+
 function toggleMorning(id,el){
   morningData[id]=!morningData[id];
   el.classList.toggle('done');
@@ -3726,6 +3744,9 @@ function buildWeekSummary(){
         byDay[r.day].morning.push({id:r.exercise,done:r.note==='DA'});
       }else if(r.type==='rating'){
         byDay[r.day].ratings[r.exercise]=r.note;
+      }else if(r.type==='ratenote'){
+        if(!byDay[r.day].rateNotes)byDay[r.day].rateNotes={};
+        byDay[r.day].rateNotes[r.exercise]=r.note;
       }else if(r.type==='exnote'){
         if(!byDay[r.day].notes)byDay[r.day].notes={};
         byDay[r.day].notes[r.exercise]=r.note;
@@ -3743,11 +3764,15 @@ function buildWeekSummary(){
         out+='\n';
       }
       // Energie/Somn pentru ziua respectivă
-      if(byDay[d].ratings.energy||byDay[d].ratings.sleep){
+      var rnD=byDay[d].rateNotes||{};
+      if(byDay[d].ratings.energy||byDay[d].ratings.sleep||rnD.energy||rnD.sleep){
         var rats=[];
         if(byDay[d].ratings.energy)rats.push('⚡ Energie '+byDay[d].ratings.energy+'/10');
         if(byDay[d].ratings.sleep)rats.push('😴 Somn '+byDay[d].ratings.sleep+'/10');
-        out+='  '+rats.join(' · ')+'\n';
+        if(rats.length)out+='  '+rats.join(' · ')+'\n';
+        var rn=rnD;
+        if(rn.energy)out+='    energie: '+rn.energy+'\n';
+        if(rn.sleep)out+='    somn: '+rn.sleep+'\n';
       }
       Object.keys(byDay[d].exercises).forEach(function(ex){
         var sets=byDay[d].exercises[ex].sort(function(a,b){return a.set-b.set;});
@@ -4318,6 +4343,7 @@ function mergeRemote(remote){
     if(r.type==='checklist') return r.date+'|c|'+r.exercise;
     if(r.type==='dimineata') return r.date+'|d|'+r.exercise;
     if(r.type==='rating') return r.date+'|r|'+r.exercise;
+    if(r.type==='ratenote') return r.date+'|rn|'+r.exercise;
     if(r.type==='exnote') return r.date+'|n|'+r.exercise;
     if(r.type==='rir') return r.date+'|q|'+r.exercise;
     if(r.type==='masuratoare') return r.date+'|m';
@@ -4507,7 +4533,7 @@ function initGhid(){
 // PRELOAD DATE PENTRU DATA SELECTATĂ (azi sau backdated)
 // ═══════════════════════════════════════════════════════════════
 function preloadToday(){
-  setData={};checkData={};morningData={};ratingData={};exNoteData={};
+  setData={};checkData={};morningData={};ratingData={};rateNoteData={};exNoteData={};
   var rows=getRowsForDate(getEffectiveDateRo());
   rows.forEach(function(r){
     if(r.type==='antrenament'&&r.exercise&&r.set){
@@ -4522,6 +4548,9 @@ function preloadToday(){
     }
     if(r.type==='rating'&&r.exercise){
       ratingData[r.exercise]=parseInt(r.note)||5;
+    }
+    if(r.type==='ratenote'&&r.exercise){
+      rateNoteData[r.exercise]=r.note||'';
     }
     if(r.type==='exnote'&&r.exercise){
       exNoteData[r.exercise]=r.note||'';

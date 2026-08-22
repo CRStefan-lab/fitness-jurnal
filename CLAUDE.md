@@ -49,6 +49,7 @@ Aplicația e **feature-complete** ca "antrenor în buzunar", construită integra
   - `antrenament` {date(dd.mm.yyyy), day(LUNI..), exercise, set, reps, kg, note('PR:tip' la record)}
   - `checklist` / `dimineata` / `rir`(easy|ok|hard) / `exnote` — {exercise, note}
   - `rating` {exercise:'energy'|'sleep', note:'1'-'10'}
+  - `ratenote` {exercise:'energy'|'sleep', note:text} — notă liberă la starea zilei (apare în export)
   - `masuratoare` {weight, waist, neck, hip, chest, biceps, thigh, calf, note}
 - `custom_program` = output-ul `generateProgram()` (exercises/schedule/morningRoutines/nutrition/checklist/ghid/meta) — aplicat la load peste definițiile statice
 - `user_profile` = {sex, age, height, weight, experience, equipment, hasBara, days, goal, morningRoutine, name}
