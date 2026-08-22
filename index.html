@@ -255,6 +255,16 @@ html[data-mode="light"] .ai-btn-ghost{color:#6d28d9}
 .hist-card.open .hist-card-bd{display:block}
 .hist-set{font-family:'Chakra Petch','Segoe UI',Arial,sans-serif;font-weight:600;background:var(--s2);border:1px solid var(--bd);color:var(--text);border-radius:7px;padding:4px 8px;font-size:10.5px}
 .hist-set.pr{background:rgba(245,158,11,.1);border-color:rgba(245,158,11,.45);color:#fbbf24}
+/* 3.4 — Nutriție: macro-uri vizuale + mese pliabile */
+.meal-card .meal-items{display:none}
+.meal-card.open .meal-items{display:block}
+.meal-card:not(.open) .meal-hd{border-bottom:none}
+.meal-hd{cursor:pointer;user-select:none;-webkit-user-select:none}
+.meal-chev{color:var(--muted);font-size:11px;transition:transform .2s;margin-left:8px;flex-shrink:0}
+.meal-card.open .meal-chev{transform:rotate(180deg)}
+.macro-val{font-family:'Chakra Petch','Segoe UI',Arial,sans-serif}
+.macro-split{display:flex;height:10px;border-radius:5px;overflow:hidden;gap:2px;margin-bottom:8px}
+.macro-split>div{border-radius:3px}
 .repeat-btn{background:rgba(var(--acc2-rgb),.12);border:1px solid rgba(var(--acc2-rgb),.4);border-radius:8px;color:var(--acc2);font-size:11px;font-weight:700;cursor:pointer;padding:6px 8px;font-family:inherit;flex-shrink:0;letter-spacing:.2px}
 .repeat-btn:active{background:rgba(var(--acc2-rgb),.25)}
 .azi-stats{display:flex;gap:8px;margin-bottom:10px;font-size:11px;align-items:stretch}
@@ -611,7 +621,7 @@ input:checked + .slider:before{transform:translateX(20px);background:var(--acc)}
 <div id="tab-nutritie" class="sec">
   <div class="day-scroll" id="nutDays"></div>
   <div id="nutDayHdr"></div>
-  <div class="macro-row" id="nutMacros"></div>
+  <div id="nutMacros" style="margin-bottom:10px"></div>
   <div id="nutMeals"></div>
   <div id="nutNote"></div>
 
@@ -641,7 +651,7 @@ input:checked + .slider:before{transform:translateX(20px);background:var(--acc)}
   <div id="nutVariationWrap">
   <div class="stitle">🐟 Variație săptămânală (1 zi/săpt)</div>
   <div class="meal-card" style="border-color:rgba(56,189,248,.35)">
-    <div class="meal-hd"><div><div class="meal-nm">🐟 Somon + quinoa (în loc de Masa 3)</div><div class="meal-tm">Orice zi PUI sau TON · 1x/săpt</div></div><div style="text-align:right"><div class="meal-kc" style="color:#38bdf8">~700 kcal</div><div class="meal-pr">~45g proteine · Omega 3</div></div></div>
+    <div class="meal-hd" onclick="this.parentElement.classList.toggle('open')"><div><div class="meal-nm">🐟 Somon + quinoa (în loc de Masa 3)</div><div class="meal-tm">Orice zi PUI sau TON · 1x/săpt</div></div><div style="text-align:right"><div class="meal-kc" style="color:#38bdf8">~700 kcal</div><div class="meal-pr">~45g proteine · Omega 3</div></div><span class="meal-chev">▼</span></div>
     <div class="meal-items">
       <div class="item-row"><div><div class="item-nm">Somon (file, raw)</div><div class="item-am">200g</div></div><div class="item-kc">420 kcal</div></div>
       <div class="item-row"><div><div class="item-nm">Quinoa (raw)</div><div class="item-am">80g</div></div><div class="item-kc">300 kcal</div></div>
@@ -3520,6 +3530,24 @@ function updateChkCount(){
 // ═══════════════════════════════════════════════════════════════
 // Nutriție pentru programe GENERATE: calculator kcal/macros + principii
 // (planurile de mese hardcodate rămân doar pentru programul standard)
+// Macro-uri vizuale (3.4): bară de compoziție calorică + pastile cu % din calorii
+function macroVisualHtml(protein,carbs,fat){
+  var kcalP=protein*4,kcalC=carbs*4,kcalF=fat*9;
+  var tot=kcalP+kcalC+kcalF;if(tot<=0)tot=1;
+  var pp=Math.round(kcalP/tot*100),pc=Math.round(kcalC/tot*100),pf=Math.max(0,100-pp-pc);
+  var h='<div class="macro-split">';
+  h+='<div style="flex:'+kcalP+';background:linear-gradient(90deg,#ef4444,#f87171);box-shadow:0 0 8px rgba(248,113,113,.35)"></div>';
+  h+='<div style="flex:'+kcalC+';background:linear-gradient(90deg,#0ea5e9,#38bdf8);box-shadow:0 0 8px rgba(56,189,248,.35)"></div>';
+  h+='<div style="flex:'+kcalF+';background:linear-gradient(90deg,#f59e0b,#fbbf24);box-shadow:0 0 8px rgba(251,191,36,.35)"></div>';
+  h+='</div>';
+  h+='<div class="macro-row" style="margin-bottom:0">';
+  h+='<div class="macro-box" style="border-color:rgba(248,113,113,.3);background:rgba(248,113,113,.05)"><div class="macro-val mp">'+protein+'<span>g</span></div><div class="macro-lbl">PROTEINE · '+pp+'%</div></div>';
+  h+='<div class="macro-box" style="border-color:rgba(56,189,248,.3);background:rgba(56,189,248,.05)"><div class="macro-val mc">'+carbs+'<span>g</span></div><div class="macro-lbl">CARBO · '+pc+'%</div></div>';
+  h+='<div class="macro-box" style="border-color:rgba(251,191,36,.3);background:rgba(251,191,36,.05)"><div class="macro-val mf">'+fat+'<span>g</span></div><div class="macro-lbl">GRĂSIMI · '+pf+'%</div></div>';
+  h+='</div>';
+  return h;
+}
+
 function renderNutritionAuto(){
   var n=customNutrition;
   document.getElementById('nutDays').style.display='none';
@@ -3530,20 +3558,17 @@ function renderNutritionAuto(){
     '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">'+
     '<div><div style="font-size:22px;font-weight:900">Planul tău caloric</div>'+
     '<div style="font-size:11px;color:var(--purple);font-weight:600;margin-top:2px">Obiectiv: '+goalLabel+' · TDEE estimat '+n.tdee+' kcal</div></div>'+
-    '<div style="background:var(--s1);border:1px solid var(--bd);border-radius:12px;padding:8px 14px;text-align:center">'+
-    '<div style="font-size:20px;font-weight:900;color:var(--acc)">'+n.kcal+'</div>'+
+    '<div style="background:rgba(var(--acc-rgb),.08);border:1px solid rgba(var(--acc-rgb),.4);border-radius:12px;padding:8px 14px;text-align:center;box-shadow:0 0 16px rgba(var(--acc-rgb),.14)">'+
+    '<div style="font-size:22px;font-weight:700;font-family:\'Chakra Petch\',\'Segoe UI\',Arial,sans-serif;color:var(--acc2)">'+n.kcal+'</div>'+
     '<div style="font-size:10px;color:var(--muted);letter-spacing:1px">KCAL/ZI</div></div></div>';
-  document.getElementById('nutMacros').innerHTML=
-    '<div class="macro-box"><div class="macro-val mp">'+n.protein+'<span>g</span></div><div class="macro-lbl">PROTEINE</div></div>'+
-    '<div class="macro-box"><div class="macro-val mc">'+n.carbs+'<span>g</span></div><div class="macro-lbl">CARBOHIDRAȚI</div></div>'+
-    '<div class="macro-box"><div class="macro-val mf">'+n.fat+'<span>g</span></div><div class="macro-lbl">GRĂSIMI</div></div>';
+  document.getElementById('nutMacros').innerHTML=macroVisualHtml(n.protein,n.carbs,n.fat);
   var meals=document.getElementById('nutMeals');
-  var html='<div class="meal-card"><div class="meal-hd"><div><div class="meal-nm">📋 Principiile planului tău</div><div class="meal-tm">generat pe profilul tău — nu mese impuse</div></div></div><div class="meal-items">';
+  var html='<div class="meal-card open"><div class="meal-hd" onclick="this.parentElement.classList.toggle(\'open\')"><div><div class="meal-nm">📋 Principiile planului tău</div><div class="meal-tm">generat pe profilul tău — nu mese impuse</div></div><span class="meal-chev">▼</span></div><div class="meal-items">';
   (n.principles||[]).forEach(function(p){
     html+='<div class="item-row"><div class="item-nm" style="font-weight:500;line-height:1.4">'+p+'</div></div>';
   });
   html+='</div></div>';
-  html+='<div class="meal-card"><div class="meal-hd"><div><div class="meal-nm">💧 Ținte zilnice</div></div></div><div class="meal-items">';
+  html+='<div class="meal-card open"><div class="meal-hd" onclick="this.parentElement.classList.toggle(\'open\')"><div><div class="meal-nm">💧 Ținte zilnice</div></div><span class="meal-chev">▼</span></div><div class="meal-items">';
   html+='<div class="item-row"><div class="item-nm">Apă</div><div class="item-kc">'+n.waterL+' L</div></div>';
   html+='<div class="item-row"><div class="item-nm">Pași</div><div class="item-kc">'+n.stepsTarget+'</div></div>';
   html+='</div></div>';
@@ -3574,19 +3599,16 @@ function renderNutDay(){
     '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">'+
     '<div><div style="font-size:22px;font-weight:900">'+s.day+'</div>'+
     '<div style="font-size:11px;color:var(--purple);font-weight:600;margin-top:2px">'+p.subtitle+'</div></div>'+
-    '<div style="background:var(--s1);border:1px solid var(--bd);border-radius:12px;padding:8px 14px;text-align:center">'+
-    '<div style="font-size:20px;font-weight:900;color:'+p.color+'">'+p.kcal+'</div>'+
+    '<div style="background:rgba(var(--acc-rgb),.08);border:1px solid rgba(var(--acc-rgb),.4);border-radius:12px;padding:8px 14px;text-align:center;box-shadow:0 0 16px rgba(var(--acc-rgb),.14)">'+
+    '<div style="font-size:22px;font-weight:700;font-family:\'Chakra Petch\',\'Segoe UI\',Arial,sans-serif;color:'+p.color+'">'+p.kcal+'</div>'+
     '<div style="font-size:9px;color:var(--muted);letter-spacing:1px">KCAL/ZI</div></div></div>';
-  document.getElementById('nutMacros').innerHTML=
-    '<div class="macro-box"><div class="macro-val mp">'+p.protein+'<span>g</span></div><div class="macro-lbl">PROTEINE</div></div>'+
-    '<div class="macro-box"><div class="macro-val mc">'+p.carbs+'<span>g</span></div><div class="macro-lbl">CARBOHIDRAȚI</div></div>'+
-    '<div class="macro-box"><div class="macro-val mf">'+p.fat+'<span>g</span></div><div class="macro-lbl">GRĂSIMI</div></div>';
+  document.getElementById('nutMacros').innerHTML=macroVisualHtml(p.protein,p.carbs,p.fat);
   var meals=document.getElementById('nutMeals');meals.innerHTML='';
-  p.meals.forEach(function(meal){
+  p.meals.forEach(function(meal,mi){
     var itemsHtml=meal.items.map(function(it){
       return '<div class="item-row"><div><div class="item-nm">'+it.name+'</div><div class="item-am">'+it.amount+'</div></div><div class="item-kc">'+it.kcal+' kcal</div></div>';
     }).join('');
-    meals.innerHTML+='<div class="meal-card"><div class="meal-hd"><div><div class="meal-nm">'+meal.emoji+' '+meal.name+'</div><div class="meal-tm">⏰ '+meal.time+'</div></div><div style="text-align:right"><div class="meal-kc" style="color:'+p.color+'">'+meal.kcal+' kcal</div><div class="meal-pr">~'+meal.protein+'g proteine</div></div></div><div class="meal-items">'+itemsHtml+'</div></div>';
+    meals.innerHTML+='<div class="meal-card'+(mi===0?' open':'')+'"><div class="meal-hd" onclick="this.parentElement.classList.toggle(\'open\')"><div><div class="meal-nm">'+meal.emoji+' '+meal.name+'</div><div class="meal-tm">⏰ '+meal.time+'</div></div><div style="text-align:right"><div class="meal-kc" style="color:'+p.color+'">'+meal.kcal+' kcal</div><div class="meal-pr">~'+meal.protein+'g proteine</div></div><span class="meal-chev">▼</span></div><div class="meal-items">'+itemsHtml+'</div></div>';
   });
   document.getElementById('nutNote').innerHTML=p.note?'<div class="note-box">💡 '+p.note+'</div>':'';
 }
