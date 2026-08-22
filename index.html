@@ -44,7 +44,8 @@ html[data-theme="foc"]{--acc:#f59e0b;--acc-rgb:245,158,11;--acc-dim:#b45309;--ac
 html[data-theme="verde"]{--acc:#22c55e;--acc-rgb:34,197,94;--acc-dim:#15803d;--acc2:#86efac;--acc2-rgb:134,239,172}
 /* Aspect deschis (toggle în Setări) — acc2 devine varianta închisă ca să rămână lizibil pe alb */
 html[data-mode="light"]{--bg:#f5f7f9;--s1:#ffffff;--s2:#eef1f5;--bd:#e2e8ee;--text:#182430;--muted:#66788b;--acc2:var(--acc-dim);--acc2-rgb:var(--acc-rgb);--shadow-acc:0 0 24px rgba(var(--acc-rgb),.16)}
-html[data-mode="light"] body{background:var(--bg)}
+html[data-mode="light"] body{background:transparent}
+html[data-mode="light"] body::before{background:radial-gradient(ellipse 90% 38% at 50% -8%,rgba(var(--acc-rgb),.07),transparent 60%),radial-gradient(ellipse 70% 42% at 108% 42%,rgba(139,92,246,.04),transparent 65%)}
 html[data-mode="light"] .hdr{background:#ffffff}
 html[data-mode="light"] .hdr-title{color:#13202b}
 html[data-mode="light"] .bnav{background:rgba(255,255,255,.96)}
@@ -77,7 +78,10 @@ html[data-mode="light"] .set-box.dirty{background:rgba(245,158,11,.07)}
 .mode-btn{flex:1;background:var(--s2);border:2px solid var(--bd);border-radius:10px;color:var(--text);padding:10px;font-family:inherit;font-weight:700;font-size:13px;cursor:pointer}
 .mode-btn.sel{border-color:var(--acc);background:rgba(var(--acc-rgb),.1)}
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif;font-size:15px;padding-bottom:calc(90px + env(safe-area-inset-bottom))}
+html{background:var(--bg)}
+body{background:transparent;color:var(--text);font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif;font-size:15px;padding-bottom:calc(90px + env(safe-area-inset-bottom))}
+/* Atmosferă: aure discrete de lumină în spatele întregii aplicații (fix, nu derulează) */
+body::before{content:'';position:fixed;inset:0;z-index:-1;pointer-events:none;background:radial-gradient(ellipse 90% 38% at 50% -8%,rgba(var(--acc-rgb),.09),transparent 60%),radial-gradient(ellipse 70% 42% at 108% 42%,rgba(167,139,250,.05),transparent 65%),radial-gradient(ellipse 75% 36% at -12% 88%,rgba(var(--acc-rgb),.05),transparent 60%)}
 .hdr{background:linear-gradient(140deg,#0e1822 0%,#111d28 55%,#0a1117 100%);padding:calc(env(safe-area-inset-top) + 14px) 64px 14px 16px;border-bottom:1px solid var(--bd);position:relative}
 .hdr::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent 0%,var(--acc) 30%,var(--acc2) 50%,var(--acc) 70%,transparent 100%);opacity:.7}
 .hdr-lbl{font-size:10px;letter-spacing:3px;color:var(--acc);margin-bottom:4px;font-weight:600;text-transform:uppercase}
@@ -273,6 +277,26 @@ html[data-mode="light"] .ai-btn-ghost{color:#6d28d9}
 .morning-count{font-family:'Chakra Petch','Segoe UI',Arial,sans-serif;font-weight:700;color:var(--acc2)}
 .rating-card{position:relative;overflow:hidden}
 .chk-count{font-family:'Chakra Petch','Segoe UI',Arial,sans-serif;font-weight:700}
+/* Atmosferă globală — anti-anost */
+.hdr::before{content:'';position:absolute;left:0;right:0;bottom:-1px;height:1px;background:linear-gradient(90deg,transparent,rgba(var(--acc-rgb),.55),transparent)}
+.hdr::after{content:'';position:absolute;top:-46px;right:-34px;width:190px;height:150px;background:radial-gradient(closest-side,rgba(var(--acc-rgb),.2),transparent);pointer-events:none}
+.stitle::before{content:'';width:3px;height:12px;border-radius:2px;background:linear-gradient(180deg,var(--acc2),var(--acc));box-shadow:0 0 6px rgba(var(--acc-rgb),.55);flex-shrink:0}
+.nb.act::after{top:0;bottom:auto;left:26%;right:26%;height:3px;border-radius:0 0 3px 3px;background:linear-gradient(90deg,var(--acc),var(--acc2));box-shadow:0 2px 10px rgba(var(--acc-rgb),.55)}
+.nb.act .ico{filter:drop-shadow(0 0 6px rgba(var(--acc-rgb),.65))}
+.chart-empty{padding:26px 14px;border:1px dashed var(--bd);border-radius:12px;background:repeating-linear-gradient(-45deg,rgba(125,141,154,.025) 0 8px,transparent 8px 20px)}
+.meas-in:focus,.set-in:focus,.time-input:focus,.rate-note-input:focus,.set-note-input:focus{border-color:var(--acc);box-shadow:0 0 0 2px rgba(var(--acc-rgb),.16);outline:none}
+/* Setări & Progres: grupuri cu identitate de culoare + glow pe deschis */
+.sgroup.open{border-color:rgba(var(--acc-rgb),.35);box-shadow:0 0 18px rgba(var(--acc-rgb),.07)}
+.sgroup.danger.open{border-color:rgba(244,63,94,.5);box-shadow:0 0 18px rgba(244,63,94,.1)}
+.sgroup-ico{border:1px solid rgba(var(--acc-rgb),.3)}
+#sgProgram .sgroup-ico,#pgMasuratori .sgroup-ico{background:rgba(56,189,248,.12);border-color:rgba(56,189,248,.35)}
+#sgTimer .sgroup-ico,#pgRealizari .sgroup-ico{background:rgba(245,158,11,.12);border-color:rgba(245,158,11,.35)}
+#sgNotif .sgroup-ico,#pgCorp .sgroup-ico{background:rgba(167,139,250,.12);border-color:rgba(167,139,250,.35)}
+#sgBackup .sgroup-ico,#pgCalendar .sgroup-ico{background:rgba(34,197,94,.12);border-color:rgba(34,197,94,.35)}
+#sgInfo .sgroup-ico{background:rgba(125,141,154,.12);border-color:rgba(125,141,154,.3)}
+#pgPoze .sgroup-ico{background:rgba(236,72,153,.12);border-color:rgba(236,72,153,.35)}
+.sgroup.danger .sgroup-ico{border-color:rgba(244,63,94,.4)}
+#setariSearch:focus{border-color:var(--acc);box-shadow:0 0 0 3px rgba(var(--acc-rgb),.14);outline:none}
 .repeat-btn{background:rgba(var(--acc2-rgb),.12);border:1px solid rgba(var(--acc2-rgb),.4);border-radius:8px;color:var(--acc2);font-size:11px;font-weight:700;cursor:pointer;padding:6px 8px;font-family:inherit;flex-shrink:0;letter-spacing:.2px}
 .repeat-btn:active{background:rgba(var(--acc2-rgb),.25)}
 .azi-stats{display:flex;gap:8px;margin-bottom:10px;font-size:11px;align-items:stretch}
