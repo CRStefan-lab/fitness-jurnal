@@ -2615,6 +2615,9 @@ var MORNING_GUIDES={
   morn_pike_pushup:{name:'Pike push-up',how:'Din poziția V inversat (fese sus), cobori capul spre podea îndoind coatele, apoi împingi înapoi.',tip:'Pregătește umerii pentru împinsul de seară.',easier:'Pe genunchi (fesele mai jos, pași mai mici) sau doar ține poziția V 20 sec — pattern-ul contează, nu adâncimea.'},
   morn_mob_umeri:{name:'Mobilitate umeri',how:'Cercuri ample cu brațele (10 înainte + 10 înapoi), apoi brațele pe perete și aluneci în sus/jos (wall slides), apoi întinderi ușoare ale pieptului în cadru de ușă.',tip:'Lent și fără durere — cauți mobilitate, nu forțare.'},
   morn_kegel:{name:'Kegel',how:'Contractă mușchii planșeului pelvin (cei cu care ai opri urinarea) 3-5 sec, relaxează 3 sec. Repetă 10-15 ori.',tip:'Nu contracta fesierii sau abdomenul. Nimeni nu vede că îl faci — poți oriunde.'},
+  morn_kegel_rapid:{name:'Kegel rapid (quick flicks)',how:'Contracții SCURTE și puternice: strângi 1 sec, relaxezi complet 2 sec. 15 repetări. Antrenează fibrele rapide — cele care intervin la tuse, strănut, ridicat greutăți.',tip:'Complementar Kegel-ului clasic: acela lucrează rezistența, acesta reacția rapidă. Relaxarea completă între repetări e obligatorie.',easier:'Începe cu 8 repetări și crește treptat.'},
+  morn_kegel_respiratie:{name:'Kegel cu respirație diafragmatică',how:'Culcat sau șezând: inspiri adânc în burtă (planșeul coboară, se relaxează) → expiri lent și contracți planșeul spre final. 10 respirații complete.',tip:'Cea mai funcțională variantă — planșeul lucrează sincronizat cu diafragma, exact ca în viața reală. Dacă ținei respirația, ai greșit.',easier:'5 respirații, doar coordonarea — fără forță în contracție.'},
+  morn_relax_pelvin:{name:'Relaxare planșeu pelvin',how:'Poziția copilului sau happy baby (culcat pe spate, genunchii la piept, prinzi tălpile), respiri adânc 5 minute lăsând planșeul să se DESTINDĂ la fiecare inspir. Fără nicio contracție.',tip:'Pentru planșeu hiperton (tensionat): mai multe contracții înrăutățesc situația — relaxarea e antrenamentul. Semne: disconfort pelvin, urinare frecventă în ciuda Kegel-urilor.',easier:'Doar 2-3 min de respirație adâncă, culcat cu genunchii îndoiți.'},
   morn_fandari:{name:'Fandări în loc',how:'Pas mare în spate, cobori genunchiul spre podea, revii împingând în călcâiul din față. Alternezi picioarele.',tip:'Trunchiul drept, mișcare controlată.',easier:'Ține-te de perete sau de un scaun pentru echilibru și coboară doar cât e confortabil — adâncimea vine cu timpul.'},
   morn_glute_bridge:{name:'Glute bridge',how:'Pe spate, genunchii îndoiți, împingi șoldurile sus strângând fesierii, ții 1 sec, cobori lent.',tip:'Activează fesierii pentru antrenamentul de seară.'},
   morn_plank:{name:'Plank',how:'Pe coate, corpul drept de la cap la călcâie. Menții poziția respirând normal.',tip:'Fesierii și abdomenul contractate — nu lăsa șoldurile să cadă.',easier:'Pe genunchi (linie dreaptă de la genunchi la cap) sau intervale scurte: 3×15 sec cu pauză.'},
@@ -2642,6 +2645,10 @@ var MORNING_GUIDES={
 // g = grupa funcțională; alternativele vin din aceeași grupă (pattern-ul zilei rămâne)
 // eq = echipament necesar (filtrat după profilul userului)
 var MORNING_SWAP_POOL={
+  morn_kegel:{name:'Kegel (contracții)',target:'3×10–15',g:'pelvic'},
+  morn_kegel_rapid:{name:'Kegel rapid (quick flicks)',target:'3×15',g:'pelvic'},
+  morn_kegel_respiratie:{name:'Kegel cu respirație diafragmatică',target:'10 respirații',g:'pelvic'},
+  morn_relax_pelvin:{name:'Relaxare planșeu pelvin',target:'5 min',g:'pelvic'},
   morn_flotari_lente:{name:'Flotări lente',target:'3×6–8 rep',g:'push'},
   morn_pike_pushup:{name:'Pike push-up',target:'2×6 rep',g:'push'},
   morn_flotari_inguste:{name:'Flotări înguste',target:'2×8 rep',g:'push'},
@@ -2667,7 +2674,8 @@ var MORNING_SWAP_POOL={
   morn_yoga:{name:'Yoga / mobilitate ghidată',target:'15–20 min',g:'recovery'},
   morn_foam_roll:{name:'Foam rolling',target:'8–10 min',g:'recovery'}
 };
-// morn_kegel nu are alternative — e obiectiv de sănătate, nu exercițiu interschimbabil
+// Grupa 'pelvic': variante reale de antrenament al planșeului pelvin (rezistență /
+// fibre rapide / coordonare cu respirația / relaxare pt planșeu hiperton)
 
 var morningOrigById={}; // idNou → idOriginal (pentru butonul de revenire)
 function getMorningSwaps(){try{return JSON.parse(localStorage.getItem('morning_swaps')||'{}');}catch(e){return {};}}
