@@ -648,6 +648,17 @@ input:checked + .slider:before{transform:translateX(20px);background:var(--acc)}
     </div>
   </div>
 
+  <div class="sgroup" id="pgCalendar">
+    <div class="sgroup-hd" onclick="this.parentElement.classList.toggle('open');pgRerender('pgCalendar')">
+      <div class="sgroup-ico">🗓️</div>
+      <div style="flex:1;min-width:0"><div class="sgroup-ttl">Calendar activitate</div><div class="sgroup-sub">20 săptămâni · intensitatea = tonajul zilei</div></div>
+      <div class="sgroup-chev">▼</div>
+    </div>
+    <div class="sgroup-bd">
+      <div id="heatmapWrap" style="padding-top:12px"></div>
+    </div>
+  </div>
+
   <div class="sgroup" id="pgMasuratori">
     <div class="sgroup-hd" onclick="this.parentElement.classList.toggle('open');pgRerender('pgMasuratori')">
       <div class="sgroup-ico">📏</div>
@@ -5221,6 +5232,110 @@ function getActivityStreak(){
   return streak;
 }
 
+// ═══════════════════════════════════════════════════════════════
+// CALENDAR ACTIVITATE — heatmap tip GitHub, intensitate = tonajul zilei
+// (design: artboard aprobat „Calendar activitate")
+// ═══════════════════════════════════════════════════════════════
+function getLongestStreak(){
+  var act={};
+  loadStore().rows.forEach(function(r){
+    if(r.type==='antrenament'||r.type==='dimineata'||(r.type==='checklist'&&r.note==='DA'))act[r.date]=true;
+  });
+  var dayKey=function(d){return d.getFullYear()*10000+(d.getMonth()+1)*100+d.getDate();};
+  var keys={};
+  Object.keys(act).forEach(function(ro){var d=parseRoDate(ro);if(d)keys[dayKey(d)]=true;});
+  var best=0;
+  Object.keys(act).forEach(function(ro){
+    var d=parseRoDate(ro);if(!d)return;
+    var prev=new Date(d);prev.setDate(prev.getDate()-1);
+    if(keys[dayKey(prev)])return; // nu e început de serie
+    var len=1,cur=new Date(d);
+    for(;;){cur.setDate(cur.getDate()+1);if(keys[dayKey(cur)])len++;else break;}
+    if(len>best)best=len;
+  });
+  return best;
+}
+
+function renderActivityCalendar(){
+  var el=document.getElementById('heatmapWrap');if(!el)return;
+  var WEEKS=20;
+  var ton={},act={};
+  loadStore().rows.forEach(function(r){
+    if(r.type==='antrenament'){
+      ton[r.date]=(ton[r.date]||0)+(parseFloat(r.kg)||0)*(parseFloat(r.reps)||0);
+      act[r.date]=true;
+    }else if(r.type==='dimineata'||(r.type==='checklist'&&r.note==='DA')){
+      act[r.date]=true;
+    }
+  });
+  // Praguri: quartile din tonajele nenule (intensitate relativă la tine, nu absolută)
+  var tvals=Object.keys(ton).map(function(k){return ton[k];}).filter(function(v){return v>0;}).sort(function(a,b){return a-b;});
+  var q=function(p){return tvals.length?tvals[Math.min(tvals.length-1,Math.floor(tvals.length*p))]:0;};
+  var t1=q(.25),t2=q(.5),t3=q(.75);
+  var levelFor=function(ro){
+    var t=ton[ro]||0;
+    if(t>0)return t<=t1?1:(t<=t2?2:(t<=t3?3:4));
+    return act[ro]?1:0;
+  };
+  var shades=['var(--s2)','rgba(var(--acc-rgb),.25)','rgba(var(--acc-rgb),.45)','rgba(var(--acc-rgb),.7)','var(--acc)'];
+  var start=getWeekBounds(-(WEEKS-1)).monday;
+  var todayRo=today();
+  var now=new Date();
+  var months=['IAN','FEB','MAR','APR','MAI','IUN','IUL','AUG','SEP','OCT','NOI','DEC'];
+  var dayLbl=['L','Ma','Mi','J','V','S','D'];
+  var CELL=12,GAP=3;
+  var monthRow='',cols='',lastMonth=-1,trainDays={};
+  for(var w=0;w<WEEKS;w++){
+    var monday=new Date(start);monday.setDate(start.getDate()+w*7);
+    var mLbl='';
+    if(monday.getMonth()!==lastMonth){mLbl=months[monday.getMonth()];lastMonth=monday.getMonth();}
+    monthRow+='<div style="width:'+CELL+'px;flex-shrink:0;font-size:7.5px;color:var(--muted);white-space:nowrap;overflow:visible">'+mLbl+'</div>';
+    var cells='';
+    for(var dd=0;dd<7;dd++){
+      var day=new Date(monday);day.setDate(monday.getDate()+dd);
+      var ro=day.toLocaleDateString('ro-RO');
+      var future=day>now;
+      var lvl=future?-1:levelFor(ro);
+      if((ton[ro]||0)>0&&day>=start)trainDays[ro]=true;
+      var st='width:'+CELL+'px;height:'+CELL+'px;border-radius:3px;flex-shrink:0;background:'+(lvl<0?'transparent':shades[lvl]);
+      if(ro===todayRo)st+=';outline:1.5px solid var(--acc2);outline-offset:1px';
+      if(lvl>0)st+=';cursor:pointer';
+      cells+='<div style="'+st+'"'+(lvl>0?' onclick="hmInfo(\''+ro+'\')"':'')+'></div>';
+    }
+    cols+='<div style="display:flex;flex-direction:column;gap:'+GAP+'px">'+cells+'</div>';
+  }
+  var dayCol='';
+  for(var dl=0;dl<7;dl++){
+    dayCol+='<div style="height:'+CELL+'px;display:flex;align-items:center;font-size:7.5px;color:var(--muted)">'+dayLbl[dl]+'</div>';
+  }
+  var html='<div style="overflow-x:auto">';
+  html+='<div style="display:flex;gap:'+GAP+'px;margin-left:22px;margin-bottom:3px">'+monthRow+'</div>';
+  html+='<div style="display:flex;gap:4px">';
+  html+='<div style="display:flex;flex-direction:column;gap:'+GAP+'px;width:18px;flex-shrink:0">'+dayCol+'</div>';
+  html+='<div style="display:flex;gap:'+GAP+'px">'+cols+'</div>';
+  html+='</div></div>';
+  // Legendă
+  html+='<div style="display:flex;align-items:center;gap:4px;justify-content:flex-end;margin-top:8px;font-size:9.5px;color:var(--muted)">mai puțin ';
+  shades.forEach(function(s){html+='<div style="width:10px;height:10px;border-radius:2px;background:'+s+'"></div>';});
+  html+=' mai mult</div>';
+  // Statistici streak
+  var curStreak=getActivityStreak(),bestStreak=getLongestStreak();
+  var chk='font-family:\'Chakra Petch\',\'Segoe UI\',Arial,sans-serif;font-weight:700';
+  html+='<div style="display:flex;flex-direction:column;gap:7px;margin-top:14px;font-size:12px">';
+  html+='<div style="display:flex;justify-content:space-between;align-items:baseline"><span style="color:var(--muted)">🔥 Streak curent</span><strong style="'+chk+';color:#fb923c">'+curStreak+' zile</strong></div>';
+  html+='<div style="display:flex;justify-content:space-between;align-items:baseline"><span style="color:var(--muted)">🏆 Cel mai lung streak</span><strong style="'+chk+';color:#fbbf24">'+bestStreak+' zile</strong></div>';
+  html+='<div style="display:flex;justify-content:space-between;align-items:baseline"><span style="color:var(--muted)">💪 Antrenamente în perioadă</span><strong style="'+chk+';color:var(--acc2)">'+Object.keys(trainDays).length+'</strong></div>';
+  html+='</div>';
+  el.innerHTML=html;
+}
+
+function hmInfo(ro){
+  var rows=getRowsForDate(ro).filter(function(r){return r.type==='antrenament';});
+  var t=0;rows.forEach(function(r){t+=(parseFloat(r.kg)||0)*(parseFloat(r.reps)||0);});
+  if(rows.length)showToast(ro+' · '+rows.length+' seturi'+(t>0?' · '+Math.round(t).toLocaleString('ro-RO')+' kg':''));
+  else showToast(ro+' · activitate (dimineață / checklist)');
+}
+
 // ── Încălzire calculată pentru ⭐ (rampa clasică) ──
 function buildWarmupHint(exerciseName){
   var last=getLastPerformance(exerciseName,getEffectiveDateRo());
@@ -5566,6 +5681,7 @@ function pgRerender(id){
   else if(id==='pgCorp'){renderBodyChart();renderRecompChart();}
   else if(id==='pgMasuratori'){renderMeasurements();syncMeasFormState();}
   else if(id==='pgPoze'){renderPhotos();}
+  else if(id==='pgCalendar'){renderActivityCalendar();}
 }
 
 function initMetricSeg(){
