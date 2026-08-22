@@ -46,6 +46,7 @@ html[data-theme="verde"]{--acc:#22c55e;--acc-rgb:34,197,94;--acc-dim:#15803d;--a
 html[data-mode="light"]{--bg:#f5f7f9;--s1:#ffffff;--s2:#eef1f5;--bd:#e2e8ee;--text:#182430;--muted:#66788b;--acc2:var(--acc-dim);--acc2-rgb:var(--acc-rgb);--shadow-acc:0 0 24px rgba(var(--acc-rgb),.16)}
 html[data-mode="light"] body{background:transparent}
 html[data-mode="light"] body::before{background:radial-gradient(ellipse 90% 38% at 50% -8%,rgba(var(--acc-rgb),.07),transparent 60%),radial-gradient(ellipse 70% 42% at 108% 42%,rgba(139,92,246,.04),transparent 65%)}
+html[data-mode="light"] body::after{opacity:.028}
 html[data-mode="light"] .hdr{background:#ffffff}
 html[data-mode="light"] .hdr-title{color:#13202b}
 html[data-mode="light"] .bnav{background:rgba(255,255,255,.96)}
@@ -66,13 +67,13 @@ html[data-mode="light"] .set-box.dirty{background:rgba(245,158,11,.07)}
 @keyframes secIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
 .sec.act{animation:secIn .25s ease}
 @keyframes cardIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
-.sec.act .card{animation:cardIn .3s ease backwards}
+.sec.act .card,.sec.act .hist-card,.sec.act .sgroup,.sec.act .ghid-item,.sec.act .prog-hud,.sec.act .ai-panel,.sec.act .meal-card,.sec.act .morning-card,.sec.act .rating-card{animation:cardIn .3s ease backwards}
 .sec.act .card:nth-of-type(2){animation-delay:.05s}
 .sec.act .card:nth-of-type(3){animation-delay:.09s}
 .sec.act .card:nth-of-type(4){animation-delay:.13s}
 .sec.act .card:nth-of-type(5){animation-delay:.17s}
 .sec.act .card:nth-of-type(6){animation-delay:.21s}
-@media (prefers-reduced-motion:reduce){.sec.act,.sec.act .card,.skip-reasons.show{animation:none}}
+@media (prefers-reduced-motion:reduce){.sec.act,.sec.act .card,.sec.act .hist-card,.sec.act .sgroup,.sec.act .ghid-item,.sec.act .prog-hud,.sec.act .ai-panel,.sec.act .meal-card,.sec.act .morning-card,.sec.act .rating-card,.skip-reasons.show{animation:none}}
 /* Toggle aspect (întunecat/deschis) */
 .mode-row{display:flex;gap:8px;padding:4px 0 2px}
 .mode-btn{flex:1;background:var(--s2);border:2px solid var(--bd);border-radius:10px;color:var(--text);padding:10px;font-family:inherit;font-weight:700;font-size:13px;cursor:pointer}
@@ -82,6 +83,8 @@ html{background:var(--bg)}
 body{background:transparent;color:var(--text);font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif;font-size:15px;padding-bottom:calc(90px + env(safe-area-inset-bottom))}
 /* Atmosferă: aure discrete de lumină în spatele întregii aplicații (fix, nu derulează) */
 body::before{content:'';position:fixed;inset:0;z-index:-1;pointer-events:none;background:radial-gradient(ellipse 90% 38% at 50% -8%,rgba(var(--acc-rgb),.09),transparent 60%),radial-gradient(ellipse 70% 42% at 108% 42%,rgba(167,139,250,.05),transparent 65%),radial-gradient(ellipse 75% 36% at -12% 88%,rgba(var(--acc-rgb),.05),transparent 60%)}
+/* Grain fin static peste aure — maschează banding-ul pe OLED, dă textură de material */
+body::after{content:'';position:fixed;inset:0;z-index:-1;pointer-events:none;opacity:.05;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");background-size:180px 180px}
 .hdr{background:linear-gradient(140deg,#0e1822 0%,#111d28 55%,#0a1117 100%);padding:calc(env(safe-area-inset-top) + 14px) 64px 14px 16px;border-bottom:1px solid var(--bd);position:relative}
 .hdr::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent 0%,var(--acc) 30%,var(--acc2) 50%,var(--acc) 70%,transparent 100%);opacity:.7}
 .hdr-lbl{font-size:10px;letter-spacing:3px;color:var(--acc);margin-bottom:4px;font-weight:600;text-transform:uppercase}
