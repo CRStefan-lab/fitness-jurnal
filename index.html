@@ -165,6 +165,18 @@ body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSy
 .hud-bar>div{height:100%;border-radius:3px}
 .hud-seg{flex:1;height:7px;border-radius:2px;background:var(--s2)}
 @media (prefers-reduced-motion:reduce){.hud-dot{animation:none}}
+/* Realizări — sobru, fără confetti */
+.ach-row{display:flex;align-items:center;gap:11px;padding:9px 0;border-bottom:1px solid var(--bd)}
+.ach-row:last-child{border-bottom:none}
+.ach-ico{width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:15px;flex-shrink:0}
+.ach-ico.on{background:rgba(var(--acc-rgb),.15);border:1px solid rgba(var(--acc-rgb),.5);box-shadow:0 0 12px rgba(var(--acc-rgb),.22)}
+.ach-ico.off{background:var(--s2);border:1px solid var(--bd);opacity:.6;filter:grayscale(.7)}
+.ach-name{font-size:12.5px;font-weight:600}
+.ach-row.off .ach-name{color:var(--muted)}
+.ach-date{font-size:10px;letter-spacing:1px;color:var(--acc2);font-family:'Chakra Petch','Segoe UI',Arial,sans-serif;font-weight:700;flex-shrink:0}
+.ach-prog{font-size:10px;color:var(--muted);font-family:'Chakra Petch','Segoe UI',Arial,sans-serif;font-weight:700;flex-shrink:0}
+.ach-bar{height:4px;border-radius:2px;background:var(--s2);overflow:hidden;margin-top:5px}
+.ach-bar>div{height:100%;background:linear-gradient(90deg,var(--acc),var(--acc2));border-radius:2px}
 /* Selector temă de culoare */
 .theme-row{display:flex;gap:10px;flex-wrap:wrap;padding:6px 0 2px}
 .theme-swatch{width:40px;height:40px;border-radius:50%;cursor:pointer;border:3px solid transparent;padding:0;flex-shrink:0;position:relative;transition:transform .15s,border-color .15s}
@@ -656,6 +668,17 @@ input:checked + .slider:before{transform:translateX(20px);background:var(--acc)}
     </div>
     <div class="sgroup-bd">
       <div id="heatmapWrap" style="padding-top:12px"></div>
+    </div>
+  </div>
+
+  <div class="sgroup" id="pgRealizari">
+    <div class="sgroup-hd" onclick="this.parentElement.classList.toggle('open');pgRerender('pgRealizari')">
+      <div class="sgroup-ico">🏅</div>
+      <div style="flex:1;min-width:0"><div class="sgroup-ttl">Realizări</div><div class="sgroup-sub" id="pgAchSub">Praguri atinse pe drum</div></div>
+      <div class="sgroup-chev">▼</div>
+    </div>
+    <div class="sgroup-bd">
+      <div id="achWrap" style="padding-top:6px"></div>
     </div>
   </div>
 
@@ -5329,6 +5352,108 @@ function renderActivityCalendar(){
   el.innerHTML=html;
 }
 
+// ═══════════════════════════════════════════════════════════════
+// REALIZĂRI — praguri atinse (sobru, fără confetti)
+// Deblocat = teal + data; în progres = bară. Totul recalculat din date.
+// ═══════════════════════════════════════════════════════════════
+function streakFirstReach(n){
+  var act={};
+  loadStore().rows.forEach(function(r){
+    if(r.type==='antrenament'||r.type==='dimineata'||(r.type==='checklist'&&r.note==='DA'))act[r.date]=true;
+  });
+  var dayKey=function(d){return d.getFullYear()*10000+(d.getMonth()+1)*100+d.getDate();};
+  var keys={};Object.keys(act).forEach(function(ro){var d=parseRoDate(ro);if(d)keys[dayKey(d)]=true;});
+  var bestDate=null;
+  Object.keys(act).forEach(function(ro){
+    var d=parseRoDate(ro);if(!d)return;
+    var prev=new Date(d);prev.setDate(prev.getDate()-1);
+    if(keys[dayKey(prev)])return; // doar începuturi de serie
+    var len=1,cur=new Date(d);
+    for(;;){
+      var nx=new Date(cur);nx.setDate(nx.getDate()+1);
+      if(!keys[dayKey(nx)])break;
+      len++;cur=nx;
+      if(len===n&&(!bestDate||cur<bestDate)){bestDate=new Date(cur);break;}
+    }
+  });
+  return bestDate;
+}
+
+function achDateLbl(d){
+  if(!d)return '';
+  var months=['IAN','FEB','MAR','APR','MAI','IUN','IUL','AUG','SEP','OCT','NOI','DEC'];
+  var s=('0'+d.getDate()).slice(-2)+' '+months[d.getMonth()];
+  if(d.getFullYear()!==new Date().getFullYear())s+=' \''+String(d.getFullYear()).slice(2);
+  return s;
+}
+
+function buildAchievements(){
+  var rows=loadStore().rows.filter(function(r){return r.type==='antrenament';})
+    .slice().sort(function(a,b){return (parseRoDate(a.date)||0)-(parseRoDate(b.date)||0);});
+  var TH_T=[1,10,25,50,100],TH_S=[100,1000],TH_K=[10000,100000],TH_P=[1,10,50];
+  var mT={},mS={},mK={},mP={};
+  var seen={},nT=0,nS=0,kg=0,nP=0;
+  rows.forEach(function(r){
+    if(!seen[r.date]){seen[r.date]=true;nT++;TH_T.forEach(function(t){if(nT===t)mT[t]=r.date;});}
+    nS++;TH_S.forEach(function(t){if(nS===t)mS[t]=r.date;});
+    kg+=(parseFloat(r.kg)||0)*(parseFloat(r.reps)||0);
+    TH_K.forEach(function(t){if(!mK[t]&&kg>=t)mK[t]=r.date;});
+    if(r.note&&r.note.indexOf('PR:')===0){nP++;TH_P.forEach(function(t){if(nP===t)mP[t]=r.date;});}
+  });
+  var best=getLongestStreak();
+  var ci=getCycleInfo();
+  var cycleDone=ci.cycle>1&&rows.length>0;
+  var cycleDate=null;
+  if(cycleDone){var cs=getCycleStartDate();if(cs){cycleDate=new Date(cs);cycleDate.setDate(cycleDate.getDate()+55);}}
+  var D=function(ro){return ro?parseRoDate(ro):null;};
+  var list=[
+    {icon:'🏋️',name:'Primul antrenament',cur:nT,target:1,date:D(mT[1])},
+    {icon:'💪',name:'10 antrenamente',cur:nT,target:10,date:D(mT[10])},
+    {icon:'💪',name:'25 de antrenamente',cur:nT,target:25,date:D(mT[25])},
+    {icon:'💪',name:'50 de antrenamente',cur:nT,target:50,date:D(mT[50])},
+    {icon:'💪',name:'100 de antrenamente',cur:nT,target:100,date:D(mT[100])},
+    {icon:'📊',name:'100 de seturi',cur:nS,target:100,date:D(mS[100]),unit:'SETURI'},
+    {icon:'📊',name:'1.000 de seturi',cur:nS,target:1000,date:D(mS[1000]),unit:'SETURI'},
+    {icon:'⚖️',name:'10.000 kg ridicați',cur:Math.round(kg),target:10000,date:D(mK[10000]),unit:'KG'},
+    {icon:'⚖️',name:'100.000 kg ridicați',cur:Math.round(kg),target:100000,date:D(mK[100000]),unit:'KG'},
+    {icon:'🏆',name:'Primul PR',cur:nP,target:1,date:D(mP[1])},
+    {icon:'🏆',name:'10 PR-uri',cur:nP,target:10,date:D(mP[10]),unit:'PR'},
+    {icon:'🏆',name:'50 de PR-uri',cur:nP,target:50,date:D(mP[50]),unit:'PR'},
+    {icon:'🔥',name:'7 zile de streak',cur:Math.min(best,7),target:7,date:best>=7?streakFirstReach(7):null,unit:'ZILE'},
+    {icon:'🔥',name:'4 săptămâni de streak',cur:Math.min(best,28),target:28,date:best>=28?streakFirstReach(28):null,unit:'ZILE'},
+    {icon:'🔁',name:'Primul ciclu complet (8 săpt.)',cur:cycleDone?8:(rows.length?ci.week:0),target:8,date:cycleDate,unit:'SĂPT'}
+  ];
+  list.forEach(function(a){a.unlocked=a.cur>=a.target;});
+  return list;
+}
+
+function renderAchievements(){
+  var el=document.getElementById('achWrap');if(!el)return;
+  var list=buildAchievements();
+  var unlocked=list.filter(function(a){return a.unlocked;});
+  var locked=list.filter(function(a){return !a.unlocked;});
+  unlocked.sort(function(a,b){return (a.date||new Date(0))-(b.date||new Date(0));});
+  locked.sort(function(a,b){return b.cur/b.target-a.cur/a.target;});
+  var sub=document.getElementById('pgAchSub');
+  if(sub)sub.textContent=unlocked.length+' din '+list.length+' deblocate';
+  var html='';
+  unlocked.forEach(function(a){
+    html+='<div class="ach-row"><div class="ach-ico on">'+a.icon+'</div>';
+    html+='<div class="ach-name" style="flex:1;min-width:0">'+a.name+'</div>';
+    html+='<div class="ach-date">DEBLOCAT'+(a.date?' · '+achDateLbl(a.date):'')+'</div></div>';
+  });
+  locked.forEach(function(a){
+    var pct=Math.min(100,a.cur/a.target*100);
+    html+='<div class="ach-row off"><div class="ach-ico off">'+a.icon+'</div>';
+    html+='<div style="flex:1;min-width:0"><div class="ach-name">'+a.name+'</div><div class="ach-bar"><div style="width:'+pct.toFixed(1)+'%"></div></div></div>';
+    html+='<div class="ach-prog">'+a.cur.toLocaleString('ro-RO')+' / '+a.target.toLocaleString('ro-RO')+(a.unit?' '+a.unit:'')+'</div></div>';
+  });
+  if(!list.some(function(a){return a.cur>0;})){
+    html='<div style="font-size:12px;color:var(--muted);text-align:center;padding:14px 0">Primul antrenament salvat deblochează prima realizare. 💪</div>';
+  }
+  el.innerHTML=html;
+}
+
 function hmInfo(ro){
   var rows=getRowsForDate(ro).filter(function(r){return r.type==='antrenament';});
   var t=0;rows.forEach(function(r){t+=(parseFloat(r.kg)||0)*(parseFloat(r.reps)||0);});
@@ -5682,6 +5807,7 @@ function pgRerender(id){
   else if(id==='pgMasuratori'){renderMeasurements();syncMeasFormState();}
   else if(id==='pgPoze'){renderPhotos();}
   else if(id==='pgCalendar'){renderActivityCalendar();}
+  else if(id==='pgRealizari'){renderAchievements();}
 }
 
 function initMetricSeg(){
