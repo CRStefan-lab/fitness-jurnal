@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Politica de confidențialitate — Fitness Jurnal</title>
+<style>
+  :root{color-scheme:dark light}
+  body{margin:0;padding:0;background:#0a1117;color:#e6edf3;font-family:'Segoe UI',system-ui,-apple-system,sans-serif;line-height:1.7}
+  .wrap{max-width:680px;margin:0 auto;padding:32px 20px 60px}
+  h1{font-size:26px;margin:18px 0 4px}
+  .sub{color:#7d8d9a;font-size:13px;margin-bottom:28px}
+  h2{font-size:17px;margin:28px 0 8px;color:#5eead4}
+  p,li{font-size:14.5px;color:#c7d1d9}
+  .card{background:#121b24;border:1px solid #273340;border-radius:12px;padding:16px 18px;margin:20px 0}
+  .card strong{color:#22c55e}
+  a{color:#5eead4}
+  .top{height:4px;background:linear-gradient(90deg,#14b8a6,#5eead4);border-radius:0 0 4px 4px}
+  @media (prefers-color-scheme: light){
+    body{background:#f5f7f9;color:#182430}
+    p,li{color:#3a4a58}
+    .card{background:#ffffff;border-color:#e2e8ee}
+    h2{color:#0d8a80}
+    a{color:#0d8a80}
+  }
+</style>
+</head>
+<body>
+<div class="top"></div>
+<div class="wrap">
+  <h1>Politica de confidențialitate</h1>
+  <div class="sub">Fitness Jurnal · ultima actualizare: august 2026</div>
+
+  <div class="card">
+    <strong>Pe scurt: datele tale nu pleacă nicăieri.</strong>
+    Tot ce introduci în aplicație — antrenamente, măsurători, poze de progres, profil —
+    se salvează <strong>exclusiv pe dispozitivul tău</strong>. Aplicația nu are server,
+    nu are cont de utilizator și nu trimite nimic către noi sau către terți.
+  </div>
+
+  <h2>Ce date stochează aplicația</h2>
+  <p>Aplicația stochează local, pe dispozitivul tău (în localStorage și IndexedDB, mecanismele standard ale browserului):</p>
+  <ul>
+    <li>jurnalul de antrenament (seturi, repetări, greutăți, note);</li>
+    <li>măsurători corporale și poze de progres (dacă alegi să le adaugi);</li>
+    <li>profilul introdus la configurare (sex, vârstă, înălțime, greutate, echipament, obiectiv);</li>
+    <li>preferințe de aplicație (temă, timer, notificări) și copii de siguranță automate locale.</li>
+  </ul>
+
+  <h2>Ce NU facem</h2>
+  <ul>
+    <li>Nu colectăm, nu transmitem și nu vindem niciun fel de date personale.</li>
+    <li>Nu folosim servicii de analiză (analytics), tracking sau profilare.</li>
+    <li>Nu cerem cont, e-mail sau autentificare.</li>
+    <li>Nu accesăm datele tale — tehnic nici nu am putea: ele nu părăsesc dispozitivul.</li>
+  </ul>
+
+  <h2>Copiile de siguranță</h2>
+  <p>Backup-ul datelor este responsabilitatea ta: aplicația îți oferă export manual (fișier JSON
+  descărcat sau partajat către un serviciu ales de tine, de ex. e-mail sau Drive) și snapshot-uri
+  automate stocate tot local. Dacă partajezi un backup către un serviciu extern, acel transfer
+  este guvernat de politica serviciului respectiv, ales de tine.</p>
+
+  <h2>Permisiuni</h2>
+  <p>Notificările (opționale) sunt programate local, pentru remindere de antrenament și backup.
+  Accesul la fișiere e folosit doar când tu inițiezi un export/import de backup sau adaugi o poză de progres.</p>
+
+  <h2>Ștergerea datelor</h2>
+  <p>Poți șterge oricând toate datele din <em>Setări → Zona periculoasă → Șterge toate datele</em>,
+  sau dezinstalând aplicația / ștergând datele site-ului din browser.</p>
+
+  <h2>Contact</h2>
+  <p>Întrebări despre această politică: deschide un issue la
+  <a href="https://github.com/CRStefan-lab/fitness-jurnal">github.com/CRStefan-lab/fitness-jurnal</a>.</p>
+</div>
+</body>
+</html>
