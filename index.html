@@ -5817,6 +5817,13 @@ function buildDigestStats(offset){
   var tonnage=training.reduce(function(a,r){return a+(parseFloat(r.kg)||0)*(parseFloat(r.reps)||0);},0);
   var prs=training.filter(function(r){return r.note&&r.note.indexOf('PR:')===0;});
   var energyVals=rows.filter(function(r){return r.type==='rating'&&r.exercise==='energy';}).map(function(r){return parseInt(r.note)||0;});
+  var sleepVals=rows.filter(function(r){return r.type==='rating'&&r.exercise==='sleep';}).map(function(r){return parseInt(r.note)||0;});
+  var notesByDate={};
+  rows.filter(function(r){return r.type==='ratenote'&&r.note;}).forEach(function(r){
+    if(!notesByDate[r.date])notesByDate[r.date]={date:r.date,day:r.day||''};
+    notesByDate[r.date][r.exercise]=r.note;
+  });
+  var stateNotes=Object.keys(notesByDate).sort(function(a,b){return parseRoDate(a)-parseRoDate(b);}).map(function(k){return notesByDate[k];});
   var morningDone=rows.filter(function(r){return r.type==='dimineata'&&r.note==='DA';}).length;
   // Δ măsurători: cea mai recentă din săptămână vs anterioară
   var meas=getMeasurements();
@@ -5839,6 +5846,8 @@ function buildDigestStats(offset){
     tonnage:Math.round(tonnage),
     prs:prs.length,
     energyAvg:energyVals.length?(energyVals.reduce(function(a,v){return a+v;},0)/energyVals.length).toFixed(1):null,
+    sleepAvg:sleepVals.length?(sleepVals.reduce(function(a,v){return a+v;},0)/sleepVals.length).toFixed(1):null,
+    stateNotes:stateNotes,
     morningDone:morningDone,
     streak:getActivityStreak(),
     deltas:deltas
@@ -5855,6 +5864,17 @@ function showWeeklyDigest(offset){
   html+='<div class="wiz-preview-stat"><span>🏋️ Volum total ridicat</span><strong>'+d.tonnage.toLocaleString('ro-RO')+' kg</strong></div>';
   if(d.prs)html+='<div class="wiz-preview-stat"><span>🏆 Recorduri noi</span><strong style="color:var(--green)">'+d.prs+'</strong></div>';
   if(d.energyAvg)html+='<div class="wiz-preview-stat"><span>⚡ Energie medie</span><strong>'+d.energyAvg+'/10</strong></div>';
+  if(d.sleepAvg)html+='<div class="wiz-preview-stat"><span>&#128564; Somn mediu</span><strong>'+d.sleepAvg+'/10</strong></div>';
+  if(d.stateNotes&&d.stateNotes.length){
+    var escD=function(t){return String(t).replace(/</g,'&lt;').replace(/>/g,'&gt;');};
+    html+='<div style="font-size:10px;font-weight:800;letter-spacing:1.5px;color:var(--purple);text-transform:uppercase;margin:14px 0 6px">&#128221; Note stare</div>';
+    d.stateNotes.forEach(function(n){
+      var pz=[];
+      if(n.energy)pz.push('&#9889; '+escD(n.energy));
+      if(n.sleep)pz.push('&#128564; '+escD(n.sleep));
+      html+='<div style="font-size:12px;color:var(--muted);line-height:1.5;padding:4px 0;border-bottom:1px solid var(--bd)"><strong style="color:var(--text)">'+(n.day||n.date).slice(0,3)+'</strong> '+pz.join(' · ')+'</div>';
+    });
+  }
   if(d.morningDone)html+='<div class="wiz-preview-stat"><span>☀️ Bife dimineață</span><strong>'+d.morningDone+'</strong></div>';
   if(d.streak>=2)html+='<div class="wiz-preview-stat"><span>🔥 Streak activ</span><strong style="color:#fb923c">'+d.streak+' zile</strong></div>';
   d.deltas.forEach(function(dl){
@@ -5874,6 +5894,8 @@ function digestAsText(){
   t+='💪 '+d.sessions+' antrenamente · '+d.sets+' seturi · '+d.tonnage.toLocaleString('ro-RO')+' kg ridicate\n';
   if(d.prs)t+='🏆 '+d.prs+' recorduri personale noi\n';
   if(d.streak>=2)t+='🔥 '+d.streak+' zile consecutive de activitate\n';
+  if(d.energyAvg||d.sleepAvg){var ea=[];if(d.energyAvg)ea.push('energie '+d.energyAvg+'/10');if(d.sleepAvg)ea.push('somn '+d.sleepAvg+'/10');t+='📊 Medii: '+ea.join(', ')+'\n';}
+  if(d.stateNotes&&d.stateNotes.length){t+='\n📝 Note:\n';d.stateNotes.forEach(function(n){var pz=[];if(n.energy)pz.push('energie: '+n.energy);if(n.sleep)pz.push('somn: '+n.sleep);t+='  '+(n.day||n.date)+' - '+pz.join(' · ')+'\n';});}
   d.deltas.forEach(function(dl){t+='📏 '+dl.label+': '+(dl.v>0?'+':'')+dl.v.toFixed(1)+' '+dl.unit+'\n';});
   t+='— Fitness Jurnal';
   return t;
