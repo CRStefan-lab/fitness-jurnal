@@ -1941,6 +1941,14 @@ function renderToday(){
         html+='&nbsp;&nbsp;• '+r.exercise+' — '+r.reps+'×'+r.kg+'kg <span style="color:var(--acc2)">('+prLbl+')</span><br>';
       });
     }
+    // Starea zilei: energie/somn + notele libere
+    var sumRat=[];
+    if(ratingData.energy)sumRat.push('Energie '+ratingData.energy+'/10');
+    if(ratingData.sleep)sumRat.push('Somn '+ratingData.sleep+'/10');
+    if(sumRat.length)html+='&#9889; '+sumRat.join(' · ')+'<br>';
+    var esc=function(t){return String(t).replace(/</g,'&lt;').replace(/>/g,'&gt;');};
+    if(rateNoteData.energy)html+='<span style="color:var(--muted)">&#8627; energie: '+esc(rateNoteData.energy)+'</span><br>';
+    if(rateNoteData.sleep)html+='<span style="color:var(--muted)">&#8627; somn: '+esc(rateNoteData.sleep)+'</span><br>';
     var sumStreak=getActivityStreak();
     if(sumStreak>=2)html+='🔥 Streak: <strong>'+sumStreak+' zile</strong><br>';
     html+='<span style="color:var(--muted)">😴 Recuperarea începe acum: proteinele + somnul de 7+ ore fac creșterea.</span>';
