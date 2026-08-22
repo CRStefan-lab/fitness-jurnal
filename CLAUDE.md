@@ -74,6 +74,33 @@ Aplicația e **feature-complete** ca "antrenor în buzunar", construită integra
 
 Biblioteca și sfaturile citează studii reale: Maeo 2021/2023 (leg curl șezând, triceps overhead), Kassiano 2023/2025 (gambe stretch, biceps incline/preacher), Plotkin 2023 (hip thrust≈squat), Rodríguez-Ridao 2020 (înclinat 30°), Morton 2018 + Helms/Whittaker/Garthe/Schoenfeld/Hall (nutriție), Singer 2024 (pauze), Pelland 2025 (volum). NU exagera stretch-ul (tiebreaker, nu multiplicator).
 
+## ROADMAP ACTIV (aug 2026, de la v77) — ordinea de execuție
+
+Regulă: ecranele noi trec întâi prin Claude Design canvas (mockup-uri existente:
+https://claude.ai/code/artifact/58262086-9997-4f03-b01a-eab993de04f9 — 4 artboard-uri
+aprobate ca direcție). Ownerul NU face ajustări de design — Claude decide tot designul
+singur, ownerul doar reacționează la rezultat. Mandat estetic: STUNNING, nu "AI/low
+budget" — adâncime, atmosferă, momente wow; Pro HUD e baza, se împinge mai departe.
+
+**🔴 Faza 1 — QoL (primele):**
+1.1 „Sar azi" pe exercițiu (starea Sărit + motiv + Reia; deblochează rezumatul zilei — azi ziua nu e „completă" dacă sari ceva)
+1.2 Undo la salvarea setului (toast ~5s cu Anulează)
+1.3 Auto-backup silențios: snapshot zilnic rotativ (7 zile) în IndexedDB + „Restaurează" în Setări
+1.4 Calculator de discuri la exerciții cu bară („42.5 = bară 20 + 2×10 + 2×1.25")
+
+**🚀 Faza 2 — Next level:**
+2.1 Volum pe mușchi/săptămână vs banda 10–20 Pelland (flagship; pattern-ul vine din EXERCISE_DB via exId, fallback nume)
+2.2 Heatmap calendar (tip GitHub, intensitate=tonaj) + streak-uri
+2.3 Realizări (sobru, fără confetti; praguri de decis la implementare)
+2.4 Mini-istoric RIR per exercițiu (ultimele 3 sesiuni: 💪💪😮‍💨)
+
+**🎨 Faza 3 — „Stunning pass" tab cu tab (design canvas întâi, apoi cod):**
+3.1 Azi (ierarhie dramatică, cardul activ = erou) · 3.2 Istoric (panoul AI premium, zile-carduri cu micro-viz) · 3.3 Progres (grafice cu gradient+glow) · 3.4 Nutriție (macro-uri vizuale, restructurare pliabilă) · 3.5 Rezumatul zilei & Digest (momentele wow — prioritare) · 3.6 Wizard & Ghid (thumbnails exerciții)
+
+**🏁 Faza 4 — Lansarea** (blocant: numele; apoi secțiunea de mai jos)
+
+Ordinea: 1.1+1.2 → 1.3 → 2.1 → 3.5 → restul F2 → F3 tab cu tab → 1.4+2.4 printre ele.
+
 ## Roadmap rămas (faza LANSARE — plan detaliat)
 
 1. **Nume aplicație** — brainstorm cu owner-ul; verifică disponibilitatea pe Play Store; apoi: title în index.html/manifest, iconiță nouă (SVG inline în manifest, actual e 🏋️ pe gradient teal), eventual splash
