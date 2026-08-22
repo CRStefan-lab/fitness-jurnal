@@ -117,6 +117,14 @@ body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSy
 .sgroup-bd .stitle{margin-top:16px}
 .sgroup-bd .stitle:first-child{margin-top:12px}
 .sgroup-bd .notif-row{background:var(--s2)}
+/* Plasă de siguranță — snapshot-uri automate zilnice */
+.snap-row{display:flex;align-items:center;gap:10px;background:var(--s2);border:1px solid var(--bd);border-radius:10px;padding:9px 12px;margin-bottom:6px}
+.snap-row.today{border-color:rgba(34,197,94,.35)}
+.snap-date{font-family:'Chakra Petch','Segoe UI',Arial,sans-serif;font-weight:700;font-size:13px;color:var(--text)}
+.snap-meta{font-size:10.5px;color:var(--muted);margin-top:1px}
+.snap-btn{margin-left:auto;background:rgba(var(--acc-rgb),.1);border:1px solid rgba(var(--acc-rgb),.4);border-radius:8px;color:var(--acc2);font-size:11px;font-weight:700;padding:7px 11px;cursor:pointer;font-family:inherit;flex-shrink:0}
+.snap-btn:active{background:rgba(var(--acc-rgb),.25)}
+.snap-badge{font-size:9px;font-weight:800;letter-spacing:.5px;color:var(--green);background:rgba(34,197,94,.12);border-radius:5px;padding:2px 6px;margin-left:7px;vertical-align:1px}
 /* Selector temă de culoare */
 .theme-row{display:flex;gap:10px;flex-wrap:wrap;padding:6px 0 2px}
 .theme-swatch{width:40px;height:40px;border-radius:50%;cursor:pointer;border:3px solid transparent;padding:0;flex-shrink:0;position:relative;transition:transform .15s,border-color .15s}
@@ -933,10 +941,16 @@ input:checked + .slider:before{transform:translateX(20px);background:var(--acc)}
   <div class="sgroup" id="sgBackup">
     <div class="sgroup-hd" onclick="this.parentElement.classList.toggle('open')">
       <div class="sgroup-ico">💾</div>
-      <div style="flex:1;min-width:0"><div class="sgroup-ttl">Backup & sincronizare</div><div class="sgroup-sub">Share, fișier local, sync desktop</div></div>
+      <div style="flex:1;min-width:0"><div class="sgroup-ttl">Backup & sincronizare</div><div class="sgroup-sub">Plasă de siguranță, share, fișier local, sync</div></div>
       <div class="sgroup-chev">▼</div>
     </div>
     <div class="sgroup-bd">
+      <div class="stitle">🛟 Plasă de siguranță (automat)</div>
+      <p style="font-size:12px;color:var(--muted);margin-bottom:8px;line-height:1.5">
+        App-ul salvează <strong style="color:var(--acc2)">singur</strong>, zilnic, un snapshot complet al datelor — ultimele 7 zile, doar pe acest device. Dacă ceva se pierde sau se strică, restaurezi de aici cu un tap.
+      </p>
+      <div id="snapList"><div style="font-size:11px;color:var(--muted);text-align:center;padding:8px">Se încarcă…</div></div>
+
       <div class="stitle" id="shareTitle">⚡ Share backup rapid</div>
       <p style="font-size:12px;color:var(--muted);margin-bottom:10px;line-height:1.5" id="shareDesc">
         Un tap → meniul de share al telefonului → trimite datele către Drive, Mail, Telegram, orice. Zero setup.
@@ -1022,7 +1036,7 @@ input:checked + .slider:before{transform:translateX(20px);background:var(--acc)}
     </div>
     <div class="sgroup-bd">
       <p style="font-size:11px;color:var(--muted);margin:12px 0 10px;line-height:1.5">
-        Șterge tot ce e salvat pe acest device (jurnal, program, măsurători). Fă un backup înainte — nu există undo.
+        Șterge tot ce e salvat pe acest device (jurnal, program, măsurători). Fă un backup înainte. Singura scăpare după: snapshot-urile automate din „Backup & sincronizare → Plasă de siguranță" (ultimele 7 zile).
       </p>
       <button class="btn btn-danger" onclick="resetAll()">🗑️ Șterge toate datele</button>
     </div>
@@ -1599,6 +1613,7 @@ function showTab(name,btn){
     initRestTimerUI();
     updateStorageInfo();
     updateInfo();
+    renderSnapshots();
     // Populez profilul
     var p=getProfile();
     var ph=document.getElementById('profileHeight');if(ph)ph.value=p.height;
@@ -6605,6 +6620,120 @@ function addCustomExerciseDialog(){
   showToast('Exercițiu adăugat ✓');
 }
 
+// ═══════════════════════════════════════════════════════════════
+// AUTO-BACKUP SILENȚIOS — snapshot zilnic rotativ (7 zile) în IndexedDB
+// Primul snapshot al zilei = starea de la finalul zilei precedente.
+// Separat de localStorage → supraviețuiește ștergerii jurnalului.
+// ═══════════════════════════════════════════════════════════════
+var SNAP_KEEP=7;
+function snapDb(){
+  return new Promise(function(resolve,reject){
+    var req=indexedDB.open('fitness-snapshots',1);
+    req.onupgradeneeded=function(){req.result.createObjectStore('snaps',{keyPath:'date'});};
+    req.onsuccess=function(){resolve(req.result);};
+    req.onerror=function(){reject(req.error);};
+  });
+}
+function snapCollect(){
+  var data={};
+  for(var i=0;i<localStorage.length;i++){var k=localStorage.key(i);data[k]=localStorage.getItem(k);}
+  return data;
+}
+function snapRowsCount(data){
+  try{var s=JSON.parse(data[STORAGE_KEY]||'{}');return (s.rows||[]).length;}catch(e){return 0;}
+}
+function snapSave(dateIso){
+  return snapDb().then(function(db){
+    return new Promise(function(resolve){
+      var tx=db.transaction('snaps','readwrite');
+      tx.objectStore('snaps').put({date:dateIso,ts:Date.now(),data:snapCollect()});
+      tx.oncomplete=function(){resolve(true);};
+      tx.onerror=function(){resolve(false);};
+    });
+  }).catch(function(){return false;});
+}
+function snapGetAll(){
+  return snapDb().then(function(db){
+    return new Promise(function(resolve){
+      var req=db.transaction('snaps','readonly').objectStore('snaps').getAll();
+      req.onsuccess=function(){resolve(req.result||[]);};
+      req.onerror=function(){resolve([]);};
+    });
+  }).catch(function(){return [];});
+}
+function maybeAutoSnapshot(){
+  var todayI=todayISO();
+  snapGetAll().then(function(all){
+    if(all.some(function(s){return s.date===todayI;}))return;
+    snapSave(todayI).then(function(ok){
+      if(!ok)return;
+      // Rotație: păstrează doar ultimele SNAP_KEEP zile
+      snapGetAll().then(function(all2){
+        var dates=all2.map(function(s){return s.date;}).sort();
+        var extra=dates.slice(0,Math.max(0,dates.length-SNAP_KEEP));
+        if(!extra.length)return;
+        snapDb().then(function(db){
+          var st=db.transaction('snaps','readwrite').objectStore('snaps');
+          extra.forEach(function(d){st.delete(d);});
+        });
+      });
+    });
+  });
+}
+function snapDateLabel(dateIso){
+  var todayI=todayISO();
+  if(dateIso===todayI)return 'Azi';
+  var d=new Date(dateIso+'T12:00:00');
+  var days=['Duminică','Luni','Marți','Miercuri','Joi','Vineri','Sâmbătă'];
+  var diff=Math.round((new Date(todayI+'T12:00:00')-d)/86400000);
+  if(diff===1)return 'Ieri';
+  return days[d.getDay()]+' '+isoToRo(dateIso).slice(0,5);
+}
+function renderSnapshots(){
+  var el=document.getElementById('snapList');if(!el)return;
+  snapGetAll().then(function(all){
+    if(!all.length){
+      el.innerHTML='<div style="font-size:11px;color:var(--muted);text-align:center;padding:8px">Primul snapshot se creează automat la deschiderea aplicației.</div>';
+      return;
+    }
+    all.sort(function(a,b){return a.date<b.date?1:-1;});
+    var html='';
+    all.forEach(function(s){
+      var n=snapRowsCount(s.data);
+      var kb=Math.max(1,Math.round(JSON.stringify(s.data).length/1024));
+      var t=new Date(s.ts);
+      var hh=String(t.getHours()).padStart(2,'0')+':'+String(t.getMinutes()).padStart(2,'0');
+      var isToday=s.date===todayISO();
+      html+='<div class="snap-row'+(isToday?' today':'')+'">';
+      html+='<div><div class="snap-date">'+snapDateLabel(s.date)+(isToday?'<span class="snap-badge">AUTO</span>':'')+'</div>';
+      html+='<div class="snap-meta">'+n+' înregistrări · '+kb+' KB · salvat la '+hh+'</div></div>';
+      html+='<button class="snap-btn" onclick="restoreSnapshot(\''+s.date+'\')">↩ Restaurează</button>';
+      html+='</div>';
+    });
+    el.innerHTML=html;
+  });
+}
+function restoreSnapshot(dateIso){
+  snapGetAll().then(function(all){
+    var snap=null;
+    all.forEach(function(s){if(s.date===dateIso)snap=s;});
+    if(!snap){showToast('Snapshot negăsit','var(--red)');return;}
+    var n=snapRowsCount(snap.data);
+    var msg='Restaurezi datele din '+snapDateLabel(dateIso)+' ('+isoToRo(dateIso)+') — '+n+' înregistrări?\n\nTOT ce e acum pe device va fi înlocuit cu starea din snapshot.';
+    if(dateIso!==todayISO())msg+='\n\nStarea de ACUM se păstrează în snapshot-ul de azi — poți reveni oricând azi.';
+    if(!confirm(msg))return;
+    var doRestore=function(){
+      localStorage.clear();
+      for(var k in snap.data)localStorage.setItem(k,snap.data[k]);
+      showToast('✓ Restaurat din '+isoToRo(dateIso)+' — reîncarc…','var(--green)');
+      setTimeout(function(){location.reload();},900);
+    };
+    // Siguranță dublă: starea curentă intră în snapshot-ul de azi înainte de restaurare
+    if(dateIso!==todayISO()){snapSave(todayISO()).then(doRestore);}
+    else{doRestore();}
+  });
+}
+
 // SW UPDATE BANNER
 var _pendingSW=null;
 function showUpdateBanner(sw){
@@ -6713,6 +6842,9 @@ window.addEventListener('load',function(){
 
   // Verifică dacă backup-ul e vechi (>7 zile)
   setTimeout(checkBackupOverdue,1200);
+
+  // Auto-backup silențios: snapshot zilnic rotativ (după init, să nu blocheze startul)
+  setTimeout(maybeAutoSnapshot,2000);
 
   // Verifică dacă măsurătorile sunt vechi (>7 zile) — important pentru recomp
   setTimeout(checkMeasurementOverdue,1400);
