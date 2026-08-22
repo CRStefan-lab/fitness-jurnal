@@ -5,7 +5,7 @@ App personal devenit multi-user, în drum spre Google Play. Limba: **română on
 - **Live**: https://crstefan-lab.github.io/fitness-jurnal/ (GitHub Pages, repo `CRStefan-lab/fitness-jurnal`)
 - **Push pe `main` = deploy instant** — PWA-ul tuturor userilor se auto-actualizează (banner "Versiune nouă")
 
-## Stare curentă (iulie 2026, SW `fitness-v45`)
+## Stare curentă (august 2026, SW `fitness-v85`)
 
 Aplicația e **feature-complete** ca "antrenor în buzunar", construită integral în sesiuni Claude Code:
 - Jurnal complet (seturi rep×kg, pre-fill, steppers, PR detection, edit/backdate, note per exercițiu)
@@ -18,6 +18,10 @@ Aplicația e **feature-complete** ca "antrenor în buzunar", construită integra
 - Personalizare: nume în header, 6 teme de accent (CSS vars `--acc-rgb`/`--acc2-rgb`, `html[data-theme]`, cheie `app_theme`), sex M/F în setări; Setări reorganizate în 7 grupuri pliabile (`.sgroup`), Zona periculoasă ultima
 - Design "Pro HUD" (v54-v55): Chakra Petch self-hostat în `fonts/` (4 woff2, precache în SW) pe titluri/cifre; pastile colorate statistici (`.azi-stat.as1-4`); toggle aspect întunecat/deschis (`html[data-mode="light"]`, cheie `app_mode`, `applyMode()`/`setMode()`, snippet pre-paint în head; pe light `--acc2` devine `--acc-dim` pt contrast); nav + gear cu SVG inline (stroke currentColor, nu emoji); micro-animații tab/carduri (`secIn`/`cardIn`, respectă prefers-reduced-motion); mockup-uri explorare în `design-preview.html` (gitignored)
 - Rest timer fundal (deadline-based) + beep + mod auto 90s/150s⭐
+- QoL v78-v85: „Sar azi" per exercițiu (rând `skip` cu motiv, card dashed ambră + Reia, ziua se încheie fără el; `skipData` în preload, vizibil în Istoric+export); Undo la set (toast 5s sus `#undoToast` cu bară countdown, restaurează rândul suprascris `prevRow`, variantă PR aurie); auto-backup zilnic rotativ 7 zile în IndexedDB `fitness-snapshots` (`maybeAutoSnapshot` la load, „Plasă de siguranță" în Setări→Backup cu Restaurează; snapshot-urile supraviețuiesc resetAll); calculator discuri la bară (`isBarbellEx`, `bar_weight` 20/15/10, greedy pe perechi); mini-istoric RIR 🥱💪😮‍💨 lângă ținta AZI
+- Volum pe mușchi/săptămână (v80-81, flagship): panou în Istoric sub sumar, 9 grupe (`VOLUME_GROUPS`, mușchi din EXERCISE_DB via exId→nume→heuristică, secundari ½ set după `PATTERN_SECONDARY`), bare cu banda 10–20 Pelland evidențiată + axă 0/10/20 + legendă + hint auto din cel mai mare gol (`volumeHint`); exportul AI folosește același motor (`buildVolumePerGroup`)
+- Progres: Calendar activitate (v83, heatmap GitHub 20 săpt., intensitate=tonaj în quartile proprii, tap→toast, streak curent+`getLongestStreak`) și Realizări (v84, 15 praguri sobre: deblocat teal+dată / bară progres, `buildAchievements`)
+- Momente wow v82 (design: canvas „Rezumat si Digest"): Rezumatul zilei = card „ZI COMPLETĂ/ÎNCHEIATĂ" cu tonaj-erou gradient + count-up (`animateHero`, o dată/zi), chip delta vs sesiunea trecută, pastile `hud-*`, spotlight PR auriu, bare energie/somn; Digest = inel sesiuni SVG + volum-erou + delta % săpt. (`prevTonnage`/`target` în stats), bare segmentate, chips măsurători; imaginea de share PNG în aceeași compoziție (fără notele personale)
 - Utilizatori activi reali: owner (legacy) + iubita + prieteni (programe generate) — feedback-ul lor a condus ultimele fix-uri
 
 **Următoarea fază (nefăcută): LANSAREA** — vezi Roadmap jos. Blocant: numele aplicației (owner-ul nu a decis).
@@ -49,13 +53,15 @@ Aplicația e **feature-complete** ca "antrenor în buzunar", construită integra
   - `antrenament` {date(dd.mm.yyyy), day(LUNI..), exercise, set, reps, kg, note('PR:tip' la record)}
   - `checklist` / `dimineata` / `rir`(easy|ok|hard) / `exnote` — {exercise, note}
   - `rating` {exercise:'energy'|'sleep', note:'1'-'10'}
+  - `skip` {exercise, note:motiv} — exercițiu sărit azi (dedup dată+exercițiu; `skipData` per zi)
   - `ratenote` {exercise:'energy'|'sleep', note:text} — notă liberă la starea zilei (apare în export)
   - `masuratoare` {weight, waist, neck, hip, chest, biceps, thigh, calf, note}
 - `custom_program` = output-ul `generateProgram()` (exercises/schedule/morningRoutines/nutrition/checklist/ghid/meta) — aplicat la load peste definițiile statice
 - `user_profile` = {sex, age, height, weight, experience, equipment, hasBara, days, goal, morningRoutine, name}
 - `app_theme` = id temă accent ('' implicit / ocean / mov / roz / foc / verde) — aplicată de snippet-ul din `<head>` + `applyTheme()`; graficele/canvas folosesc `themeAcc()`/`themeAcc2()`
 - `legacy_program`='1' = grandfathered · `program_cycle_start` = deload/cicluri · `manual_deload_until` = deload acceptat
-- Poze de progres: IndexedDB `fitness-photos` · FSA handle (desktop): IndexedDB `fitness-fsa`
+- Poze de progres: IndexedDB `fitness-photos` · FSA handle (desktop): IndexedDB `fitness-fsa` · Snapshot-uri auto (7 zile): IndexedDB `fitness-snapshots` (tot localStorage-ul, cheie = data ISO)
+- `bar_weight` = greutatea barei pt. calculatorul de discuri (20 implicit)
 - Dedup: `addRow()` șterge rândul existent cu aceeași cheie (vezi `mergeRemote key()`)
 
 ## Arhitectura logică (în index.html)
@@ -82,24 +88,16 @@ aprobate ca direcție). Ownerul NU face ajustări de design — Claude decide to
 singur, ownerul doar reacționează la rezultat. Mandat estetic: STUNNING, nu "AI/low
 budget" — adâncime, atmosferă, momente wow; Pro HUD e baza, se împinge mai departe.
 
-**🔴 Faza 1 — QoL (primele):**
-1.1 „Sar azi" pe exercițiu (starea Sărit + motiv + Reia; deblochează rezumatul zilei — azi ziua nu e „completă" dacă sari ceva)
-1.2 Undo la salvarea setului (toast ~5s cu Anulează)
-1.3 Auto-backup silențios: snapshot zilnic rotativ (7 zile) în IndexedDB + „Restaurează" în Setări
-1.4 Calculator de discuri la exerciții cu bară („42.5 = bară 20 + 2×10 + 2×1.25")
+**✅ Faza 1 — QoL (FĂCUTĂ, v78-v85):** 1.1 „Sar azi" ✓ · 1.2 Undo la set ✓ · 1.3 Auto-backup silențios ✓ · 1.4 Calculator discuri ✓
 
-**🚀 Faza 2 — Next level:**
-2.1 Volum pe mușchi/săptămână vs banda 10–20 Pelland (flagship; pattern-ul vine din EXERCISE_DB via exId, fallback nume)
-2.2 Heatmap calendar (tip GitHub, intensitate=tonaj) + streak-uri
-2.3 Realizări (sobru, fără confetti; praguri de decis la implementare)
-2.4 Mini-istoric RIR per exercițiu (ultimele 3 sesiuni: 💪💪😮‍💨)
+**✅ Faza 2 — Next level (FĂCUTĂ, v80-v85):** 2.1 Volum pe mușchi vs banda 10–20 ✓ (flagship) · 2.2 Heatmap calendar + streak-uri ✓ · 2.3 Realizări ✓ · 2.4 Mini-istoric RIR ✓
 
 **🎨 Faza 3 — „Stunning pass" tab cu tab (design canvas întâi, apoi cod):**
-3.1 Azi (ierarhie dramatică, cardul activ = erou) · 3.2 Istoric (panoul AI premium, zile-carduri cu micro-viz) · 3.3 Progres (grafice cu gradient+glow) · 3.4 Nutriție (macro-uri vizuale, restructurare pliabilă) · 3.5 Rezumatul zilei & Digest (momentele wow — prioritare) · 3.6 Wizard & Ghid (thumbnails exerciții)
+3.1 Azi (ierarhie dramatică, cardul activ = erou) · 3.2 Istoric (panoul AI premium, zile-carduri cu micro-viz) · 3.3 Progres (grafice cu gradient+glow) · 3.4 Nutriție (macro-uri vizuale, restructurare pliabilă) · ~~3.5 Rezumatul zilei & Digest~~ ✓ FĂCUT v82 (canvas: https://claude.ai/code/artifact/6424ff7b-6778-41c3-9067-338e7c75a597) · 3.6 Wizard & Ghid (thumbnails exerciții)
 
 **🏁 Faza 4 — Lansarea** (blocant: numele; apoi secțiunea de mai jos)
 
-Ordinea: 1.1+1.2 → 1.3 → 2.1 → 3.5 → restul F2 → F3 tab cu tab → 1.4+2.4 printre ele.
+Ordinea rămasă: 3.1 → 3.2 → 3.3 → 3.4 → 3.6 → Faza 4.
 
 ## Roadmap rămas (faza LANSARE — plan detaliat)
 
