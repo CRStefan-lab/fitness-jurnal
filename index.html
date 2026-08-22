@@ -3776,10 +3776,11 @@ function volumeInfoFor(exerciseName){
 function buildWeeklyVolume(weekOffset){
   var rows=getRowsForWeek(weekOffset).filter(function(r){return r.type==='antrenament';});
   if(!rows.length)return null;
-  var vol={},ton={};
+  var vol={},ton={},days={},counted=0;
   rows.forEach(function(r){
     var info=volumeInfoFor(r.exercise);
     if(!info.group)return; // recovery/pași/stretching nu intră
+    days[r.date]=true;counted++;
     vol[info.group]=(vol[info.group]||0)+1;
     ton[info.group]=(ton[info.group]||0)+(parseFloat(r.kg)||0)*(parseFloat(r.reps)||0);
     var sec=info.pattern&&PATTERN_SECONDARY[info.pattern];
@@ -3794,7 +3795,28 @@ function buildWeeklyVolume(weekOffset){
     if(v>0)groups.push({id:g.id,label:g.label,val:v,tonnage:ton[g.id]||0});
     else zeros.push(g.label);
   });
-  return groups.length?{groups:groups,zeros:zeros}:null;
+  return groups.length?{groups:groups,zeros:zeros,sessions:Object.keys(days).length,counted:counted}:null;
+}
+// Hint automat: cel mai mare gol față de bandă → sugestie concretă
+var VOL_SUGGEST={piept:'împins sau fluturări',spate:'ramat sau tracțiuni',umeri:'ridicări laterale',biceps:'flexii biceps',triceps:'extensii triceps',cvadriceps:'squat sau fandări',fesieri:'hip thrust sau RDL',gambe:'ridicări pe vârfuri',core:'plank sau abdomene'};
+function volumeHint(data){
+  var worst=null;
+  data.groups.forEach(function(g){
+    if(g.val<VOL_BAND_LO){
+      var gap=VOL_BAND_LO-g.val;
+      if(!worst||gap>worst.gap)worst={g:g,gap:gap};
+    }
+  });
+  if(worst){
+    var need=Math.ceil(worst.gap);
+    return '⚠️ <strong style="color:#fbbf24">'+worst.g.label+'</strong> e la '+volFmt(worst.g.val)+' seturi — sub bandă. <strong style="color:var(--text)">+'+need+' seturi de '+(VOL_SUGGEST[worst.g.id]||'lucru direct')+'</strong> ar închide golul.';
+  }
+  var over=null;
+  data.groups.forEach(function(g){
+    if(g.val>VOL_BAND_HI&&(!over||g.val>over.val))over=g;
+  });
+  if(over)return '🔻 <strong style="color:#fb7185">'+over.label+'</strong> e la '+volFmt(over.val)+' seturi — peste 20 nu crește mai mult, doar obosește. Taie sau mută volumul spre o grupă rămasă în urmă.';
+  return '✅ Toate grupele lucrate sunt în banda 10–20 — exact unde se construiește mușchiul. Ține-o așa.';
 }
 function volFmt(v){return v%1===0?String(v):v.toFixed(1);}
 function renderVolumePanel(){
@@ -3810,6 +3832,13 @@ function renderVolumePanel(){
   html+='<div style="flex:1;min-width:0"><div class="card-ttl">Volum pe mușchi</div><div class="card-sub">vs banda de creștere 10–20 seturi/săpt.</div></div>';
   html+='<div class="card-chev">▼</div></div>';
   html+='<div class="card-bd"><div style="padding-top:12px">';
+  html+='<div style="font-size:11px;color:var(--muted);margin-bottom:10px">'+data.sessions+' antrenament'+(data.sessions===1?'':'e')+' logat'+(data.sessions===1?'':'e')+' · '+data.counted+' seturi numărate</div>';
+  // Axa 0 / 10 / 20 (aliniată cu banda de pe track)
+  html+='<div style="position:relative;height:13px;margin-bottom:3px;font-family:\'Chakra Petch\',\'Segoe UI\',Arial,sans-serif;font-size:9px;color:var(--muted)">';
+  html+='<span style="position:absolute;left:0">0</span>';
+  html+='<span style="position:absolute;left:'+bandL.toFixed(1)+'%;transform:translateX(-50%);color:var(--green)">10</span>';
+  html+='<span style="position:absolute;left:'+(bandL+bandW).toFixed(1)+'%;transform:translateX(-50%);color:var(--green)">20</span>';
+  html+='</div>';
   data.groups.forEach(function(g){
     var st=g.val<VOL_BAND_LO?'low':(g.val<=VOL_BAND_HI?'ok':'high');
     var stLbl={low:'SUB ȚINTĂ',ok:'OPTIM',high:'PESTE'}[st];
@@ -3819,9 +3848,17 @@ function renderVolumePanel(){
     html+='<div class="vol-track"><div class="vol-band" style="left:'+bandL.toFixed(1)+'%;width:'+bandW.toFixed(1)+'%"></div><div class="vol-fill '+st+'" data-w="'+w.toFixed(1)+'"></div></div>';
     html+='</div>';
   });
+  // Legendă compactă
+  html+='<div style="display:flex;gap:12px;font-size:9.5px;color:var(--muted);margin:2px 0 0;align-items:center">';
+  html+='<span><span style="display:inline-block;width:8px;height:8px;border-radius:2px;background:#fbbf24;vertical-align:-1px"></span> sub țintă</span>';
+  html+='<span><span style="display:inline-block;width:8px;height:8px;border-radius:2px;background:var(--acc2);vertical-align:-1px"></span> în bandă</span>';
+  html+='<span><span style="display:inline-block;width:8px;height:8px;border-radius:2px;background:#fb7185;vertical-align:-1px"></span> peste</span>';
+  html+='</div>';
   if(data.zeros.length){
-    html+='<div style="font-size:10.5px;color:var(--muted);margin-top:2px">Fără volum săpt. asta: '+data.zeros.join(' · ')+'</div>';
+    html+='<div style="font-size:10.5px;color:var(--muted);margin-top:8px">Fără volum săpt. asta: '+data.zeros.join(' · ')+'</div>';
   }
+  // Hint generat automat din cel mai mare gol
+  html+='<div style="background:rgba(var(--acc-rgb),.06);border-left:3px solid var(--acc);border-radius:0 8px 8px 0;padding:8px 11px;margin-top:10px;font-size:11.5px;line-height:1.55;color:var(--text)">'+volumeHint(data)+'</div>';
   html+='<div style="font-size:10.5px;color:var(--muted);margin-top:10px;line-height:1.55;border-top:1px solid var(--bd);padding-top:8px">🎯 <strong style="color:var(--acc2)">10–20 seturi/mușchi/săpt.</strong> = zona de creștere maximă (Pelland 2025, 67 studii). Compusele numără ½ pentru mușchii secundari (ex: împinsul → ½ triceps). Sub bandă = sub-optim, nu zero; peste 20 = risc pentru recuperare.</div>';
   html+='</div></div></div>';
   el.innerHTML=html;
