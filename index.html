@@ -1998,7 +1998,7 @@ function renderToday(){
       var trend=getTrend(e.name);
       var trendBadge=trend?' <span style="color:'+trend.color+';font-weight:800" title="trend ultimele 3 sesiuni">'+trend.arrow+'</span>':'';
       if(rec){
-        smartHint='<div style="background:rgba(var(--acc-rgb),.1);border-left:3px solid var(--acc);padding:4px 10px;margin:4px 14px 0;border-radius:0 6px 6px 0;font-size:11px;color:var(--text)">🎯 <strong style="color:var(--acc2)">AZI</strong>: '+rec.target+trendBadge+'</div>';
+        smartHint='<div style="background:rgba(var(--acc-rgb),.1);border-left:3px solid var(--acc);padding:4px 10px;margin:4px 14px 0;border-radius:0 6px 6px 0;font-size:11px;color:var(--text)">🎯 <strong style="color:var(--acc2)">AZI</strong>: '+rec.target+trendBadge+rirHistoryBadge(e.name)+'</div>';
         // Prima dată la exercițiu: protocolul de găsire a greutății de start
         if(rec.action==='start'){
           smartHint+='<div style="background:rgba(125,141,154,.06);border-left:2px solid var(--muted);padding:4px 10px;margin:4px 14px 0;border-radius:0 4px 4px 0;font-size:11px;color:var(--muted);line-height:1.5">💡 <strong style="color:var(--text)">Cum găsești greutatea:</strong> set 1 cu cea mai mică opțiune (gantere mici / bara goală). La final mai puteai face lejer 5+ repetări? Urcă puțin la setul următor. Când termini setul cu doar 2-3 repetări „în rezervor" — aia e greutatea ta; de data viitoare Smart Coach preia de aici. Prea greu chiar și cu minimul? Deschide 📖 — există variantă mai ușoară.</div>';
@@ -2016,7 +2016,7 @@ function renderToday(){
     }else{
       var accRec=getAccessoryRec(e.name,e);
       if(accRec){
-        smartHint='<div style="background:rgba(125,141,154,.06);border-left:2px solid '+accRec.color+';padding:3px 10px;margin:4px 14px 0;border-radius:0 4px 4px 0;font-size:11px;color:var(--muted)">📊 Ultima: '+accRec.lastStr+' · 🎯 <strong style="color:'+accRec.color+'">Opțional azi: '+accRec.targetStr+'</strong> <span style="color:var(--muted)">('+accRec.why+')</span></div>';
+        smartHint='<div style="background:rgba(125,141,154,.06);border-left:2px solid '+accRec.color+';padding:3px 10px;margin:4px 14px 0;border-radius:0 4px 4px 0;font-size:11px;color:var(--muted)">📊 Ultima: '+accRec.lastStr+' · 🎯 <strong style="color:'+accRec.color+'">Opțional azi: '+accRec.targetStr+'</strong> <span style="color:var(--muted)">('+accRec.why+')</span>'+rirHistoryBadge(e.name)+'</div>';
       }
     }
     // Auto-expand pentru primul exercițiu incomplet
@@ -2050,7 +2050,18 @@ function renderToday(){
       skipHtml+='<button class="skip-pill" onclick="skipExerciseCustom(\''+sk+'\')">💬 Alt motiv</button>';
       skipHtml+='</div>';
     }
-    html+='<div class="card-bd"><div>'+kgHint+setsHtml+noteHtml+skipHtml+'</div></div></div>';
+    // 1.4 — Calculator de discuri la exerciții cu bară
+    var plateHtml='';
+    if(isBarbellEx(e)){
+      var lastPlate=getLastPerformance(key,getEffectiveDateRo());
+      var suggKg=(lastPlate&&lastPlate.kg)?lastPlate.kg:'';
+      plateHtml='<div class="skip-link" style="text-align:left;color:var(--muted)" onclick="togglePlateCalc('+ei+')">🧮 Calculator discuri</div>';
+      plateHtml+='<div class="skip-reasons" id="plc_'+ei+'" style="flex-direction:column;align-items:stretch;gap:8px">';
+      plateHtml+='<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap"><input class="set-in" type="number" inputmode="decimal" step="0.5" min="0" id="plcKg_'+ei+'" value="'+suggKg+'" placeholder="kg" style="width:76px" oninput="renderPlateCalc('+ei+')"><span style="font-size:11px;color:var(--muted)">kg totali · bară:</span><span id="plcBars_'+ei+'" style="display:flex;gap:5px"></span></div>';
+      plateHtml+='<div id="plcOut_'+ei+'" style="font-size:12.5px;line-height:1.6"></div>';
+      plateHtml+='</div>';
+    }
+    html+='<div class="card-bd"><div>'+kgHint+setsHtml+noteHtml+plateHtml+skipHtml+'</div></div></div>';
   });
 
   // Rezumatul zilei — apare când TOATE seturile zilei sunt salvate; persistă (recalculat din date)
@@ -2434,6 +2445,64 @@ function saveSet(keyEnc,setNum,ei){
       startRestTimer(!!exObj.star);
     }
   }
+}
+
+// ═══════════════════════════════════════════════════════════════
+// MINI-ISTORIC RIR — ultimele 3 sesiuni ca emoji pe cardul exercițiului
+// ═══════════════════════════════════════════════════════════════
+function rirHistoryBadge(name){
+  var rows=loadStore().rows.filter(function(r){return r.type==='rir'&&r.exercise===name;})
+    .sort(function(a,b){return (parseRoDate(a.date)||0)-(parseRoDate(b.date)||0);});
+  if(!rows.length)return '';
+  var em={easy:'🥱',ok:'💪',hard:'😮‍💨'};
+  var last=rows.slice(-3).map(function(r){return em[r.note]||'';}).join('');
+  if(!last)return '';
+  return ' <span style="margin-left:4px;letter-spacing:1px" title="Cât de greu a fost — ultimele sesiuni (vechi → recent)">'+last+'</span>';
+}
+
+// ═══════════════════════════════════════════════════════════════
+// CALCULATOR DE DISCURI — la exerciții cu bară
+// „42.5 = bară 20 + 2×10 + 2×1.25" (discuri per pereche, greedy)
+// ═══════════════════════════════════════════════════════════════
+function isBarbellEx(e){
+  if(e&&e.exId&&window.ProgramGenerator&&ProgramGenerator.EXERCISE_DB){
+    var db=ProgramGenerator.EXERCISE_DB.find(function(x){return x.id===e.exId;});
+    if(db)return db.equipment.indexOf('bara')>=0;
+  }
+  return /\bbara\b/i.test(e.name);
+}
+function getBarWeight(){var v=parseFloat(localStorage.getItem('bar_weight'));return v>0?v:20;}
+function setBarWeight(w,ei){localStorage.setItem('bar_weight',String(w));renderPlateCalc(ei);}
+function togglePlateCalc(ei){
+  var p=document.getElementById('plc_'+ei);if(!p)return;
+  p.classList.toggle('show');
+  if(p.classList.contains('show'))renderPlateCalc(ei);
+}
+function renderPlateCalc(ei){
+  var bw=getBarWeight();
+  var bars=document.getElementById('plcBars_'+ei);
+  if(bars){
+    bars.innerHTML=[20,15,10].map(function(b){
+      return '<button class="skip-pill" style="padding:4px 10px;font-size:10.5px'+(b===bw?'':';background:transparent;border-color:var(--bd);color:var(--muted)')+'" onclick="setBarWeight('+b+','+ei+')">'+b+'</button>';
+    }).join('');
+  }
+  var out=document.getElementById('plcOut_'+ei);if(!out)return;
+  var kg=parseFloat((document.getElementById('plcKg_'+ei)||{}).value);
+  if(!kg||kg<=0){out.innerHTML='<span style="color:var(--muted)">Scrie greutatea totală dorită.</span>';return;}
+  if(kg<bw){out.innerHTML='<span style="color:#fbbf24">⚠️ '+kg+' kg e sub bara goală ('+bw+' kg). Pornește cu bara goală.</span>';return;}
+  var plates=[25,20,15,10,5,2.5,1.25,0.5];
+  var side=(kg-bw)/2,rem=side,parts=[];
+  plates.forEach(function(p){
+    var n=Math.floor((rem+1e-9)/p);
+    if(n>0){parts.push((2*n)+'×'+p);rem=Math.round((rem-n*p)*1000)/1000;}
+  });
+  var achieved=Math.round((kg-2*rem)*100)/100;
+  var chak='font-family:\'Chakra Petch\',\'Segoe UI\',Arial,sans-serif;font-weight:700';
+  var line='<strong style="'+chak+';color:var(--acc2)">'+achieved+' kg</strong> <span style="color:var(--muted)">=</span> bară '+bw+(parts.length?' <span style="color:var(--muted)">+</span> '+parts.join(' <span style="color:var(--muted)">+</span> '):' (goală)');
+  if(rem>0.001){
+    line+='<br><span style="font-size:10.5px;color:#fbbf24">⚠️ '+kg+' kg nu iese exact cu discuri standard — cel mai apropiat: '+achieved+' kg.</span>';
+  }
+  out.innerHTML=line;
 }
 
 // ═══════════════════════════════════════════════════════════════
