@@ -5910,14 +5910,38 @@ function copyDigestText(){
 
 function downloadDigestImage(){
   var d=digestData;if(!d)return;
-  var W=1080,H=1350;
+  var W=1080;
+  // Pregatim liniile de note (wrap la ~44 caractere) ca sa calculam inaltimea necesara
+  var noteBlocks=[];
+  (d.stateNotes||[]).forEach(function(n){
+    var pz=[];
+    if(n.energy)pz.push('⚡ '+n.energy);
+    if(n.sleep)pz.push('😴 '+n.sleep);
+    if(!pz.length)return;
+    var line=(n.day||n.date).slice(0,3)+': '+pz.join('  ·  ');
+    var words=line.split(' '),cur='',chunks=[];
+    words.forEach(function(w){
+      if((cur+' '+w).trim().length>44){if(cur)chunks.push(cur.trim());cur=w;}
+      else{cur=(cur+' '+w).trim();}
+    });
+    if(cur)chunks.push(cur.trim());
+    noteBlocks.push(chunks);
+  });
+  var statsCount=2+(d.prs?1:0)+(d.streak>=2?1:0)+Math.min(2,d.deltas.length);
+  var yEnd=300+statsCount*170;
+  var hasAvg=!!(d.energyAvg||d.sleepAvg);
+  var notesH=0;
+  if(noteBlocks.length){
+    notesH=58;
+    noteBlocks.forEach(function(c){notesH+=c.length*40+10;});
+  }
+  var needed=yEnd+(hasAvg?60:0)+notesH+140;
+  var H=Math.max(1350,Math.min(2100,needed));
   var cv=document.createElement('canvas');cv.width=W;cv.height=H;
   var ctx=cv.getContext('2d');
-  // fundal
   var grad=ctx.createLinearGradient(0,0,W,H);
   grad.addColorStop(0,'#0e1822');grad.addColorStop(1,'#0a1117');
   ctx.fillStyle=grad;ctx.fillRect(0,0,W,H);
-  // linie accent sus
   var grad2=ctx.createLinearGradient(0,0,W,0);
   grad2.addColorStop(0,themeAcc());grad2.addColorStop(.5,themeAcc2());grad2.addColorStop(1,themeAcc());
   ctx.fillStyle=grad2;ctx.fillRect(0,0,W,12);
@@ -5926,7 +5950,6 @@ function downloadDigestImage(){
   ctx.fillText('SĂPTĂMÂNA MEA',W/2,120);
   ctx.fillStyle='#7d8d9a';ctx.font='400 34px sans-serif';
   ctx.fillText(d.period,W/2,175);
-  // stats mari
   var y=300;
   function bigStat(emoji,val,label){
     ctx.fillStyle='#e6edf3';ctx.font='800 88px sans-serif';
@@ -5942,8 +5965,34 @@ function downloadDigestImage(){
   d.deltas.slice(0,2).forEach(function(dl){
     bigStat('📏',(dl.v>0?'+':'')+dl.v.toFixed(1)+' '+dl.unit,dl.label.toLowerCase());
   });
+  if(hasAvg){
+    var av=[];
+    if(d.energyAvg)av.push('⚡ '+d.energyAvg+'/10');
+    if(d.sleepAvg)av.push('😴 '+d.sleepAvg+'/10');
+    ctx.fillStyle='#7d8d9a';ctx.font='400 32px sans-serif';
+    ctx.fillText('Medii: '+av.join('   ·   '),W/2,y);y+=60;
+  }
+  if(noteBlocks.length){
+    ctx.fillStyle=themeAcc2();ctx.font='700 28px sans-serif';
+    ctx.fillText('📝 NOTELE SĂPTĂMÂNII',W/2,y);y+=50;
+    var maxY=H-110,left=noteBlocks.length;
+    for(var ni=0;ni<noteBlocks.length;ni++){
+      var chunks=noteBlocks[ni];
+      if(y+chunks.length*40>maxY)break;
+      for(var ci=0;ci<chunks.length;ci++){
+        ctx.fillStyle=ci===0?'#e6edf3':'#7d8d9a';
+        ctx.font=(ci===0?'600 30px':'400 28px')+' sans-serif';
+        ctx.fillText(chunks[ci],W/2,y);y+=40;
+      }
+      y+=10;left--;
+    }
+    if(left>0){
+      ctx.fillStyle='#7d8d9a';ctx.font='400 26px sans-serif';
+      ctx.fillText('+ încă '+left+' zile cu note',W/2,y);
+    }
+  }
   ctx.fillStyle=themeAcc();ctx.font='700 30px sans-serif';
-  ctx.fillText('— Fitness Jurnal · 8 săptămâni —',W/2,H-60);
+  ctx.fillText('— Fitness Jurnal · 8 săptămâni —',W/2,H-50);
   cv.toBlob(function(blob){
     var url=URL.createObjectURL(blob);
     var a=document.createElement('a');
