@@ -265,6 +265,8 @@ html[data-mode="light"] .ai-btn-ghost{color:#6d28d9}
 .macro-val{font-family:'Chakra Petch','Segoe UI',Arial,sans-serif}
 .macro-split{display:flex;height:10px;border-radius:5px;overflow:hidden;gap:2px;margin-bottom:8px}
 .macro-split>div{border-radius:3px}
+/* 3.6 — Thumbnails exerciții: siluetă cu mușchiul țintă evidențiat */
+.ex-thumb{width:36px;height:38px;border-radius:10px;background:rgba(var(--acc-rgb),.07);border:1px solid rgba(var(--acc-rgb),.25);display:flex;align-items:center;justify-content:center;flex-shrink:0}
 .repeat-btn{background:rgba(var(--acc2-rgb),.12);border:1px solid rgba(var(--acc2-rgb),.4);border-radius:8px;color:var(--acc2);font-size:11px;font-weight:700;cursor:pointer;padding:6px 8px;font-family:inherit;flex-shrink:0;letter-spacing:.2px}
 .repeat-btn:active{background:rgba(var(--acc2-rgb),.25)}
 .azi-stats{display:flex;gap:8px;margin-bottom:10px;font-size:11px;align-items:stretch}
@@ -3344,7 +3346,7 @@ function toggleLib(){
     Object.keys(byMuscle).sort().forEach(function(m){
       h+='<div style="font-size:10px;font-weight:700;letter-spacing:1.5px;color:var(--acc);text-transform:uppercase;margin:10px 0 4px">'+m+' ('+byMuscle[m].length+')</div>';
       byMuscle[m].forEach(function(x){
-        h+='<div style="padding:7px 0;border-bottom:1px solid var(--bd);font-size:13px;cursor:pointer;display:flex;justify-content:space-between;gap:8px" onclick="openGuideByName(\''+encodeURIComponent(x.name)+'\')"><span>'+x.name+'</span><span style="color:var(--muted);font-size:11px;flex-shrink:0">📖</span></div>';
+        h+='<div style="padding:6px 0;border-bottom:1px solid var(--bd);font-size:13px;cursor:pointer;display:flex;align-items:center;gap:9px" onclick="openGuideByName(\''+encodeURIComponent(x.name)+'\')"><span class="ex-thumb" style="width:28px;height:30px;border-radius:8px">'+muscleThumb(volumeGroupFor(x.muscle),20)+'</span><span style="flex:1;min-width:0">'+x.name+'</span><span style="color:var(--muted);font-size:11px;flex-shrink:0">📖</span></div>';
       });
     });
     cont.innerHTML=h;
@@ -3385,7 +3387,7 @@ function openGuideByName(nameEnc){
   var title=document.getElementById('guideTitle');
   var tag=document.getElementById('guideTag');
   var body=document.getElementById('guideBody');
-  title.textContent=name;
+  title.innerHTML='<span style="display:flex;align-items:center;gap:9px"><span class="ex-thumb" style="width:40px;height:42px">'+thumbForExercise(name)+'</span><span style="flex:1;min-width:0">'+name+'</span></span>';
   if(g){
     tag.textContent=g.tag||'';
     body.innerHTML=
@@ -3408,7 +3410,7 @@ function openMorningGuide(id){
   var tag=document.getElementById('guideTag');
   var body=document.getElementById('guideBody');
   if(g){
-    title.textContent='☀️ '+g.name;
+    title.innerHTML='<span style="display:flex;align-items:center;gap:9px"><span class="ex-thumb" style="width:40px;height:42px">'+thumbForExercise(g.name)+'</span><span style="flex:1;min-width:0">☀️ '+g.name+'</span></span>';
     tag.textContent='Rutina de dimineață · pattern, nu efort maxim';
     body.innerHTML=
       '<div class="g-row"><div class="g-lbl">Cum</div><div>'+g.how+'</div></div>'+
@@ -5208,13 +5210,55 @@ function showShareDiag(){
 // ═══════════════════════════════════════════════════════════════
 // GHID
 // ═══════════════════════════════════════════════════════════════
+// ═══════════════════════════════════════════════════════════════
+// THUMBNAILS EXERCIȚII (3.6) — siluetă cu grupa musculară evidențiată
+// ═══════════════════════════════════════════════════════════════
+var THUMB_SPOTS={
+  piept:[[9.7,9.8],[14.3,9.8]],
+  umeri:[[7.6,8.2],[16.4,8.2]],
+  biceps:[[6.9,11.4],[17.1,11.4]],
+  triceps:[[6.4,13.2],[17.6,13.2]],
+  spate:[[12,10.8]],
+  cvadriceps:[[10,18.6],[14,18.6]],
+  fesieri:[[12,15.9]],
+  gambe:[[9.8,22.6],[14.2,22.6]],
+  core:[[12,13.4]]
+};
+function muscleThumb(group,size){
+  size=size||26;
+  var s='<svg width="'+size+'" height="'+Math.round(size*26/24)+'" viewBox="0 0 24 26" fill="none" aria-hidden="true">';
+  if(!group||!THUMB_SPOTS[group]){
+    // fallback: ganteră (exerciții generice / mobilitate)
+    s+='<g stroke="var(--acc2)" stroke-width="1.5" stroke-linecap="round">';
+    s+='<rect x="4" y="9.5" width="3" height="8" rx="1.2"/><rect x="17" y="9.5" width="3" height="8" rx="1.2"/><line x1="7" y1="13.5" x2="17" y2="13.5"/>';
+    s+='</g></svg>';
+    return s;
+  }
+  // siluetă (stroke discret)
+  s+='<g stroke="var(--muted)" stroke-width="1.25" stroke-linecap="round" stroke-linejoin="round" opacity=".75">';
+  s+='<circle cx="12" cy="3.7" r="2"/>';
+  s+='<path d="M9 7.4 h6 a1.4 1.4 0 0 1 1.4 1.5 l-.5 6.2 h-7.8 l-.5-6.2 A1.4 1.4 0 0 1 9 7.4 Z"/>';
+  s+='<path d="M8.8 8.1 L6.4 14.6 M15.2 8.1 L17.6 14.6"/>';
+  s+='<path d="M10.3 15.4 L9.7 24.6 M13.7 15.4 L14.3 24.6"/>';
+  s+='</g>';
+  THUMB_SPOTS[group].forEach(function(p){
+    s+='<circle cx="'+p[0]+'" cy="'+p[1]+'" r="2.7" fill="rgba(var(--acc-rgb),.3)"/>';
+    s+='<circle cx="'+p[0]+'" cy="'+p[1]+'" r="1.5" fill="var(--acc2)"/>';
+  });
+  s+='</svg>';
+  return s;
+}
+function thumbForExercise(name){
+  return muscleThumb(volumeInfoFor(name).group);
+}
+
 function initGhid(){
   var cont=document.getElementById('ghid-content'),html='';
   ghidEx.forEach(function(ex,i){
     var id='gh_'+i;
     html+='<div class="ghid-item" id="'+id+'" onclick="document.getElementById(\''+id+'\').classList.toggle(\'open\')">';
     var tagCls=ex.tag==='bară'?'g-bara':(ex.tag==='bodyweight'?'g-bodyweight':'g-gantere');
-    html+='<div class="ghid-nm">'+ex.name+'<span class="gtag '+tagCls+'">'+ex.tag+'</span><span style="color:var(--muted);font-size:11px;margin-left:auto">▼</span></div>';
+    html+='<div class="ghid-nm"><span class="ex-thumb">'+thumbForExercise(ex.name)+'</span><span style="flex:1;min-width:0">'+ex.name+'</span><span class="gtag '+tagCls+'">'+ex.tag+'</span><span style="color:var(--muted);font-size:11px">▼</span></div>';
     html+='<div class="ghid-body">';
     html+='<div class="g-row"><div class="g-lbl">Start</div><div>'+ex.start+'</div></div>';
     html+='<div class="g-row"><div class="g-lbl">Mișcare</div><div>'+ex.move+'</div></div>';

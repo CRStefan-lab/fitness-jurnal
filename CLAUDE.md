@@ -5,7 +5,7 @@ App personal devenit multi-user, în drum spre Google Play. Limba: **română on
 - **Live**: https://crstefan-lab.github.io/fitness-jurnal/ (GitHub Pages, repo `CRStefan-lab/fitness-jurnal`)
 - **Push pe `main` = deploy instant** — PWA-ul tuturor userilor se auto-actualizează (banner "Versiune nouă")
 
-## Stare curentă (august 2026, SW `fitness-v85`)
+## Stare curentă (august 2026, SW `fitness-v90`)
 
 Aplicația e **feature-complete** ca "antrenor în buzunar", construită integral în sesiuni Claude Code:
 - Jurnal complet (seturi rep×kg, pre-fill, steppers, PR detection, edit/backdate, note per exercițiu)
@@ -22,6 +22,7 @@ Aplicația e **feature-complete** ca "antrenor în buzunar", construită integra
 - Volum pe mușchi/săptămână (v80-81, flagship): panou în Istoric sub sumar, 9 grupe (`VOLUME_GROUPS`, mușchi din EXERCISE_DB via exId→nume→heuristică, secundari ½ set după `PATTERN_SECONDARY`), bare cu banda 10–20 Pelland evidențiată + axă 0/10/20 + legendă + hint auto din cel mai mare gol (`volumeHint`); exportul AI folosește același motor (`buildVolumePerGroup`)
 - Progres: Calendar activitate (v83, heatmap GitHub 20 săpt., intensitate=tonaj în quartile proprii, tap→toast, streak curent+`getLongestStreak`) și Realizări (v84, 15 praguri sobre: deblocat teal+dată / bară progres, `buildAchievements`)
 - Momente wow v82 (design: canvas „Rezumat si Digest"): Rezumatul zilei = card „ZI COMPLETĂ/ÎNCHEIATĂ" cu tonaj-erou gradient + count-up (`animateHero`, o dată/zi), chip delta vs sesiunea trecută, pastile `hud-*`, spotlight PR auriu, bare energie/somn; Digest = inel sesiuni SVG + volum-erou + delta % săpt. (`prevTonnage`/`target` în stats), bare segmentate, chips măsurători; imaginea de share PNG în aceeași compoziție (fără notele personale)
+- Stunning pass v86-v90: Azi = ierarhie dramatică (card-hero cu strip+glow+badge „ÎN LUCRU" pe primul incomplet, sb-future dashed pe seturile următoare, completele comprimate `.card-done:not(.open)`, idle dimmed, bara „PROGRESUL ZILEI" live `updateDayProgress`); Istoric = panou AI mov premium (`.ai-panel`, export box ascuns până la generare) + zile-carduri (`.hist-card`, coloană dată Chakra, micro-viz segmentată per exercițiu, tonaj dreapta, pastile seturi `S3 · 11×40 🏆`, ziua recentă deschisă); Progres = grafice cu `smoothPath` + gradient sub linie + glow blur + eticheta ultimei valori; Nutriție = `macroVisualHtml` (bară compoziție calorică + pastile cu % kcal) + mese pliabile (prima deschisă); Ghid = thumbnails `muscleThumb` (siluetă SVG cu grupa evidențiată din `volumeInfoFor`) în listă+bibliotecă+modal
 - Utilizatori activi reali: owner (legacy) + iubita + prieteni (programe generate) — feedback-ul lor a condus ultimele fix-uri
 
 **Următoarea fază (nefăcută): LANSAREA** — vezi Roadmap jos. Blocant: numele aplicației (owner-ul nu a decis).
@@ -92,12 +93,9 @@ budget" — adâncime, atmosferă, momente wow; Pro HUD e baza, se împinge mai 
 
 **✅ Faza 2 — Next level (FĂCUTĂ, v80-v85):** 2.1 Volum pe mușchi vs banda 10–20 ✓ (flagship) · 2.2 Heatmap calendar + streak-uri ✓ · 2.3 Realizări ✓ · 2.4 Mini-istoric RIR ✓
 
-**🎨 Faza 3 — „Stunning pass" tab cu tab (design canvas întâi, apoi cod):**
-3.1 Azi (ierarhie dramatică, cardul activ = erou) · 3.2 Istoric (panoul AI premium, zile-carduri cu micro-viz) · 3.3 Progres (grafice cu gradient+glow) · 3.4 Nutriție (macro-uri vizuale, restructurare pliabilă) · ~~3.5 Rezumatul zilei & Digest~~ ✓ FĂCUT v82 (canvas: https://claude.ai/code/artifact/6424ff7b-6778-41c3-9067-338e7c75a597) · 3.6 Wizard & Ghid (thumbnails exerciții)
+**✅ Faza 3 — „Stunning pass" (FĂCUTĂ, v82-v90):** 3.1 Azi ✓ (erou+bara zilei, canvas „Azi Stunning Pass" https://claude.ai/code/artifact/64f05b7f-01f1-4b11-8cf4-23987bbf116f) · 3.2 Istoric ✓ (AI premium+zile-carduri, canvas https://claude.ai/code/artifact/070c73b6-e8b4-4516-828d-4d602794f3df) · 3.3 Progres ✓ (grafice gradient+glow) · 3.4 Nutriție ✓ (macro-split+mese pliabile) · 3.5 Rezumat & Digest ✓ v82 (canvas https://claude.ai/code/artifact/6424ff7b-6778-41c3-9067-338e7c75a597) · 3.6 Ghid ✓ (thumbnails = siluete SVG cu mușchiul evidențiat, `muscleThumb`/`thumbForExercise`; wizard-ul nu listează exerciții — nu se aplică)
 
-**🏁 Faza 4 — Lansarea** (blocant: numele; apoi secțiunea de mai jos)
-
-Ordinea rămasă: 3.1 → 3.2 → 3.3 → 3.4 → 3.6 → Faza 4.
+**🏁 Faza 4 — Lansarea** (URMĂTOAREA; blocant: numele aplicației — decizia owner-ului; apoi secțiunea de mai jos)
 
 ## Roadmap rămas (faza LANSARE — plan detaliat)
 
