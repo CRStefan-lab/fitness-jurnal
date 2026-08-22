@@ -1,6 +1,6 @@
 // Service Worker — network-first pentru HTML (updates vizibile imediat)
 // cache-first pentru restul (viteză)
-const CACHE = 'fitness-v86-azi-ierarhie';
+const CACHE = 'fitness-v87-istoric-premium';
 const PRECACHE = ['./', './index.html', './manifest.json', './generator.js',
   './fonts/chakra-600-latin.woff2', './fonts/chakra-600-latin-ext.woff2',
   './fonts/chakra-700-latin.woff2', './fonts/chakra-700-latin-ext.woff2'];

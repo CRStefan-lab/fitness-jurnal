@@ -229,6 +229,32 @@ body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSy
 .card.card-done:not(.open) .hint-wrap{display:none}
 .set-box.sb-future:not(.saved){opacity:.55;border-style:dashed}
 html[data-mode="light"] .card.card-hero,html[data-mode="light"] .card.card-hero.open{box-shadow:0 0 24px rgba(var(--acc-rgb),.18),0 10px 26px rgba(30,50,70,.12)}
+/* 3.2 — Istoric: panoul AI premium + zile-carduri cu micro-viz */
+.ai-panel{position:relative;border:1px solid rgba(167,139,250,.5);border-radius:16px;overflow:hidden;background:linear-gradient(160deg,rgba(167,139,250,.08),rgba(167,139,250,.02) 45%,var(--s1) 80%);box-shadow:0 0 26px rgba(167,139,250,.13);margin-bottom:14px}
+.ai-strip{position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--purple),#c4b5fd,var(--purple))}
+.ai-ico{width:38px;height:38px;border-radius:11px;background:rgba(167,139,250,.14);border:1px solid rgba(167,139,250,.4);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0}
+.ai-ttl{font-weight:700;font-size:14px;font-family:'Chakra Petch','Segoe UI',Arial,sans-serif;letter-spacing:.5px}
+.ai-btn-main{flex:1;text-align:center;background:linear-gradient(120deg,#8b5cf6,var(--purple));border:none;border-radius:11px;padding:11px;font-size:12.5px;font-weight:700;color:#150b2e;box-shadow:0 5px 16px rgba(167,139,250,.28);cursor:pointer;font-family:inherit}
+.ai-btn-main:active{opacity:.85}
+.ai-btn-ghost{flex:0 0 auto;border:1px solid rgba(167,139,250,.4);background:transparent;border-radius:11px;padding:11px 14px;font-size:12.5px;font-weight:600;color:#c4b5fd;cursor:pointer;font-family:inherit}
+.ai-btn-ghost:active{background:rgba(167,139,250,.12)}
+html[data-mode="light"] .ai-btn-ghost{color:#6d28d9}
+.hist-card{border:1px solid var(--bd);border-radius:14px;background:var(--s1);overflow:hidden;margin-bottom:10px}
+.hist-card:not(.open){opacity:.85}
+.hist-card-hd{padding:11px 13px;display:flex;align-items:center;gap:10px;cursor:pointer;user-select:none;-webkit-user-select:none}
+.hist-card.open .hist-card-hd{border-bottom:1px solid var(--bd)}
+.hist-date-col{display:flex;flex-direction:column;align-items:center;width:40px;flex-shrink:0}
+.hist-date-day{font-size:10px;letter-spacing:1.5px;font-weight:700;font-family:'Chakra Petch','Segoe UI',Arial,sans-serif;color:var(--muted)}
+.hist-card.trained .hist-date-day{color:var(--acc2)}
+.hist-date-num{font-size:15px;font-weight:700;font-family:'Chakra Petch','Segoe UI',Arial,sans-serif}
+.hist-viz{display:flex;gap:3px;align-items:center;margin-top:5px}
+.hist-viz>div{height:7px;border-radius:2px}
+.hist-ton{font-size:15px;font-weight:700;font-family:'Chakra Petch','Segoe UI',Arial,sans-serif;color:var(--acc2)}
+.hist-ton-lbl{font-size:8.5px;letter-spacing:1px;color:var(--muted)}
+.hist-card-bd{display:none;padding:4px 0 6px}
+.hist-card.open .hist-card-bd{display:block}
+.hist-set{font-family:'Chakra Petch','Segoe UI',Arial,sans-serif;font-weight:600;background:var(--s2);border:1px solid var(--bd);color:var(--text);border-radius:7px;padding:4px 8px;font-size:10.5px}
+.hist-set.pr{background:rgba(245,158,11,.1);border-color:rgba(245,158,11,.45);color:#fbbf24}
 .repeat-btn{background:rgba(var(--acc2-rgb),.12);border:1px solid rgba(var(--acc2-rgb),.4);border-radius:8px;color:var(--acc2);font-size:11px;font-weight:700;cursor:pointer;padding:6px 8px;font-family:inherit;flex-shrink:0;letter-spacing:.2px}
 .repeat-btn:active{background:rgba(var(--acc2-rgb),.25)}
 .azi-stats{display:flex;gap:8px;margin-bottom:10px;font-size:11px;align-items:stretch}
@@ -810,13 +836,23 @@ input:checked + .slider:before{transform:translateX(20px);background:var(--acc)}
 </div>
 
 <div id="tab-istoric" class="sec">
-  <div class="stitle">🤖 AI</div>
-  <p style="font-size:11px;color:var(--muted);margin-bottom:10px;line-height:1.5">
-    Export <strong style="color:var(--text)">complet</strong> pentru Claude sau orice AI: toate săptămânile, măsurători, BF%, stagnări, PR-uri, volum/grup, aderență.
-  </p>
-  <button class="btn btn-acc" onclick="doExport()">🤖 Generează export complet</button>
-  <button class="btn btn-ghost" onclick="copyExport()">📋 Copiază în clipboard</button>
-  <div class="export-box" id="exportBox">Apasă butonul pentru a genera exportul complet.</div>
+  <div class="ai-panel">
+    <div class="ai-strip"></div>
+    <div style="padding:14px;display:flex;flex-direction:column;gap:10px">
+      <div style="display:flex;align-items:center;gap:10px">
+        <div class="ai-ico">🤖</div>
+        <div style="flex:1;min-width:0">
+          <div class="ai-ttl">ANTRENORUL AI</div>
+          <div style="font-size:11px;color:var(--muted);margin-top:1px">Tot istoricul, gata de analiză — lipește-l în Claude sau orice AI</div>
+        </div>
+      </div>
+      <div style="display:flex;gap:8px">
+        <button class="ai-btn-main" onclick="doExport()">🤖 Generează exportul</button>
+        <button class="ai-btn-ghost" onclick="copyExport()">📋 Copiază</button>
+      </div>
+      <div class="export-box" id="exportBox" style="display:none;margin-bottom:0">Apasă butonul pentru a genera exportul complet.</div>
+    </div>
+  </div>
 
   <div class="stitle">🎉 Rezumatul săptămânii</div>
   <button class="btn btn-ghost" onclick="showWeeklyDigest(currentWeekOffset)">🎉 Vezi rezumatul săptămânii afișate</button>
@@ -3846,85 +3882,110 @@ function renderHistoric(){
     return;
   }
 
-  // Grupare pe zi
+  // Grupare pe zi — cu dată, PR-uri și tonaj pentru micro-viz (design: canvas 3.2)
   var byDay={};
   rows.forEach(function(r){
-    if(!byDay[r.day])byDay[r.day]={exercises:{},checks:[],morning:[],skips:[]};
+    if(!byDay[r.day])byDay[r.day]={exercises:{},exOrder:[],checks:[],morning:[],skips:[],date:null,tonnage:0,prCount:0,sets:0};
+    var D=byDay[r.day];
+    if(r.date&&!D.date)D.date=r.date;
     if(r.type==='antrenament'){
-      if(!byDay[r.day].exercises[r.exercise])byDay[r.day].exercises[r.exercise]=[];
-      byDay[r.day].exercises[r.exercise].push({set:r.set,reps:r.reps,kg:r.kg});
+      if(!D.exercises[r.exercise]){D.exercises[r.exercise]=[];D.exOrder.push(r.exercise);}
+      var isPr=!!(r.note&&r.note.indexOf('PR:')===0);
+      D.exercises[r.exercise].push({set:r.set,reps:r.reps,kg:r.kg,pr:isPr});
+      D.tonnage+=(parseFloat(r.kg)||0)*(parseFloat(r.reps)||0);
+      D.sets++;
+      if(isPr)D.prCount++;
     }else if(r.type==='checklist'){
-      byDay[r.day].checks.push({item:r.exercise,value:r.note});
+      D.checks.push({item:r.exercise,value:r.note});
     }else if(r.type==='dimineata'){
-      byDay[r.day].morning.push({id:r.exercise,done:r.note==='DA'});
+      D.morning.push({id:r.exercise,done:r.note==='DA'});
     }else if(r.type==='skip'){
-      byDay[r.day].skips.push({exercise:r.exercise,reason:r.note||''});
+      D.skips.push({exercise:r.exercise,reason:r.note||''});
     }
   });
 
-  var html='';
-  ['LUNI','MARȚI','MIERCURI','JOI','VINERI','SÂMBĂTĂ','DUMINICĂ'].forEach(function(d){
+  // Ziua cea mai recentă cu date e deschisă implicit
+  var DAY_ORDER=['LUNI','MARȚI','MIERCURI','JOI','VINERI','SÂMBĂTĂ','DUMINICĂ'];
+  var dayShort={LUNI:'LU',MARȚI:'MA',MIERCURI:'MI',JOI:'JO',VINERI:'VI','SÂMBĂTĂ':'SÂ','DUMINICĂ':'DU'};
+  var openDay=null,openTime=-1;
+  DAY_ORDER.forEach(function(d){
     if(!byDay[d])return;
-    var dayData=byDay[d];
-    var exCount=Object.keys(dayData.exercises).length;
-    var totalSetsInDay=Object.values(dayData.exercises).reduce(function(a,sets){return a+sets.length;},0);
-    var chkDone=dayData.checks.filter(function(c){return c.value==='DA';}).length;
-    var morningDone=dayData.morning.filter(function(m){return m.done;}).length;
-    var morningTotal=dayData.morning.length;
+    var dt=parseRoDate(byDay[d].date);
+    var t=dt?dt.getTime():0;
+    if(t>=openTime){openTime=t;openDay=d;}
+  });
 
-    html+='<div class="hist-day">';
-    // Header zi
-    html+='<div class="hist-day-hd"><span>'+d+'</span>';
-    html+='<span style="color:var(--muted);font-size:11px">';
-    if(exCount)html+='💪 '+exCount+' ex · '+totalSetsInDay+' sets';
-    if(morningTotal)html+=' · ☀️ '+morningDone+'/'+morningTotal;
-    if(chkDone)html+=' · ✅ '+chkDone+'/'+checkItems.length;
-    html+='</span></div>';
-
-    // Exercitii
-    if(exCount){
-      Object.keys(dayData.exercises).forEach(function(ex){
-        var sets=dayData.exercises[ex].sort(function(a,b){return a.set-b.set;});
-        var exEnc=encodeURIComponent(ex);
-        var meta=findExerciseMeta(ex);
-        var totalSets=meta?meta.ex.sets:Math.max.apply(null,sets.map(function(s){return s.set;}));
-        var starIcon=(meta&&meta.ex.star)?'<span style="color:var(--acc2);margin-right:4px">⭐</span>':'';
-        var doneCount=sets.length;
-        var doneIndicator='<span style="color:var(--muted);font-size:10px;font-weight:400"> · '+doneCount+'/'+totalSets+' · tap set/+ adaugă</span>';
-        html+='<div class="hist-ex"><div class="hist-ex-nm">'+starIcon+ex+doneIndicator+'</div><div class="hist-sets">';
-        // Afișează TOATE sloturile (1..totalSets) — salvate sau goale
-        for(var setNum=1;setNum<=totalSets;setNum++){
-          var found=sets.find(function(s){return s.set===setNum;});
-          if(found){
-            html+='<span class="hist-set" onclick="openEdit(\''+d+'\',\''+exEnc+'\','+setNum+')">S'+setNum+': '+found.reps+'×'+found.kg+'kg ✎</span>';
-          }else{
-            // Slot gol — tap pentru a adăuga
-            html+='<span class="hist-set" style="background:rgba(245,158,11,.08);color:#fbbf24;border:1px dashed rgba(245,158,11,.4)" onclick="openAddSet(\''+d+'\',\''+exEnc+'\','+setNum+')">+ S'+setNum+'</span>';
-          }
+  var html='';
+  DAY_ORDER.forEach(function(d){
+    if(!byDay[d])return;
+    var D=byDay[d];
+    var exCount=D.exOrder.length;
+    var chkDone=D.checks.filter(function(c){return c.value==='DA';}).length;
+    var morningDone=D.morning.filter(function(m){return m.done;}).length;
+    var morningTotal=D.morning.length;
+    var di=DAY_ORDER.indexOf(d);
+    var progLabel=(exercises[schedule[di].exDay]||{}).label||'';
+    var dt=parseRoDate(D.date);
+    var dayNum=dt?dt.getDate():'';
+    var trained=exCount>0;
+    var cardId='hc_'+di;
+    html+='<div class="hist-card'+(d===openDay?' open':'')+(trained?' trained':'')+'" id="'+cardId+'">';
+    html+='<div class="hist-card-hd" onclick="document.getElementById(\''+cardId+'\').classList.toggle(\'open\')">';
+    html+='<div class="hist-date-col"><div class="hist-date-day">'+(dayShort[d]||d.slice(0,2))+'</div><div class="hist-date-num">'+dayNum+'</div></div>';
+    html+='<div style="flex:1;min-width:0">';
+    html+='<div style="display:flex;align-items:baseline;gap:8px"><span style="font-size:12px;font-weight:700;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+(trained?progLabel:d.charAt(0)+d.slice(1).toLowerCase())+'</span>'+(D.prCount?'<span style="font-size:10px;color:#fbbf24;font-weight:800;flex-shrink:0">🏆 '+D.prCount+' PR</span>':'')+'</div>';
+    if(trained){
+      // Micro-viz: un segment per exercițiu, lățime ∝ seturi, intensitate descrescătoare
+      html+='<div class="hist-viz">';
+      D.exOrder.forEach(function(ex,i){
+        var alpha=Math.max(.25,.95-i*.16);
+        html+='<div style="flex:'+D.exercises[ex].length+';background:rgba(var(--acc-rgb),'+alpha.toFixed(2)+')"></div>';
+      });
+      html+='</div>';
+    }else if(morningTotal||D.checks.length){
+      html+='<div style="font-size:10.5px;color:var(--muted);margin-top:3px">'+(morningTotal?'☀️ '+morningDone+'/'+morningTotal:'')+(D.checks.length?(morningTotal?' · ':'')+'✅ '+chkDone:'')+'</div>';
+    }
+    html+='</div>';
+    if(trained){
+      html+='<div style="text-align:right;flex-shrink:0"><div class="hist-ton">'+Math.round(D.tonnage).toLocaleString('ro-RO')+'</div><div class="hist-ton-lbl">KG · '+D.sets+' SETURI</div></div>';
+    }
+    html+='<div class="card-chev" style="flex-shrink:0">▼</div>';
+    html+='</div>';
+    // Corpul: seturile ca pastile (tap = editează, + = adaugă), săritele, dimineața+checklist
+    html+='<div class="hist-card-bd">';
+    D.exOrder.forEach(function(ex){
+      var sets=D.exercises[ex].sort(function(a,b){return a.set-b.set;});
+      var exEnc=encodeURIComponent(ex);
+      var meta=findExerciseMeta(ex);
+      var totalSets=meta?meta.ex.sets:Math.max.apply(null,sets.map(function(s){return s.set;}));
+      var starIcon=(meta&&meta.ex.star)?'<span style="color:var(--acc2);margin-right:4px">⭐</span>':'';
+      html+='<div class="hist-ex"><div class="hist-ex-nm">'+starIcon+ex+'<span style="color:var(--muted);font-size:10px;font-weight:400"> · '+sets.length+'/'+totalSets+'</span></div><div class="hist-sets">';
+      for(var setNum=1;setNum<=totalSets;setNum++){
+        var found=sets.find(function(s){return s.set===setNum;});
+        if(found){
+          html+='<span class="hist-set'+(found.pr?' pr':'')+'" onclick="openEdit(\''+d+'\',\''+exEnc+'\','+setNum+')">S'+setNum+' · '+found.reps+'×'+found.kg+(found.pr?' 🏆':' ✎')+'</span>';
+        }else{
+          html+='<span class="hist-set" style="background:rgba(245,158,11,.08);color:#fbbf24;border:1px dashed rgba(245,158,11,.4)" onclick="openAddSet(\''+d+'\',\''+exEnc+'\','+setNum+')">+ S'+setNum+'</span>';
         }
-        html+='</div></div>';
+      }
+      html+='</div></div>';
+    });
+    if(D.skips.length){
+      D.skips.forEach(function(sk){
+        html+='<div class="hist-ex" style="border:1px dashed rgba(245,158,11,.35);background:repeating-linear-gradient(-45deg,rgba(245,158,11,.04) 0 6px,transparent 6px 16px)"><div class="hist-ex-nm" style="color:var(--muted);margin-bottom:0">⤼ '+sk.exercise+' <span style="color:#fbbf24;font-size:10px;font-weight:400">SĂRIT'+(sk.reason?' · '+sk.reason:'')+'</span></div></div>';
       });
     }
-
-    // Exerciții sărite („Sar azi")
-    if(dayData.skips.length){
-      dayData.skips.forEach(function(sk){
-        html+='<div class="hist-ex" style="border:1px dashed rgba(245,158,11,.35);background:repeating-linear-gradient(-45deg,rgba(245,158,11,.04) 0 6px,transparent 6px 16px)"><div class="hist-ex-nm" style="color:var(--muted)">⤼ '+sk.exercise+' <span style="color:#fbbf24;font-size:10px;font-weight:400">SĂRIT'+(sk.reason?' · '+sk.reason:'')+'</span></div></div>';
-      });
-    }
-
-    // Sumar morning + checklist (compact)
-    if(morningTotal||dayData.checks.length){
+    if(morningTotal||D.checks.length){
       html+='<div class="hist-ex" style="background:rgba(var(--acc-rgb),.04);font-size:11px;color:var(--muted)">';
       if(morningTotal)html+='☀️ Dimineață: '+morningDone+'/'+morningTotal+' bifate';
-      if(morningTotal&&dayData.checks.length)html+=' · ';
-      if(dayData.checks.length){
-        var doneList=dayData.checks.filter(function(c){return c.value==='DA';}).map(function(c){return c.item;}).join(', ');
+      if(morningTotal&&D.checks.length)html+=' · ';
+      if(D.checks.length){
+        var doneList=D.checks.filter(function(c){return c.value==='DA';}).map(function(c){return c.item;}).join(', ');
         if(doneList)html+='✅ '+doneList;
       }
       html+='</div>';
     }
-    html+='</div>';
+    html+='</div></div>';
   });
   cont.innerHTML=html;
 }
@@ -4456,7 +4517,9 @@ function buildWeekSummary(){
 
 function doExport(){
   var text=buildWeekSummary();
-  document.getElementById('exportBox').textContent=text;
+  var box=document.getElementById('exportBox');
+  box.textContent=text;
+  box.style.display='block';
   showToast('Rezumat generat ✓');
 }
 
