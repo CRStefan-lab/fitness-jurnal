@@ -266,6 +266,104 @@ var SPLIT_3DAY={
   schedule:['luni','marti','miercuri','joi','vineri','sambata','sambata']
 };
 
+
+/* 2 ZILE — două full body complete. Volum sub banda 10-20 (Pelland 2025):
+   e menținere + progres lent, dar net mai bine decât zero. Onest în UI. */
+var SPLIT_2DAY={
+  days:[
+    {key:'luni',label:'Full Body A',icon:'🏋️',type:'full',slots:[
+      {pattern:'squat',star:true,sets:4,target:'8–12'},
+      {pattern:'push_h',star:true,sets:4,target:'6–10'},
+      {pattern:'pull',star:false,sets:4,target:'8–12'},
+      {pattern:'core',star:false,sets:3,target:'12–20'},
+      {pattern:'izo_umeri',star:false,sets:3,target:'12–15',optional:true}]},
+    {key:'marti',label:'Recovery — Pași + Core',icon:'🚶',type:'recovery',slots:[]},
+    {key:'joi',label:'Full Body B',icon:'⚡',type:'full',slots:[
+      {pattern:'hinge',star:true,sets:4,target:'8–12'},
+      {pattern:'push_v',star:true,sets:3,target:'8–12'},
+      {pattern:'pull',star:false,sets:3,target:'10–15'},
+      {pattern:'gambe',star:false,sets:3,target:'15–20'},
+      {pattern:'biceps',star:false,sets:3,target:'10–15',optional:true}]},
+    {key:'sambata',label:'Recovery + Mobilitate',icon:'🧘',type:'recovery',slots:[]}
+  ],
+  schedule:['luni','marti','marti','joi','sambata','sambata','sambata']
+};
+
+/* 5 ZILE — Push / Picioare / Pull / Upper / Lower.
+   Fiecare mușchi ajunge de 2× pe săptămână, în banda 10-20. */
+var SPLIT_5DAY={
+  days:[
+    {key:'luni',label:'Piept / Umeri / Triceps',icon:'🏋️',type:'push',slots:[
+      {pattern:'push_h',star:true,sets:4,target:'6–10'},
+      {pattern:'push_v',star:true,sets:3,target:'8–12'},
+      {pattern:'izo_umeri',star:false,sets:3,target:'12–15'},
+      {pattern:'izo_piept',star:false,sets:3,target:'10–15',optional:true},
+      {pattern:'triceps',star:false,sets:3,target:'10–15'}]},
+    {key:'marti',label:'Picioare',icon:'🦵',type:'lower',slots:[
+      {pattern:'squat',star:true,sets:4,target:'8–12'},
+      {pattern:'hinge',star:true,sets:4,target:'8–12'},
+      {pattern:'lunge',star:false,sets:3,target:'8/picior'},
+      {pattern:'gambe',star:false,sets:3,target:'15–20'}]},
+    {key:'miercuri',label:'Spate / Biceps',icon:'💪',type:'pull',slots:[
+      {pattern:'pull',star:true,sets:4,target:'8–12'},
+      {pattern:'pull',star:false,sets:3,target:'10–15'},
+      {pattern:'spate_post',star:false,sets:3,target:'12–15'},
+      {pattern:'biceps',star:false,sets:3,target:'10–15'}]},
+    {key:'joi',label:'Upper — Piept & Spate',icon:'⚡',type:'push',slots:[
+      {pattern:'push_h',star:true,sets:3,target:'8–12'},
+      {pattern:'pull',star:true,sets:3,target:'8–12'},
+      {pattern:'izo_umeri',star:false,sets:3,target:'12–15'},
+      {pattern:'triceps',star:false,sets:3,target:'10–15',optional:true},
+      {pattern:'biceps',star:false,sets:3,target:'10–15',optional:true}]},
+    {key:'vineri',label:'Picioare & Fesieri',icon:'🦵',type:'lower',slots:[
+      {pattern:'glute',star:true,sets:4,target:'8–12'},
+      {pattern:'squat',star:false,sets:3,target:'10–12'},
+      {pattern:'gambe',star:false,sets:3,target:'15–20'},
+      {pattern:'core',star:false,sets:3,target:'12–20'}]},
+    {key:'sambata',label:'Recovery + Mobilitate',icon:'🧘',type:'recovery',slots:[]}
+  ],
+  schedule:['luni','marti','miercuri','joi','vineri','sambata','sambata']
+};
+
+/* 6 ZILE — Push/Pull/Picioare ×2. Pentru cine chiar are timp și recuperare;
+   volumul rămâne în banda 10-20, nu peste. */
+var SPLIT_6DAY={
+  days:[
+    {key:'luni',label:'Push A — Piept / Umeri',icon:'🏋️',type:'push',slots:[
+      {pattern:'push_h',star:true,sets:4,target:'6–10'},
+      {pattern:'push_v',star:true,sets:3,target:'8–12'},
+      {pattern:'izo_umeri',star:false,sets:3,target:'12–15'},
+      {pattern:'triceps',star:false,sets:3,target:'10–15'}]},
+    {key:'marti',label:'Pull A — Spate / Biceps',icon:'💪',type:'pull',slots:[
+      {pattern:'pull',star:true,sets:4,target:'8–12'},
+      {pattern:'pull',star:false,sets:3,target:'10–15'},
+      {pattern:'spate_post',star:false,sets:3,target:'12–15'},
+      {pattern:'biceps',star:false,sets:3,target:'10–15'}]},
+    {key:'miercuri',label:'Picioare A',icon:'🦵',type:'lower',slots:[
+      {pattern:'squat',star:true,sets:4,target:'8–12'},
+      {pattern:'hinge',star:true,sets:3,target:'8–12'},
+      {pattern:'lunge',star:false,sets:3,target:'8/picior'},
+      {pattern:'gambe',star:false,sets:3,target:'15–20'}]},
+    {key:'joi',label:'Push B — Piept / Triceps',icon:'⚡',type:'push',slots:[
+      {pattern:'push_h',star:true,sets:3,target:'8–12'},
+      {pattern:'izo_piept',star:false,sets:3,target:'10–15'},
+      {pattern:'izo_umeri',star:false,sets:3,target:'12–15'},
+      {pattern:'triceps',star:false,sets:3,target:'10–15'}]},
+    {key:'vineri',label:'Pull B — Spate / Posterior',icon:'💪',type:'pull',slots:[
+      {pattern:'pull',star:true,sets:3,target:'8–12'},
+      {pattern:'spate_post',star:false,sets:3,target:'12–15'},
+      {pattern:'biceps',star:false,sets:3,target:'10–15'},
+      {pattern:'core',star:false,sets:3,target:'12–20'}]},
+    {key:'sambata',label:'Picioare B — Fesieri',icon:'🦵',type:'lower',slots:[
+      {pattern:'glute',star:true,sets:4,target:'8–12'},
+      {pattern:'squat',star:false,sets:3,target:'10–12'},
+      {pattern:'gambe',star:false,sets:3,target:'15–20'},
+      {pattern:'core',star:false,sets:3,target:'12–20'}]},
+    {key:'duminica',label:'Recovery + Mobilitate',icon:'🧘',type:'recovery',slots:[]}
+  ],
+  schedule:['luni','marti','miercuri','joi','vineri','sambata','duminica']
+};
+
 /* ───────────────────────────────────────────────────────────────
    ACCENT (preferință, nu sex): 'echilibrat' = template-urile ca atare;
    'glute' = mai mult volum picioare-fesieri, în limitele 10-20 seturi/mușchi
@@ -273,7 +371,8 @@ var SPLIT_3DAY={
    Template-urile NU se mută — clonăm înainte de modificare.
    ─────────────────────────────────────────────────────────────── */
 function buildSplit(profile){
-  var base=profile.days===4?SPLIT_4DAY:SPLIT_3DAY;
+  var SPLITS={2:SPLIT_2DAY,3:SPLIT_3DAY,4:SPLIT_4DAY,5:SPLIT_5DAY,6:SPLIT_6DAY};
+  var base=SPLITS[profile.days]||SPLIT_3DAY;
   var split={days:base.days.map(function(day){
     return {key:day.key,label:day.label,icon:day.icon,type:day.type,
       slots:day.slots.map(function(s){
@@ -294,6 +393,19 @@ function buildSplit(profile){
         // Full Body A: core → glute (core rămâne în recovery + rutina de dimineață)
         day.slots.forEach(function(s){
           if(s.pattern==='core'){s.pattern='glute';s.target='10–15';}
+        });
+      }
+      if(day.key==='luni'&&profile.days===2){
+        // Full Body A: core → glute (2 zile: fiecare slot contează)
+        day.slots.forEach(function(s){
+          if(s.pattern==='core'){s.pattern='glute';s.target='10–15';}
+        });
+      }
+      if((profile.days===5&&day.key==='vineri')||(profile.days===6&&day.key==='sambata')){
+        // Ziua de picioare secundară: squat-ul non-⭐ → al doilea hip thrust/glute
+        day.label='Picioare & Fesieri';
+        day.slots.forEach(function(s){
+          if(s.pattern==='squat'&&!s.star){s.pattern='glute';s.target='10–15';}
         });
       }
     });
@@ -407,14 +519,20 @@ function pickFromPattern(pool,pattern,starWanted,usedIds){
   return candidates[0];
 }
 
-function pickExercise(pool,slot,usedIds){
-  var ex=pickFromPattern(pool,slot.pattern,slot.star,usedIds);
-  if(ex)return ex;
-  // fallback pe pattern-uri înrudite
-  var fallbacks=FALLBACK_PATTERNS[slot.pattern]||[];
-  for(var i=0;i<fallbacks.length;i++){
-    ex=pickFromPattern(pool,fallbacks[i],slot.star,usedIds);
+function pickExercise(pool,slot,usedIds,softAvoid){
+  // softAvoid = exercițiile deja folosite ÎN ALTE ZILE: le ocolim ca să nu iasă
+  // Push A identic cu Push B; dacă pool-ul s-a epuizat, revenim la varianta bună.
+  var avoid=(softAvoid&&softAvoid.length)?usedIds.concat(softAvoid):null;
+  var attempts=avoid?[avoid,usedIds]:[usedIds];
+  for(var a=0;a<attempts.length;a++){
+    var block=attempts[a];
+    var ex=pickFromPattern(pool,slot.pattern,slot.star,block);
     if(ex)return ex;
+    var fallbacks=FALLBACK_PATTERNS[slot.pattern]||[];
+    for(var i=0;i<fallbacks.length;i++){
+      ex=pickFromPattern(pool,fallbacks[i],slot.star,block);
+      if(ex)return ex;
+    }
   }
   return null;
 }
@@ -429,6 +547,11 @@ function adjustVolume(sets,isStar,profile){
   return s;
 }
 
+// Bodyweight nu susține 5-6 zile: pool-ul e mic, ai repeta aceleași mișcări
+// fără câștig real. Limita e o decizie de programare, nu una arbitrară.
+function allowedDays(equipment){
+  return equipment==='bodyweight'?[2,3,4]:[2,3,4,5,6];
+}
 function maxExercisesPerDay(profile){
   return profile.experience==='incepator'?4:5;
 }
@@ -443,8 +566,8 @@ function calcNutrition(profile){
   }else{
     bmr=10*profile.weight+6.25*profile.height-5*profile.age+5;
   }
-  // factor activitate: sedentar + antrenament → 1.4 (3 zile) / 1.5 (4 zile)
-  var activity=profile.days>=4?1.5:1.4;
+  // factor activitate: sedentar + antrenament (3→1.4 și 4→1.5 rămân neschimbate)
+  var activity={2:1.35,3:1.4,4:1.5,5:1.55,6:1.6}[profile.days]||(profile.days>=4?1.5:1.4);
   var tdee=bmr*activity;
   var goalAdj={slabit:-0.20,recomp:-0.12,masa:0.10}[profile.goal]||-0.12;
   var kcal=Math.round(tdee*(1+goalAdj)/10)*10;
@@ -492,7 +615,7 @@ function buildChecklist(profile,nutrition){
    profile: {sex:'M'|'F', age, height(cm), weight(kg),
              experience:'incepator'|'intermediar',
              equipment:'bodyweight'|'home_min'|'gym', hasBara:bool,
-             days:3|4, goal:'slabit'|'recomp'|'masa',
+             days:2..6, goal:'slabit'|'recomp'|'masa',
              morningRoutine:bool}
    ─────────────────────────────────────────────────────────────── */
 function generateProgram(profile){
@@ -503,7 +626,8 @@ function generateProgram(profile){
   if(!(profile.height>=120&&profile.height<=230))errors.push('înălțime invalidă');
   if(!(profile.weight>=35&&profile.weight<=250))errors.push('greutate invalidă');
   if(!EQUIPMENT_PROFILES[profile.equipment])errors.push('profil echipament invalid');
-  if([3,4].indexOf(profile.days)<0)errors.push('zile: doar 3 sau 4 în v1');
+  var okDays=EQUIPMENT_PROFILES[profile.equipment]?allowedDays(profile.equipment):[2,3,4,5,6];
+  if(okDays.indexOf(profile.days)<0)errors.push('zile: '+okDays.join('/')+' pentru acest echipament');
   if(['slabit','recomp','masa'].indexOf(profile.goal)<0)errors.push('obiectiv invalid');
   if(['incepator','intermediar'].indexOf(profile.experience)<0)errors.push('experiență invalidă');
   if(profile.emphasis!==undefined&&['echilibrat','glute'].indexOf(profile.emphasis)<0)errors.push('accent invalid');
@@ -515,6 +639,7 @@ function generateProgram(profile){
   var morningRoutines={};
   var maxEx=maxExercisesPerDay(profile);
   var warnings=[];
+  var programUsed=[]; // variație între zile (Push A ≠ Push B)
 
   split.days.forEach(function(day){
     if(day.type==='recovery'){
@@ -541,12 +666,13 @@ function generateProgram(profile){
     }
     slots.forEach(function(slot){
       if(list.length>=maxEx&&!slot.star)return;
-      var ex=pickExercise(pool,slot,usedIds);
+      var ex=pickExercise(pool,slot,usedIds,programUsed);
       if(!ex){
         warnings.push(day.key+': niciun exercițiu pentru pattern "'+slot.pattern+'"'+(slot.star?' (⭐)':''));
         return;
       }
       usedIds.push(ex.id);
+      programUsed.push(ex.id);
       list.push({
         star:slot.star&&ex.starEligible,
         name:ex.name,
@@ -602,7 +728,8 @@ var API={
   EQUIPMENT_PROFILES:EQUIPMENT_PROFILES,
   MORNING_TEMPLATES:MORNING_TEMPLATES,
   generateProgram:generateProgram,
-  calcNutrition:calcNutrition
+  calcNutrition:calcNutrition,
+  allowedDays:allowedDays
 };
 
 if(typeof module!=='undefined'&&module.exports){module.exports=API;}

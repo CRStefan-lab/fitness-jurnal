@@ -1658,25 +1658,60 @@ function dpUntilLabel(iso){
   return DP_LONG[(d.getDay()+6)%7].toLowerCase()+', '+isoToRo(iso).slice(0,5);
 }
 
-// ── Modal „Zilele mele" ──
+// ── Modal „Zilele mele" (câte zile + care zile) ──
+var DP_SPLIT_NAME={2:'Full Body ×2',3:'Full Body ×3',4:'Push / Picioare / Pull / Full',5:'Push / Picioare / Pull / Upper / Lower',6:'Push / Pull / Picioare ×2'};
+var DP_SPLIT_NOTE={
+  2:'Menținere + progres lent: volumul rămâne sub banda optimă 10–20 seturi/mușchi, dar e infinit mai bine decât zero. Ideal când timpul chiar nu există.',
+  3:'Minimul care aduce progres solid — fiecare mușchi lucrat de 2–3 ori pe săptămână.',
+  4:'Echilibrul cel mai bun între rezultate și timp pentru majoritatea oamenilor.',
+  5:'Volum mare, fiecare grupă prinsă de 2 ori pe săptămână. Cere constanță.',
+  6:'Doar dacă somnul și recuperarea sunt în regulă. Mai mult nu înseamnă automat mai bine — volumul peste 20 de seturi/mușchi nu mai crește nimic.'
+};
+var DP_DEFAULT_DAYS={2:[0,3],3:[0,2,4],4:[0,1,3,4],5:[0,1,2,3,4],6:[0,1,2,3,4,5]};
 var dayPlanState=null;
+
+function dpProfileReady(){
+  var p=getProfile();
+  return !!(p&&p.sex&&p.age&&p.height&&p.weight&&p.experience&&p.equipment&&p.goal);
+}
+function dpAllowedCounts(){
+  var p=getProfile();
+  if(window.ProgramGenerator&&ProgramGenerator.allowedDays&&p.equipment){
+    return ProgramGenerator.allowedDays(p.equipment);
+  }
+  return [2,3,4,5,6];
+}
 function openDayPlan(){
   var plan=getDayPlan();
   var need=dayPlanCount();
   var days=plan.days.slice();
   if(days.length!==need)days=baseTrainingDayIdx();
-  dayPlanState={days:days,mode:plan.temp?'temp':'perm',dur:'1w',until:plan.until||''};
+  dayPlanState={count:need,days:days,mode:plan.temp?'temp':'perm',dur:'1w',until:plan.until||''};
   renderDayPlan();
   document.getElementById('dayPlanModal').classList.add('show');
 }
 function closeDayPlan(){document.getElementById('dayPlanModal').classList.remove('show');}
+function dpSetCount(n){
+  if(n===dayPlanState.count)return;
+  dayPlanState.count=n;
+  dayPlanState.days=(DP_DEFAULT_DAYS[n]||[]).slice();
+  dayPlanState.mode='perm'; // structura programului se schimbă doar permanent
+  renderDayPlan();
+}
 function dpToggle(d){
   var i=dayPlanState.days.indexOf(d);
   if(i>=0)dayPlanState.days.splice(i,1);
   else dayPlanState.days.push(d);
   renderDayPlan();
 }
-function dpSetMode(m){dayPlanState.mode=m;renderDayPlan();}
+function dpSetMode(m){
+  if(m==='temp'&&dayPlanState.count!==dayPlanCount()){
+    // excepția temporară mută zilele, nu rescrie programul
+    dayPlanState.count=dayPlanCount();
+    dayPlanState.days=getDayPlan().days.slice();
+  }
+  dayPlanState.mode=m;renderDayPlan();
+}
 function dpSetDur(v){dayPlanState.dur=v;renderDayPlan();}
 function dpSetDate(v){dayPlanState.until=v;renderDayPlan();}
 function dpComputeUntil(){
@@ -1685,13 +1720,38 @@ function dpComputeUntil(){
   var d=new Date();d.setDate(d.getDate()+add);
   return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
 }
+function dpGoWizard(){closeDayPlan();openWizard(true);}
+
 function renderDayPlan(){
-  var need=dayPlanCount();
+  var CH="font-family:'Chakra Petch','Segoe UI',Arial,sans-serif";
+  var need=dayPlanState.count;
+  var progCount=dayPlanCount();
   var sel=dayPlanState.days.slice().sort(function(a,b){return a-b;});
   var ok=sel.length===need;
-  var CH="font-family:'Chakra Petch','Segoe UI',Arial,sans-serif";
+  var willRegen=need!==progCount;
+  var ready=dpProfileReady();
   var h='';
-  h+='<div style="font-size:12px;color:var(--muted);line-height:1.55;margin-bottom:12px">Programul tău are <strong style="color:var(--acc2)">'+need+' zile</strong> de antrenament. Alege în ce zile le faci — restul devin automat recuperare și mobilitate.</div>';
+
+  // 1) Câte zile pe săptămână
+  h+='<div style="font-size:10px;'+CH+';letter-spacing:2px;color:var(--muted);margin-bottom:7px">CÂTE ZILE PE SĂPTĂMÂNĂ</div>';
+  if(ready){
+    var counts=dpAllowedCounts();
+    h+='<div style="display:flex;gap:5px;margin-bottom:7px">';
+    counts.forEach(function(c){
+      h+='<button class="dpl-day'+(c===need?' on':'')+'" style="flex:1" onclick="dpSetCount('+c+')">'+c+'</button>';
+    });
+    h+='</div>';
+    h+='<div style="font-size:11.5px;color:var(--acc2);font-weight:600;margin-bottom:3px">'+(DP_SPLIT_NAME[need]||'')+'</div>';
+    h+='<div style="font-size:11px;color:var(--muted);line-height:1.5;margin-bottom:'+(willRegen?'8':'14')+'px">'+(DP_SPLIT_NOTE[need]||'')+'</div>';
+    if(willRegen){
+      h+='<div style="background:rgba(245,158,11,.09);border:1px solid rgba(245,158,11,.4);border-radius:10px;padding:9px 11px;margin-bottom:14px;font-size:11px;color:#fbbf24;line-height:1.5">⚠️ Programul se regenerează pe <strong>'+need+' zile</strong>, pe profilul tău. Istoricul, PR-urile și măsurătorile rămân neatinse.</div>';
+    }
+  }else{
+    h+='<div style="background:var(--s2);border:1px solid var(--bd);border-radius:10px;padding:10px 12px;margin-bottom:14px;font-size:11.5px;color:var(--muted);line-height:1.5">Ai <strong style="color:var(--text)">'+progCount+' zile</strong> de antrenament. Ca să schimb numărul, am nevoie de profilul complet (echipament, nivel, obiectiv) — durează un minut.<br><button class="dpl-pill" style="margin-top:8px" onclick="dpGoWizard()">🔄 Completează profilul</button></div>';
+  }
+
+  // 2) În ce zile
+  h+='<div style="font-size:10px;'+CH+';letter-spacing:2px;color:var(--muted);margin-bottom:7px">ÎN CE ZILE</div>';
   h+='<div style="display:flex;gap:5px;margin-bottom:6px">';
   for(var d=0;d<7;d++){
     var on=sel.indexOf(d)>=0;
@@ -1701,12 +1761,14 @@ function renderDayPlan(){
   var missing=need-sel.length;
   var statusTxt=ok?'✓ '+need+'/'+need+' ZILE ALESE':(missing>0?sel.length+'/'+need+' — mai alege '+missing:sel.length+'/'+need+' — deselectează '+(-missing));
   h+='<div style="font-size:11px;'+CH+';letter-spacing:1px;color:'+(ok?'var(--green)':'#fbbf24')+';margin-bottom:14px">'+statusTxt+'</div>';
+
+  // 3) Permanent vs temporar
   h+='<div class="dpl-seg">';
   h+='<button class="'+(dayPlanState.mode==='perm'?'act':'')+'" onclick="dpSetMode(\'perm\')">📌 Permanent</button>';
   h+='<button class="'+(dayPlanState.mode==='temp'?'act':'')+'" onclick="dpSetMode(\'temp\')">⏳ Temporar</button>';
   h+='</div>';
   if(dayPlanState.mode==='temp'){
-    h+='<div style="font-size:11.5px;color:var(--muted);margin:10px 0 7px;line-height:1.5">Cât ține excepția? După, revii automat la programul obișnuit.</div>';
+    h+='<div style="font-size:11.5px;color:var(--muted);margin:10px 0 7px;line-height:1.5">Cât ține excepția? După, revii automat la programul obișnuit. (Temporar mută doar zilele, nu schimbă structura programului.)</div>';
     h+='<div style="display:flex;gap:6px;flex-wrap:wrap">';
     [['1w','1 săptămână'],['2w','2 săptămâni'],['1m','1 lună'],['date','Până la o dată']].forEach(function(o){
       h+='<button class="dpl-pill'+(dayPlanState.dur===o[0]?' on':'')+'" onclick="dpSetDur(\''+o[0]+'\')">'+o[1]+'</button>';
@@ -1720,7 +1782,9 @@ function renderDayPlan(){
   }else{
     h+='<div style="font-size:11.5px;color:var(--muted);margin:10px 0 0;line-height:1.5">Devine programul tău obișnuit. Îl poți schimba oricând de aici.</div>';
   }
-  if(ok){
+
+  // 4) Previzualizare (doar când nu se regenerează — altfel exercițiile încă nu există)
+  if(ok&&!willRegen){
     var prev=buildScheduleFor(sel);
     h+='<div style="font-size:10px;'+CH+';letter-spacing:2px;color:var(--muted);margin:16px 0 7px">CUM ARATĂ SĂPTĂMÂNA</div>';
     h+='<div style="border:1px solid var(--bd);border-radius:12px;overflow:hidden">';
@@ -1740,14 +1804,38 @@ function renderDayPlan(){
   var btn=document.getElementById('dayPlanSave');
   btn.disabled=!ok;
   btn.style.opacity=ok?'1':'.45';
-  btn.textContent=dayPlanState.mode==='temp'?'⏳ Aplică temporar':'📌 Salvează zilele';
+  btn.textContent=willRegen?('🔄 Regenerează pe '+need+' zile'):(dayPlanState.mode==='temp'?'⏳ Aplică temporar':'📌 Salvează zilele');
   var rb=document.getElementById('dayPlanRevert');
   if(rb)rb.style.display=getTempPlan()?'block':'none';
 }
+
 function saveDayPlan(){
-  var need=dayPlanCount();
   var sel=dayPlanState.days.slice().sort(function(a,b){return a-b;});
-  if(sel.length!==need)return;
+  if(sel.length!==dayPlanState.count)return;
+  // Schimbare de structură → regenerăm programul pe noul număr de zile
+  if(dayPlanState.count!==dayPlanCount()){
+    if(!dpProfileReady()){showToast('Am nevoie de profilul complet — reia wizard-ul','var(--acc2)');return;}
+    var wasLegacy=!isCustomProgram;
+    var msg='Programul se regenerează pe '+dayPlanState.count+' zile, pe profilul tău.\n\nIstoricul, PR-urile și măsurătorile rămân neatinse.';
+    if(wasLegacy)msg+='\n\nAtenție: programul standard va fi înlocuit cu unul generat.';
+    if(!confirm(msg+'\n\nContinui?'))return;
+    var p=getProfile();
+    var prof={sex:p.sex,age:parseInt(p.age),height:parseFloat(p.height),weight:parseFloat(p.weight),
+      experience:p.experience,equipment:p.equipment,hasBara:!!p.hasBara,days:dayPlanState.count,
+      goal:p.goal,emphasis:p.emphasis||'echilibrat',morningRoutine:p.morningRoutine!==false};
+    var res=ProgramGenerator.generateProgram(prof);
+    if(res.errors){showToast('Nu pot genera: '+res.errors[0],'var(--red)');return;}
+    res.meta.generatedAt=new Date().toISOString();
+    p.days=dayPlanState.count;
+    localStorage.setItem('user_profile',JSON.stringify(p));
+    localStorage.setItem('custom_program',JSON.stringify(res));
+    localStorage.setItem('training_days',JSON.stringify({days:sel,ts:Date.now()}));
+    localStorage.removeItem('training_days_temp');
+    localStorage.removeItem('legacy_program');
+    showToast('🔄 Program nou pe '+dayPlanState.count+' zile — reîncarc…','var(--green)');
+    setTimeout(function(){location.reload();},900);
+    return;
+  }
   if(dayPlanState.mode==='temp'){
     var until=dpComputeUntil();
     if(!until){showToast('Alege data până la care ține excepția','var(--acc2)');return;}
@@ -1782,9 +1870,10 @@ function renderMyDaysRow(){
   var el=document.getElementById('myDaysInfo');
   if(!el)return;
   var t=getTempPlan();
-  el.innerHTML='🗓️ <strong style="color:var(--text)">'+dayPlanSummaryText()+'</strong>'+
+  el.innerHTML='🗓️ <strong style="color:var(--text)">'+dayPlanCount()+' zile</strong> · '+dayPlanSummaryText()+
     (t?' · <span style="color:#fbbf24">temporar, până '+dpUntilLabel(t.until)+'</span>':'');
 }
+
 (function(){try{applyDayPlan();}catch(e){console.error('applyDayPlan failed',e);}})();
 
 // ═══════════════════════════════════════════════════════════════
@@ -7578,6 +7667,10 @@ function wizChoiceBtn(field,value,title,sub,extraOnclick){
 
 function wizSet(field,value){
   if(field==='days')value=parseInt(value);
+  // schimbarea echipamentului poate invalida numărul de zile ales anterior
+  if(field==='equipment'&&wizState.data.days&&window.ProgramGenerator&&ProgramGenerator.allowedDays){
+    if(ProgramGenerator.allowedDays(value).indexOf(wizState.data.days)<0)wizState.data.days=null;
+  }
   if(field==='hasBara'||field==='morningRoutine')value=(value==='true');
   wizState.data[field]=value;
   renderWizard();
@@ -7604,6 +7697,8 @@ function wizNext(){
   if(wizState.step===3&&!d.equipment){wizErr('Alege echipamentul');return;}
   if(wizState.step===4){
     if(!d.days){wizErr('Alege câte zile');return;}
+    var okD=(window.ProgramGenerator&&ProgramGenerator.allowedDays)?ProgramGenerator.allowedDays(d.equipment):[2,3,4,5,6];
+    if(okD.indexOf(d.days)<0){wizErr('Cu echipamentul ales poți '+okD.join('/')+' zile');return;}
     if(!d.goal){wizErr('Alege obiectivul');return;}
   }
   if(wizState.step===5){
@@ -7714,7 +7809,20 @@ function renderWizard(){
   else if(s===4){
     html+='<div class="wiz-title">Timp și obiectiv</div>';
     html+='<div class="wiz-label">Câte zile pe săptămână te poți antrena?</div>';
-    html+='<div class="wiz-row">'+wizChoiceBtn('days','3','3 zile','Full Body ×3')+wizChoiceBtn('days','4','4 zile','Push/Legs/Pull/Full')+'</div>';
+    var eqDays=(window.ProgramGenerator&&ProgramGenerator.allowedDays)?ProgramGenerator.allowedDays(d.equipment):[2,3,4,5,6];
+    html+='<div style="display:flex;gap:5px;margin-bottom:8px">';
+    eqDays.forEach(function(c){
+      html+='<button class="dpl-day'+(parseInt(d.days)===c?' on':'')+'" style="flex:1" onclick="wizSet(\'days\',\'"+c+"\')">'+c+'</button>';
+    });
+    html+='</div>';
+    if(d.days){
+      html+='<div style="font-size:12px;color:var(--acc2);font-weight:600;margin-bottom:3px">'+(DP_SPLIT_NAME[d.days]||'')+'</div>';
+      html+='<div style="font-size:11px;color:var(--muted);line-height:1.5;margin-bottom:6px">'+(DP_SPLIT_NOTE[d.days]||'')+'</div>';
+    }
+    if(d.equipment==='bodyweight'){
+      html+='<div style="font-size:10.5px;color:var(--muted);margin-bottom:6px;line-height:1.45">ℹ️ Fără echipament, peste 4 zile ai repeta aceleași mișcări fără câștig real — de-asta lista se oprește la 4.</div>';
+    }
+    html+='<div style="font-size:11px;color:var(--muted);margin-bottom:10px;line-height:1.45">🗓️ <strong style="color:var(--text)">Care</strong> zile alegi se stabilește după, din Setări — și poți pune oricând o excepție temporară.</div>';
     html+='<div class="wiz-label">Obiectivul principal</div>';
     html+=wizChoiceBtn('goal','slabit','🔥 Slăbit','Vrei în primul rând să dai jos kilograme. Antrenamentul greu îți apără mușchii cât slăbești.');
     html+=wizChoiceBtn('goal','recomp','✨ Tonifiere / Recompoziție','Vrei să fii ferm(ă) și definit(ă): mai puțină grăsime + mușchi conturat. Alegerea potrivită pentru majoritatea. Fără grijă: antrenamentul greu nu te face masiv(ă) — asta ar cere ani de surplus caloric intenționat.');
