@@ -5,7 +5,7 @@ App personal devenit multi-user, în drum spre Google Play. Limba: **română on
 - **Live**: https://crstefan-lab.github.io/fitness-jurnal/ (GitHub Pages, repo `CRStefan-lab/fitness-jurnal`)
 - **Push pe `main` = deploy instant** — PWA-ul tuturor userilor se auto-actualizează (banner "Versiune nouă")
 
-## Stare curentă (august 2026, SW `fitness-v93`)
+## Stare curentă (septembrie 2026, SW `fitness-v94`)
 
 Aplicația e **feature-complete** ca "antrenor în buzunar", construită integral în sesiuni Claude Code:
 - Jurnal complet (seturi rep×kg, pre-fill, steppers, PR detection, edit/backdate, note per exercițiu)
@@ -18,6 +18,7 @@ Aplicația e **feature-complete** ca "antrenor în buzunar", construită integra
 - Personalizare: nume în header, 6 teme de accent (CSS vars `--acc-rgb`/`--acc2-rgb`, `html[data-theme]`, cheie `app_theme`), sex M/F în setări; Setări reorganizate în 7 grupuri pliabile (`.sgroup`), Zona periculoasă ultima
 - Design "Pro HUD" (v54-v55): Chakra Petch self-hostat în `fonts/` (4 woff2, precache în SW) pe titluri/cifre; pastile colorate statistici (`.azi-stat.as1-4`); toggle aspect întunecat/deschis (`html[data-mode="light"]`, cheie `app_mode`, `applyMode()`/`setMode()`, snippet pre-paint în head; pe light `--acc2` devine `--acc-dim` pt contrast); nav + gear cu SVG inline (stroke currentColor, nu emoji); micro-animații tab/carduri (`secIn`/`cardIn`, respectă prefers-reduced-motion); mockup-uri explorare în `design-preview.html` (gitignored)
 - Rest timer fundal (deadline-based) + beep + mod auto 90s/150s⭐
+- **Zile flexibile (v94)**: programul definește CE se face, planul de zile definește CÂND. `baseSchedule` = snapshot-ul programului (generat sau legacy) capturat la parse; `buildScheduleFor(days)` remapează sloturile de antrenament (zi cu ⭐ = `isTrainingExDay`) pe zilele alese, în ordine, și umple restul: prima zi liberă după un antrenament = recuperare activă, următoarele = mobilitate; `nutType` călătorește cu ziua (contează la legacy). Două straturi: `training_days` (permanent) și `training_days_temp` {days, until} — excepție care EXPIRĂ singură (`checkTempPlanExpired` la load + în `checkDayChanged`) și revine la permanent. UI: modal `openDayPlan()` (toggle 7 zile + contor N/N, segment Permanent/Temporar, durate 1săpt/2săpt/1lună/dată, previzualizarea săptămânii), intrări din Setări→Programul meu și din rândul „Antrenamente: ..." din tab Program, bannere ambră cu „Revino acum" în Azi+Program. Dacă numărul de zile salvate nu se potrivește cu programul (ex. după regenerare 4→3), se revine automat la `baseSchedule` fără pierdere de date. `initProgram` folosește acum `schedule[di].exDay` (înainte avea zilele hardcodate).
 - QoL v78-v85: „Sar azi" per exercițiu (rând `skip` cu motiv, card dashed ambră + Reia, ziua se încheie fără el; `skipData` în preload, vizibil în Istoric+export); Undo la set (toast 5s sus `#undoToast` cu bară countdown, restaurează rândul suprascris `prevRow`, variantă PR aurie); auto-backup zilnic rotativ 7 zile în IndexedDB `fitness-snapshots` (`maybeAutoSnapshot` la load, „Plasă de siguranță" în Setări→Backup cu Restaurează; snapshot-urile supraviețuiesc resetAll); calculator discuri la bară (`isBarbellEx`, `bar_weight` 20/15/10, greedy pe perechi); mini-istoric RIR 🥱💪😮‍💨 lângă ținta AZI
 - Volum pe mușchi/săptămână (v80-81, flagship): panou în Istoric sub sumar, 9 grupe (`VOLUME_GROUPS`, mușchi din EXERCISE_DB via exId→nume→heuristică, secundari ½ set după `PATTERN_SECONDARY`), bare cu banda 10–20 Pelland evidențiată + axă 0/10/20 + legendă + hint auto din cel mai mare gol (`volumeHint`); exportul AI folosește același motor (`buildVolumePerGroup`)
 - Progres: Calendar activitate (v83, heatmap GitHub 20 săpt., intensitate=tonaj în quartile proprii, tap→toast, streak curent+`getLongestStreak`) și Realizări (v84, 15 praguri sobre: deblocat teal+dată / bară progres, `buildAchievements`)
@@ -66,6 +67,7 @@ Aplicația e **feature-complete** ca "antrenor în buzunar", construită integra
 - `legacy_program`='1' = grandfathered · `program_cycle_start` = deload/cicluri · `manual_deload_until` = deload acceptat
 - Poze de progres: IndexedDB `fitness-photos` · FSA handle (desktop): IndexedDB `fitness-fsa` · Snapshot-uri auto (7 zile): IndexedDB `fitness-snapshots` (tot localStorage-ul, cheie = data ISO)
 - `bar_weight` = greutatea barei pt. calculatorul de discuri (20 implicit)
+- `training_days` = {days:[0..6]} zilele de antrenament alese (0=Luni) · `training_days_temp` = {days, until:'yyyy-mm-dd'} excepție temporară care expiră singură
 - Dedup: `addRow()` șterge rândul existent cu aceeași cheie (vezi `mergeRemote key()`)
 
 ## Arhitectura logică (în index.html)

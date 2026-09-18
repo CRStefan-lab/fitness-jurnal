@@ -223,6 +223,16 @@ body::after{content:'';position:fixed;inset:0;z-index:-1;pointer-events:none;opa
 .skip-reasons.show{display:flex;animation:cardIn .2s ease}
 .skip-pill{background:rgba(245,158,11,.08);border:1px solid rgba(245,158,11,.35);color:#fbbf24;border-radius:20px;font-size:11.5px;font-weight:700;padding:7px 12px;cursor:pointer;font-family:inherit}
 .skip-pill:active{background:rgba(245,158,11,.22)}
+/* Zilele mele de antrenament */
+.dpl-day{flex:1;background:var(--s2);border:2px solid var(--bd);border-radius:10px;color:var(--muted);font-family:'Chakra Petch','Segoe UI',Arial,sans-serif;font-weight:700;font-size:13px;padding:11px 0;cursor:pointer}
+.dpl-day.on{background:rgba(var(--acc-rgb),.14);border-color:var(--acc);color:var(--acc2);box-shadow:0 0 12px rgba(var(--acc-rgb),.25)}
+.dpl-seg{display:flex;gap:6px}
+.dpl-seg button{flex:1;background:var(--s2);border:1px solid var(--bd);border-radius:10px;color:var(--muted);font-family:inherit;font-weight:700;font-size:12.5px;padding:10px 0;cursor:pointer}
+.dpl-seg button.act{background:rgba(var(--acc-rgb),.12);border-color:var(--acc);color:var(--acc2)}
+.dpl-pill{background:var(--s2);border:1px solid var(--bd);border-radius:20px;color:var(--muted);font-family:inherit;font-weight:600;font-size:11.5px;padding:7px 12px;cursor:pointer}
+.dpl-pill.on{background:rgba(var(--acc-rgb),.12);border-color:var(--acc);color:var(--acc2)}
+.temp-banner{display:flex;align-items:center;gap:8px;background:linear-gradient(120deg,rgba(245,158,11,.12),rgba(245,158,11,.03));border:1px solid rgba(245,158,11,.4);border-radius:10px;padding:8px 11px;margin-bottom:12px;font-size:11.5px;color:#fbbf24;line-height:1.45}
+.temp-banner button{background:rgba(245,158,11,.15);border:1px solid rgba(245,158,11,.5);color:#fbbf24;border-radius:7px;font-size:10.5px;font-weight:700;padding:5px 9px;cursor:pointer;font-family:inherit;flex-shrink:0}
 /* 3.1 — Ierarhia dramatică în Azi: eroul = primul exercițiu incomplet */
 .card.card-hero,.card.card-hero.open{position:relative;border-color:rgba(var(--acc-rgb),.65);background:linear-gradient(165deg,rgba(var(--acc-rgb),.09),rgba(var(--acc-rgb),.02) 45%,var(--s1) 80%);box-shadow:0 0 28px rgba(var(--acc-rgb),.18),0 12px 30px rgba(0,0,0,.35)}
 .card.card-hero::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--acc),var(--acc2))}
@@ -978,7 +988,10 @@ input:checked + .slider:before{transform:translateX(20px);background:var(--acc)}
     <div class="sgroup-bd">
       <div class="rules-box" style="margin:12px 0 10px">
         <div class="rule-row" id="myProgramInfo">—</div>
+        <div class="rule-row" id="myDaysInfo">—</div>
       </div>
+      <button class="btn btn-acc" onclick="openDayPlan()">🗓️ Schimbă zilele de antrenament</button>
+      <p style="font-size:11px;color:var(--muted);margin:-4px 0 10px;line-height:1.45">Nu poți lunea? Mută antrenamentele pe orice zile — sau pune o excepție temporară (o săptămână, o lună) după care revii singur la program.</p>
       <button class="btn btn-ghost" onclick="openWizard(true)" id="myProgramBtn">🔄 Reia wizard-ul (modifică programul)</button>
       <p style="font-size:11px;color:var(--muted);margin-bottom:2px;line-height:1.4">
         Istoricul și PR-urile tale rămân intacte la regenerare — se schimbă doar planul de exerciții/nutriție.
@@ -1318,6 +1331,17 @@ input:checked + .slider:before{transform:translateX(20px);background:var(--acc)}
   <button class="rest-timer-btn" onclick="stopRestTimer()">✕</button>
 </div>
 
+<div class="modal" id="dayPlanModal" onclick="if(event.target===this)closeDayPlan()">
+  <div class="modal-content" style="max-height:88vh;overflow-y:auto">
+    <div class="modal-ttl">🗓️ Zilele mele de antrenament</div>
+    <div class="modal-sub">Muți programul pe zilele care ți se potrivesc — conținutul rămâne neschimbat</div>
+    <div id="dayPlanBody" style="margin-top:12px"></div>
+    <button class="btn btn-acc" style="margin-top:14px" id="dayPlanSave" onclick="saveDayPlan()">📌 Salvează zilele</button>
+    <button class="btn btn-ghost" id="dayPlanRevert" style="display:none;margin-bottom:8px" onclick="revertTempPlan()">↩ Revino la programul obișnuit</button>
+    <button class="btn btn-ghost" style="margin-bottom:0" onclick="closeDayPlan()">Închide</button>
+  </div>
+</div>
+
 <div class="toast" id="toast"></div>
 
 <div class="undo-toast" id="undoToast">
@@ -1537,6 +1561,233 @@ function getSwaps(){try{return JSON.parse(localStorage.getItem('exercise_swaps')
 })();
 
 // ═══════════════════════════════════════════════════════════════
+// ZILELE MELE DE ANTRENAMENT — remapare peste programul generat
+// Programul definește CE se face (push/picioare/pull/full + recovery);
+// planul de zile definește CÂND. Schema de bază rămâne intactă, așa că
+// se poate reveni oricând. Două straturi:
+//   training_days      = alegerea permanentă {days:[0..6]}  (0=Luni)
+//   training_days_temp = excepție cu expirare {days, until:'yyyy-mm-dd'}
+// ═══════════════════════════════════════════════════════════════
+var baseSchedule=schedule.map(function(s){return {day:s.day,nutType:s.nutType,exDay:s.exDay};});
+var DP_DAY_NAMES=['LUNI','MARȚI','MIERCURI','JOI','VINERI','SÂMBĂTĂ','DUMINICĂ'];
+var DP_SHORT=['L','Ma','Mi','J','V','S','D'];
+var DP_LONG=['Luni','Marți','Miercuri','Joi','Vineri','Sâmbătă','Duminică'];
+
+// Zi de antrenament = are cel puțin un exercițiu ⭐ (recovery/mobilitate nu au)
+function isTrainingExDay(exDay){
+  var d=exercises[exDay];
+  if(!d||!d.list||!d.list.length)return false;
+  for(var i=0;i<d.list.length;i++){if(d.list[i].star)return true;}
+  return false;
+}
+function baseWorkSlots(){
+  return baseSchedule.filter(function(s){return isTrainingExDay(s.exDay);});
+}
+function baseRestSlots(){
+  return baseSchedule.filter(function(s){return !isTrainingExDay(s.exDay);});
+}
+function baseTrainingDayIdx(){
+  var out=[];
+  baseSchedule.forEach(function(s,i){if(isTrainingExDay(s.exDay))out.push(i);});
+  return out;
+}
+function dayPlanCount(){return baseWorkSlots().length;}
+
+function getTempPlan(){
+  var t=null;
+  try{t=JSON.parse(localStorage.getItem('training_days_temp')||'null');}catch(e){}
+  if(t&&t.days&&t.days.length&&t.until&&todayISO()<=t.until)return t;
+  return null;
+}
+function getDayPlan(){
+  var t=getTempPlan();
+  if(t)return {days:t.days.slice(),temp:true,until:t.until};
+  var p=null;
+  try{p=JSON.parse(localStorage.getItem('training_days')||'null');}catch(e){}
+  if(p&&p.days&&p.days.length)return {days:p.days.slice(),temp:false,until:null};
+  return {days:baseTrainingDayIdx(),temp:false,until:null,isDefault:true};
+}
+// Expirarea excepției: o dată detectată, planul permanent revine singur
+function checkTempPlanExpired(){
+  var raw=null;
+  try{raw=JSON.parse(localStorage.getItem('training_days_temp')||'null');}catch(e){}
+  if(raw&&raw.until&&todayISO()>raw.until){
+    localStorage.removeItem('training_days_temp');
+    return true;
+  }
+  return false;
+}
+
+// Construiește cele 7 zile calendaristice pentru o alegere dată (fără efecte)
+function buildScheduleFor(days){
+  var work=baseWorkSlots(),rest=baseRestSlots();
+  if(!work.length)return baseSchedule.slice();
+  var chosen=(days||[]).slice().sort(function(a,b){return a-b;});
+  if(chosen.length!==work.length)return baseSchedule.slice();
+  var slotByDay={};
+  chosen.forEach(function(d,i){slotByDay[d]=work[i];});
+  var restLight=rest[0]||null;
+  var restLast=rest.length?rest[rest.length-1]:restLight;
+  var out=[];
+  for(var d=0;d<7;d++){
+    if(slotByDay[d]){
+      out.push({day:DP_DAY_NAMES[d],nutType:slotByDay[d].nutType,exDay:slotByDay[d].exDay});
+      continue;
+    }
+    // Prima zi liberă după un antrenament = recuperare activă; următoarele = mobilitate
+    var firstInGap=(d===0)||!!slotByDay[d-1];
+    var trainingLater=false;
+    for(var a=d+1;a<7;a++){if(slotByDay[a]){trainingLater=true;break;}}
+    var slot=(firstInGap&&trainingLater)?restLight:restLast;
+    if(!slot)slot=restLight||work[0];
+    out.push({day:DP_DAY_NAMES[d],nutType:slot.nutType,exDay:slot.exDay});
+  }
+  return out;
+}
+function applyDayPlan(){
+  schedule=buildScheduleFor(getDayPlan().days);
+}
+
+function dayPlanSummaryText(){
+  var plan=getDayPlan();
+  return plan.days.slice().sort(function(a,b){return a-b;}).map(function(d){return DP_LONG[d];}).join(' · ');
+}
+function dpUntilLabel(iso){
+  var d=parseRoDate(iso);
+  if(!d)return iso;
+  return DP_LONG[(d.getDay()+6)%7].toLowerCase()+', '+isoToRo(iso).slice(0,5);
+}
+
+// ── Modal „Zilele mele" ──
+var dayPlanState=null;
+function openDayPlan(){
+  var plan=getDayPlan();
+  var need=dayPlanCount();
+  var days=plan.days.slice();
+  if(days.length!==need)days=baseTrainingDayIdx();
+  dayPlanState={days:days,mode:plan.temp?'temp':'perm',dur:'1w',until:plan.until||''};
+  renderDayPlan();
+  document.getElementById('dayPlanModal').classList.add('show');
+}
+function closeDayPlan(){document.getElementById('dayPlanModal').classList.remove('show');}
+function dpToggle(d){
+  var i=dayPlanState.days.indexOf(d);
+  if(i>=0)dayPlanState.days.splice(i,1);
+  else dayPlanState.days.push(d);
+  renderDayPlan();
+}
+function dpSetMode(m){dayPlanState.mode=m;renderDayPlan();}
+function dpSetDur(v){dayPlanState.dur=v;renderDayPlan();}
+function dpSetDate(v){dayPlanState.until=v;renderDayPlan();}
+function dpComputeUntil(){
+  if(dayPlanState.dur==='date')return dayPlanState.until||'';
+  var add={'1w':6,'2w':13,'1m':29}[dayPlanState.dur];
+  var d=new Date();d.setDate(d.getDate()+add);
+  return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+}
+function renderDayPlan(){
+  var need=dayPlanCount();
+  var sel=dayPlanState.days.slice().sort(function(a,b){return a-b;});
+  var ok=sel.length===need;
+  var CH="font-family:'Chakra Petch','Segoe UI',Arial,sans-serif";
+  var h='';
+  h+='<div style="font-size:12px;color:var(--muted);line-height:1.55;margin-bottom:12px">Programul tău are <strong style="color:var(--acc2)">'+need+' zile</strong> de antrenament. Alege în ce zile le faci — restul devin automat recuperare și mobilitate.</div>';
+  h+='<div style="display:flex;gap:5px;margin-bottom:6px">';
+  for(var d=0;d<7;d++){
+    var on=sel.indexOf(d)>=0;
+    h+='<button class="dpl-day'+(on?' on':'')+'" onclick="dpToggle('+d+')">'+DP_SHORT[d]+'</button>';
+  }
+  h+='</div>';
+  var missing=need-sel.length;
+  var statusTxt=ok?'✓ '+need+'/'+need+' ZILE ALESE':(missing>0?sel.length+'/'+need+' — mai alege '+missing:sel.length+'/'+need+' — deselectează '+(-missing));
+  h+='<div style="font-size:11px;'+CH+';letter-spacing:1px;color:'+(ok?'var(--green)':'#fbbf24')+';margin-bottom:14px">'+statusTxt+'</div>';
+  h+='<div class="dpl-seg">';
+  h+='<button class="'+(dayPlanState.mode==='perm'?'act':'')+'" onclick="dpSetMode(\'perm\')">📌 Permanent</button>';
+  h+='<button class="'+(dayPlanState.mode==='temp'?'act':'')+'" onclick="dpSetMode(\'temp\')">⏳ Temporar</button>';
+  h+='</div>';
+  if(dayPlanState.mode==='temp'){
+    h+='<div style="font-size:11.5px;color:var(--muted);margin:10px 0 7px;line-height:1.5">Cât ține excepția? După, revii automat la programul obișnuit.</div>';
+    h+='<div style="display:flex;gap:6px;flex-wrap:wrap">';
+    [['1w','1 săptămână'],['2w','2 săptămâni'],['1m','1 lună'],['date','Până la o dată']].forEach(function(o){
+      h+='<button class="dpl-pill'+(dayPlanState.dur===o[0]?' on':'')+'" onclick="dpSetDur(\''+o[0]+'\')">'+o[1]+'</button>';
+    });
+    h+='</div>';
+    if(dayPlanState.dur==='date'){
+      h+='<input type="date" class="time-input" style="width:100%;margin-top:9px" value="'+(dayPlanState.until||'')+'" onchange="dpSetDate(this.value)">';
+    }
+    var u=dpComputeUntil();
+    if(u)h+='<div style="font-size:11px;color:var(--acc2);margin-top:9px">⏳ Activ până '+dpUntilLabel(u)+' inclusiv</div>';
+  }else{
+    h+='<div style="font-size:11.5px;color:var(--muted);margin:10px 0 0;line-height:1.5">Devine programul tău obișnuit. Îl poți schimba oricând de aici.</div>';
+  }
+  if(ok){
+    var prev=buildScheduleFor(sel);
+    h+='<div style="font-size:10px;'+CH+';letter-spacing:2px;color:var(--muted);margin:16px 0 7px">CUM ARATĂ SĂPTĂMÂNA</div>';
+    h+='<div style="border:1px solid var(--bd);border-radius:12px;overflow:hidden">';
+    prev.forEach(function(s,i){
+      var exd=exercises[s.exDay]||{label:'—',icon:'·'};
+      var isW=isTrainingExDay(s.exDay);
+      h+='<div style="display:flex;align-items:center;gap:9px;padding:7px 11px;font-size:12px;'+(i<6?'border-bottom:1px solid var(--bd);':'')+(isW?'background:rgba(var(--acc-rgb),.06)':'opacity:.6')+'">';
+      h+='<div style="width:26px;'+CH+';font-weight:700;color:'+(isW?'var(--acc2)':'var(--muted)')+'">'+DP_SHORT[i]+'</div>';
+      h+='<div style="flex-shrink:0">'+exd.icon+'</div>';
+      h+='<div style="flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:'+(isW?'var(--text)':'var(--muted)')+'">'+exd.label+'</div>';
+      if(isW)h+='<div style="font-size:8.5px;letter-spacing:1.2px;'+CH+';font-weight:700;color:var(--acc2);flex-shrink:0">ANTRENAMENT</div>';
+      h+='</div>';
+    });
+    h+='</div>';
+  }
+  document.getElementById('dayPlanBody').innerHTML=h;
+  var btn=document.getElementById('dayPlanSave');
+  btn.disabled=!ok;
+  btn.style.opacity=ok?'1':'.45';
+  btn.textContent=dayPlanState.mode==='temp'?'⏳ Aplică temporar':'📌 Salvează zilele';
+  var rb=document.getElementById('dayPlanRevert');
+  if(rb)rb.style.display=getTempPlan()?'block':'none';
+}
+function saveDayPlan(){
+  var need=dayPlanCount();
+  var sel=dayPlanState.days.slice().sort(function(a,b){return a-b;});
+  if(sel.length!==need)return;
+  if(dayPlanState.mode==='temp'){
+    var until=dpComputeUntil();
+    if(!until){showToast('Alege data până la care ține excepția','var(--acc2)');return;}
+    localStorage.setItem('training_days_temp',JSON.stringify({days:sel,until:until,ts:Date.now()}));
+    showToast('⏳ Program temporar activ până '+dpUntilLabel(until));
+  }else{
+    localStorage.setItem('training_days',JSON.stringify({days:sel,ts:Date.now()}));
+    localStorage.removeItem('training_days_temp');
+    showToast('📌 Zile salvate: '+sel.map(function(d){return DP_LONG[d];}).join(' · '),'var(--green)');
+  }
+  closeDayPlan();
+  refreshAfterDayPlan();
+}
+function revertTempPlan(){
+  localStorage.removeItem('training_days_temp');
+  closeDayPlan();
+  refreshAfterDayPlan();
+  showToast('↩ Ai revenit la programul obișnuit');
+}
+function refreshAfterDayPlan(){
+  applyDayPlan();
+  currentWorkoutDay=null;currentWorkoutDate=null;
+  currentNutDay=todayIdx();
+  preloadToday();
+  initHeader();
+  renderToday();
+  initNutritie();
+  initProgram();
+  renderMyDaysRow();
+}
+function renderMyDaysRow(){
+  var el=document.getElementById('myDaysInfo');
+  if(!el)return;
+  var t=getTempPlan();
+  el.innerHTML='🗓️ <strong style="color:var(--text)">'+dayPlanSummaryText()+'</strong>'+
+    (t?' · <span style="color:#fbbf24">temporar, până '+dpUntilLabel(t.until)+'</span>':'');
+}
+(function(){try{applyDayPlan();}catch(e){console.error('applyDayPlan failed',e);}})();
+
+// ═══════════════════════════════════════════════════════════════
 // STORAGE
 // ═══════════════════════════════════════════════════════════════
 var STORAGE_KEY='fitness_jurnal_v1';
@@ -1729,6 +1980,12 @@ function checkDayChanged(){
     initNutritie();
     showToast('Zi nouă: '+schedule[now].day+' 🌅');
   }
+  // Excepția temporară expiră singură → revenim la programul obișnuit
+  if(checkTempPlanExpired()){
+    applyDayPlan();
+    preloadToday();initHeader();renderToday();initNutritie();
+    showToast('↩ Programul temporar s-a încheiat — ai revenit la zilele obișnuite','var(--acc2)');
+  }
   lastDetectedDay=now;
 }
 function todayISO(){
@@ -1791,6 +2048,7 @@ function showTab(name,btn){
     var ps=document.getElementById('profileSex');if(ps)ps.value=p.sex||'M';
     renderThemeRow();
     renderModeRow();
+    renderMyDaysRow();
     // Programul meu
     var mpi=document.getElementById('myProgramInfo');
     if(mpi){
@@ -1888,6 +2146,10 @@ function renderToday(){
     html+='<button class="dp-btn '+cls.join(' ')+'" onclick="setWorkoutDay('+di+')" title="'+schedule[di].day+'">'+dayShort[di]+'</button>';
   }
   html+='</div></div>';
+  var tpAzi=getTempPlan();
+  if(tpAzi){
+    html+='<div class="temp-banner"><span style="flex:1">⏳ <strong>Program temporar</strong> până '+dpUntilLabel(tpAzi.until)+'</span><button onclick="revertTempPlan()">↩ Revino</button></div>';
+  }
   if(dateOverride || dayOverride){
     html+='<div class="override-banner">⚠️ Înregistrezi: ';
     if(dateOverride){
@@ -3685,13 +3947,23 @@ function initProgram(){
   }
   html+='</div>';
 
+  // Zilele alese + excepția temporară (dacă e activă)
+  var _tp=getTempPlan();
+  if(_tp){
+    html+='<div class="temp-banner"><span style="flex:1">⏳ <strong>Program temporar</strong> — zilele mutate până '+dpUntilLabel(_tp.until)+'. După, revii automat.</span><button onclick="revertTempPlan()">↩ Revino acum</button></div>';
+  }
+  html+='<div style="display:flex;align-items:center;gap:9px;background:var(--s1);border:1px solid var(--bd);border-radius:12px;padding:9px 12px;margin-bottom:10px;font-size:11.5px">';
+  html+='<span style="flex:1;min-width:0;color:var(--muted)">🗓️ Antrenamente: <strong style="color:var(--text)">'+dayPlanSummaryText()+'</strong></span>';
+  html+='<button onclick="openDayPlan()" style="background:rgba(var(--acc-rgb),.1);border:1px solid rgba(var(--acc-rgb),.4);color:var(--acc2);border-radius:8px;font-size:10.5px;font-weight:700;padding:6px 10px;cursor:pointer;font-family:inherit;flex-shrink:0">Schimbă</button>';
+  html+='</div>';
+
   // 7 zile cu status
   html+='<div class="stitle">📋 Zilele săptămânii</div>';
   var dayLabels=['LUNI','MARȚI','MIERCURI','JOI','VINERI','SÂMBĂTĂ','DUMINICĂ'];
-  var dayKeys=['luni','marti','miercuri','joi','vineri','sambata','sambata'];
+  // zilele vin din schedule (respectă planul de zile al userului)
 
   for(var di=0;di<7;di++){
-    var dk=dayKeys[di];
+    var dk=schedule[di].exDay;
     var ex=exercises[dk];
     var dayLabel=dayLabels[di];
     var isToday=di===realDay;
@@ -7481,6 +7753,7 @@ function renderWizard(){
         var isRec=day.label.toLowerCase().indexOf('recovery')>=0;
         html+='<div class="wiz-preview-stat"><span>'+DAY_N[i]+'</span><span style="color:'+(isRec?'var(--muted)':'var(--acc2)')+';font-weight:700">'+day.icon+' '+day.label+'</span></div>';
       });
+      html+='<p style="font-size:11px;color:var(--muted);margin:6px 0 0;line-height:1.45">🗓️ Nu-ți convin zilele? Le muți oricând din <strong style="color:var(--text)">Setări → Programul meu</strong> (sau temporar, pe o perioadă).</p>';
       html+='<div class="wiz-label">Nutriția ta</div>';
       html+='<div class="wiz-preview-stat"><span>Calorii/zi</span><strong style="color:var(--acc)">'+n.kcal+' kcal</strong></div>';
       html+='<div class="wiz-preview-stat"><span>Proteine · Carbo · Grăsimi</span><strong>'+n.protein+'g · '+n.carbs+'g · '+n.fat+'g</strong></div>';
@@ -7699,6 +7972,7 @@ function manualUpdateCheck(){
 window.addEventListener('load',function(){
   applyMode(localStorage.getItem('app_mode')||''); // sincronizează meta theme-color cu aspectul salvat
   applyMorningSwaps(); // înlocuirile de dimineață, peste rutina activă
+  if(checkTempPlanExpired())applyDayPlan(); // excepția de zile a expirat cât app-ul era închis
   initHeader();
   currentNutDay=todayIdx();
   lastDetectedDay=todayIdx();
