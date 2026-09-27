@@ -919,12 +919,12 @@ html[data-mode="light"] .wiz-choice.sel,html[data-mode="light"] .mode-btn.sel,ht
 </div>
 
 <div class="install-hint" id="backupOverdueBanner" style="background:rgba(244,63,94,.12);border-color:rgba(244,63,94,.5);color:#f87a8c">
-  <button onclick="dismissBackupBanner()" style="background:none;border:none;color:var(--muted);float:right;cursor:pointer;font-size:18px;margin-top:-4px">×</button>
+  <button onclick="dismissBackupBanner()" aria-label="Închide" style="background:none;border:none;color:var(--muted);float:right;cursor:pointer;font-size:18px;margin-top:-4px">×</button>
   ⚠️ <strong>Backup vechi</strong> — <span id="backupOverdueDays">n-ai salvat de mult</span>. <button onclick="shareBackup()" style="color:#f87a8c;font-weight:800;text-decoration:underline;background:none;border:none;cursor:pointer;padding:0 4px">💾 Backup acum →</button>
 </div>
 
 <div class="install-hint" id="measOverdueBanner" style="background:rgba(56,189,248,.1);border-color:rgba(56,189,248,.4);color:#7cc6f0">
-  <button onclick="dismissMeasBanner()" style="background:none;border:none;color:var(--muted);float:right;cursor:pointer;font-size:18px;margin-top:-4px">×</button>
+  <button onclick="dismissMeasBanner()" aria-label="Închide" style="background:none;border:none;color:var(--muted);float:right;cursor:pointer;font-size:18px;margin-top:-4px">×</button>
   📏 <strong>Măsoară-te</strong> — <span id="measOverdueDays"></span> pentru a urmări recomp-ul. <button onclick="goMeasure()" style="color:#7cc6f0;font-weight:800;text-decoration:underline;background:none;border:none;cursor:pointer;padding:0 4px">📏 Acum →</button>
 </div>
 
@@ -951,7 +951,7 @@ html[data-mode="light"] .wiz-choice.sel,html[data-mode="light"] .mode-btn.sel,ht
     <div class="card-hd" onclick="document.getElementById('nutScienceCard').classList.toggle('open')">
       <div class="card-ico" style="color:var(--purple)"><svg viewBox="0 0 24 24"><path d="M9 3h6M10 3v6.5L4.5 19a1.5 1.5 0 0 0 1.3 2.2h12.4a1.5 1.5 0 0 0 1.3-2.2L14 9.5V3"/><path d="M7 15h10"/></svg></div>
       <div style="flex:1"><div class="card-ttl">Știința din spatele țintelor</div><div class="card-sub">proteine · grăsimi · carbo · deficit · timing</div></div>
-      <div class="card-chev">▼</div>
+      <div class="card-chev" aria-hidden="true">▼</div>
     </div>
     <div class="card-bd"><div style="padding-top:10px;font-size:12px;line-height:1.65;color:var(--text)">
       <p style="margin-bottom:10px"><strong style="color:#f87171">🥩 Proteine (1.8-2.2 g/kg corp)</strong><br>
@@ -972,7 +972,7 @@ html[data-mode="light"] .wiz-choice.sel,html[data-mode="light"] .mode-btn.sel,ht
   <div id="nutVariationWrap">
   <div class="stitle">Variație săptămânală (1 zi/săpt)</div>
   <div class="meal-card" style="border-color:rgba(56,189,248,.35)">
-    <div class="meal-hd" onclick="this.parentElement.classList.toggle('open')"><div><div class="meal-nm">🐟 Somon + quinoa (în loc de Masa 3)</div><div class="meal-tm">Orice zi PUI sau TON · 1x/săpt</div></div><div style="text-align:right"><div class="meal-kc" style="color:#38bdf8">~700 kcal</div><div class="meal-pr">~45g proteine · Omega 3</div></div><span class="meal-chev">▼</span></div>
+    <div class="meal-hd" onclick="this.parentElement.classList.toggle('open')"><div><div class="meal-nm">🐟 Somon + quinoa (în loc de Masa 3)</div><div class="meal-tm">Orice zi PUI sau TON · 1x/săpt</div></div><div style="text-align:right"><div class="meal-kc" style="color:#38bdf8">~700 kcal</div><div class="meal-pr">~45g proteine · Omega 3</div></div><span class="meal-chev" aria-hidden="true">▼</span></div>
     <div class="meal-items">
       <div class="item-row"><div><div class="item-nm">Somon (file, raw)</div><div class="item-am">200g</div></div><div class="item-kc">420 kcal</div></div>
       <div class="item-row"><div><div class="item-nm">Quinoa (raw)</div><div class="item-am">80g</div></div><div class="item-kc">300 kcal</div></div>
@@ -1003,11 +1003,11 @@ html[data-mode="light"] .wiz-choice.sel,html[data-mode="light"] .mode-btn.sel,ht
     <div class="sgroup-hd" onclick="this.parentElement.classList.toggle('open');pgRerender('pgExercitii')">
       <div class="sgroup-ico"><svg viewBox="0 0 24 24"><path d="M6.5 6.5v11M17.5 6.5v11M3 9.5v5M21 9.5v5M6.5 12h11"/></svg></div>
       <div style="flex:1;min-width:0"><div class="sgroup-ttl">Progres exerciții</div><div class="sgroup-sub">Evoluție kg / volum + recorduri personale</div></div>
-      <div class="sgroup-chev">▼</div>
+      <div class="sgroup-chev" aria-hidden="true">▼</div>
     </div>
     <div class="sgroup-bd">
       <div style="height:12px"></div>
-      <select class="select-box" id="exerSelect">
+      <select class="select-box" id="exerSelect" aria-label="Alege exercițiul">
         <option value="">— Alege exercițiu —</option>
       </select>
       <div class="seg" id="exerMetricSeg">
@@ -1034,7 +1034,7 @@ html[data-mode="light"] .wiz-choice.sel,html[data-mode="light"] .mode-btn.sel,ht
     <div class="sgroup-hd" onclick="this.parentElement.classList.toggle('open');pgRerender('pgCalendar')">
       <div class="sgroup-ico"><svg viewBox="0 0 24 24"><rect x="3.5" y="5" width="17" height="15" rx="2.5"/><path d="M3.5 10h17M8 3v4M16 3v4"/></svg></div>
       <div style="flex:1;min-width:0"><div class="sgroup-ttl">Calendar activitate</div><div class="sgroup-sub">20 săptămâni · intensitatea = tonajul zilei</div></div>
-      <div class="sgroup-chev">▼</div>
+      <div class="sgroup-chev" aria-hidden="true">▼</div>
     </div>
     <div class="sgroup-bd">
       <div id="heatmapWrap" style="padding-top:12px"></div>
@@ -1045,7 +1045,7 @@ html[data-mode="light"] .wiz-choice.sel,html[data-mode="light"] .mode-btn.sel,ht
     <div class="sgroup-hd" onclick="this.parentElement.classList.toggle('open');pgRerender('pgRealizari')">
       <div class="sgroup-ico"><svg viewBox="0 0 24 24"><circle cx="12" cy="14.5" r="5.5"/><path d="M8.5 3l3.5 6 3.5-6"/></svg></div>
       <div style="flex:1;min-width:0"><div class="sgroup-ttl">Realizări</div><div class="sgroup-sub" id="pgAchSub">Praguri atinse pe drum</div></div>
-      <div class="sgroup-chev">▼</div>
+      <div class="sgroup-chev" aria-hidden="true">▼</div>
     </div>
     <div class="sgroup-bd">
       <div id="achWrap" style="padding-top:6px"></div>
@@ -1056,7 +1056,7 @@ html[data-mode="light"] .wiz-choice.sel,html[data-mode="light"] .mode-btn.sel,ht
     <div class="sgroup-hd" onclick="this.parentElement.classList.toggle('open');pgRerender('pgMasuratori')">
       <div class="sgroup-ico"><svg viewBox="0 0 24 24"><rect x="2.5" y="8" width="19" height="8" rx="2"/><path d="M7 8v3M11 8v4M15 8v3M19 8v2"/></svg></div>
       <div style="flex:1;min-width:0"><div class="sgroup-ttl">Măsurători corp</div><div class="sgroup-sub" id="pgMasSub">Adaugă + istoric cu BF% estimat</div></div>
-      <div class="sgroup-chev">▼</div>
+      <div class="sgroup-chev" aria-hidden="true">▼</div>
     </div>
     <div class="sgroup-bd">
       <div style="height:12px"></div>
@@ -1067,45 +1067,45 @@ html[data-mode="light"] .wiz-choice.sel,html[data-mode="light"] .mode-btn.sel,ht
       <div class="date-drawer" id="measFormWrap">
       <div class="meas-date">
         <div class="meas-lbl">DATA</div>
-        <input class="meas-in" type="date" id="measDate">
+        <input class="meas-in" type="date" id="measDate" aria-label="Data măsurătorii">
       </div>
       <div class="meas-grid">
         <div class="meas-field">
           <div class="meas-lbl">⚖️ Greutate</div>
-          <div class="meas-input-row"><input class="meas-in" type="number" step="0.1" inputmode="decimal" id="mWeight" placeholder="kg"><span class="meas-unit">kg</span></div>
+          <div class="meas-input-row"><input class="meas-in" type="number" step="0.1" inputmode="decimal" id="mWeight" aria-label="Greutate în kg" placeholder="kg"><span class="meas-unit">kg</span></div>
         </div>
         <div class="meas-field">
           <div class="meas-lbl">Talie</div>
-          <div class="meas-input-row"><input class="meas-in" type="number" step="0.5" inputmode="decimal" id="mWaist" placeholder="cm"><span class="meas-unit">cm</span></div>
+          <div class="meas-input-row"><input class="meas-in" type="number" step="0.5" inputmode="decimal" id="mWaist" aria-label="Talie în cm" placeholder="cm"><span class="meas-unit">cm</span></div>
         </div>
         <div class="meas-field">
           <div class="meas-lbl">Piept</div>
-          <div class="meas-input-row"><input class="meas-in" type="number" step="0.5" inputmode="decimal" id="mChest" placeholder="cm"><span class="meas-unit">cm</span></div>
+          <div class="meas-input-row"><input class="meas-in" type="number" step="0.5" inputmode="decimal" id="mChest" aria-label="Piept în cm" placeholder="cm"><span class="meas-unit">cm</span></div>
         </div>
         <div class="meas-field">
           <div class="meas-lbl">Braț (contractat)</div>
-          <div class="meas-input-row"><input class="meas-in" type="number" step="0.5" inputmode="decimal" id="mBiceps" placeholder="cm"><span class="meas-unit">cm</span></div>
+          <div class="meas-input-row"><input class="meas-in" type="number" step="0.5" inputmode="decimal" id="mBiceps" aria-label="Braț în cm" placeholder="cm"><span class="meas-unit">cm</span></div>
         </div>
         <div class="meas-field">
           <div class="meas-lbl">Coapsă</div>
-          <div class="meas-input-row"><input class="meas-in" type="number" step="0.5" inputmode="decimal" id="mThigh" placeholder="cm"><span class="meas-unit">cm</span></div>
+          <div class="meas-input-row"><input class="meas-in" type="number" step="0.5" inputmode="decimal" id="mThigh" aria-label="Coapsă în cm" placeholder="cm"><span class="meas-unit">cm</span></div>
         </div>
         <div class="meas-field">
           <div class="meas-lbl">Șolduri</div>
-          <div class="meas-input-row"><input class="meas-in" type="number" step="0.5" inputmode="decimal" id="mHip" placeholder="cm"><span class="meas-unit">cm</span></div>
+          <div class="meas-input-row"><input class="meas-in" type="number" step="0.5" inputmode="decimal" id="mHip" aria-label="Șolduri în cm" placeholder="cm"><span class="meas-unit">cm</span></div>
         </div>
         <div class="meas-field">
           <div class="meas-lbl">Gât</div>
-          <div class="meas-input-row"><input class="meas-in" type="number" step="0.5" inputmode="decimal" id="mNeck" placeholder="cm"><span class="meas-unit">cm</span></div>
+          <div class="meas-input-row"><input class="meas-in" type="number" step="0.5" inputmode="decimal" id="mNeck" aria-label="Gât în cm" placeholder="cm"><span class="meas-unit">cm</span></div>
         </div>
         <div class="meas-field">
           <div class="meas-lbl">Gambă</div>
-          <div class="meas-input-row"><input class="meas-in" type="number" step="0.5" inputmode="decimal" id="mCalf" placeholder="cm"><span class="meas-unit">cm</span></div>
+          <div class="meas-input-row"><input class="meas-in" type="number" step="0.5" inputmode="decimal" id="mCalf" aria-label="Gambă în cm" placeholder="cm"><span class="meas-unit">cm</span></div>
         </div>
       </div>
       <div class="meas-field" style="margin-bottom:10px">
         <div class="meas-lbl">Notă (opțional)</div>
-        <input class="meas-in" type="text" id="mNote" placeholder="ex: după antrenament, dimineața, etc.">
+        <input class="meas-in" type="text" id="mNote" aria-label="Notă la măsurătoare" placeholder="ex: după antrenament, dimineața, etc.">
       </div>
       <button class="btn btn-acc" onclick="saveMeasurement()">💾 Salvează măsurătorile</button>
       </div>
@@ -1117,7 +1117,7 @@ html[data-mode="light"] .wiz-choice.sel,html[data-mode="light"] .mode-btn.sel,ht
     <div class="sgroup-hd" onclick="this.parentElement.classList.toggle('open');pgRerender('pgCorp')">
       <div class="sgroup-ico"><svg viewBox="0 0 24 24"><path d="M5 20v-8M12 20V5M19 20v-5M3 20h18"/></svg></div>
       <div style="flex:1;min-width:0"><div class="sgroup-ttl">Grafice corp</div><div class="sgroup-sub">Greutate, talie, BF% + verdictul recomp</div></div>
-      <div class="sgroup-chev">▼</div>
+      <div class="sgroup-chev" aria-hidden="true">▼</div>
     </div>
     <div class="sgroup-bd">
       <div style="height:12px"></div>
@@ -1148,7 +1148,7 @@ html[data-mode="light"] .wiz-choice.sel,html[data-mode="light"] .mode-btn.sel,ht
     <div class="sgroup-hd" onclick="this.parentElement.classList.toggle('open');pgRerender('pgPoze')">
       <div class="sgroup-ico"><svg viewBox="0 0 24 24"><path d="M4 8h3l2-3h6l2 3h3v11H4z"/><circle cx="12" cy="13" r="3.5"/></svg></div>
       <div style="flex:1;min-width:0"><div class="sgroup-ttl">Poze de progres</div><div class="sgroup-sub">Compară în timp — stocate doar pe telefonul tău</div></div>
-      <div class="sgroup-chev">▼</div>
+      <div class="sgroup-chev" aria-hidden="true">▼</div>
     </div>
     <div class="sgroup-bd">
       <p style="font-size:11px;color:var(--muted);margin:12px 0 8px;line-height:1.4">
@@ -1208,29 +1208,29 @@ html[data-mode="light"] .wiz-choice.sel,html[data-mode="light"] .mode-btn.sel,ht
 
 <div id="tab-setari" class="sec">
   <div class="stitle">Setări</div>
-  <input class="meas-in" type="search" id="setariSearch" placeholder="🔍 Caută în setări (timer, temă, backup...)" autocomplete="off" oninput="filterSetari(this.value)" style="font-size:14px;padding:10px 12px;margin-bottom:10px;border-radius:10px">
+  <input class="meas-in" type="search" id="setariSearch" aria-label="Caută în setări" placeholder="🔍 Caută în setări (timer, temă, backup...)" autocomplete="off" oninput="filterSetari(this.value)" style="font-size:14px;padding:10px 12px;margin-bottom:10px;border-radius:10px">
   <div id="setariNoResults" style="display:none;font-size:12px;color:var(--muted);text-align:center;padding:14px">Nimic găsit — încearcă alt cuvânt (ex: notificări, sunet, nume, șterge)</div>
 
   <div class="sgroup open" id="sgProfil">
     <div class="sgroup-hd" onclick="this.parentElement.classList.toggle('open')">
       <div class="sgroup-ico"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21c1.5-4 4.5-6 8-6s6.5 2 8 6"/></svg></div>
       <div style="flex:1;min-width:0"><div class="sgroup-ttl">Profil & personalizare</div><div class="sgroup-sub">Nume, corp, temă de culoare</div></div>
-      <div class="sgroup-chev">▼</div>
+      <div class="sgroup-chev" aria-hidden="true">▼</div>
     </div>
     <div class="sgroup-bd">
       <div class="stitle">Numele tău</div>
-      <input class="meas-in" type="text" id="profileName" placeholder="ex: Robert" maxlength="20" autocomplete="off" onchange="saveProfile()" style="font-size:15px;padding:9px 10px">
+      <input class="meas-in" type="text" id="profileName" aria-label="Numele tău" placeholder="ex: Robert" maxlength="20" autocomplete="off" onchange="saveProfile()" style="font-size:15px;padding:9px 10px">
       <p style="font-size:11px;color:var(--muted);margin:6px 0 0">Apare în header — jurnalul tău, cu numele tău.</p>
 
       <div class="stitle">Corp</div>
       <div class="meas-grid">
         <div class="meas-field">
           <div class="meas-lbl">Înălțime</div>
-          <div class="meas-input-row"><input class="meas-in" type="number" id="profileHeight" placeholder="cm" onchange="saveProfile()"><span class="meas-unit">cm</span></div>
+          <div class="meas-input-row"><input class="meas-in" type="number" id="profileHeight" aria-label="Înălțime în cm" placeholder="cm" onchange="saveProfile()"><span class="meas-unit">cm</span></div>
         </div>
         <div class="meas-field">
           <div class="meas-lbl">Vârstă</div>
-          <div class="meas-input-row"><input class="meas-in" type="number" id="profileAge" placeholder="ani" onchange="saveProfile()"><span class="meas-unit">ani</span></div>
+          <div class="meas-input-row"><input class="meas-in" type="number" id="profileAge" aria-label="Vârstă" placeholder="ani" onchange="saveProfile()"><span class="meas-unit">ani</span></div>
         </div>
       </div>
       <div class="notif-row">
@@ -1238,7 +1238,7 @@ html[data-mode="light"] .wiz-choice.sel,html[data-mode="light"] .mode-btn.sel,ht
           <div class="notif-lbl">Sex</div>
           <div class="notif-sub">Pentru formula BF% Navy (diferă M/F)</div>
         </div>
-        <select id="profileSex" class="time-input" style="width:auto" onchange="saveProfile()">
+        <select id="profileSex" aria-label="Sex" class="time-input" style="width:auto" onchange="saveProfile()">
           <option value="M">Masculin</option>
           <option value="F">Feminin</option>
         </select>
@@ -1259,7 +1259,7 @@ html[data-mode="light"] .wiz-choice.sel,html[data-mode="light"] .mode-btn.sel,ht
     <div class="sgroup-hd" onclick="this.parentElement.classList.toggle('open')">
       <div class="sgroup-ico"><svg viewBox="0 0 24 24"><rect x="5" y="4" width="14" height="17" rx="2.5"/><path d="M9 4V3h6v1M9 10h6M9 14h6M9 18h3"/></svg></div>
       <div style="flex:1;min-width:0"><div class="sgroup-ttl">Programul meu</div><div class="sgroup-sub" id="sgProgramSub">Plan antrenament & obiectiv</div></div>
-      <div class="sgroup-chev">▼</div>
+      <div class="sgroup-chev" aria-hidden="true">▼</div>
     </div>
     <div class="sgroup-bd">
       <div class="rules-box" style="margin:12px 0 10px">
@@ -1279,7 +1279,7 @@ html[data-mode="light"] .wiz-choice.sel,html[data-mode="light"] .mode-btn.sel,ht
     <div class="sgroup-hd" onclick="this.parentElement.classList.toggle('open')">
       <div class="sgroup-ico"><svg viewBox="0 0 24 24"><circle cx="12" cy="13.5" r="7.5"/><path d="M12 13.5V9.5M10 2.5h4M12 2.5V6"/></svg></div>
       <div style="flex:1;min-width:0"><div class="sgroup-ttl">Rest timer</div><div class="sgroup-sub" id="sgTimerSub">Pauză între seturi</div></div>
-      <div class="sgroup-chev">▼</div>
+      <div class="sgroup-chev" aria-hidden="true">▼</div>
     </div>
     <div class="sgroup-bd">
       <div class="notif-row" style="margin-top:12px">
@@ -1287,14 +1287,14 @@ html[data-mode="light"] .wiz-choice.sel,html[data-mode="light"] .mode-btn.sel,ht
           <div class="notif-lbl">Timer pauză după set</div>
           <div class="notif-sub" id="restTimerStatus">Activ · 90s</div>
         </div>
-        <label class="sw"><input type="checkbox" id="restTimerToggle" onchange="toggleRestTimer()"><span class="slider"></span></label>
+        <label class="sw"><input type="checkbox" id="restTimerToggle" aria-label="Timer pauză după set" onchange="toggleRestTimer()"><span class="slider"></span></label>
       </div>
       <div class="notif-row" id="restTimerDurRow">
         <div style="flex:1">
           <div class="notif-lbl">Durată</div>
           <div class="notif-sub">Recomandat: 90s hipertrofie</div>
         </div>
-        <select id="restTimerDur" class="time-input" style="width:auto" onchange="updateRestTimerDur()">
+        <select id="restTimerDur" aria-label="Durata pauzei" class="time-input" style="width:auto" onchange="updateRestTimerDur()">
           <option value="auto">Auto (90s / 2½min ⭐)</option>
           <option value="60">60s</option>
           <option value="90">90s</option>
@@ -1308,14 +1308,14 @@ html[data-mode="light"] .wiz-choice.sel,html[data-mode="light"] .mode-btn.sel,ht
           <div class="notif-lbl">🔊 Sunet la final</div>
           <div class="notif-sub">Melodie când pauza s-a terminat</div>
         </div>
-        <label class="sw"><input type="checkbox" id="restTimerSound" onchange="toggleRestTimerSound()"><span class="slider"></span></label>
+        <label class="sw"><input type="checkbox" id="restTimerSound" aria-label="Sunet la final" onchange="toggleRestTimerSound()"><span class="slider"></span></label>
       </div>
       <div class="notif-row" id="restTimerMelodyRow">
         <div style="flex:1">
           <div class="notif-lbl">🎵 Melodia</div>
           <div class="notif-sub">La schimbare o auzi instant (preview)</div>
         </div>
-        <select id="restTimerMelody" class="time-input" style="width:auto" onchange="changeMelody()">
+        <select id="restTimerMelody" aria-label="Melodia de final" class="time-input" style="width:auto" onchange="changeMelody()">
           <option value="marimba">Marimba (cald)</option>
           <option value="dingdong">Ding-dong (sonerie)</option>
           <option value="clopotel">Clopoțel (blând)</option>
@@ -1334,7 +1334,7 @@ html[data-mode="light"] .wiz-choice.sel,html[data-mode="light"] .mode-btn.sel,ht
     <div class="sgroup-hd" onclick="this.parentElement.classList.toggle('open')">
       <div class="sgroup-ico"><svg viewBox="0 0 24 24"><path d="M6 16v-5a6 6 0 0 1 12 0v5l1.5 2h-15z"/><path d="M10 20.5a2 2 0 0 0 4 0"/></svg></div>
       <div style="flex:1;min-width:0"><div class="sgroup-ttl">Notificări</div><div class="sgroup-sub" id="sgNotifSub">Reminder antrenament & backup</div></div>
-      <div class="sgroup-chev">▼</div>
+      <div class="sgroup-chev" aria-hidden="true">▼</div>
     </div>
     <div class="sgroup-bd">
       <div class="notif-row" style="margin-top:12px">
@@ -1342,7 +1342,7 @@ html[data-mode="light"] .wiz-choice.sel,html[data-mode="light"] .mode-btn.sel,ht
           <div class="notif-lbl">Reminder zilnic</div>
           <div class="notif-sub" id="notifStatus">Dezactivat</div>
         </div>
-        <label class="sw"><input type="checkbox" id="notifToggle" onchange="toggleNotif()"><span class="slider"></span></label>
+        <label class="sw"><input type="checkbox" id="notifToggle" aria-label="Reminder zilnic" onchange="toggleNotif()"><span class="slider"></span></label>
       </div>
       <div id="notifConfig" style="display:none">
         <div class="notif-row">
@@ -1350,7 +1350,7 @@ html[data-mode="light"] .wiz-choice.sel,html[data-mode="light"] .mode-btn.sel,ht
             <div class="notif-lbl">Oră</div>
             <div class="notif-sub">Când îți amintim</div>
           </div>
-          <input type="time" class="time-input" id="notifTime" value="19:00" onchange="updateNotifCfg()">
+          <input type="time" class="time-input" id="notifTime" aria-label="Ora reminderului" value="19:00" onchange="updateNotifCfg()">
         </div>
         <div class="notif-row" style="flex-direction:column;align-items:stretch">
           <div class="notif-lbl">Zile</div>
@@ -1371,7 +1371,7 @@ html[data-mode="light"] .wiz-choice.sel,html[data-mode="light"] .mode-btn.sel,ht
           <div class="notif-lbl">💾 Reminder backup</div>
           <div class="notif-sub" id="backupReminderStatus">Dezactivat</div>
         </div>
-        <label class="sw"><input type="checkbox" id="backupReminderToggle" onchange="toggleBackupReminder()"><span class="slider"></span></label>
+        <label class="sw"><input type="checkbox" id="backupReminderToggle" aria-label="Reminder backup" onchange="toggleBackupReminder()"><span class="slider"></span></label>
       </div>
       <div id="backupReminderConfig" style="display:none">
         <div class="notif-row">
@@ -1379,7 +1379,7 @@ html[data-mode="light"] .wiz-choice.sel,html[data-mode="light"] .mode-btn.sel,ht
             <div class="notif-lbl">Frecvență</div>
             <div class="notif-sub">Săptămânal = recomandat (acumulează mai puține fișiere)</div>
           </div>
-          <select id="backupReminderFreq" class="time-input" style="width:auto" onchange="updateBackupReminderCfg()">
+          <select id="backupReminderFreq" aria-label="Frecvența reminderului de backup" class="time-input" style="width:auto" onchange="updateBackupReminderCfg()">
             <option value="weekly">Săptămânal (Duminică)</option>
             <option value="daily">Zilnic</option>
             <option value="monthly">Lunar (1 a lunii)</option>
@@ -1390,7 +1390,7 @@ html[data-mode="light"] .wiz-choice.sel,html[data-mode="light"] .mode-btn.sel,ht
             <div class="notif-lbl">Oră</div>
             <div class="notif-sub">Recomandat: după ce termini ziua</div>
           </div>
-          <input type="time" class="time-input" id="backupReminderTime" value="22:00" onchange="updateBackupReminderCfg()">
+          <input type="time" class="time-input" id="backupReminderTime" aria-label="Ora reminderului de backup" value="22:00" onchange="updateBackupReminderCfg()">
         </div>
       </div>
     </div>
@@ -1400,7 +1400,7 @@ html[data-mode="light"] .wiz-choice.sel,html[data-mode="light"] .mode-btn.sel,ht
     <div class="sgroup-hd" onclick="this.parentElement.classList.toggle('open')">
       <div class="sgroup-ico"><svg viewBox="0 0 24 24"><path d="M12 3l7.5 3v5.5c0 4.5-3.2 8.2-7.5 9.5-4.3-1.3-7.5-5-7.5-9.5V6z"/><path d="M9 12l2 2 4-4"/></svg></div>
       <div style="flex:1;min-width:0"><div class="sgroup-ttl">Backup & sincronizare</div><div class="sgroup-sub">Plasă de siguranță, share, fișier local, sync</div></div>
-      <div class="sgroup-chev">▼</div>
+      <div class="sgroup-chev" aria-hidden="true">▼</div>
     </div>
     <div class="sgroup-bd">
       <div class="stitle">Plasă de siguranță (automat)</div>
@@ -1466,7 +1466,7 @@ html[data-mode="light"] .wiz-choice.sel,html[data-mode="light"] .mode-btn.sel,ht
     <div class="sgroup-hd" onclick="this.parentElement.classList.toggle('open')">
       <div class="sgroup-ico"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 11v5.5M12 7.5v.5"/></svg></div>
       <div style="flex:1;min-width:0"><div class="sgroup-ttl">Despre aplicație</div><div class="sgroup-sub">Versiune, update, status</div></div>
-      <div class="sgroup-chev">▼</div>
+      <div class="sgroup-chev" aria-hidden="true">▼</div>
     </div>
     <div class="sgroup-bd">
       <div class="rules-box" style="margin:12px 0 10px">
@@ -1491,7 +1491,7 @@ html[data-mode="light"] .wiz-choice.sel,html[data-mode="light"] .mode-btn.sel,ht
     <div class="sgroup-hd" onclick="this.parentElement.classList.toggle('open')">
       <div class="sgroup-ico"><svg viewBox="0 0 24 24"><path d="M12 3.5l9.5 16.5h-19z"/><path d="M12 10v4.5M12 17.5v.5"/></svg></div>
       <div style="flex:1;min-width:0"><div class="sgroup-ttl">Zona periculoasă</div><div class="sgroup-sub">Ștergere definitivă a datelor</div></div>
-      <div class="sgroup-chev">▼</div>
+      <div class="sgroup-chev" aria-hidden="true">▼</div>
     </div>
     <div class="sgroup-bd">
       <p style="font-size:11px;color:var(--muted);margin:12px 0 10px;line-height:1.5">
@@ -1508,7 +1508,7 @@ html[data-mode="light"] .wiz-choice.sel,html[data-mode="light"] .mode-btn.sel,ht
     <div class="card-hd" onclick="document.getElementById('principiiCard').classList.toggle('open')">
       <div class="card-ico" style="color:var(--purple)"><svg viewBox="0 0 24 24"><path d="M9 3h6M10 3v6.5L4.5 19a1.5 1.5 0 0 0 1.3 2.2h12.4a1.5 1.5 0 0 0 1.3-2.2L14 9.5V3"/><path d="M7 15h10"/></svg></div>
       <div style="flex:1"><div class="card-ttl">De ce e construit programul așa</div><div class="card-sub">7 principii din meta-analize recente</div></div>
-      <div class="card-chev">▼</div>
+      <div class="card-chev" aria-hidden="true">▼</div>
     </div>
     <div class="card-bd"><div style="padding-top:10px;font-size:12px;line-height:1.6;color:var(--text)">
       <p style="margin-bottom:8px">💪 <strong>Amplitudine completă, cu accent pe întindere.</strong> Mușchiul crește cel mai mult lucrat în poziția întinsă — coboară adânc și controlat la fiecare exercițiu. (Wolf 2023, Kassiano 2023)</p>
@@ -1530,7 +1530,7 @@ html[data-mode="light"] .wiz-choice.sel,html[data-mode="light"] .mode-btn.sel,ht
     <div class="card-hd" onclick="toggleLib()">
       <div class="card-ico"><svg viewBox="0 0 24 24"><path d="M4 5.5A2.5 2.5 0 0 1 6.5 3H20v15H6.5A2.5 2.5 0 0 0 4 20.5z"/><path d="M4 20.5V5.5"/></svg></div>
       <div style="flex:1;min-width:0"><div class="card-ttl">Toate exercițiile din bibliotecă</div><div class="card-sub">inclusiv cele care nu-s în programul tău · grupate pe mușchi</div></div>
-      <div class="card-chev">▼</div>
+      <div class="card-chev" aria-hidden="true">▼</div>
     </div>
     <div class="card-bd"><div id="libContent" style="padding-top:10px"></div></div>
   </div>
@@ -1539,13 +1539,13 @@ html[data-mode="light"] .wiz-choice.sel,html[data-mode="light"] .mode-btn.sel,ht
 </div><!-- /#app -->
 
 <div class="modal" id="editModal" onclick="if(event.target===this)closeEdit()">
-  <div class="modal-content">
+  <div class="modal-content" role="dialog" aria-modal="true" aria-labelledby="editTtl">
     <div class="modal-ttl" id="editTtl">Editează set</div>
     <div class="modal-sub" id="editSub"></div>
     <div class="modal-inputs">
-      <input id="editReps" type="number" inputmode="numeric" enterkeyhint="next" min="0" max="99" placeholder="rep">
+      <input id="editReps" aria-label="Repetări" type="number" inputmode="numeric" enterkeyhint="next" min="0" max="99" placeholder="rep">
       <span style="color:var(--muted);font-weight:700">rep ×</span>
-      <input id="editKg" type="number" inputmode="decimal" enterkeyhint="done" step="0.5" min="0" max="999" placeholder="kg">
+      <input id="editKg" aria-label="Kilograme" type="number" inputmode="decimal" enterkeyhint="done" step="0.5" min="0" max="999" placeholder="kg">
       <span style="color:var(--muted);font-weight:600">kg</span>
     </div>
     <div class="modal-btns">
@@ -1557,13 +1557,13 @@ html[data-mode="light"] .wiz-choice.sel,html[data-mode="light"] .mode-btn.sel,ht
 </div>
 
 <div class="onboarding" id="onboarding">
-  <div class="onboarding-card" style="text-align:left;max-height:88vh;overflow-y:auto;width:100%;max-width:380px;position:relative">
+  <div class="onboarding-card" role="dialog" aria-modal="true" aria-label="Configurarea programului" style="text-align:left;max-height:88vh;overflow-y:auto;width:100%;max-width:380px;position:relative">
     <div id="wizardContent"></div>
   </div>
 </div>
 
 <div class="modal" id="digestModal" onclick="if(event.target===this)closeDigest()">
-  <div class="modal-content" style="max-height:85vh;overflow-y:auto;border-color:var(--acc2)">
+  <div class="modal-content" role="dialog" aria-modal="true" aria-labelledby="digestTitle" style="max-height:85vh;overflow-y:auto;border-color:var(--acc2)">
     <div class="modal-ttl" style="color:var(--acc2)" id="digestTitle">🎉 Săptămâna ta</div>
     <div class="modal-sub" id="digestPeriod"></div>
     <div id="digestBody" style="font-size:13px;line-height:1.7"></div>
@@ -1576,7 +1576,7 @@ html[data-mode="light"] .wiz-choice.sel,html[data-mode="light"] .mode-btn.sel,ht
 </div>
 
 <div class="modal" id="guideModal" onclick="if(event.target===this)closeGuide()">
-  <div class="modal-content" style="max-height:80vh;overflow-y:auto">
+  <div class="modal-content" role="dialog" aria-modal="true" aria-labelledby="guideTitle" style="max-height:80vh;overflow-y:auto">
     <div class="modal-ttl" id="guideTitle">Exercițiu</div>
     <div class="modal-sub" id="guideTag"></div>
     <div id="guideBody" style="font-size:13px;line-height:1.6"></div>
@@ -1594,7 +1594,7 @@ html[data-mode="light"] .wiz-choice.sel,html[data-mode="light"] .mode-btn.sel,ht
     <button class="rest-timer-btn" onclick="saveRIR('easy')">🥱 Ușor</button>
     <button class="rest-timer-btn" onclick="saveRIR('ok')">💪 OK</button>
     <button class="rest-timer-btn" onclick="saveRIR('hard')">😮‍💨 Limită</button>
-    <button class="rest-timer-btn" style="flex:0 0 auto;padding:8px 11px;opacity:.55" onclick="dismissRIR()" title="Sar peste">✕</button>
+    <button class="rest-timer-btn" style="flex:0 0 auto;padding:8px 11px;opacity:.55" onclick="dismissRIR()" title="Sar peste" aria-label="Sar peste">✕</button>
   </div>
 </div>
 
@@ -1607,12 +1607,12 @@ html[data-mode="light"] .wiz-choice.sel,html[data-mode="light"] .mode-btn.sel,ht
   </div>
   <button class="rest-timer-btn" onclick="restTimerAdjust(-15)">−15s</button>
   <button class="rest-timer-btn" onclick="restTimerAdjust(15)">+15s</button>
-  <button class="rest-timer-btn" onclick="stopRestTimer()">✕</button>
+  <button class="rest-timer-btn" onclick="stopRestTimer()" aria-label="Oprește pauza">✕</button>
 </div>
 
 <div class="modal" id="dayPlanModal" onclick="if(event.target===this)closeDayPlan()">
-  <div class="modal-content" style="max-height:88vh;overflow-y:auto">
-    <div class="modal-ttl">🗓️ Zilele mele de antrenament</div>
+  <div class="modal-content" role="dialog" aria-modal="true" aria-labelledby="dayPlanTtl" style="max-height:88vh;overflow-y:auto">
+    <div class="modal-ttl" id="dayPlanTtl">🗓️ Zilele mele de antrenament</div>
     <div class="modal-sub">Muți programul pe zilele care ți se potrivesc — conținutul rămâne neschimbat</div>
     <div id="dayPlanBody" style="margin-top:12px"></div>
     <button class="btn btn-acc" style="margin-top:14px" id="dayPlanSave" onclick="saveDayPlan()">📌 Salvează zilele</button>
@@ -2533,7 +2533,7 @@ function renderToday(){
   html+='<div class="date-drawer'+(pickerOpen?' open':'')+'" id="dateDrawer">';
   html+='<div class="date-picker-row">';
   html+='<label>📅 Data</label>';
-  html+='<input type="date" id="workoutDate" value="'+effDateISO+'" onchange="setWorkoutDate(this.value)">';
+  html+='<input type="date" id="workoutDate" aria-label="Data antrenamentului" value="'+effDateISO+'" onchange="setWorkoutDate(this.value)">';
   html+='<button class="date-quick-btn'+(!currentWorkoutDate?' act':'')+'" onclick="setQuickDate(0)">Azi</button>';
   html+='<button class="date-quick-btn" onclick="setQuickDate(-1)">Ieri</button>';
   html+='</div>';
@@ -2656,14 +2656,14 @@ function renderToday(){
   html+='<div class="rating-card">';
   html+='<div class="hud-strip" style="background:linear-gradient(90deg,var(--purple),#c4b5fd)"></div>';
   html+='<div style="font-size:10px;font-weight:700;color:var(--purple);letter-spacing:2.5px;text-transform:uppercase;margin-bottom:6px;font-family:var(--fd)">STARE DE AZI</div>';
-  html+='<div class="rating-row"><div class="rating-emoji">⚡</div><div class="rating-label">Energie</div><input type="range" min="1" max="10" value="'+energyVal+'" class="rating-slider" id="ratEnergy" oninput="updateRating(\'energy\',this.value)"><div class="rating-value" id="ratEnergyVal">'+energyVal+'/10</div></div>';
-  html+='<input class="rate-note-input" type="text" id="noteEnergy" placeholder="📝 De ce? (ex: somn prost, zi grea, cafea târziu)" value="'+(rateNoteData.energy||'').replace(/"/g,'&quot;')+'" onchange="saveRateNote(\'energy\',this.value)">';
-  html+='<div class="rating-row"><div class="rating-emoji">😴</div><div class="rating-label">Calitate somn</div><input type="range" min="1" max="10" value="'+sleepVal+'" class="rating-slider" id="ratSleep" oninput="updateRating(\'sleep\',this.value)"><div class="rating-value" id="ratSleepVal">'+sleepVal+'/10</div></div>';
-  html+='<input class="rate-note-input" type="text" id="noteSleep" placeholder="📝 Notă somn (ex: 5h, m-am trezit de 3 ori)" value="'+(rateNoteData.sleep||'').replace(/"/g,'&quot;')+'" onchange="saveRateNote(\'sleep\',this.value)">';
+  html+='<div class="rating-row"><div class="rating-emoji">⚡</div><div class="rating-label">Energie</div><input type="range" min="1" max="10" value="'+energyVal+'" class="rating-slider" id="ratEnergy" aria-label="Energie" oninput="updateRating(\'energy\',this.value)"><div class="rating-value" id="ratEnergyVal">'+energyVal+'/10</div></div>';
+  html+='<input class="rate-note-input" type="text" id="noteEnergy" aria-label="Notă la energie" placeholder="📝 De ce? (ex: somn prost, zi grea, cafea târziu)" value="'+(rateNoteData.energy||'').replace(/"/g,'&quot;')+'" onchange="saveRateNote(\'energy\',this.value)">';
+  html+='<div class="rating-row"><div class="rating-emoji">😴</div><div class="rating-label">Calitate somn</div><input type="range" min="1" max="10" value="'+sleepVal+'" class="rating-slider" id="ratSleep" aria-label="Calitate somn" oninput="updateRating(\'sleep\',this.value)"><div class="rating-value" id="ratSleepVal">'+sleepVal+'/10</div></div>';
+  html+='<input class="rate-note-input" type="text" id="noteSleep" aria-label="Notă la somn" placeholder="📝 Notă somn (ex: 5h, m-am trezit de 3 ori)" value="'+(rateNoteData.sleep||'').replace(/"/g,'&quot;')+'" onchange="saveRateNote(\'sleep\',this.value)">';
   // Cântar rapid zilnic
   var todayWeight=getTodayWeight();
   html+='<div class="rating-row"><div class="rating-emoji">⚖️</div><div class="rating-label">Greutate azi</div>';
-  html+='<input type="number" step="0.1" inputmode="decimal" class="set-in" style="width:70px" id="quickWeight" placeholder="84.5" value="'+(todayWeight||'')+'" onchange="saveQuickWeight(this.value)">';
+  html+='<input type="number" step="0.1" inputmode="decimal" class="set-in" style="width:70px" id="quickWeight" aria-label="Greutate azi" placeholder="84.5" value="'+(todayWeight||'')+'" onchange="saveQuickWeight(this.value)">';
   html+='<span style="font-size:11px;color:var(--muted);margin-left:4px">kg</span></div>';
   html+='</div>';
 
@@ -2704,7 +2704,7 @@ function renderToday(){
       html+='<div style="color:var(--muted);opacity:.5;font-size:13px;width:18px;flex-shrink:0">'+(e.star?'⭐':'·')+'</div>';
       html+='<div style="flex:1;min-width:0"><div class="card-ttl">'+escHtml(e.name)+'</div><div class="card-sub">⤼ '+escHtml(skReason)+(doneSets>0?' · '+doneSets+' set'+(doneSets===1?'':'uri')+' salvate':'')+'</div></div>';
       html+='<span class="progress-badge skipb">SĂRIT</span>';
-      html+='<div class="card-chev">▼</div></div>';
+      html+='<div class="card-chev" aria-hidden="true">▼</div></div>';
       html+='<div class="card-bd"><div style="padding-top:10px">';
       html+='<div style="font-size:12px;color:var(--muted);line-height:1.7">Nu intră azi la „zi completă" — rezumatul zilei apare când restul e gata.'+(doneSets>0?'<br>✓ Seturile deja salvate rămân în jurnal.':'')+'</div>';
       html+='<button class="btn btn-ghost" style="margin:10px 0 0;padding:10px;font-size:13px" onclick="unskipExercise(\''+sk+'\')">↩ Reia exercițiul</button>';
@@ -2752,11 +2752,11 @@ function renderToday(){
       setsHtml+='<div class="set-box'+(isSaved?' saved':'')+(s>e.sets?' extra':'')+(firstOpenSet&&s>firstOpenSet&&!isSaved?' sb-future':'')+'" id="sb_'+ei+'_'+s+'"'+(s>e.sets?' title="Set extra — săpt. 7"':'')+'>';
       setsHtml+='<div class="set-lbl">'+(isSaved?'✓ S':'S')+s+(s>e.sets?'<div style="font-size:8px;color:var(--acc2);letter-spacing:.5px">+1</div>':'')+'</div>';
       setsHtml+='<div class="set-inputs">';
-      setsHtml+='<input class="set-in" type="number" inputmode="numeric" enterkeyhint="next" min="0" max="99" placeholder="rep" value="'+(saved.reps||'')+'" oninput="upSet(\''+sk+'\','+s+',\'reps\',this.value,this)">';
-      setsHtml+='<div class="stepper"><button class="stepper-btn" onclick="stepInput(\''+sk+'\','+s+',\'reps\',1,'+ei+')">+</button><button class="stepper-btn" onclick="stepInput(\''+sk+'\','+s+',\'reps\',-1,'+ei+')">−</button></div>';
+      setsHtml+='<input class="set-in" type="number" inputmode="numeric" enterkeyhint="next" min="0" max="99" placeholder="rep" aria-label="Repetări setul '+s+'" value="'+(saved.reps||'')+'" oninput="upSet(\''+sk+'\','+s+',\'reps\',this.value,this)">';
+      setsHtml+='<div class="stepper"><button class="stepper-btn" aria-label="Plus o repetare" onclick="stepInput(\''+sk+'\','+s+',\'reps\',1,'+ei+')">+</button><button class="stepper-btn" aria-label="Minus o repetare" onclick="stepInput(\''+sk+'\','+s+',\'reps\',-1,'+ei+')">−</button></div>';
       setsHtml+='<span class="set-sep">×</span>';
-      setsHtml+='<input class="set-in" type="number" inputmode="decimal" enterkeyhint="done" step="0.5" min="0" max="999" placeholder="kg" value="'+(saved.kg||'')+'" oninput="upSet(\''+sk+'\','+s+',\'kg\',this.value,this)">';
-      setsHtml+='<div class="stepper"><button class="stepper-btn" onclick="stepInput(\''+sk+'\','+s+',\'kg\',1,'+ei+')">+</button><button class="stepper-btn" onclick="stepInput(\''+sk+'\','+s+',\'kg\',-1,'+ei+')">−</button></div>';
+      setsHtml+='<input class="set-in" type="number" inputmode="decimal" enterkeyhint="done" step="0.5" min="0" max="999" placeholder="kg" aria-label="Kilograme setul '+s+'" value="'+(saved.kg||'')+'" oninput="upSet(\''+sk+'\','+s+',\'kg\',this.value,this)">';
+      setsHtml+='<div class="stepper"><button class="stepper-btn" aria-label="Mai multe kilograme" onclick="stepInput(\''+sk+'\','+s+',\'kg\',1,'+ei+')">+</button><button class="stepper-btn" aria-label="Mai puține kilograme" onclick="stepInput(\''+sk+'\','+s+',\'kg\',-1,'+ei+')">−</button></div>';
       setsHtml+='</div>';
       setsHtml+='<button class="set-btn" aria-label="Salvează setul" onclick="saveSet(\''+sk+'\','+s+','+ei+')">'+(isSaved?'✓':ICON_CHECK)+'</button></div>';
     }
@@ -2806,10 +2806,10 @@ function renderToday(){
     html+=progressBadge;
     if(isHero)html+='<span class="hero-badge">ÎN LUCRU</span>';
     html+='<button class="guide-btn" onclick="event.stopPropagation();openGuideByName(\''+sk+'\')" title="Cum se face" aria-label="Cum se face">'+ICON_BOOK+'</button>';
-    html+='<div class="card-chev">▼</div></div>';
+    html+='<div class="card-chev" aria-hidden="true">▼</div></div>';
     html+='<div class="hint-wrap">'+smartHint+'</div>';
     var exNote=(exNoteData[key]||'');
-    var noteHtml='<input class="set-note-input" type="text" placeholder="📝 Notă (ex: umăr ok, ușor azi...)" value="'+exNote.replace(/"/g,'&quot;')+'" onchange="saveExNote(\''+sk+'\',this.value)">';
+    var noteHtml='<input class="set-note-input" type="text" aria-label="Notă la exercițiu" placeholder="📝 Notă (ex: umăr ok, ușor azi...)" value="'+exNote.replace(/"/g,'&quot;')+'" onchange="saveExNote(\''+sk+'\',this.value)">';
     var kgConv=kgConventionFor(e);
     var kgHint=kgConv?'<div style="font-size:10px;color:var(--muted);padding:10px 2px 0">⚖️ '+kgConv+'</div>':'';
     // „Sar azi" — link discret; motivul se alege dintr-un rând de pastile
@@ -2874,7 +2874,7 @@ function renderToday(){
     html+='<div class="hud-dot" style="margin:0 6px 0 2px"></div>';
     html+='<div style="flex:1;min-width:0"><div class="card-ttl" style="font-family:var(--fd);letter-spacing:3px;color:var(--green)">'+(skippedList.length?'ZI ÎNCHEIATĂ':'ZI COMPLETĂ')+'</div>';
     html+='<div class="card-sub">'+setsToday+' seturi'+(prKeys.length?' · 🏆 '+prKeys.length+' PR':'')+(skippedList.length?' · ⤼ '+skippedList.length+' sărit'+(skippedList.length===1?'':'e'):'')+'</div></div>';
-    html+='<div class="card-chev">▼</div></div>';
+    html+='<div class="card-chev" aria-hidden="true">▼</div></div>';
     html+='<div class="card-bd"><div style="padding-top:12px;display:flex;flex-direction:column;gap:13px;font-size:12.5px">';
     // Eroul: tonajul zilei (count-up la prima apariție) sau seturile (zi bodyweight)
     html+='<div style="display:flex;flex-direction:column;align-items:center;gap:3px;padding:2px 0">';
@@ -4156,7 +4156,7 @@ function buildMorningCard(idx){
   html+='<div style="flex:1"><div class="morning-ttl">DIMINEAȚĂ — '+routine.label+'</div>';
   html+='<div class="morning-sub">'+routine.duration+' · '+routine.sub+'</div></div>';
   html+='<div class="morning-count" id="morningCount">'+done+'/'+total+'</div>';
-  html+='<div class="morning-chev">▼</div></div>';
+  html+='<div class="morning-chev" aria-hidden="true">▼</div></div>';
   html+='<div class="morning-bd">';
   routine.list.forEach(function(ex){
     var isDone=morningData[ex.id]===true;
@@ -4278,12 +4278,12 @@ function renderNutritionAuto(){
     '<div style="font-size:10px;color:var(--muted);letter-spacing:1px">KCAL/ZI</div></div></div>';
   document.getElementById('nutMacros').innerHTML=macroVisualHtml(n.protein,n.carbs,n.fat);
   var meals=document.getElementById('nutMeals');
-  var html='<div class="meal-card open"><div class="meal-hd" onclick="this.parentElement.classList.toggle(\'open\')"><div><div class="meal-nm">📋 Principiile planului tău</div><div class="meal-tm">generat pe profilul tău — nu mese impuse</div></div><span class="meal-chev">▼</span></div><div class="meal-items">';
+  var html='<div class="meal-card open"><div class="meal-hd" onclick="this.parentElement.classList.toggle(\'open\')"><div><div class="meal-nm">📋 Principiile planului tău</div><div class="meal-tm">generat pe profilul tău — nu mese impuse</div></div><span class="meal-chev" aria-hidden="true">▼</span></div><div class="meal-items">';
   (n.principles||[]).forEach(function(p){
     html+='<div class="item-row"><div class="item-nm" style="font-weight:500;line-height:1.4">'+p+'</div></div>';
   });
   html+='</div></div>';
-  html+='<div class="meal-card open"><div class="meal-hd" onclick="this.parentElement.classList.toggle(\'open\')"><div><div class="meal-nm">💧 Ținte zilnice</div></div><span class="meal-chev">▼</span></div><div class="meal-items">';
+  html+='<div class="meal-card open"><div class="meal-hd" onclick="this.parentElement.classList.toggle(\'open\')"><div><div class="meal-nm">💧 Ținte zilnice</div></div><span class="meal-chev" aria-hidden="true">▼</span></div><div class="meal-items">';
   html+='<div class="item-row"><div class="item-nm">Apă</div><div class="item-kc">'+n.waterL+' L</div></div>';
   html+='<div class="item-row"><div class="item-nm">Pași</div><div class="item-kc">'+n.stepsTarget+'</div></div>';
   html+='</div></div>';
@@ -4350,7 +4350,7 @@ function renderNutDay(){
     var itemsHtml=meal.items.map(function(it){
       return '<div class="item-row"><div><div class="item-nm">'+it.name+'</div><div class="item-am">'+it.amount+'</div></div><div class="item-kc">'+it.kcal+' kcal</div></div>';
     }).join('');
-    meals.innerHTML+='<div class="meal-card'+(mi===0?' open':'')+'"><div class="meal-hd" onclick="this.parentElement.classList.toggle(\'open\')"><div><div class="meal-nm">'+meal.emoji+' '+meal.name+'</div><div class="meal-tm">⏰ '+meal.time+'</div></div><div style="text-align:right"><div class="meal-kc" style="color:'+p.color+'">'+meal.kcal+' kcal</div><div class="meal-pr">~'+meal.protein+'g proteine</div></div><span class="meal-chev">▼</span></div><div class="meal-items">'+itemsHtml+'</div></div>';
+    meals.innerHTML+='<div class="meal-card'+(mi===0?' open':'')+'"><div class="meal-hd" onclick="this.parentElement.classList.toggle(\'open\')"><div><div class="meal-nm">'+meal.emoji+' '+meal.name+'</div><div class="meal-tm">⏰ '+meal.time+'</div></div><div style="text-align:right"><div class="meal-kc" style="color:'+p.color+'">'+meal.kcal+' kcal</div><div class="meal-pr">~'+meal.protein+'g proteine</div></div><span class="meal-chev" aria-hidden="true">▼</span></div><div class="meal-items">'+itemsHtml+'</div></div>';
   });
   document.getElementById('nutNote').innerHTML=p.note?'<div class="note-box">💡 '+p.note+'</div>':'';
 }
@@ -4437,7 +4437,7 @@ function initProgram(){
     html+='<div class="'+dayCls+'" id="pc_'+di+'"><div class="card-hd" onclick="document.getElementById(\'pc_'+di+'\').classList.toggle(\'open\')">';
     html+='<div class="card-ico">'+dayIconSvg(ex)+'</div>';
     html+='<div style="flex:1;min-width:0"><div class="card-ttl">'+dayLabel+' — '+ex.label+'</div><div class="card-sub">'+ex.duration+' · '+totalExercises+' exerciții · '+setsTotal+' seturi</div></div>';
-    html+='<div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px">'+statusBadge+'<div class="card-chev">▼</div></div>';
+    html+='<div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px">'+statusBadge+'<div class="card-chev" aria-hidden="true">▼</div></div>';
     html+='</div>';
     html+='<div class="card-bd"><div style="padding-top:10px">';
     var dayFirstStar=-1;
@@ -4756,7 +4756,7 @@ function renderHistoric(){
       var repsTot=0;if(bwDay)D.exOrder.forEach(function(x){D.exercises[x].forEach(function(st){repsTot+=parseFloat(st.reps)||0;});});
       html+='<div style="text-align:right;flex-shrink:0"><div class="hist-ton">'+(bwDay?repsTot:Math.round(D.tonnage).toLocaleString('ro-RO'))+'</div><div class="hist-ton-lbl">'+(bwDay?'REP':'KG')+' · '+D.sets+' SETURI</div></div>';
     }
-    html+='<div class="card-chev" style="flex-shrink:0">▼</div>';
+    html+='<div class="card-chev" aria-hidden="true" style="flex-shrink:0">▼</div>';
     html+='</div>';
     // Corpul: seturile ca pastile (tap = editează, + = adaugă), săritele, dimineața+checklist
     html+='<div class="hist-card-bd">';
@@ -4935,7 +4935,7 @@ function renderVolumePanel(){
   html+='<div class="card-hd" onclick="document.getElementById(\'volumeCard\').classList.toggle(\'open\')">';
   html+='<div class="card-ico" style="background:rgba(var(--acc-rgb),.15)">💪</div>';
   html+='<div style="flex:1;min-width:0"><div class="card-ttl">Volum pe mușchi</div><div class="card-sub">vs banda de creștere 10–20 seturi/săpt.</div></div>';
-  html+='<div class="card-chev">▼</div></div>';
+  html+='<div class="card-chev" aria-hidden="true">▼</div></div>';
   html+='<div class="card-bd"><div style="padding-top:12px">';
   html+='<div style="font-size:11px;color:var(--muted);margin-bottom:10px">'+data.sessions+' antrenament'+(data.sessions===1?'':'e')+' logat'+(data.sessions===1?'':'e')+' · '+data.counted+' seturi numărate</div>';
   // Axa 0 / 10 / 20 (aliniată cu banda de pe track)
@@ -8470,6 +8470,50 @@ document.addEventListener('keydown',function(ev){
   if(ev.key==='Escape'){var ms=document.querySelectorAll('.modal.show');if(ms.length)ms[ms.length-1].click();}
   else if((ev.key==='Enter'||ev.key===' ')&&ev.target&&ev.target.getAttribute&&ev.target.getAttribute('role')==='button'){ev.preventDefault();ev.target.click();}
 });
+// Elementele clicabile care nu sunt butoane (div/span/a fără href cu onclick) primesc rol de buton
+// și intră în ordinea tastaturii; Enter/Space le activează (vezi handler-ul de keydown de mai sus).
+function a11yEnhance(root){
+  if(!root||!root.querySelectorAll)return;
+  var SEL='[onclick]:not(button):not(a[href]):not(input):not(select):not(textarea):not(label):not(.modal):not(.onboarding)';
+  var list=root.querySelectorAll(SEL);
+  for(var i=0;i<list.length;i++){var el=list[i];if(!el.hasAttribute('role'))el.setAttribute('role','button');if(!el.hasAttribute('tabindex'))el.tabIndex=0;}
+  if(root.matches&&root.matches(SEL)&&!root.hasAttribute('role')){root.setAttribute('role','button');root.tabIndex=0;}
+}
+// Modal deschis → restul aplicației devine inert (nu primește focus/clic), focusul intră în dialog și revine după
+var _modalFocusStack=[];
+function a11yModalWatch(){
+  var app=document.getElementById('app');
+  var mods=document.querySelectorAll('.modal,.onboarding');
+  var coarse=window.matchMedia&&window.matchMedia('(pointer:coarse)').matches;
+  var sync=function(){
+    var open=[].some.call(mods,function(m){return m.classList.contains('show');});
+    if(app){if(open)app.setAttribute('inert','');else app.removeAttribute('inert');}
+  };
+  var mo=new MutationObserver(function(recs){
+    sync(); // întâi deblocăm fundalul, altfel focusul nu se poate întoarce pe butonul din aplicație
+    recs.forEach(function(r){
+      var m=r.target,isOpen=m.classList.contains('show'),was=(' '+(r.oldValue||'')+' ').indexOf(' show ')>=0;
+      if(isOpen&&!was){
+        _modalFocusStack.push(document.activeElement);
+        setTimeout(function(){
+          var box=m.querySelector('.modal-content,.onboarding-card');
+          // pe telefon nu deschidem tastatura singuri: focus pe dialog, nu pe primul câmp
+          var f=coarse?null:m.querySelector('input:not([type=hidden]):not([type=file]),select,textarea,button,[tabindex="0"],a[href]');
+          if(!f&&box){box.tabIndex=-1;f=box;}
+          if(f)try{f.focus({preventScroll:true});}catch(e){}
+        },40);
+      }else if(!isOpen&&was){
+        var prev=_modalFocusStack.pop();
+        if(prev&&prev.focus&&document.contains(prev))try{prev.focus({preventScroll:true});}catch(e){}
+      }
+    });
+  });
+  [].forEach.call(mods,function(m){mo.observe(m,{attributes:true,attributeFilter:['class'],attributeOldValue:true});});
+  new MutationObserver(function(recs){
+    recs.forEach(function(r){[].forEach.call(r.addedNodes,function(n){if(n.nodeType===1)a11yEnhance(n);});});
+  }).observe(document.body,{childList:true,subtree:true});
+  a11yEnhance(document.body);
+}
 function applyUpdate(){
   document.getElementById('updateBanner').classList.remove('show');
   if(_pendingSW&&!_swActivated){
@@ -8604,6 +8648,9 @@ window.addEventListener('load',function(){
   if(bcfg.enabled && 'Notification' in window && Notification.permission==='granted'){
     scheduleBackupReminder();
   }
+
+  // Accesibilitate: rol de buton pe elementele clicabile + dialoguri cu fundal inert
+  a11yModalWatch();
 
   // File System Access sync (desktop Chrome/Edge) — restaurează handle-ul salvat
   fsaInit();
