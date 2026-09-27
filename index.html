@@ -963,6 +963,20 @@ html[data-mode="light"] .dh-prog{stroke:var(--acc-dim)}
 .override-banner{display:block;line-height:1.55}
 .override-banner button{float:right;margin:0 0 0 10px}
 .add-custom-row{background:var(--s1);border:1px dashed var(--bd);border-radius:16px;padding:12px 14px;gap:12px}
+
+/* ═══ Loturile C+D (v104): liste grupate pe restul ecranelor ═══ */
+.glist-cards>.card{border:none;border-radius:0;margin:0;box-shadow:none;background:transparent}
+.glist-cards>.card+.card{border-top:1px solid var(--bd)}
+.glist-cards>.card.card-hero,.glist-cards>.card.card-hero.open{border:none;background:rgba(var(--acc-rgb),.05);box-shadow:inset 3px 0 0 var(--acc)}
+html[data-mode="light"] .glist-cards>.card.card-hero{box-shadow:inset 3px 0 0 var(--acc-dim)}
+#hist-content:not(:empty),#nutMeals:not(:empty),#ghid-content:not(:empty){background:var(--s1);border:1px solid var(--bd);border-radius:20px;overflow:hidden;margin-bottom:10px}
+#hist-content>.hist-card,#nutMeals>.meal-card,#ghid-content>.ghid-item{border:none;border-radius:0;margin:0;background:transparent;box-shadow:none}
+#hist-content>.hist-card+.hist-card,#nutMeals>.meal-card+.meal-card,#ghid-content>.ghid-item+.ghid-item{border-top:1px solid var(--bd)}
+#hist-content>.hist-card:not(.open){opacity:1}
+.prog-hud,.ai-panel{border-radius:22px}
+.sgroup{margin-bottom:8px}
+.hdr-sub:empty{display:none}
+.ghid-item.open .card-chev{transform:rotate(-135deg);margin-bottom:-2px}
 </style>
 </head>
 <body>
@@ -1043,7 +1057,7 @@ html[data-mode="light"] .dh-prog{stroke:var(--acc-dim)}
   <div id="nutVariationWrap">
   <div class="stitle">Variație săptămânală (1 zi/săpt)</div>
   <div class="meal-card" style="border-color:rgba(56,189,248,.35)">
-    <div class="meal-hd" onclick="this.parentElement.classList.toggle('open')"><div><div class="meal-nm">🐟 Somon + quinoa (în loc de Masa 3)</div><div class="meal-tm">Orice zi PUI sau TON · 1x/săpt</div></div><div style="text-align:right"><div class="meal-kc" style="color:#38bdf8">~700 kcal</div><div class="meal-pr">~45g proteine · Omega 3</div></div><span class="meal-chev" aria-hidden="true">▼</span></div>
+    <div class="meal-hd" onclick="this.parentElement.classList.toggle('open')"><div><div class="meal-nm">Somon + quinoa (în loc de Masa 3)</div><div class="meal-tm">Orice zi PUI sau TON · 1x/săpt</div></div><div style="text-align:right"><div class="meal-kc" style="color:#38bdf8">~700 kcal</div><div class="meal-pr">~45g proteine · Omega 3</div></div><span class="meal-chev" aria-hidden="true">▼</span></div>
     <div class="meal-items">
       <div class="item-row"><div><div class="item-nm">Somon (file, raw)</div><div class="item-am">200g</div></div><div class="item-kc">420 kcal</div></div>
       <div class="item-row"><div><div class="item-nm">Quinoa (raw)</div><div class="item-am">80g</div></div><div class="item-kc">300 kcal</div></div>
@@ -1068,7 +1082,6 @@ html[data-mode="light"] .dh-prog{stroke:var(--acc-dim)}
 <div id="tab-program" class="sec"><div id="prog-content"></div></div>
 
 <div id="tab-progres" class="sec">
-  <div class="stitle">Progres</div>
 
   <div class="sgroup open" id="pgExercitii">
     <div class="sgroup-hd" onclick="this.parentElement.classList.toggle('open');pgRerender('pgExercitii')">
@@ -1278,7 +1291,6 @@ html[data-mode="light"] .dh-prog{stroke:var(--acc-dim)}
 </div>
 
 <div id="tab-setari" class="sec">
-  <div class="stitle">Setări</div>
   <input class="meas-in" type="search" id="setariSearch" aria-label="Caută în setări" placeholder="🔍 Caută în setări (timer, temă, backup...)" autocomplete="off" oninput="filterSetari(this.value)" style="font-size:14px;padding:10px 12px;margin-bottom:10px;border-radius:10px">
   <div id="setariNoResults" style="display:none;font-size:12px;color:var(--muted);text-align:center;padding:14px">Nimic găsit — încearcă alt cuvânt (ex: notificări, sunet, nume, șterge)</div>
 
@@ -2494,7 +2506,16 @@ function showToast(msg,color,subtle){
   t._timer=setTimeout(function(){t.classList.remove('show');},dur);
 }
 
+// Titlul mare din antet urmează tabul: pe Azi salutul, în rest numele secțiunii
+var TAB_TITLES={nutritie:'Nutriție',program:'Săptămâna ta',progres:'Progres',istoric:'Istoric',ghid:'Ghid',setari:'Setări'};
+function setHeaderForTab(name){
+  var t=document.getElementById('hdrTitle'),sub=document.querySelector('.hdr-sub');
+  if(!t)return;
+  if(TAB_TITLES[name]){t.textContent=TAB_TITLES[name];if(sub)sub.style.display='none';}
+  else{initHeader();if(sub)sub.style.display='';}
+}
 function showTab(name,btn){
+  setHeaderForTab(name);
   document.querySelectorAll('.sec').forEach(function(s){s.classList.remove('act');});
   document.querySelectorAll('.nb').forEach(function(b){b.classList.remove('act');});
   document.getElementById('tab-'+name).classList.add('act');
@@ -4377,12 +4398,12 @@ function renderNutritionAuto(){
     '<div style="font-size:10px;color:var(--muted);letter-spacing:1px">KCAL/ZI</div></div></div>';
   document.getElementById('nutMacros').innerHTML=macroVisualHtml(n.protein,n.carbs,n.fat);
   var meals=document.getElementById('nutMeals');
-  var html='<div class="meal-card open"><div class="meal-hd" onclick="this.parentElement.classList.toggle(\'open\')"><div><div class="meal-nm">📋 Principiile planului tău</div><div class="meal-tm">generat pe profilul tău — nu mese impuse</div></div><span class="meal-chev" aria-hidden="true">▼</span></div><div class="meal-items">';
+  var html='<div class="meal-card open"><div class="meal-hd" onclick="this.parentElement.classList.toggle(\'open\')"><div><div class="meal-nm">Principiile planului tău</div><div class="meal-tm">generat pe profilul tău — nu mese impuse</div></div><span class="meal-chev" aria-hidden="true">▼</span></div><div class="meal-items">';
   (n.principles||[]).forEach(function(p){
     html+='<div class="item-row"><div class="item-nm" style="font-weight:500;line-height:1.4">'+p+'</div></div>';
   });
   html+='</div></div>';
-  html+='<div class="meal-card open"><div class="meal-hd" onclick="this.parentElement.classList.toggle(\'open\')"><div><div class="meal-nm">💧 Ținte zilnice</div></div><span class="meal-chev" aria-hidden="true">▼</span></div><div class="meal-items">';
+  html+='<div class="meal-card open"><div class="meal-hd" onclick="this.parentElement.classList.toggle(\'open\')"><div><div class="meal-nm">Ținte zilnice</div></div><span class="meal-chev" aria-hidden="true">▼</span></div><div class="meal-items">';
   html+='<div class="item-row"><div class="item-nm">Apă</div><div class="item-kc">'+n.waterL+' L</div></div>';
   html+='<div class="item-row"><div class="item-nm">Pași</div><div class="item-kc">'+n.stepsTarget+'</div></div>';
   html+='</div></div>';
@@ -4499,6 +4520,7 @@ function initProgram(){
 
   // 7 zile cu status
   html+='<div class="stitle">Zilele săptămânii</div>';
+  html+='<div class="glist glist-cards">';
   var dayLabels=['LUNI','MARȚI','MIERCURI','JOI','VINERI','SÂMBĂTĂ','DUMINICĂ'];
   // zilele vin din schedule (respectă planul de zile al userului)
 
@@ -4566,6 +4588,7 @@ function initProgram(){
   }
 
   // Plan general 8 săpt. — rândul curent evidențiat, făcutele bifate
+  html+='</div>';
   html+='<div class="stitle">Plan 8 săptămâni</div>';
   html+='<div class="card"><div class="card-bd" style="display:block;padding:4px 14px;border-top:none">';
   WEEK_FOCUS.forEach(function(f,i){
@@ -6170,7 +6193,7 @@ function initGhid(){
     var id='gh_'+i;
     html+='<div class="ghid-item" id="'+id+'" onclick="document.getElementById(\''+id+'\').classList.toggle(\'open\')">';
     var tagCls=ex.tag==='bară'?'g-bara':(ex.tag==='bodyweight'?'g-bodyweight':'g-gantere');
-    html+='<div class="ghid-nm"><span class="ex-thumb">'+thumbForExercise(ex.name)+'</span><span style="flex:1;min-width:0">'+ex.name+'</span><span class="gtag '+tagCls+'">'+ex.tag+'</span><span style="color:var(--muted);font-size:11px">▼</span></div>';
+    html+='<div class="ghid-nm"><span class="ex-thumb">'+thumbForExercise(ex.name)+'</span><span style="flex:1;min-width:0">'+ex.name+'</span><span class="gtag '+tagCls+'">'+ex.tag+'</span><span class="card-chev" aria-hidden="true">▼</span></div>';
     html+='<div class="ghid-body">';
     html+='<div class="g-row"><div class="g-lbl">Start</div><div>'+ex.start+'</div></div>';
     html+='<div class="g-row"><div class="g-lbl">Mișcare</div><div>'+ex.move+'</div></div>';
@@ -8282,7 +8305,7 @@ function renderWizard(){
   html+='</div></div>';
 
   if(s===0){
-    html+='<div class="wiz-title">🏋️ Bine ai venit!</div>';
+    html+='<div class="wiz-title">Bine ai venit!</div>';
     html+='<div class="wiz-sub">Programul tău de <strong style="color:var(--text)">8 săptămâni</strong>, personalizat pe corpul, echipamentul și obiectivul tău. Progresie săptămânală ghidată automat — tu doar te antrenezi.</div>';
     html+='<div class="wiz-sub">📝 6 întrebări rapide · ⏱️ sub 1 minut</div>';
     html+='<div class="wiz-sub" style="font-size:10px">⚠️ Aplicația nu înlocuiește sfatul medical. Dacă ai afecțiuni (cardiace, articulare, tensiune), consultă medicul înainte de a începe un program de forță.</div>';
@@ -8366,7 +8389,7 @@ function renderWizard(){
     if(!g){html+='<div class="wiz-sub">Eroare — reia pasul anterior.</div>';}
     else{
       var n=g.nutrition;
-      html+='<div class="wiz-title">🎉 Programul tău e gata!</div>';
+      html+='<div class="wiz-title">Programul tău e gata!</div>';
       html+='<div class="wiz-label">Săptămâna ta</div>';
       var DAY_N=['Luni','Marți','Miercuri','Joi','Vineri','Sâmbătă','Duminică'];
       var seen={};
