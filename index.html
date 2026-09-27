@@ -34,6 +34,7 @@
   --text:#e6edf3;
   --muted:#7d8d9a;
   --r:12px;
+  --appw:520px;        /* lățimea coloanei aplicației pe desktop/tabletă */
   --shadow-acc:0 0 24px rgba(var(--acc-rgb),.22);
 }
 /* Teme de accent — selectabile din Setări → Profil & personalizare */
@@ -79,13 +80,13 @@ html[data-mode="light"] .set-box.dirty{background:rgba(245,158,11,.07)}
 .mode-btn{flex:1;background:var(--s2);border:2px solid var(--bd);border-radius:10px;color:var(--text);padding:10px;font-family:inherit;font-weight:700;font-size:13px;cursor:pointer}
 .mode-btn.sel{border-color:var(--acc);background:rgba(var(--acc-rgb),.1)}
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-html{background:var(--bg)}
+html{background:var(--bg);overflow-x:hidden}
 body{background:transparent;color:var(--text);font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif;font-size:15px;padding-bottom:calc(90px + env(safe-area-inset-bottom))}
 /* Atmosferă: aure discrete de lumină în spatele întregii aplicații (fix, nu derulează) */
 body::before{content:'';position:fixed;inset:0;z-index:-1;pointer-events:none;background:radial-gradient(ellipse 90% 38% at 50% -8%,rgba(var(--acc-rgb),.09),transparent 60%),radial-gradient(ellipse 70% 42% at 108% 42%,rgba(167,139,250,.05),transparent 65%),radial-gradient(ellipse 75% 36% at -12% 88%,rgba(var(--acc-rgb),.05),transparent 60%)}
 /* Grain fin static peste aure — maschează banding-ul pe OLED, dă textură de material */
 body::after{content:'';position:fixed;inset:0;z-index:-1;pointer-events:none;opacity:.05;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");background-size:180px 180px}
-.hdr{background:linear-gradient(140deg,#0e1822 0%,#111d28 55%,#0a1117 100%);padding:calc(env(safe-area-inset-top) + 14px) 64px 14px 16px;border-bottom:1px solid var(--bd);position:relative}
+.hdr{background:linear-gradient(140deg,#0e1822 0%,#111d28 55%,#0a1117 100%);padding:calc(env(safe-area-inset-top) + 14px) 64px 14px 16px;border-bottom:1px solid var(--bd);position:relative;overflow:hidden}
 .hdr::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent 0%,var(--acc) 30%,var(--acc2) 50%,var(--acc) 70%,transparent 100%);opacity:.7}
 .hdr-lbl{font-size:10px;letter-spacing:3px;color:var(--acc);margin-bottom:4px;font-weight:600;text-transform:uppercase}
 .hdr-title{font-size:24px;font-weight:700;line-height:1.1;letter-spacing:.5px}
@@ -98,7 +99,7 @@ body::after{content:'';position:fixed;inset:0;z-index:-1;pointer-events:none;opa
 .sb-on{background:rgba(var(--acc-rgb),.15);color:var(--acc);border-color:rgba(var(--acc-rgb),.3)}
 .sb-off{background:rgba(125,141,154,.12);color:var(--muted)}
 .sb-err{background:rgba(244,63,94,.15);color:var(--red);border-color:rgba(244,63,94,.3)}
-.bnav{position:fixed;bottom:0;left:0;right:0;background:rgba(14,22,32,.96);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border-top:1px solid var(--bd);display:flex;z-index:200;padding-bottom:env(safe-area-inset-bottom)}
+.bnav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:var(--appw);background:rgba(14,22,32,.96);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border-top:1px solid var(--bd);display:flex;z-index:200;padding-bottom:env(safe-area-inset-bottom)}
 .nb{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;padding:10px 2px 12px;background:none;border:none;color:var(--muted);font-size:10px;font-weight:700;cursor:pointer;font-family:inherit;letter-spacing:.3px;transition:color .2s;position:relative}
 .nb .ico{font-size:20px;transition:transform .2s}
 .nb.act{color:var(--acc)}
@@ -367,7 +368,7 @@ html[data-mode="light"] .azi-stat.as4{background:#e0edff}html[data-mode="light"]
 .wiz-preview-stat{display:flex;justify-content:space-between;padding:7px 0;border-bottom:1px solid var(--bd);font-size:13px}
 .wiz-preview-stat:last-child{border-bottom:none}
 /* Rest timer sticky bar */
-.rest-timer{position:fixed;left:0;right:0;bottom:calc(72px + env(safe-area-inset-bottom));background:linear-gradient(135deg,#0e1822,var(--acc));border-top:2px solid var(--acc);z-index:180;display:none;align-items:center;gap:12px;padding:10px 16px;box-shadow:0 -4px 20px rgba(0,0,0,.4)}
+.rest-timer{position:fixed;left:50%;transform:translateX(-50%);width:100%;max-width:var(--appw);bottom:calc(72px + env(safe-area-inset-bottom));background:linear-gradient(135deg,#0e1822,var(--acc));border-top:2px solid var(--acc);z-index:180;display:none;align-items:center;gap:12px;padding:10px 16px;box-shadow:0 -4px 20px rgba(0,0,0,.4)}
 .rest-timer.show{display:flex}
 .rest-timer-icon{font-size:22px}
 .rest-timer-info{flex:1}
@@ -617,9 +618,13 @@ input:checked + .slider:before{transform:translateX(20px);background:var(--acc)}
 .rate-note-input:focus{outline:none;border-color:var(--purple)}
 .rate-note-input::placeholder{color:var(--muted)}
 .rating-value{font-size:16px;font-weight:900;color:var(--purple);min-width:28px;text-align:right}
+/* Coloană centrată — pe desktop/tabletă aplicația stă ca pe telefon, nu se întinde pe tot ecranul */
+#app{max-width:var(--appw);margin:0 auto;min-height:100vh;position:relative}
+@media (min-width:600px){#app{border-left:1px solid var(--bd);border-right:1px solid var(--bd);background:rgba(255,255,255,.012)}html[data-mode="light"] #app{background:rgba(255,255,255,.35)}}
 </style>
 </head>
 <body>
+<div id="app">
 <div class="hdr">
   <div class="hdr-lbl"><span id="hdrLblText">FITNESS JURNAL · 8 SĂPTĂMÂNI</span> <span id="syncBadge" class="sync-badge sb-off" onclick="showTab('setari')" title="Setări & Sync">LOCAL</span></div>
   <div class="hdr-title" id="hdrTitle">BLOC FRIENDLY</div>
@@ -1258,6 +1263,8 @@ input:checked + .slider:before{transform:translateX(20px);background:var(--acc)}
     <div class="card-bd"><div id="libContent" style="padding-top:10px"></div></div>
   </div>
 </div>
+
+</div><!-- /#app -->
 
 <div class="modal" id="editModal" onclick="if(event.target===this)closeEdit()">
   <div class="modal-content">
