@@ -892,6 +892,32 @@ html[data-mode="light"] .wiz-choice.sel,html[data-mode="light"] .mode-btn.sel,ht
 .azi-stat-val,.hud-tile-val,.chk-count,.morning-count,.set-in,.vol-val,.hist-ton,.macro-val,.rest-timer-time,.hud-hero,.chart-stat-val,.meal-kc,.rating-value{font-variant-numeric:tabular-nums}
 
 @media (prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important;scroll-behavior:auto!important}}
+
+/* ═══ Lot A (v102): notificări snackbar + ferestre care urcă de jos ═══ */
+.toast{left:12px;right:12px;margin:0 auto;width:auto;max-width:calc(var(--appw) - 24px);transform:translateY(16px);white-space:normal;display:flex;align-items:center;gap:11px;padding:12px 14px;border:1px solid rgba(255,255,255,.08);color:var(--text);background:rgba(38,43,52,.97);-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px);border-radius:16px;font-size:13.5px;font-weight:600;line-height:1.35;letter-spacing:0;text-align:left;box-shadow:0 14px 34px rgba(0,0,0,.45)}
+.toast.show{transform:translateY(0)}
+.toast.subtle{padding:9px 12px;font-size:12.5px}
+.toast .t-ico{width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;background:rgba(47,214,161,.16);color:var(--green)}
+.toast .t-ico svg{width:15px;height:15px;fill:none;stroke:currentColor;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}
+.toast.t-err .t-ico{background:rgba(244,63,94,.16);color:var(--red)}
+.toast.t-warn .t-ico{background:rgba(245,158,11,.16);color:var(--amber)}
+.toast.t-info .t-ico{background:rgba(var(--acc-rgb),.16);color:var(--acc2)}
+.toast .t-msg{flex:1;min-width:0;overflow-wrap:anywhere}
+html[data-mode="light"] .toast{background:rgba(255,255,255,.98);border-color:var(--bd);box-shadow:0 12px 30px rgba(16,24,40,.18)}
+body:has(.rest-timer.show) .toast{bottom:calc(168px + env(safe-area-inset-bottom))}
+body:has(#rirPrompt.show) .toast{bottom:calc(250px + env(safe-area-inset-bottom))}
+.undo-toast{left:12px;right:12px;margin:0 auto;width:auto;max-width:calc(var(--appw) - 24px);transform:translateY(-24px);background:rgba(38,43,52,.97);border:1px solid rgba(255,255,255,.08);border-radius:16px}
+.undo-toast.show{transform:translateY(0)}
+.undo-toast .u-msg{flex:1;color:var(--text);font-weight:600}
+.undo-toast.pr{border-color:rgba(245,158,11,.55)}
+.undo-toast.pr .u-msg{color:var(--amber)}
+html[data-mode="light"] .undo-toast{background:rgba(255,255,255,.98);border-color:var(--bd)}
+@keyframes sheetUp{from{transform:translateY(40px);opacity:.4}to{transform:none;opacity:1}}
+@media (max-width:599px){
+  .modal{align-items:flex-end;padding:0}
+  .modal-content{max-width:none;width:100%;border-radius:24px 24px 0 0;border-left:none;border-right:none;border-bottom:none;padding:10px 18px calc(18px + env(safe-area-inset-bottom));animation:sheetUp .28s cubic-bezier(.2,.9,.3,1)}
+  .modal-content::before{content:'';display:block;width:40px;height:4px;border-radius:2px;background:var(--bd);margin:0 auto 14px}
+}
 </style>
 </head>
 <body>
@@ -915,17 +941,17 @@ html[data-mode="light"] .wiz-choice.sel,html[data-mode="light"] .mode-btn.sel,ht
 
 <div class="install-hint" id="fsaReconnectBanner" style="background:rgba(245,158,11,.12);border-color:rgba(245,158,11,.5);color:var(--amber)">
   🔒 <strong>Sync fișier întrerupt</strong> (permisiune pierdută după update).
-  <button onclick="fsaReconnect()" style="color:var(--amber);font-weight:800;text-decoration:underline;background:none;border:none;cursor:pointer;padding:0 4px">🔓 Reconectează →</button>
+  <button onclick="fsaReconnect()" style="color:var(--amber);font-weight:800;text-decoration:underline;background:none;border:none;cursor:pointer;padding:0 4px">Reconectează →</button>
 </div>
 
 <div class="install-hint" id="backupOverdueBanner" style="background:rgba(244,63,94,.12);border-color:rgba(244,63,94,.5);color:#f87a8c">
   <button onclick="dismissBackupBanner()" aria-label="Închide" style="background:none;border:none;color:var(--muted);float:right;cursor:pointer;font-size:18px;margin-top:-4px">×</button>
-  ⚠️ <strong>Backup vechi</strong> — <span id="backupOverdueDays">n-ai salvat de mult</span>. <button onclick="shareBackup()" style="color:#f87a8c;font-weight:800;text-decoration:underline;background:none;border:none;cursor:pointer;padding:0 4px">💾 Backup acum →</button>
+  ⚠️ <strong>Backup vechi</strong> — <span id="backupOverdueDays">n-ai salvat de mult</span>. <button onclick="shareBackup()" style="color:#f87a8c;font-weight:800;text-decoration:underline;background:none;border:none;cursor:pointer;padding:0 4px">Backup acum →</button>
 </div>
 
 <div class="install-hint" id="measOverdueBanner" style="background:rgba(56,189,248,.1);border-color:rgba(56,189,248,.4);color:#7cc6f0">
   <button onclick="dismissMeasBanner()" aria-label="Închide" style="background:none;border:none;color:var(--muted);float:right;cursor:pointer;font-size:18px;margin-top:-4px">×</button>
-  📏 <strong>Măsoară-te</strong> — <span id="measOverdueDays"></span> pentru a urmări recomp-ul. <button onclick="goMeasure()" style="color:#7cc6f0;font-weight:800;text-decoration:underline;background:none;border:none;cursor:pointer;padding:0 4px">📏 Acum →</button>
+  📏 <strong>Măsoară-te</strong> — <span id="measOverdueDays"></span> pentru a urmări recomp-ul. <button onclick="goMeasure()" style="color:#7cc6f0;font-weight:800;text-decoration:underline;background:none;border:none;cursor:pointer;padding:0 4px">Acum →</button>
 </div>
 
 <nav class="bnav">
@@ -1107,7 +1133,7 @@ html[data-mode="light"] .wiz-choice.sel,html[data-mode="light"] .mode-btn.sel,ht
         <div class="meas-lbl">Notă (opțional)</div>
         <input class="meas-in" type="text" id="mNote" aria-label="Notă la măsurătoare" placeholder="ex: după antrenament, dimineața, etc.">
       </div>
-      <button class="btn btn-acc" onclick="saveMeasurement()">💾 Salvează măsurătorile</button>
+      <button class="btn btn-acc" onclick="saveMeasurement()">Salvează măsurătorile</button>
       </div>
       <div id="measHistory"></div>
     </div>
@@ -1154,7 +1180,7 @@ html[data-mode="light"] .wiz-choice.sel,html[data-mode="light"] .mode-btn.sel,ht
       <p style="font-size:11px;color:var(--muted);margin:12px 0 8px;line-height:1.4">
         Cântarul minte, oglinda minte — pozele nu. O poză pe lună, aceeași poziție și lumină.
       </p>
-      <button class="btn btn-ghost" onclick="document.getElementById('photoInput').click()">➕ Adaugă poză de progres</button>
+      <button class="btn btn-ghost" onclick="document.getElementById('photoInput').click()">Adaugă poză de progres</button>
       <input type="file" id="photoInput" accept="image/*" capture="environment" style="display:none" onchange="addProgressPhoto(event)">
       <div id="photoCompare"></div>
       <div id="photoGrid" style="display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-top:8px"></div>
@@ -1178,15 +1204,15 @@ html[data-mode="light"] .wiz-choice.sel,html[data-mode="light"] .mode-btn.sel,ht
         </div>
       </div>
       <div style="display:flex;gap:8px">
-        <button class="ai-btn-main" onclick="doExport()">🤖 Generează exportul</button>
-        <button class="ai-btn-ghost" onclick="copyExport()">📋 Copiază</button>
+        <button class="ai-btn-main" onclick="doExport()">Generează exportul</button>
+        <button class="ai-btn-ghost" onclick="copyExport()">Copiază</button>
       </div>
       <div class="export-box" id="exportBox" style="display:none;margin-bottom:0">Apasă butonul pentru a genera exportul complet.</div>
     </div>
   </div>
 
   <div class="stitle">Rezumatul săptămânii</div>
-  <button class="btn btn-ghost" onclick="showWeeklyDigest(currentWeekOffset)">🎉 Vezi rezumatul săptămânii afișate</button>
+  <button class="btn btn-ghost" onclick="showWeeklyDigest(currentWeekOffset)">Vezi rezumatul săptămânii afișate</button>
 
   <div class="stitle">Istoricul</div>
   <div class="week-nav">
@@ -1266,9 +1292,9 @@ html[data-mode="light"] .wiz-choice.sel,html[data-mode="light"] .mode-btn.sel,ht
         <div class="rule-row" id="myProgramInfo">—</div>
         <div class="rule-row" id="myDaysInfo">—</div>
       </div>
-      <button class="btn btn-acc" onclick="openDayPlan()">🗓️ Schimbă zilele de antrenament</button>
+      <button class="btn btn-acc" onclick="openDayPlan()">Schimbă zilele de antrenament</button>
       <p style="font-size:11px;color:var(--muted);margin:-4px 0 10px;line-height:1.45">Nu poți lunea? Mută antrenamentele pe orice zile — sau pune o excepție temporară (o săptămână, o lună) după care revii singur la program.</p>
-      <button class="btn btn-ghost" onclick="openWizard(true)" id="myProgramBtn">🔄 Reia wizard-ul (modifică programul)</button>
+      <button class="btn btn-ghost" onclick="openWizard(true)" id="myProgramBtn">Reia wizard-ul (modifică programul)</button>
       <p style="font-size:11px;color:var(--muted);margin-bottom:2px;line-height:1.4">
         Istoricul și PR-urile tale rămân intacte la regenerare — se schimbă doar planul de exerciții/nutriție.
       </p>
@@ -1359,7 +1385,7 @@ html[data-mode="light"] .wiz-choice.sel,html[data-mode="light"] .mode-btn.sel,ht
         <div class="notif-row" style="flex-direction:column;align-items:stretch;gap:6px">
           <div class="notif-lbl">Mesaj</div>
           <div class="notif-sub" id="notifMsgPreview">—</div>
-          <button class="btn btn-ghost" style="margin:4px 0 0" onclick="testNotif()">🔔 Trimite notificare test</button>
+          <button class="btn btn-ghost" style="margin:4px 0 0" onclick="testNotif()">Trimite notificare test</button>
         </div>
       </div>
       <p style="font-size:11px;color:var(--muted);margin-top:8px;line-height:1.5">
@@ -1413,10 +1439,10 @@ html[data-mode="light"] .wiz-choice.sel,html[data-mode="light"] .mode-btn.sel,ht
       <p style="font-size:12px;color:var(--muted);margin-bottom:10px;line-height:1.5" id="shareDesc">
         Un tap → meniul de share al telefonului → trimite datele către Drive, Mail, Telegram, orice. Zero setup.
       </p>
-      <button class="btn btn-acc" onclick="shareBackup()">📤 Share backup (Drive / Mail / ...)</button>
+      <button class="btn btn-acc" onclick="shareBackup()">Share backup (Drive / Mail / ...)</button>
       <div class="btn-row" style="margin-top:6px">
-        <button class="btn btn-ghost" style="font-size:12px;padding:8px" onclick="emailBackup()">✉️ Trimite pe email</button>
-        <button class="btn btn-ghost" style="font-size:12px;padding:8px" onclick="showShareDiag()">🔧 Diagnostic</button>
+        <button class="btn btn-ghost" style="font-size:12px;padding:8px" onclick="emailBackup()">Trimite pe email</button>
+        <button class="btn btn-ghost" style="font-size:12px;padding:8px" onclick="showShareDiag()">Diagnostic</button>
       </div>
       <p style="font-size:11px;color:var(--acc2);margin:6px 0 0;line-height:1.5;text-align:center;display:none" id="shareHint">
         💡 <strong>Pe mobile = sincronizarea ta.</strong> Apasă Share o dată pe săptămână → salvează în Drive.
@@ -1427,8 +1453,8 @@ html[data-mode="light"] .wiz-choice.sel,html[data-mode="light"] .mode-btn.sel,ht
         Fișier salvat cu numele <code style="background:var(--bg);padding:1px 4px;border-radius:3px;font-size:11px;color:var(--acc2)">fitness-data dd.mm.yyyy.json</code> (un fișier per zi, vezi data clar).
       </p>
       <div class="btn-row">
-        <button class="btn btn-ghost" onclick="downloadJSON()">⬇️ Descarcă</button>
-        <button class="btn btn-ghost" onclick="document.getElementById('fileImport').click()">⬆️ Importă</button>
+        <button class="btn btn-ghost" onclick="downloadJSON()">Descarcă</button>
+        <button class="btn btn-ghost" onclick="document.getElementById('fileImport').click()">Importă</button>
       </div>
       <input type="file" id="fileImport" accept="application/json" style="display:none" onchange="importJSON(event)">
 
@@ -1475,7 +1501,7 @@ html[data-mode="light"] .wiz-choice.sel,html[data-mode="light"] .mode-btn.sel,ht
           App-ul verifică automat update-uri când îl deschizi sau intri pe el. Dacă apare banner "Versiune nouă disponibilă" → apasă "Actualizează".
         </div>
       </div>
-      <button class="btn btn-ghost" onclick="manualUpdateCheck()">🔄 Verifică update acum</button>
+      <button class="btn btn-ghost" onclick="manualUpdateCheck()">Verifică update acum</button>
       <div class="rules-box">
         <div class="rule-row">📱 PWA instalat: <strong id="infoPwa" style="color:var(--text)">verific...</strong></div>
         <div class="rule-row">🔔 Notificări: <strong id="infoNotif" style="color:var(--text)">verific...</strong></div>
@@ -1497,7 +1523,7 @@ html[data-mode="light"] .wiz-choice.sel,html[data-mode="light"] .mode-btn.sel,ht
       <p style="font-size:11px;color:var(--muted);margin:12px 0 10px;line-height:1.5">
         Șterge jurnalul de pe acest device (seturi, măsurători, ciclul de progresie). Programul, profilul și setările rămân. Fă un backup înainte. Singura scăpare după: snapshot-urile automate din „Backup & sincronizare → Plasă de siguranță" (ultimele 7 zile).
       </p>
-      <button class="btn btn-danger" onclick="resetAll()">🗑️ Șterge toate datele</button>
+      <button class="btn btn-danger" onclick="resetAll()">Șterge toate datele</button>
     </div>
   </div>
 </div>
@@ -1549,8 +1575,8 @@ html[data-mode="light"] .wiz-choice.sel,html[data-mode="light"] .mode-btn.sel,ht
       <span style="color:var(--muted);font-weight:600">kg</span>
     </div>
     <div class="modal-btns">
-      <button class="btn btn-acc" onclick="saveEdit()">💾 Salvează</button>
-      <button class="btn btn-danger" onclick="deleteEdit()">🗑️ Șterge</button>
+      <button class="btn btn-acc" onclick="saveEdit()">Salvează</button>
+      <button class="btn btn-danger" onclick="deleteEdit()">Șterge</button>
       <button class="btn btn-ghost" onclick="closeEdit()">Anulează</button>
     </div>
   </div>
@@ -1567,9 +1593,9 @@ html[data-mode="light"] .wiz-choice.sel,html[data-mode="light"] .mode-btn.sel,ht
     <div class="modal-ttl" style="color:var(--acc2)" id="digestTitle">🎉 Săptămâna ta</div>
     <div class="modal-sub" id="digestPeriod"></div>
     <div id="digestBody" style="font-size:13px;line-height:1.7"></div>
-    <button class="btn btn-acc" style="margin-top:12px" onclick="downloadDigestImage()">📸 Salvează ca imagine</button>
+    <button class="btn btn-acc" style="margin-top:12px" onclick="downloadDigestImage()">Salvează ca imagine</button>
     <div class="btn-row" style="margin-top:8px">
-      <button class="btn btn-ghost" onclick="copyDigestText()">📋 Copiază text</button>
+      <button class="btn btn-ghost" onclick="copyDigestText()">Copiază text</button>
       <button class="btn btn-ghost" onclick="closeDigest()">Închide</button>
     </div>
   </div>
@@ -1615,13 +1641,13 @@ html[data-mode="light"] .wiz-choice.sel,html[data-mode="light"] .mode-btn.sel,ht
     <div class="modal-ttl" id="dayPlanTtl">🗓️ Zilele mele de antrenament</div>
     <div class="modal-sub">Muți programul pe zilele care ți se potrivesc — conținutul rămâne neschimbat</div>
     <div id="dayPlanBody" style="margin-top:12px"></div>
-    <button class="btn btn-acc" style="margin-top:14px" id="dayPlanSave" onclick="saveDayPlan()">📌 Salvează zilele</button>
+    <button class="btn btn-acc" style="margin-top:14px" id="dayPlanSave" onclick="saveDayPlan()">Salvează zilele</button>
     <button class="btn btn-ghost" id="dayPlanRevert" style="display:none;margin-bottom:8px" onclick="revertTempPlan()">↩ Revino la programul obișnuit</button>
     <button class="btn btn-ghost" style="margin-bottom:0" onclick="closeDayPlan()">Închide</button>
   </div>
 </div>
 
-<div class="toast" id="toast"></div>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
 
 <div class="undo-toast" id="undoToast">
   <div class="u-msg" id="undoMsg"></div>
@@ -2027,7 +2053,7 @@ function renderDayPlan(){
       h+='<div style="background:rgba(245,158,11,.09);border:1px solid rgba(245,158,11,.4);border-radius:10px;padding:9px 11px;margin-bottom:14px;font-size:11px;color:var(--amber);line-height:1.5">⚠️ Programul se regenerează pe <strong>'+need+' zile</strong>, pe profilul tău. Istoricul, PR-urile și măsurătorile rămân neatinse.</div>';
     }
   }else{
-    h+='<div style="background:var(--s2);border:1px solid var(--bd);border-radius:10px;padding:10px 12px;margin-bottom:14px;font-size:11.5px;color:var(--muted);line-height:1.5">Ai <strong style="color:var(--text)">'+progCount+' zile</strong> de antrenament. Ca să schimb numărul, am nevoie de profilul complet (echipament, nivel, obiectiv) — durează un minut.<br><button class="dpl-pill" style="margin-top:8px" onclick="dpGoWizard()">🔄 Completează profilul</button></div>';
+    h+='<div style="background:var(--s2);border:1px solid var(--bd);border-radius:10px;padding:10px 12px;margin-bottom:14px;font-size:11.5px;color:var(--muted);line-height:1.5">Ai <strong style="color:var(--text)">'+progCount+' zile</strong> de antrenament. Ca să schimb numărul, am nevoie de profilul complet (echipament, nivel, obiectiv) — durează un minut.<br><button class="dpl-pill" style="margin-top:8px" onclick="dpGoWizard()">Completează profilul</button></div>';
   }
 
   // 2) În ce zile
@@ -2044,7 +2070,7 @@ function renderDayPlan(){
 
   // 3) Permanent vs temporar
   h+='<div class="dpl-seg">';
-  h+='<button class="'+(dayPlanState.mode==='perm'?'act':'')+'" onclick="dpSetMode(\'perm\')">📌 Permanent</button>';
+  h+='<button class="'+(dayPlanState.mode==='perm'?'act':'')+'" onclick="dpSetMode(\'perm\')">Permanent</button>';
   h+='<button class="'+(dayPlanState.mode==='temp'?'act':'')+'" onclick="dpSetMode(\'temp\')">⏳ Temporar</button>';
   h+='</div>';
   if(dayPlanState.mode==='temp'){
@@ -2393,18 +2419,29 @@ function todayISO(){
   return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
 }
 
+// Notificare tip snackbar: textul fără emoji-urile de la capete, iconița vine din tipul mesajului
+var TOAST_ICONS={
+  ok:'<path d="M5 12.5l4.5 4.5L19 7.5"/>',
+  err:'<circle cx="12" cy="12" r="9"/><path d="M12 7.5v5.5M12 16.5v.5"/>',
+  warn:'<path d="M12 3.5l9.5 16.5h-19z"/><path d="M12 10v4M12 17v.5"/>',
+  info:'<circle cx="12" cy="12" r="9"/><path d="M12 11v5.5M12 7.5v.5"/>'
+};
+var EMO_EDGE_RE=/^[\s\u200D\uFE0F\p{Extended_Pictographic}]+|[\s\u200D\uFE0F\p{Extended_Pictographic}]+$/gu;
+function toastKind(color){
+  var c=String(color||'');
+  if(/red|f43f5e|ef4444/.test(c))return 'err';
+  if(/amber|fbbf24|f59e0b|f97316/.test(c))return 'warn';
+  if(/acc|purple|blue/.test(c))return 'info';
+  return 'ok';
+}
 function showToast(msg,color,subtle){
   var t=document.getElementById('toast');
-  t.textContent=msg;
-  t.style.borderColor=color||'var(--green)';
-  t.style.color=color||'var(--green)';
-  if(subtle){
-    t.style.padding='5px 14px';
-    t.style.fontSize='12px';
-  }else{
-    t.style.padding='';
-    t.style.fontSize='';
-  }
+  var kind=toastKind(color);
+  var text=String(msg==null?'':msg).replace(EMO_EDGE_RE,'')||String(msg);
+  t.className='toast t-'+kind+(subtle?' subtle':'');
+  t.innerHTML='<span class="t-ico" aria-hidden="true"><svg viewBox="0 0 24 24">'+TOAST_ICONS[kind]+'</svg></span><span class="t-msg"></span>';
+  t.querySelector('.t-msg').textContent=text;
+  void t.offsetWidth; // repornește tranziția și când vine un mesaj peste altul
   t.classList.add('show');
   clearTimeout(t._timer);
   // Durată adaptivă: mesajele lungi stau cât să poată fi citite (~45ms/caracter)
@@ -2635,7 +2672,7 @@ function renderToday(){
     html+='<div style="background:rgba(167,139,250,.12);border:1px solid rgba(167,139,250,.45);border-radius:10px;padding:12px;margin-bottom:12px;font-size:12px;line-height:1.5;color:var(--text)">';
     html+='🧘 <strong style="color:var(--purple)">Corpul cere pauză.</strong> Stagnezi la '+deloadSuggest.stagnant+' exerciții ⭐'+(deloadSuggest.energy!==null?' iar energia ta medie e '+deloadSuggest.energy.toFixed(1)+'/10':'')+'. O săptămână ușoară acum = progres mai rapid după.';
     html+='<div style="display:flex;gap:8px;margin-top:10px">';
-    html+='<button class="btn btn-acc" style="margin:0;padding:10px;font-size:13px;flex:1" onclick="acceptManualDeload()">🧘 Accept — săptămână ușoară</button>';
+    html+='<button class="btn btn-acc" style="margin:0;padding:10px;font-size:13px;flex:1" onclick="acceptManualDeload()">Accept — săptămână ușoară</button>';
     html+='<button class="btn btn-ghost" style="margin:0;padding:10px;font-size:13px;flex:0 0 auto" onclick="dismissDeloadSuggest()">Nu acum</button>';
     html+='</div></div>';
   }
@@ -2820,7 +2857,7 @@ function renderToday(){
       [['🤕','Durere / disconfort'],['🥱','Fără energie'],['⏱️','Fără timp'],['🚫','Fără echipament']].forEach(function(rp){
         skipHtml+='<button class="skip-pill" onclick="skipExercise(\''+sk+'\',\''+rp[1]+'\')">'+rp[0]+' '+rp[1]+'</button>';
       });
-      skipHtml+='<button class="skip-pill" onclick="skipExerciseCustom(\''+sk+'\')">💬 Alt motiv</button>';
+      skipHtml+='<button class="skip-pill" onclick="skipExerciseCustom(\''+sk+'\')">Alt motiv</button>';
       skipHtml+='</div>';
     }
     // 1.4 — Calculator de discuri la exerciții cu bară
@@ -4384,7 +4421,7 @@ function initProgram(){
   html+='</div>';
   // Buton ciclu nou — apare dacă ești în săpt. 8 sau mai departe
   if(week>=8 || cycleInfo.absWeek>8){
-    html+='<button class="btn btn-acc" style="margin-top:12px;margin-bottom:0;font-size:13px;padding:10px" onclick="startNewCycle()">🔄 Începe ciclul nou (săpt. 1/8)</button>';
+    html+='<button class="btn btn-acc" style="margin-top:12px;margin-bottom:0;font-size:13px;padding:10px" onclick="startNewCycle()">Începe ciclul nou (săpt. 1/8)</button>';
   }
   html+='</div>';
 
@@ -5479,8 +5516,8 @@ function renderModeRow(){
   var row=document.getElementById('modeRow');if(!row)return;
   var cur=localStorage.getItem('app_mode')||'';
   row.innerHTML=
-    '<button class="mode-btn'+(cur===''?' sel':'')+'" onclick="setMode(\'\')">🌙 Întunecat</button>'+
-    '<button class="mode-btn'+(cur==='light'?' sel':'')+'" onclick="setMode(\'light\')">☀️ Deschis</button>';
+    '<button class="mode-btn'+(cur===''?' sel':'')+'" onclick="setMode(\'\')">Întunecat</button>'+
+    '<button class="mode-btn'+(cur==='light'?' sel':'')+'" onclick="setMode(\'light\')">Deschis</button>';
 }
 
 // Culorile temei curente, pentru grafice SVG și canvas (unde var() nu merge)
@@ -5904,15 +5941,15 @@ function updateFsaUI(needReconnect){
     status.innerHTML='⚪ Deconectat';
     sub.innerHTML='Alege un fișier JSON (dacă există) sau creează unul nou — ideal într-un folder Drive pentru sync între device-uri.';
     actions.innerHTML=
-      '<div class="btn-row"><button class="btn btn-acc" onclick="fsaPick()">📁 Alege fișier</button>'+
-      '<button class="btn btn-ghost" onclick="fsaCreateNew()">➕ Creează nou</button></div>';
+      '<div class="btn-row"><button class="btn btn-acc" onclick="fsaPick()">Alege fișier</button>'+
+      '<button class="btn btn-ghost" onclick="fsaCreateNew()">Creează nou</button></div>';
     return;
   }
 
   if(needReconnect){
     status.innerHTML='⏸️ '+fsaState.fileName+' · pauză';
     sub.innerHTML='Permisiunea a expirat (normal după închidere browser). Apasă pentru a reactiva.';
-    actions.innerHTML='<button class="btn btn-acc" onclick="fsaReconnect()">🔓 Reconectează</button><button class="btn btn-danger" onclick="fsaDisconnect()">🔌 Uită fișierul</button>';
+    actions.innerHTML='<button class="btn btn-acc" onclick="fsaReconnect()">Reconectează</button><button class="btn btn-danger" onclick="fsaDisconnect()">Uită fișierul</button>';
     return;
   }
 
@@ -5927,9 +5964,9 @@ function updateFsaUI(needReconnect){
   }
   sub.innerHTML='Ultima scriere: '+lastTxt+' · Scriere automată 2s după fiecare modificare · Citire automată la 30s.';
   actions.innerHTML=
-    '<div class="btn-row"><button class="btn btn-ghost" onclick="fsaWriteFile()">💾 Scrie acum</button>'+
-    '<button class="btn btn-ghost" onclick="fsaReadFile().then(function(){showToast(\'Verificat ✓\');})">🔄 Verifică</button></div>'+
-    '<button class="btn btn-danger" onclick="fsaDisconnect()">🔌 Oprește sync</button>';
+    '<div class="btn-row"><button class="btn btn-ghost" onclick="fsaWriteFile()">Scrie acum</button>'+
+    '<button class="btn btn-ghost" onclick="fsaReadFile().then(function(){showToast(\'Verificat ✓\');})">Verifică</button></div>'+
+    '<button class="btn btn-danger" onclick="fsaDisconnect()">Oprește sync</button>';
 }
 
 // ═══════════════════════════════════════════════════════════════
@@ -8260,7 +8297,7 @@ function renderWizard(){
     html+='<button class="wiz-choice'+(!d.morningRoutine?' sel':'')+'" onclick="wizSet(\'morningRoutine\',\'false\')"><div class="wiz-choice-title">Nu</div><div class="wiz-choice-sub">doar seara</div></button>';
     html+='</div>';
     html+='<div class="wiz-err" id="wizErr"></div>';
-    html+='<div class="wiz-nav"><button class="btn btn-ghost btn-back" onclick="wizBack()">←</button><button class="btn btn-acc" onclick="wizNext()">✨ Generează programul</button></div>';
+    html+='<div class="wiz-nav"><button class="btn btn-ghost btn-back" onclick="wizBack()">←</button><button class="btn btn-acc" onclick="wizNext()">Generează programul</button></div>';
   }
   else if(s===6){
     var g=wizState.generated;
@@ -8287,7 +8324,7 @@ function renderWizard(){
       html+='<div class="wiz-preview-stat"><span>Proteine · Carbo · Grăsimi</span><strong>'+n.protein+'g · '+n.carbs+'g · '+n.fat+'g</strong></div>';
       html+='<div class="wiz-preview-stat"><span>Apă · Pași</span><strong>'+n.waterL+'L · '+n.stepsTarget+'</strong></div>';
       html+='<div class="wiz-sub" style="margin-top:12px">📈 Progresie automată: săpt. 1-2 înveți · 3-4 +repetări · 5-6 +kg · 7 +set · 8 recuperare — apoi ciclu nou. Smart Coach îți spune zilnic exact ce să faci.</div>';
-      html+='<div class="wiz-nav"><button class="btn btn-ghost btn-back" onclick="wizBack()">←</button><button class="btn btn-acc" onclick="wizFinish()">🚀 Începe programul</button></div>';
+      html+='<div class="wiz-nav"><button class="btn btn-ghost btn-back" onclick="wizBack()">←</button><button class="btn btn-acc" onclick="wizFinish()">Începe programul</button></div>';
     }
   }
   c.innerHTML=html;
