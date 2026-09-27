@@ -2,41 +2,60 @@
 <html lang="ro">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, viewport-fit=cover">
-<meta name="theme-color" content="#0e1822">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0b0d10">
+<meta name="description" content="Jurnal de antrenament cu antrenor inteligent: program personalizat, progresie săptămânală, nutriție și progres — totul pe telefonul tău.">
+<meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Fitness">
 <link rel="manifest" href="./manifest.json">
+<link rel="icon" type="image/png" sizes="32x32" href="./icons/favicon-32.png">
+<link rel="apple-touch-icon" href="./icons/apple-touch-icon.png">
+<link rel="preload" href="./fonts/barlow-400-latin.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="./fonts/barlowc-700-latin.woff2" as="font" type="font/woff2" crossorigin>
 <title>Fitness Jurnal</title>
-<script>try{var _t=localStorage.getItem('app_theme');if(_t)document.documentElement.setAttribute('data-theme',_t);var _m=localStorage.getItem('app_mode');if(_m)document.documentElement.setAttribute('data-mode',_m);}catch(e){}</script>
+<script>try{var _t=localStorage.getItem('app_theme');if(_t)document.documentElement.setAttribute('data-theme',_t);var _m=localStorage.getItem('app_mode');if(_m)document.documentElement.setAttribute('data-mode',_m);if(_m==='light'){var _tc=document.querySelector('meta[name="theme-color"]');if(_tc)_tc.setAttribute('content','#f4f5f7');}}catch(e){}</script>
 <style>
-/* Chakra Petch — self-hostat (offline PWA), doar cifre/titluri HUD */
-@font-face{font-family:'Chakra Petch';font-style:normal;font-weight:600;font-display:swap;src:url('./fonts/chakra-600-latin.woff2') format('woff2');unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD}
-@font-face{font-family:'Chakra Petch';font-style:normal;font-weight:600;font-display:swap;src:url('./fonts/chakra-600-latin-ext.woff2') format('woff2');unicode-range:U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+0304,U+0308,U+0329,U+1D00-1DBF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C0,U+2113,U+2C60-2C7F,U+A720-A7FF}
-@font-face{font-family:'Chakra Petch';font-style:normal;font-weight:700;font-display:swap;src:url('./fonts/chakra-700-latin.woff2') format('woff2');unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD}
-@font-face{font-family:'Chakra Petch';font-style:normal;font-weight:700;font-display:swap;src:url('./fonts/chakra-700-latin-ext.woff2') format('woff2');unicode-range:U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+0304,U+0308,U+0329,U+1D00-1DBF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C0,U+2113,U+2C60-2C7F,U+A720-A7FF}
+/* Barlow + Barlow Condensed — self-hostate (offline PWA); latin-ext = ă ș ț */
+@font-face{font-family:'Barlow';font-style:normal;font-weight:400;font-display:swap;src:url('./fonts/barlow-400-latin-ext.woff2') format('woff2');unicode-range:U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF}
+@font-face{font-family:'Barlow';font-style:normal;font-weight:400;font-display:swap;src:url('./fonts/barlow-400-latin.woff2') format('woff2');unicode-range:U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD}
+@font-face{font-family:'Barlow';font-style:normal;font-weight:600;font-display:swap;src:url('./fonts/barlow-600-latin-ext.woff2') format('woff2');unicode-range:U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF}
+@font-face{font-family:'Barlow';font-style:normal;font-weight:600;font-display:swap;src:url('./fonts/barlow-600-latin.woff2') format('woff2');unicode-range:U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD}
+@font-face{font-family:'Barlow';font-style:normal;font-weight:700;font-display:swap;src:url('./fonts/barlow-700-latin-ext.woff2') format('woff2');unicode-range:U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF}
+@font-face{font-family:'Barlow';font-style:normal;font-weight:700;font-display:swap;src:url('./fonts/barlow-700-latin.woff2') format('woff2');unicode-range:U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD}
+@font-face{font-family:'Barlow Condensed';font-style:normal;font-weight:600;font-display:swap;src:url('./fonts/barlowc-600-latin-ext.woff2') format('woff2');unicode-range:U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF}
+@font-face{font-family:'Barlow Condensed';font-style:normal;font-weight:600;font-display:swap;src:url('./fonts/barlowc-600-latin.woff2') format('woff2');unicode-range:U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD}
+@font-face{font-family:'Barlow Condensed';font-style:normal;font-weight:700;font-display:swap;src:url('./fonts/barlowc-700-latin-ext.woff2') format('woff2');unicode-range:U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF}
+@font-face{font-family:'Barlow Condensed';font-style:normal;font-weight:700;font-display:swap;src:url('./fonts/barlowc-700-latin.woff2') format('woff2');unicode-range:U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD}
 :root{
-  --bg:#0a1117;
-  --s1:#121b24;
-  --s2:#1a2530;
-  --bd:#273340;
-  --acc:#14b8a6;        /* teal-500 */
-  --acc-rgb:20,184,166;
+  --bg:#0b0d10;
+  --s1:#14171c;
+  --s2:#1c2027;
+  --s3:#262b34;
+  --bd:#262b33;
+  --acc:#c6f135;        /* volt — accentul implicit (Atelier) */
+  --acc-rgb:198,241,53;
   --acc-soft:rgba(var(--acc-rgb),.15);
-  --acc-dim:#0d8a80;
-  --acc2:#5eead4;       /* teal-300 accent bright */
-  --acc2-rgb:94,234,212;
+  --acc-dim:#55720a;    /* varianta închisă: text pe fundal deschis */
+  --acc2:#d6fa6e;
+  --acc2-rgb:214,250,110;
+  --acc-fg:#0b0d10;     /* text pe accent — închis pe toate temele (contrast ≥4.5) */
   --blue:#38bdf8;
-  --green:#22c55e;
+  --green:#2fd6a1;
   --red:#f43f5e;
   --purple:#a78bfa;
-  --text:#e6edf3;
-  --muted:#7d8d9a;
-  --r:12px;
+  --amber:var(--amber);
+  --text:#eef0f3;
+  --muted:#8a929e;
+  --r:16px;
   --appw:520px;        /* lățimea coloanei aplicației pe desktop/tabletă */
-  --shadow-acc:0 0 24px rgba(var(--acc-rgb),.22);
+  --shadow-acc:none;
+  --fb:'Barlow',system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;
+  --fd:'Barlow Condensed','Barlow',system-ui,sans-serif;
 }
+/* Turcoazul clasic (accentul vechi) rămâne ca temă */
+html[data-theme="teal"]{--acc:#14b8a6;--acc-rgb:20,184,166;--acc-dim:#0b7a71;--acc2:#5eead4;--acc2-rgb:94,234,212}
 /* Teme de accent — selectabile din Setări → Profil & personalizare */
 html[data-theme="ocean"]{--acc:#0ea5e9;--acc-rgb:14,165,233;--acc-dim:#0369a1;--acc2:#7dd3fc;--acc2-rgb:125,211,252}
 html[data-theme="mov"]{--acc:#8b5cf6;--acc-rgb:139,92,246;--acc-dim:#6d28d9;--acc2:#c4b5fd;--acc2-rgb:196,181,253}
@@ -44,7 +63,7 @@ html[data-theme="roz"]{--acc:#ec4899;--acc-rgb:236,72,153;--acc-dim:#be185d;--ac
 html[data-theme="foc"]{--acc:#f59e0b;--acc-rgb:245,158,11;--acc-dim:#b45309;--acc2:#fcd34d;--acc2-rgb:252,211,77}
 html[data-theme="verde"]{--acc:#22c55e;--acc-rgb:34,197,94;--acc-dim:#15803d;--acc2:#86efac;--acc2-rgb:134,239,172}
 /* Aspect deschis (toggle în Setări) — acc2 devine varianta închisă ca să rămână lizibil pe alb */
-html[data-mode="light"]{--bg:#f5f7f9;--s1:#ffffff;--s2:#eef1f5;--bd:#e2e8ee;--text:#182430;--muted:#66788b;--acc2:var(--acc-dim);--acc2-rgb:var(--acc-rgb);--shadow-acc:0 0 24px rgba(var(--acc-rgb),.16)}
+html[data-mode="light"]{--bg:#f4f5f7;--s1:#ffffff;--s2:#eef0f3;--s3:#e4e7ec;--bd:#e2e5ea;--text:#15181d;--muted:#5f6b7a;--acc2:var(--acc-dim);--acc2-rgb:var(--acc-rgb);--shadow-acc:none;--amber:#a15c07;--green:#0f8a5f;--blue:#0369a1;--purple:#6d28d9;--red:#be123c}
 html[data-mode="light"] body{background:transparent}
 html[data-mode="light"] body::before{background:radial-gradient(ellipse 90% 38% at 50% -8%,rgba(var(--acc-rgb),.07),transparent 60%),radial-gradient(ellipse 70% 42% at 108% 42%,rgba(139,92,246,.04),transparent 65%)}
 html[data-mode="light"] body::after{opacity:.028}
@@ -56,9 +75,9 @@ html[data-mode="light"] .card.open{box-shadow:0 6px 16px rgba(30,50,70,.08),0 0 
 html[data-mode="light"] .onboarding{background:rgba(233,238,243,.96)}
 html[data-mode="light"] .toast{background:#ffffff;box-shadow:0 8px 24px rgba(30,50,70,.18)}
 html[data-mode="light"] .set-box.dirty{background:rgba(245,158,11,.07)}
-/* Tipografie HUD — Chakra Petch pe titluri și cifre */
-.hdr-lbl,.hdr-date,.stitle,.azi-stat-val,.rest-timer-time,.set-in,.wiz-title,.onboarding-title{font-family:'Chakra Petch','Segoe UI',Arial,sans-serif}
-.hdr-title{font-family:'Chakra Petch','Segoe UI',Arial,sans-serif;font-weight:700;letter-spacing:.5px}
+/* Tipografie — Barlow Condensed (var(--fd)) pe titluri și cifre */
+.hdr-lbl,.hdr-date,.stitle,.azi-stat-val,.rest-timer-time,.set-in,.wiz-title,.onboarding-title{font-family:var(--fd)}
+.hdr-title{font-family:var(--fd);font-weight:700;letter-spacing:.5px}
 .rest-timer-time{font-weight:700}
 /* Iconografie SVG — nav + gear (înlocuiește emoji) */
 .nb .ico{display:flex;align-items:center;justify-content:center;height:22px}
@@ -81,14 +100,14 @@ html[data-mode="light"] .set-box.dirty{background:rgba(245,158,11,.07)}
 .mode-btn.sel{border-color:var(--acc);background:rgba(var(--acc-rgb),.1)}
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 html{background:var(--bg);overflow-x:hidden}
-body{background:transparent;color:var(--text);font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif;font-size:15px;padding-bottom:calc(90px + env(safe-area-inset-bottom))}
+body{background:transparent;color:var(--text);font-family:var(--fb);font-size:15px;padding-bottom:calc(90px + env(safe-area-inset-bottom))}
 /* Atmosferă: aure discrete de lumină în spatele întregii aplicații (fix, nu derulează) */
 body::before{content:'';position:fixed;inset:0;z-index:-1;pointer-events:none;background:radial-gradient(ellipse 90% 38% at 50% -8%,rgba(var(--acc-rgb),.09),transparent 60%),radial-gradient(ellipse 70% 42% at 108% 42%,rgba(167,139,250,.05),transparent 65%),radial-gradient(ellipse 75% 36% at -12% 88%,rgba(var(--acc-rgb),.05),transparent 60%)}
 /* Grain fin static peste aure — maschează banding-ul pe OLED, dă textură de material */
 body::after{content:'';position:fixed;inset:0;z-index:-1;pointer-events:none;opacity:.05;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");background-size:180px 180px}
 .hdr{background:linear-gradient(140deg,#0e1822 0%,#111d28 55%,#0a1117 100%);padding:calc(env(safe-area-inset-top) + 14px) 64px 14px 16px;border-bottom:1px solid var(--bd);position:relative;overflow:hidden}
 .hdr::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent 0%,var(--acc) 30%,var(--acc2) 50%,var(--acc) 70%,transparent 100%);opacity:.7}
-.hdr-lbl{font-size:10px;letter-spacing:3px;color:var(--acc);margin-bottom:4px;font-weight:600;text-transform:uppercase}
+.hdr-lbl{font-size:10px;letter-spacing:3px;color:var(--acc2);margin-bottom:4px;font-weight:600;text-transform:uppercase}
 .hdr-title{font-size:24px;font-weight:700;line-height:1.1;letter-spacing:.5px}
 .hdr-sub{font-size:12px;color:var(--muted);margin-top:4px}
 .hdr-date{font-size:11px;color:var(--acc2);margin-top:6px;font-weight:600;letter-spacing:1.2px}
@@ -96,18 +115,18 @@ body::after{content:'';position:fixed;inset:0;z-index:-1;pointer-events:none;opa
 .sync-badge:active{opacity:.7}
 .settings-gear{position:absolute;top:calc(env(safe-area-inset-top) + 14px);right:14px;background:var(--s2);border:1px solid var(--bd);border-radius:10px;width:38px;height:38px;display:flex;align-items:center;justify-content:center;font-size:18px;cursor:pointer;color:var(--text)}
 .settings-gear:active{background:var(--bd);border-color:var(--acc)}
-.sb-on{background:rgba(var(--acc-rgb),.15);color:var(--acc);border-color:rgba(var(--acc-rgb),.3)}
+.sb-on{background:rgba(var(--acc-rgb),.15);color:var(--acc2);border-color:rgba(var(--acc-rgb),.3)}
 .sb-off{background:rgba(125,141,154,.12);color:var(--muted)}
 .sb-err{background:rgba(244,63,94,.15);color:var(--red);border-color:rgba(244,63,94,.3)}
 .bnav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:var(--appw);background:rgba(14,22,32,.96);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border-top:1px solid var(--bd);display:flex;z-index:200;padding-bottom:env(safe-area-inset-bottom)}
 .nb{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;padding:10px 2px 12px;background:none;border:none;color:var(--muted);font-size:10px;font-weight:700;cursor:pointer;font-family:inherit;letter-spacing:.3px;transition:color .2s;position:relative}
 .nb .ico{font-size:20px;transition:transform .2s}
-.nb.act{color:var(--acc)}
+.nb.act{color:var(--acc2)}
 .nb.act .ico{transform:scale(1.1)}
 .nb.act::after{content:'';position:absolute;bottom:0;left:30%;right:30%;height:2px;background:var(--acc);border-radius:2px}
 .sec{display:none;padding:14px}
 .sec.act{display:block}
-.stitle{font-size:11px;font-weight:600;letter-spacing:2px;color:var(--acc);text-transform:uppercase;margin:14px 0 8px;display:flex;align-items:center;gap:8px}
+.stitle{font-size:11px;font-weight:600;letter-spacing:2px;color:var(--acc2);text-transform:uppercase;margin:14px 0 8px;display:flex;align-items:center;gap:8px}
 .stitle::after{content:'';flex:1;height:1px;background:var(--bd)}
 /* Setări — grupuri pliabile */
 .sgroup{background:var(--s1);border:1px solid var(--bd);border-radius:var(--r);margin-bottom:10px;overflow:hidden}
@@ -128,7 +147,7 @@ body::after{content:'';position:fixed;inset:0;z-index:-1;pointer-events:none;opa
 /* Plasă de siguranță — snapshot-uri automate zilnice */
 .snap-row{display:flex;align-items:center;gap:10px;background:var(--s2);border:1px solid var(--bd);border-radius:10px;padding:9px 12px;margin-bottom:6px}
 .snap-row.today{border-color:rgba(34,197,94,.35)}
-.snap-date{font-family:'Chakra Petch','Segoe UI',Arial,sans-serif;font-weight:700;font-size:13px;color:var(--text)}
+.snap-date{font-family:var(--fd);font-weight:700;font-size:13px;color:var(--text)}
 .snap-meta{font-size:10.5px;color:var(--muted);margin-top:1px}
 .snap-btn{margin-left:auto;background:rgba(var(--acc-rgb),.1);border:1px solid rgba(var(--acc-rgb),.4);border-radius:8px;color:var(--acc2);font-size:11px;font-weight:700;padding:7px 11px;cursor:pointer;font-family:inherit;flex-shrink:0}
 .snap-btn:active{background:rgba(var(--acc-rgb),.25)}
@@ -138,15 +157,15 @@ body::after{content:'';position:fixed;inset:0;z-index:-1;pointer-events:none;opa
 .vol-hd{display:flex;align-items:baseline;gap:7px;margin-bottom:4px}
 .vol-name{font-size:12px;font-weight:700;color:var(--text)}
 .vol-status{font-size:8.5px;font-weight:800;letter-spacing:.6px;padding:2px 6px;border-radius:5px}
-.vol-status.low{background:rgba(245,158,11,.12);color:#fbbf24}
+.vol-status.low{background:rgba(245,158,11,.12);color:var(--amber)}
 .vol-status.ok{background:rgba(34,197,94,.15);color:var(--green)}
 .vol-status.high{background:rgba(244,63,94,.14);color:#fb7185}
-.vol-val{font-family:'Chakra Petch','Segoe UI',Arial,sans-serif;font-size:14px;font-weight:700;margin-left:auto;color:var(--text)}
+.vol-val{font-family:var(--fd);font-size:14px;font-weight:700;margin-left:auto;color:var(--text)}
 .vol-val small{font-size:9px;color:var(--muted);font-weight:600;letter-spacing:.4px}
 .vol-track{position:relative;height:11px;background:var(--s2);border-radius:6px}
 .vol-band{position:absolute;top:0;bottom:0;background:rgba(34,197,94,.09);border-left:1px dashed rgba(34,197,94,.5);border-right:1px dashed rgba(34,197,94,.5)}
 .vol-fill{position:absolute;top:2px;bottom:2px;left:2px;border-radius:4px;width:0;transition:width .7s cubic-bezier(.25,.9,.3,1)}
-.vol-fill.low{background:linear-gradient(90deg,rgba(245,158,11,.45),#fbbf24)}
+.vol-fill.low{background:linear-gradient(90deg,rgba(245,158,11,.45),var(--amber))}
 .vol-fill.ok{background:linear-gradient(90deg,rgba(var(--acc-rgb),.5),var(--acc2));box-shadow:0 0 12px rgba(var(--acc-rgb),.5)}
 .vol-fill.high{background:linear-gradient(90deg,rgba(244,63,94,.45),#fb7185);box-shadow:0 0 10px rgba(244,63,94,.35)}
 @media (prefers-reduced-motion:reduce){.vol-fill{transition:none}}
@@ -154,20 +173,20 @@ body::after{content:'';position:fixed;inset:0;z-index:-1;pointer-events:none;opa
 .hud-strip{position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--acc),var(--green),var(--acc2));border-radius:var(--r) var(--r) 0 0}
 .hud-dot{width:8px;height:8px;border-radius:50%;background:var(--green);box-shadow:0 0 10px rgba(34,197,94,.9);animation:hudPulse 2.2s ease-in-out infinite;flex-shrink:0}
 @keyframes hudPulse{0%,100%{opacity:1}50%{opacity:.45}}
-.hud-hero{font-family:'Chakra Petch','Segoe UI',Arial,sans-serif;font-size:50px;line-height:1;font-weight:700;background:linear-gradient(115deg,var(--acc2) 10%,var(--green) 85%);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;font-variant-numeric:tabular-nums}
+.hud-hero{font-family:var(--fd);font-size:50px;line-height:1;font-weight:700;background:linear-gradient(115deg,var(--acc2) 10%,var(--green) 85%);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;font-variant-numeric:tabular-nums}
 .hud-hero-lbl{font-size:10px;letter-spacing:3px;color:var(--muted);font-weight:600}
 .hud-chip{display:inline-flex;align-items:center;gap:6px;background:rgba(34,197,94,.1);border:1px solid rgba(34,197,94,.4);color:var(--green);border-radius:20px;padding:4px 12px;font-size:11.5px;font-weight:700}
-.hud-chip.down{background:rgba(245,158,11,.08);border-color:rgba(245,158,11,.4);color:#fbbf24}
+.hud-chip.down{background:rgba(245,158,11,.08);border-color:rgba(245,158,11,.4);color:var(--amber)}
 .hud-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}
 .hud-tile{display:flex;flex-direction:column;align-items:center;gap:2px;border-radius:10px;padding:9px 4px;border:1px solid var(--bd)}
-.hud-tile-val{font-size:18px;font-weight:700;font-family:'Chakra Petch','Segoe UI',Arial,sans-serif;line-height:1.1}
+.hud-tile-val{font-size:18px;font-weight:700;font-family:var(--fd);line-height:1.1}
 .hud-tile-lbl{font-size:8.5px;letter-spacing:1px;color:var(--muted);text-align:center}
 .hud-t1{background:rgba(var(--acc-rgb),.08);border-color:rgba(var(--acc-rgb),.3)}.hud-t1 .hud-tile-val{color:var(--acc2)}
 .hud-t2{background:rgba(56,189,248,.07);border-color:rgba(56,189,248,.3)}.hud-t2 .hud-tile-val{color:var(--blue)}
-.hud-t3{background:rgba(245,158,11,.08);border-color:rgba(245,158,11,.35)}.hud-t3 .hud-tile-val{color:#fbbf24}
+.hud-t3{background:rgba(245,158,11,.08);border-color:rgba(245,158,11,.35)}.hud-t3 .hud-tile-val{color:var(--amber)}
 .hud-t4{background:rgba(251,146,60,.08);border-color:rgba(251,146,60,.35)}.hud-t4 .hud-tile-val{color:#fb923c}
 .hud-pr{border:1px solid rgba(245,158,11,.4);background:linear-gradient(120deg,rgba(245,158,11,.09),rgba(245,158,11,.02));border-radius:12px;padding:10px 12px}
-.hud-pr-ttl{font-size:10px;letter-spacing:2.5px;font-weight:700;color:#fbbf24;font-family:'Chakra Petch','Segoe UI',Arial,sans-serif;margin-bottom:7px}
+.hud-pr-ttl{font-size:10px;letter-spacing:2.5px;font-weight:700;color:var(--amber);font-family:var(--fd);margin-bottom:7px}
 .hud-pr-row{display:flex;align-items:baseline;gap:8px;padding:2px 0}
 .hud-bar{height:5px;border-radius:3px;background:var(--s2);overflow:hidden;flex:1}
 .hud-bar>div{height:100%;border-radius:3px}
@@ -181,8 +200,8 @@ body::after{content:'';position:fixed;inset:0;z-index:-1;pointer-events:none;opa
 .ach-ico.off{background:var(--s2);border:1px solid var(--bd);opacity:.6;filter:grayscale(.7)}
 .ach-name{font-size:12.5px;font-weight:600}
 .ach-row.off .ach-name{color:var(--muted)}
-.ach-date{font-size:10px;letter-spacing:1px;color:var(--acc2);font-family:'Chakra Petch','Segoe UI',Arial,sans-serif;font-weight:700;flex-shrink:0}
-.ach-prog{font-size:10px;color:var(--muted);font-family:'Chakra Petch','Segoe UI',Arial,sans-serif;font-weight:700;flex-shrink:0}
+.ach-date{font-size:10px;letter-spacing:1px;color:var(--acc2);font-family:var(--fd);font-weight:700;flex-shrink:0}
+.ach-prog{font-size:10px;color:var(--muted);font-family:var(--fd);font-weight:700;flex-shrink:0}
 .ach-bar{height:4px;border-radius:2px;background:var(--s2);overflow:hidden;margin-top:5px}
 .ach-bar>div{height:100%;background:linear-gradient(90deg,var(--acc),var(--acc2));border-radius:2px}
 /* Selector temă de culoare */
@@ -211,34 +230,34 @@ body::after{content:'';position:fixed;inset:0;z-index:-1;pointer-events:none;opa
 .set-box{position:relative}
 .card.card-done{border-color:rgba(34,197,94,.5);background:linear-gradient(135deg,rgba(34,197,94,.04),transparent)}
 .progress-badge{font-size:10px;font-weight:800;padding:3px 8px;border-radius:6px;margin-right:6px;flex-shrink:0;letter-spacing:.3px}
-.progress-badge.partial{background:rgba(245,158,11,.15);color:#fbbf24}
+.progress-badge.partial{background:rgba(245,158,11,.15);color:var(--amber)}
 .progress-badge.complete{background:rgba(34,197,94,.2);color:var(--green)}
 /* „Sar azi" — stare Sărit per exercițiu (textură diagonală = slot inactiv) */
 .card.card-skip{border-style:dashed;border-color:rgba(245,158,11,.38);background:repeating-linear-gradient(-45deg,rgba(245,158,11,.04) 0 6px,transparent 6px 16px)}
 .card.card-skip .card-ttl{color:var(--muted)}
-.card.card-skip .card-sub{color:#fbbf24;opacity:.85}
-.progress-badge.skipb{background:rgba(245,158,11,.12);color:#fbbf24;border:1px dashed rgba(245,158,11,.5)}
+.card.card-skip .card-sub{color:var(--amber);opacity:.85}
+.progress-badge.skipb{background:rgba(245,158,11,.12);color:var(--amber);border:1px dashed rgba(245,158,11,.5)}
 .skip-link{display:block;text-align:right;font-size:11px;color:var(--muted);padding:10px 2px 0;cursor:pointer;user-select:none;-webkit-user-select:none}
-.skip-link:active{color:#fbbf24}
+.skip-link:active{color:var(--amber)}
 .skip-reasons{display:none;flex-wrap:wrap;gap:6px;padding-top:10px}
 .skip-reasons.show{display:flex;animation:cardIn .2s ease}
-.skip-pill{background:rgba(245,158,11,.08);border:1px solid rgba(245,158,11,.35);color:#fbbf24;border-radius:20px;font-size:11.5px;font-weight:700;padding:7px 12px;cursor:pointer;font-family:inherit}
+.skip-pill{background:rgba(245,158,11,.08);border:1px solid rgba(245,158,11,.35);color:var(--amber);border-radius:20px;font-size:11.5px;font-weight:700;padding:7px 12px;cursor:pointer;font-family:inherit}
 .skip-pill:active{background:rgba(245,158,11,.22)}
 /* Zilele mele de antrenament */
-.dpl-day{flex:1;background:var(--s2);border:2px solid var(--bd);border-radius:10px;color:var(--muted);font-family:'Chakra Petch','Segoe UI',Arial,sans-serif;font-weight:700;font-size:13px;padding:11px 0;cursor:pointer}
+.dpl-day{flex:1;background:var(--s2);border:2px solid var(--bd);border-radius:10px;color:var(--muted);font-family:var(--fd);font-weight:700;font-size:13px;padding:11px 0;cursor:pointer}
 .dpl-day.on{background:rgba(var(--acc-rgb),.14);border-color:var(--acc);color:var(--acc2);box-shadow:0 0 12px rgba(var(--acc-rgb),.25)}
 .dpl-seg{display:flex;gap:6px}
 .dpl-seg button{flex:1;background:var(--s2);border:1px solid var(--bd);border-radius:10px;color:var(--muted);font-family:inherit;font-weight:700;font-size:12.5px;padding:10px 0;cursor:pointer}
 .dpl-seg button.act{background:rgba(var(--acc-rgb),.12);border-color:var(--acc);color:var(--acc2)}
 .dpl-pill{background:var(--s2);border:1px solid var(--bd);border-radius:20px;color:var(--muted);font-family:inherit;font-weight:600;font-size:11.5px;padding:7px 12px;cursor:pointer}
 .dpl-pill.on{background:rgba(var(--acc-rgb),.12);border-color:var(--acc);color:var(--acc2)}
-.temp-banner{display:flex;align-items:center;gap:8px;background:linear-gradient(120deg,rgba(245,158,11,.12),rgba(245,158,11,.03));border:1px solid rgba(245,158,11,.4);border-radius:10px;padding:8px 11px;margin-bottom:12px;font-size:11.5px;color:#fbbf24;line-height:1.45}
-.temp-banner button{background:rgba(245,158,11,.15);border:1px solid rgba(245,158,11,.5);color:#fbbf24;border-radius:7px;font-size:10.5px;font-weight:700;padding:5px 9px;cursor:pointer;font-family:inherit;flex-shrink:0}
+.temp-banner{display:flex;align-items:center;gap:8px;background:linear-gradient(120deg,rgba(245,158,11,.12),rgba(245,158,11,.03));border:1px solid rgba(245,158,11,.4);border-radius:10px;padding:8px 11px;margin-bottom:12px;font-size:11.5px;color:var(--amber);line-height:1.45}
+.temp-banner button{background:rgba(245,158,11,.15);border:1px solid rgba(245,158,11,.5);color:var(--amber);border-radius:7px;font-size:10.5px;font-weight:700;padding:5px 9px;cursor:pointer;font-family:inherit;flex-shrink:0}
 /* 3.1 — Ierarhia dramatică în Azi: eroul = primul exercițiu incomplet */
 .card.card-hero,.card.card-hero.open{position:relative;border-color:rgba(var(--acc-rgb),.65);background:linear-gradient(165deg,rgba(var(--acc-rgb),.09),rgba(var(--acc-rgb),.02) 45%,var(--s1) 80%);box-shadow:0 0 28px rgba(var(--acc-rgb),.18),0 12px 30px rgba(0,0,0,.35)}
 .card.card-hero::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--acc),var(--acc2))}
 .card.card-hero .card-ttl{font-size:15px}
-.hero-badge{font-size:8.5px;letter-spacing:1.5px;font-weight:700;color:var(--acc2);font-family:'Chakra Petch','Segoe UI',Arial,sans-serif;background:rgba(var(--acc-rgb),.12);border:1px solid rgba(var(--acc-rgb),.45);border-radius:6px;padding:3px 7px;flex-shrink:0}
+.hero-badge{font-size:8.5px;letter-spacing:1.5px;font-weight:700;color:var(--acc2);font-family:var(--fd);background:rgba(var(--acc-rgb),.12);border:1px solid rgba(var(--acc-rgb),.45);border-radius:6px;padding:3px 7px;flex-shrink:0}
 .card.card-idle:not(.open){opacity:.68}
 .card.card-done:not(.open){opacity:.62}
 .card.card-done:not(.open) .card-hd{padding-top:7px;padding-bottom:7px}
@@ -251,7 +270,7 @@ html[data-mode="light"] .card.card-hero,html[data-mode="light"] .card.card-hero.
 .ai-panel{position:relative;border:1px solid rgba(167,139,250,.5);border-radius:16px;overflow:hidden;background:linear-gradient(160deg,rgba(167,139,250,.08),rgba(167,139,250,.02) 45%,var(--s1) 80%);box-shadow:0 0 26px rgba(167,139,250,.13);margin-bottom:14px}
 .ai-strip{position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--purple),#c4b5fd,var(--purple))}
 .ai-ico{width:38px;height:38px;border-radius:11px;background:rgba(167,139,250,.14);border:1px solid rgba(167,139,250,.4);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0}
-.ai-ttl{font-weight:700;font-size:14px;font-family:'Chakra Petch','Segoe UI',Arial,sans-serif;letter-spacing:.5px}
+.ai-ttl{font-weight:700;font-size:14px;font-family:var(--fd);letter-spacing:.5px}
 .ai-btn-main{flex:1;text-align:center;background:linear-gradient(120deg,#8b5cf6,var(--purple));border:none;border-radius:11px;padding:11px;font-size:12.5px;font-weight:700;color:#150b2e;box-shadow:0 5px 16px rgba(167,139,250,.28);cursor:pointer;font-family:inherit}
 .ai-btn-main:active{opacity:.85}
 .ai-btn-ghost{flex:0 0 auto;border:1px solid rgba(167,139,250,.4);background:transparent;border-radius:11px;padding:11px 14px;font-size:12.5px;font-weight:600;color:#c4b5fd;cursor:pointer;font-family:inherit}
@@ -262,17 +281,17 @@ html[data-mode="light"] .ai-btn-ghost{color:#6d28d9}
 .hist-card-hd{padding:11px 13px;display:flex;align-items:center;gap:10px;cursor:pointer;user-select:none;-webkit-user-select:none}
 .hist-card.open .hist-card-hd{border-bottom:1px solid var(--bd)}
 .hist-date-col{display:flex;flex-direction:column;align-items:center;width:40px;flex-shrink:0}
-.hist-date-day{font-size:10px;letter-spacing:1.5px;font-weight:700;font-family:'Chakra Petch','Segoe UI',Arial,sans-serif;color:var(--muted)}
+.hist-date-day{font-size:10px;letter-spacing:1.5px;font-weight:700;font-family:var(--fd);color:var(--muted)}
 .hist-card.trained .hist-date-day{color:var(--acc2)}
-.hist-date-num{font-size:15px;font-weight:700;font-family:'Chakra Petch','Segoe UI',Arial,sans-serif}
+.hist-date-num{font-size:15px;font-weight:700;font-family:var(--fd)}
 .hist-viz{display:flex;gap:3px;align-items:center;margin-top:5px}
 .hist-viz>div{height:7px;border-radius:2px}
-.hist-ton{font-size:15px;font-weight:700;font-family:'Chakra Petch','Segoe UI',Arial,sans-serif;color:var(--acc2)}
+.hist-ton{font-size:15px;font-weight:700;font-family:var(--fd);color:var(--acc2)}
 .hist-ton-lbl{font-size:8.5px;letter-spacing:1px;color:var(--muted)}
 .hist-card-bd{display:none;padding:4px 0 6px}
 .hist-card.open .hist-card-bd{display:block}
-.hist-set{font-family:'Chakra Petch','Segoe UI',Arial,sans-serif;font-weight:600;background:var(--s2);border:1px solid var(--bd);color:var(--text);border-radius:7px;padding:4px 8px;font-size:10.5px}
-.hist-set.pr{background:rgba(245,158,11,.1);border-color:rgba(245,158,11,.45);color:#fbbf24}
+.hist-set{font-family:var(--fd);font-weight:600;background:var(--s2);border:1px solid var(--bd);color:var(--text);border-radius:7px;padding:4px 8px;font-size:10.5px}
+.hist-set.pr{background:rgba(245,158,11,.1);border-color:rgba(245,158,11,.45);color:var(--amber)}
 /* 3.4 — Nutriție: macro-uri vizuale + mese pliabile */
 .meal-card .meal-items{display:none}
 .meal-card.open .meal-items{display:block}
@@ -280,7 +299,7 @@ html[data-mode="light"] .ai-btn-ghost{color:#6d28d9}
 .meal-hd{cursor:pointer;user-select:none;-webkit-user-select:none}
 .meal-chev{color:var(--muted);font-size:11px;transition:transform .2s;margin-left:8px;flex-shrink:0}
 .meal-card.open .meal-chev{transform:rotate(180deg)}
-.macro-val{font-family:'Chakra Petch','Segoe UI',Arial,sans-serif}
+.macro-val{font-family:var(--fd)}
 .macro-split{display:flex;height:10px;border-radius:5px;overflow:hidden;gap:2px;margin-bottom:8px}
 .macro-split>div{border-radius:3px}
 /* 3.6 — Thumbnails exerciții: siluetă cu mușchiul țintă evidențiat */
@@ -288,9 +307,9 @@ html[data-mode="light"] .ai-btn-ghost{color:#6d28d9}
 /* Stunning pass restul — Program HUD + polish Azi/Progres/wizard */
 .prog-hud{position:relative;border:1px solid rgba(var(--acc-rgb),.5);border-radius:16px;overflow:hidden;background:linear-gradient(160deg,rgba(var(--acc-rgb),.1),rgba(var(--acc2-rgb),.03) 45%,var(--s1) 80%);box-shadow:0 0 26px rgba(var(--acc-rgb),.13);padding:15px 14px 14px;margin:14px 0 12px}
 .morning-card{position:relative}
-.morning-count{font-family:'Chakra Petch','Segoe UI',Arial,sans-serif;font-weight:700;color:var(--acc2)}
+.morning-count{font-family:var(--fd);font-weight:700;color:var(--acc2)}
 .rating-card{position:relative;overflow:hidden}
-.chk-count{font-family:'Chakra Petch','Segoe UI',Arial,sans-serif;font-weight:700}
+.chk-count{font-family:var(--fd);font-weight:700}
 /* Atmosferă globală — anti-anost */
 .hdr::before{content:'';position:absolute;left:0;right:0;bottom:-1px;height:1px;background:linear-gradient(90deg,transparent,rgba(var(--acc-rgb),.55),transparent)}
 .hdr::after{content:'';position:absolute;top:-46px;right:-34px;width:190px;height:150px;background:radial-gradient(closest-side,rgba(var(--acc-rgb),.2),transparent);pointer-events:none}
@@ -326,17 +345,17 @@ html[data-mode="light"] .azi-stat.as2{background:#e1f4e2}html[data-mode="light"]
 html[data-mode="light"] .azi-stat.as3{background:#ebe4fc}html[data-mode="light"] .azi-stat.as3 .azi-stat-val{color:#6234cf}
 html[data-mode="light"] .azi-stat.as4{background:#e0edff}html[data-mode="light"] .azi-stat.as4 .azi-stat-val{color:#1f5cbd}
 .date-toggle{display:flex;align-items:center;justify-content:space-between;padding:8px 12px;background:var(--s1);border:1px solid var(--bd);border-radius:10px;margin-bottom:10px;cursor:pointer;font-size:12px;color:var(--muted)}
-.date-toggle-act{color:#fbbf24;border-color:rgba(245,158,11,.4)}
+.date-toggle-act{color:var(--amber);border-color:rgba(245,158,11,.4)}
 .date-drawer{display:none;margin-bottom:10px}
 .date-drawer.open{display:block}
 .onboarding{position:fixed;inset:0;background:rgba(10,17,23,.95);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);z-index:1500;display:none;align-items:center;justify-content:center;padding:24px}
 .onboarding.show{display:flex}
 .onboarding-card{background:var(--s1);border:1px solid var(--acc);border-radius:var(--r);padding:24px;max-width:340px;text-align:center}
-.onboarding-title{font-size:22px;font-weight:700;color:var(--acc);margin-bottom:8px}
+.onboarding-title{font-size:22px;font-weight:700;color:var(--acc2);margin-bottom:8px}
 .onboarding-sub{font-size:13px;color:var(--muted);margin-bottom:16px;line-height:1.5}
 .onboarding-steps{text-align:left;font-size:13px;line-height:1.6;margin-bottom:18px}
 .onboarding-steps li{margin-bottom:6px}
-.empty-state-action{display:inline-block;color:var(--acc);text-decoration:underline;cursor:pointer;margin-top:8px;font-weight:700}
+.empty-state-action{display:inline-block;color:var(--acc2);text-decoration:underline;cursor:pointer;margin-top:8px;font-weight:700}
 .add-custom-row{display:flex;gap:8px;align-items:center;background:var(--s2);border:1px dashed rgba(var(--acc-rgb),.3);border-radius:10px;padding:10px;margin-top:10px;cursor:pointer}
 .add-custom-row:active{background:rgba(var(--acc-rgb),.06)}
 .guide-btn{background:rgba(56,189,248,.12);border:1px solid rgba(56,189,248,.35);color:var(--blue);width:30px;height:30px;border-radius:8px;font-size:14px;cursor:pointer;flex-shrink:0;display:flex;align-items:center;justify-content:center;padding:0;font-family:inherit}
@@ -344,7 +363,7 @@ html[data-mode="light"] .azi-stat.as4{background:#e0edff}html[data-mode="light"]
 .video-btn{display:block;width:100%;background:rgba(244,63,94,.1);border:1px solid rgba(244,63,94,.35);color:#f87a8c;border-radius:10px;padding:11px;font-size:13px;font-weight:800;cursor:pointer;font-family:inherit;text-align:center;text-decoration:none;margin-top:10px}
 .video-btn:active{background:rgba(244,63,94,.25)}
 /* Wizard onboarding */
-.wiz-title{font-size:20px;font-weight:700;color:var(--acc);margin-bottom:4px}
+.wiz-title{font-size:20px;font-weight:700;color:var(--acc2);margin-bottom:4px}
 .wiz-sub{font-size:12px;color:var(--muted);margin-bottom:16px;line-height:1.5}
 .wiz-progress{display:flex;gap:4px;margin-bottom:16px}
 .wiz-progress-dot{flex:1;height:4px;border-radius:2px;background:var(--s2)}
@@ -386,7 +405,7 @@ html[data-mode="light"] .azi-stat.as4{background:#e0edff}html[data-mode="light"]
 /* Steppers +/- pentru inputuri */
 .stepper{display:flex;flex-direction:column;gap:2px;flex-shrink:0}
 .stepper-btn{background:var(--bg);border:1px solid var(--bd);color:var(--acc2);width:31px;height:24px;border-radius:6px;font-size:16px;font-weight:900;cursor:pointer;font-family:inherit;line-height:1;display:flex;align-items:center;justify-content:center;padding:0}
-.stepper-btn:active{background:var(--acc);color:#05201d}
+.stepper-btn:active{background:var(--acc);color:var(--acc-fg)}
 .set-note-input{width:100%;background:var(--bg);border:1px solid var(--bd);border-radius:6px;color:var(--text);font-size:12px;padding:5px 8px;font-family:inherit;margin-top:6px}
 .set-note-input:focus{outline:none;border-color:var(--acc2)}
 .set-lbl{font-size:12px;color:var(--muted);font-weight:800;letter-spacing:.5px;width:36px;flex-shrink:0}
@@ -397,7 +416,7 @@ html[data-mode="light"] .azi-stat.as4{background:#e0edff}html[data-mode="light"]
 .set-unit{font-size:11px;color:var(--muted);font-weight:600;flex-shrink:0}
 .set-btn{background:rgba(34,197,94,.15);border:1px solid rgba(34,197,94,.4);border-radius:8px;color:var(--green);font-size:12px;font-weight:700;cursor:pointer;padding:8px 10px;font-family:inherit;flex-shrink:0}
 .set-btn:active{background:rgba(34,197,94,.3)}
-.chk-count{font-size:42px;font-weight:900;color:var(--acc);text-align:center;line-height:1;padding:10px 0 4px}
+.chk-count{font-size:42px;font-weight:900;color:var(--acc2);text-align:center;line-height:1;padding:10px 0 4px}
 .chk-sub{font-size:12px;color:var(--muted);text-align:center;margin-bottom:14px}
 .chk-item{display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid var(--bd);cursor:pointer}
 .chk-item:last-child{border-bottom:none}
@@ -424,7 +443,7 @@ html[data-mode="light"] .azi-stat.as4{background:#e0edff}html[data-mode="light"]
 .macro-val{font-size:16px;font-weight:900}
 .macro-val span{font-size:10px;font-weight:400}
 .macro-lbl{font-size:10px;color:var(--muted);margin-top:1px}
-.mp{color:#f87171}.mc{color:#38bdf8}.mf{color:#fbbf24}
+.mp{color:#f87171}.mc{color:#38bdf8}.mf{color:var(--amber)}
 .meal-card{background:var(--s1);border:1px solid var(--bd);border-radius:var(--r);margin-bottom:10px;overflow:hidden}
 .meal-hd{padding:12px 14px;border-bottom:1px solid var(--bd);display:flex;justify-content:space-between;align-items:center}
 .meal-nm{font-size:13px;font-weight:700}
@@ -442,7 +461,7 @@ html[data-mode="light"] .azi-stat.as4{background:#e0edff}html[data-mode="light"]
 .rule-row{font-size:12px;color:#8888aa;padding:5px 0;border-bottom:1px solid var(--bd);line-height:1.4}
 .rule-row:last-child{border-bottom:none}
 .hist-day{background:var(--s1);border-radius:var(--r);border:1px solid var(--bd);margin-bottom:10px;overflow:hidden}
-.hist-day-hd{padding:10px 14px;background:var(--s2);font-weight:700;font-size:13px;color:var(--acc);display:flex;justify-content:space-between;align-items:center}
+.hist-day-hd{padding:10px 14px;background:var(--s2);font-weight:700;font-size:13px;color:var(--acc2);display:flex;justify-content:space-between;align-items:center}
 .hist-ex{padding:8px 14px;border-bottom:1px solid var(--bd);font-size:13px}
 .hist-ex:last-child{border-bottom:none}
 .hist-ex-nm{font-weight:600;margin-bottom:4px}
@@ -453,7 +472,7 @@ html[data-mode="light"] .azi-stat.as4{background:#e0edff}html[data-mode="light"]
 .ghid-nm{font-weight:700;font-size:14px;display:flex;align-items:center;gap:8px}
 .gtag{font-size:10px;padding:2px 7px;border-radius:20px;font-weight:600;flex-shrink:0}
 .g-bara{background:rgba(56,189,248,.2);color:var(--blue)}
-.g-gantere{background:rgba(var(--acc-rgb),.15);color:var(--acc)}
+.g-gantere{background:rgba(var(--acc-rgb),.15);color:var(--acc2)}
 .g-bodyweight{background:rgba(var(--acc2-rgb),.15);color:var(--acc2)}
 .ghid-body{display:none;margin-top:10px;border-top:1px solid var(--bd);padding-top:10px}
 .ghid-item.open .ghid-body{display:block}
@@ -462,7 +481,7 @@ html[data-mode="light"] .azi-stat.as4{background:#e0edff}html[data-mode="light"]
 .export-box{background:var(--s2);border-radius:var(--r);border:1px solid var(--bd);padding:14px;margin-bottom:10px;font-size:12px;line-height:1.7;white-space:pre-wrap;color:var(--text);max-height:320px;overflow-y:auto;font-family:ui-monospace,Menlo,Consolas,monospace}
 .btn{display:block;width:100%;padding:14px;border-radius:var(--r);border:none;font-family:inherit;font-size:15px;font-weight:800;cursor:pointer;margin-bottom:10px;letter-spacing:.3px;transition:transform .1s,box-shadow .2s}
 .btn:active{transform:scale(.98)}
-.btn-acc{background:linear-gradient(135deg,var(--acc) 0%,var(--acc-dim) 100%);color:#05201d;box-shadow:var(--shadow-acc)}
+.btn-acc{background:linear-gradient(135deg,var(--acc) 0%,var(--acc-dim) 100%);color:var(--acc-fg);box-shadow:var(--shadow-acc)}
 .btn-ghost{background:var(--s2);color:var(--text);border:1px solid var(--bd)}
 .btn-ghost:active{border-color:var(--acc)}
 .btn-danger{background:transparent;color:var(--red);border:1px solid rgba(244,63,94,.4)}
@@ -474,14 +493,14 @@ html[data-mode="light"] .azi-stat.as4{background:#e0edff}html[data-mode="light"]
 .undo-toast{position:fixed;top:calc(env(safe-area-inset-top) + 12px);left:50%;transform:translateX(-50%) translateY(-24px);display:flex;align-items:stretch;background:rgba(14,24,34,.92);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border:1px solid var(--green);border-radius:14px;overflow:hidden;z-index:998;opacity:0;pointer-events:none;transition:opacity .3s,transform .3s cubic-bezier(.2,.9,.3,1.2);box-shadow:0 10px 30px rgba(0,0,0,.45);max-width:92vw}
 .undo-toast.show{opacity:1;transform:translateX(-50%) translateY(0);pointer-events:auto}
 .undo-toast .u-msg{padding:12px 14px;font-size:13px;font-weight:800;color:var(--green);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;letter-spacing:.3px;display:flex;align-items:center}
-.undo-toast .u-btn{padding:12px 15px;font-size:11px;font-weight:700;letter-spacing:1.2px;color:var(--acc2);background:rgba(var(--acc-rgb),.1);border:none;border-left:1px solid var(--bd);cursor:pointer;font-family:'Chakra Petch','Segoe UI',Arial,sans-serif;text-transform:uppercase;flex-shrink:0}
+.undo-toast .u-btn{padding:12px 15px;font-size:11px;font-weight:700;letter-spacing:1.2px;color:var(--acc2);background:rgba(var(--acc-rgb),.1);border:none;border-left:1px solid var(--bd);cursor:pointer;font-family:var(--fd);text-transform:uppercase;flex-shrink:0}
 .undo-toast .u-btn:active{background:rgba(var(--acc-rgb),.28)}
 .undo-toast .u-bar{position:absolute;left:0;bottom:0;height:2px;background:var(--green);width:100%}
-.undo-toast.pr{border-color:#fbbf24;box-shadow:0 10px 30px rgba(0,0,0,.45),0 0 20px rgba(245,158,11,.3)}
-.undo-toast.pr .u-msg{color:#fbbf24}
-.undo-toast.pr .u-bar{background:#fbbf24}
+.undo-toast.pr{border-color:var(--amber);box-shadow:0 10px 30px rgba(0,0,0,.45),0 0 20px rgba(245,158,11,.3)}
+.undo-toast.pr .u-msg{color:var(--amber)}
+.undo-toast.pr .u-bar{background:var(--amber)}
 html[data-mode="light"] .undo-toast{background:rgba(255,255,255,.94);box-shadow:0 10px 30px rgba(30,50,70,.22)}
-.install-hint{background:rgba(var(--acc-rgb),.1);border:1px solid rgba(var(--acc-rgb),.3);border-radius:10px;padding:10px 12px;margin:14px;font-size:12px;color:var(--acc);line-height:1.5;display:none}
+.install-hint{background:rgba(var(--acc-rgb),.1);border:1px solid rgba(var(--acc-rgb),.3);border-radius:10px;padding:10px 12px;margin:14px;font-size:12px;color:var(--acc2);line-height:1.5;display:none}
 .install-hint.show{display:block}
 .install-hint button{background:none;border:none;color:var(--muted);float:right;cursor:pointer;font-size:18px;margin-top:-4px}
 .week-nav{display:flex;align-items:center;gap:8px;background:var(--s1);border:1px solid var(--bd);border-radius:var(--r);padding:8px;margin-bottom:10px}
@@ -500,7 +519,7 @@ html[data-mode="light"] .undo-toast{background:rgba(255,255,255,.94);box-shadow:
 .meas-history{background:var(--s1);border:1px solid var(--bd);border-radius:var(--r);overflow:hidden}
 .meas-hist-row{padding:10px 12px;border-bottom:1px solid var(--bd);display:flex;flex-direction:column;gap:4px}
 .meas-hist-row:last-child{border-bottom:none}
-.meas-hist-date{font-size:12px;font-weight:700;color:var(--acc)}
+.meas-hist-date{font-size:12px;font-weight:700;color:var(--acc2)}
 .meas-hist-vals{display:flex;flex-wrap:wrap;gap:4px;font-size:11px}
 .meas-v{background:var(--s2);padding:2px 7px;border-radius:6px;color:var(--text)}
 .meas-v .delta-up{color:var(--green);font-weight:700}
@@ -513,7 +532,7 @@ html[data-mode="light"] .undo-toast{background:rgba(255,255,255,.94);box-shadow:
 .setup-box{background:var(--s2);border:1px solid var(--bd);border-radius:10px;padding:12px;margin-top:10px;font-size:12px;line-height:1.6;display:none}
 .setup-box.show{display:block}
 .setup-box ol{margin-left:16px;margin-top:6px}
-.setup-box code{background:var(--bg);padding:1px 4px;border-radius:3px;font-size:11px;color:var(--acc);font-family:ui-monospace,Menlo,Consolas,monospace}
+.setup-box code{background:var(--bg);padding:1px 4px;border-radius:3px;font-size:11px;color:var(--acc2);font-family:ui-monospace,Menlo,Consolas,monospace}
 .nb{font-size:9px}
 .nb .ico{font-size:18px}
 .seg{display:flex;flex-wrap:wrap;gap:4px;background:var(--s1);border:1px solid var(--bd);border-radius:10px;padding:3px;margin-bottom:10px}
@@ -543,9 +562,9 @@ input:checked + .slider:before{transform:translateX(20px);background:var(--acc)}
 .time-input{background:var(--bg);border:1px solid var(--bd);border-radius:8px;color:var(--text);font-family:inherit;font-size:14px;padding:8px 10px;width:100px}
 .days-pick{display:flex;gap:4px;margin-top:6px}
 .day-pill{flex:1;background:var(--s2);border:1px solid var(--bd);border-radius:8px;padding:6px;text-align:center;cursor:pointer;font-size:11px;font-weight:700;color:var(--muted)}
-.day-pill.on{background:rgba(var(--acc-rgb),.15);border-color:var(--acc);color:var(--acc)}
+.day-pill.on{background:rgba(var(--acc-rgb),.15);border-color:var(--acc);color:var(--acc2)}
 .recom-header{background:linear-gradient(135deg,rgba(var(--acc-rgb),.12),rgba(var(--acc2-rgb),.06));border:1px solid rgba(var(--acc-rgb),.3);border-radius:var(--r);padding:14px;margin-bottom:10px}
-.recom-week{font-size:18px;font-weight:900;color:var(--acc);letter-spacing:.5px}
+.recom-week{font-size:18px;font-weight:900;color:var(--acc2);letter-spacing:.5px}
 .recom-focus{font-size:12px;color:var(--text);margin-top:4px}
 .recom-focus strong{color:var(--acc2)}
 .recom-progress{display:flex;gap:3px;margin-top:10px}
@@ -559,14 +578,14 @@ input:checked + .slider:before{transform:translateX(20px);background:var(--acc)}
 .recom-current{font-size:12px;color:var(--muted);margin:3px 0}
 .recom-target{font-size:13px;color:var(--acc2);font-weight:700;margin:5px 0;display:flex;align-items:center;gap:6px}
 .recom-tip{font-size:11px;color:var(--muted);font-style:italic;margin-top:6px;line-height:1.4}
-.recom-action-tag{display:inline-block;font-size:9px;letter-spacing:.5px;padding:2px 6px;border-radius:4px;background:rgba(var(--acc-rgb),.15);color:var(--acc);font-weight:700;margin-left:6px}
+.recom-action-tag{display:inline-block;font-size:9px;letter-spacing:.5px;padding:2px 6px;border-radius:4px;background:rgba(var(--acc-rgb),.15);color:var(--acc2);font-weight:700;margin-left:6px}
 .edit-btn{background:none;border:none;color:var(--muted);cursor:pointer;font-size:13px;padding:2px 6px;margin-left:4px;font-family:inherit}
 .hist-set{cursor:pointer;transition:background .15s}
 .hist-set:active{background:rgba(34,197,94,.25)}
 .modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:1000;align-items:center;justify-content:center;padding:20px}
 .modal.show{display:flex}
 .modal-content{background:var(--s1);border:1px solid var(--acc);border-radius:var(--r);padding:18px;max-width:360px;width:100%}
-.modal-ttl{font-size:16px;font-weight:800;margin-bottom:4px;color:var(--acc)}
+.modal-ttl{font-size:16px;font-weight:800;margin-bottom:4px;color:var(--acc2)}
 .modal-sub{font-size:12px;color:var(--muted);margin-bottom:14px;line-height:1.4}
 .modal-inputs{display:flex;align-items:center;gap:10px;margin-bottom:14px;justify-content:center}
 .modal-inputs input{width:80px;background:var(--bg);border:1px solid var(--bd);border-radius:8px;color:var(--text);font-family:inherit;font-size:18px;font-weight:700;text-align:center;padding:10px 6px}
@@ -578,17 +597,17 @@ input:checked + .slider:before{transform:translateX(20px);background:var(--acc)}
 .date-picker-row input[type="date"]{flex:1;background:var(--s2);border:1px solid var(--bd);border-radius:9px;color:var(--text);font-family:inherit;font-size:13px;padding:8px 10px;font-weight:700;color-scheme:dark}
 .date-picker-row input[type="date"]:focus{outline:none;border-color:var(--acc)}
 .date-quick-btn{background:var(--s2);border:1px solid var(--bd);border-radius:9px;color:var(--muted);font-family:inherit;font-size:11px;font-weight:800;padding:8px 10px;cursor:pointer;letter-spacing:.3px;flex-shrink:0}
-.date-quick-btn:active{border-color:var(--acc);color:var(--acc)}
-.date-quick-btn.act{background:rgba(var(--acc-rgb),.15);border-color:var(--acc);color:var(--acc)}
+.date-quick-btn:active{border-color:var(--acc);color:var(--acc2)}
+.date-quick-btn.act{background:rgba(var(--acc-rgb),.15);border-color:var(--acc);color:var(--acc2)}
 .day-picker{display:flex;gap:4px;margin-bottom:12px}
 .dp-btn{flex:1;background:var(--s2);border:1px solid var(--bd);color:var(--muted);border-radius:9px;padding:10px 0;font-size:12px;font-weight:800;cursor:pointer;font-family:inherit;letter-spacing:.3px;transition:all .15s;position:relative}
 .dp-btn.today{border-color:rgba(var(--acc2-rgb),.4);color:var(--acc2)}
 .dp-btn.today::before{content:'•';position:absolute;top:1px;right:4px;color:var(--acc2);font-size:14px;line-height:1}
-.dp-btn.selected{background:linear-gradient(135deg,var(--acc) 0%,var(--acc-dim) 100%);color:#05201d;border-color:var(--acc);box-shadow:var(--shadow-acc)}
-.dp-btn.selected.today::before{color:#05201d}
+.dp-btn.selected{background:linear-gradient(135deg,var(--acc) 0%,var(--acc-dim) 100%);color:var(--acc-fg);border-color:var(--acc);box-shadow:var(--shadow-acc)}
+.dp-btn.selected.today::before{color:var(--acc-fg)}
 .override-banner{background:rgba(245,158,11,.1);border:1px solid rgba(245,158,11,.4);color:#f5a623;border-radius:10px;padding:10px 12px;font-size:12px;margin-bottom:12px;display:flex;align-items:center;gap:8px;line-height:1.4}
-.override-banner strong{color:#fbbf24}
-.override-banner button{background:none;border:none;color:#fbbf24;text-decoration:underline;font-weight:800;cursor:pointer;font-family:inherit;font-size:12px;padding:0;margin-left:auto;flex-shrink:0}
+.override-banner strong{color:var(--amber)}
+.override-banner button{background:none;border:none;color:var(--amber);text-decoration:underline;font-weight:800;cursor:pointer;font-family:inherit;font-size:12px;padding:0;margin-left:auto;flex-shrink:0}
 .morning-card{background:linear-gradient(135deg,rgba(var(--acc2-rgb),.08),rgba(var(--acc-rgb),.05));border:1px solid rgba(var(--acc2-rgb),.25);border-radius:var(--r);margin-bottom:12px;overflow:hidden}
 .morning-hd{display:flex;align-items:center;gap:10px;padding:12px 14px;cursor:pointer;user-select:none}
 .morning-hd .sun{font-size:20px;flex-shrink:0}
@@ -602,7 +621,7 @@ input:checked + .slider:before{transform:translateX(20px);background:var(--acc)}
 .morning-item{display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid var(--bd);cursor:pointer}
 .morning-item:last-child{border-bottom:none}
 .morning-item .chk-box{width:22px;height:22px;border-radius:6px;border:2px solid var(--bd);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:13px;font-weight:700;transition:all .15s}
-.morning-item.done .chk-box{background:var(--acc2);border-color:var(--acc2);color:#05201d}
+.morning-item.done .chk-box{background:var(--acc2);border-color:var(--acc2);color:var(--acc-fg)}
 .morning-item.done .morning-name{text-decoration:line-through;color:var(--muted)}
 .morning-name{font-size:13px;font-weight:700;flex:1}
 .morning-target{font-size:11px;color:var(--muted);font-weight:600;flex-shrink:0}
@@ -621,6 +640,258 @@ input:checked + .slider:before{transform:translateX(20px);background:var(--acc)}
 /* Coloană centrată — pe desktop/tabletă aplicația stă ca pe telefon, nu se întinde pe tot ecranul */
 #app{max-width:var(--appw);margin:0 auto;min-height:100vh;position:relative}
 @media (min-width:600px){#app{border-left:1px solid var(--bd);border-right:1px solid var(--bd);background:rgba(255,255,255,.012)}html[data-mode="light"] #app{background:rgba(255,255,255,.35)}}
+
+/* ═══════════════════════════════════════════════════════════════
+   ATELIER (v98) — redesign vizual: calm, premium, atletic.
+   Grafit + volt, suprafețe tonale fără glow-uri, Barlow / Barlow Condensed,
+   nav plutitor, iconițe SVG, chevroane CSS. Stratul ăsta stă ULTIMUL și
+   suprascrie stilurile vechi (Pro HUD) fără să le șteargă.
+   ═══════════════════════════════════════════════════════════════ */
+:root{color-scheme:dark}
+html[data-mode="light"]{color-scheme:light}
+body{font-family:var(--fb);line-height:1.4;padding-bottom:calc(104px + env(safe-area-inset-bottom));-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale}
+body::before{background:radial-gradient(ellipse 85% 32% at 50% -8%,rgba(var(--acc-rgb),.07),transparent 70%)}
+body::after{display:none}
+html[data-mode="light"] body::before{background:none}
+:focus-visible{outline:2px solid var(--acc);outline-offset:2px}
+html[data-mode="light"] :focus-visible{outline-color:var(--acc-dim)}
+
+/* Header — tipografie mare, fără gradient/orb */
+.hdr,html[data-mode="light"] .hdr{background:transparent;border-bottom:none;padding:calc(env(safe-area-inset-top) + 20px) 70px 6px 18px}
+.hdr::before,.hdr::after{display:none}
+.hdr-lbl{font-family:var(--fb);font-size:11px;font-weight:600;letter-spacing:.14em;color:var(--muted);margin-bottom:8px}
+.hdr-title{font-family:var(--fd);font-size:42px;font-weight:700;letter-spacing:.005em;line-height:.92;text-transform:uppercase}
+.hdr-sub{font-size:13px;color:var(--muted);margin-top:8px}
+.hdr-date{font-family:var(--fb);font-size:12.5px;font-weight:600;letter-spacing:.01em;color:var(--acc2);margin-top:3px}
+.settings-gear{top:calc(env(safe-area-inset-top) + 20px);right:16px;width:44px;height:44px;border-radius:14px;background:var(--s1);border:1px solid var(--bd)}
+.settings-gear:active{background:var(--s2);border-color:var(--bd)}
+.sync-badge{font-family:var(--fb);font-size:10px;letter-spacing:.06em;border-radius:6px;padding:2px 7px}
+
+/* Secțiuni + titluri */
+.sec{padding:8px 16px 16px}
+.stitle{font-family:var(--fb);font-size:11.5px;font-weight:600;letter-spacing:.14em;color:var(--muted);margin:24px 2px 10px;gap:10px}
+.stitle::before{display:none}
+.sgroup-bd .stitle{margin-top:18px}
+.sgroup-bd .stitle:first-child{margin-top:14px}
+
+/* Suprafețe — un singur limbaj pentru toate cardurile */
+.card,.sgroup,.meal-card,.hist-card,.ghid-item,.rating-card,.morning-card,.chart-wrap,.week-nav,.meas-history,.recom-item,.prog-hud,.ai-panel,.drive-card{border-radius:var(--r)}
+.card,.sgroup,.meal-card,.hist-card,.ghid-item,.rating-card,.morning-card,.chart-wrap,.week-nav,.meas-history,.prog-hud{background:var(--s1);border:1px solid var(--bd);box-shadow:none}
+.card.open,.sgroup.open,.ghid-item.open{border-color:rgba(255,255,255,.14);box-shadow:none}
+html[data-mode="light"] .card,html[data-mode="light"] .card.open,html[data-mode="light"] .sgroup,html[data-mode="light"] .hist-card,html[data-mode="light"] .meal-card{box-shadow:0 1px 2px rgba(16,24,40,.05)}
+html[data-mode="light"] .card.open,html[data-mode="light"] .sgroup.open,html[data-mode="light"] .ghid-item.open{border-color:#d3d8df}
+.hud-strip,.ai-strip{display:none}
+.card-hd{padding:14px 16px;gap:12px}
+.card-ttl{font-weight:600;font-size:15px}
+.card-sub{font-size:12px}
+.card-bd{padding:0 16px 16px;border-top-color:var(--bd)}
+.card-ico,.sgroup-ico{width:36px;height:36px;border-radius:11px;background:var(--s2)!important;border:1px solid var(--bd)!important;color:var(--text);font-size:16px}
+.card-ico svg,.sgroup-ico svg{width:19px;height:19px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.card-ico{color:var(--acc2)}
+#pgExercitii .sgroup-ico,#sgProfil .sgroup-ico{color:var(--acc2)}
+#sgProgram .sgroup-ico,#pgMasuratori .sgroup-ico{color:var(--blue)}
+#sgTimer .sgroup-ico,#pgRealizari .sgroup-ico{color:var(--amber)}
+#sgNotif .sgroup-ico,#pgCorp .sgroup-ico{color:var(--purple)}
+#sgBackup .sgroup-ico,#pgCalendar .sgroup-ico{color:var(--green)}
+#sgInfo .sgroup-ico{color:var(--muted)}
+#pgPoze .sgroup-ico{color:#f472b6}
+.sgroup.danger .sgroup-ico{color:var(--red)}
+.sgroup-hd{padding:14px 16px;gap:12px}
+.sgroup-ttl{font-weight:600;font-size:15px}
+.sgroup-sub{font-size:12px}
+.sgroup-bd{padding:2px 16px 16px;border-top-color:var(--bd)}
+.sgroup.danger{border-color:rgba(244,63,94,.3)}
+.sgroup.danger.open{border-color:rgba(244,63,94,.5);box-shadow:none}
+
+/* Chevroane desenate (în loc de ▼) */
+.card-chev,.sgroup-chev,.meal-chev,.morning-chev{font-size:0;width:8px;height:8px;border-right:1.8px solid var(--muted);border-bottom:1.8px solid var(--muted);transform:rotate(45deg);margin:0 5px 4px 8px;flex-shrink:0;transition:transform .2s}
+.card.open .card-chev,.hist-card.open .card-chev,.sgroup.open .sgroup-chev,.meal-card.open .meal-chev,.morning-card.open .morning-chev{transform:rotate(-135deg);margin-bottom:-2px}
+
+/* Azi — exercițiul curent (erou) */
+.card.card-hero,.card.card-hero.open{border-color:rgba(var(--acc-rgb),.5);background:linear-gradient(180deg,rgba(var(--acc-rgb),.07),rgba(var(--acc-rgb),0) 150px),var(--s1);box-shadow:none}
+.card.card-hero::before{display:none}
+.card.card-hero .card-ttl{font-size:16px}
+html[data-mode="light"] .card.card-hero,html[data-mode="light"] .card.card-hero.open{border-color:var(--acc-dim);background:var(--s1);box-shadow:0 1px 3px rgba(16,24,40,.08)}
+.hero-badge{font-family:var(--fb);font-weight:700;font-size:10px;letter-spacing:.08em;color:var(--acc-fg);background:var(--acc);border:none;border-radius:999px;padding:4px 9px}
+.card.card-hero[id^="ec_"] .card-hd{position:relative;padding-top:36px}
+.card.card-hero[id^="ec_"] .card-hd .hero-badge{position:absolute;top:13px;left:46px}
+.card.card-done{border-color:var(--bd);background:var(--s1)}
+.card.card-idle:not(.open){opacity:.78}
+.card.card-done:not(.open){opacity:.7}
+.progress-badge{font-family:var(--fb);font-size:10.5px;font-weight:700;border-radius:999px;padding:3px 9px}
+.progress-badge.complete{background:rgba(47,214,161,.14)}
+.card.card-skip{border-color:rgba(245,158,11,.35)}
+
+/* Stats de sus — neutre, cifra face treaba */
+.azi-stats{gap:8px;margin-bottom:12px}
+.azi-stat,.azi-stat.as1,.azi-stat.as2,.azi-stat.as3,.azi-stat.as4,html[data-mode="light"] .azi-stat.as1,html[data-mode="light"] .azi-stat.as2,html[data-mode="light"] .azi-stat.as3,html[data-mode="light"] .azi-stat.as4{background:var(--s1);border:1px solid var(--bd);border-radius:14px;padding:10px 0 9px}
+.azi-stat .azi-stat-val,.azi-stat.as2 .azi-stat-val,.azi-stat.as3 .azi-stat-val,.azi-stat.as4 .azi-stat-val,html[data-mode="light"] .azi-stat.as2 .azi-stat-val,html[data-mode="light"] .azi-stat.as3 .azi-stat-val,html[data-mode="light"] .azi-stat.as4 .azi-stat-val{font-family:var(--fd);font-size:23px;font-weight:700;color:var(--text)}
+.azi-stat.as1 .azi-stat-val,html[data-mode="light"] .azi-stat.as1 .azi-stat-val{color:var(--acc2)}
+.azi-stat-lbl{font-size:10px;font-weight:600;letter-spacing:.08em;margin-top:3px}
+.date-toggle{background:var(--s1);border-radius:14px;padding:11px 14px;font-size:13px}
+
+/* Dimineață + stare */
+.morning-card{background:var(--s1)}
+.morning-hd{padding:14px 16px}
+.morning-ttl{color:var(--text);font-weight:600;font-size:15px}
+.morning-count{font-family:var(--fd);font-size:14px;background:var(--s2);border:1px solid var(--bd);color:var(--text);padding:2px 10px}
+.morning-bd{border-top-color:var(--bd)}
+.rating-card{background:var(--s1);padding:14px 16px}
+.rating-label{font-weight:600}
+.rating-value{font-family:var(--fd);font-size:19px;font-weight:700}
+
+/* Seturi — cifre condensate, țintă tactilă mai mare */
+.set-box{border:1px solid var(--bd);border-radius:14px;padding:8px 8px 8px 10px;gap:6px}
+.set-box.saved{border-color:rgba(47,214,161,.45);background:rgba(47,214,161,.06)}
+.set-box.dirty{border-color:rgba(245,158,11,.5)}
+.set-lbl{font-family:var(--fd);font-size:15px;font-weight:700;width:30px;letter-spacing:.02em}
+.set-in{font-family:var(--fd);font-size:21px;font-weight:700;width:50px;border-radius:10px;padding:7px 2px;background:var(--bg)}
+.stepper{gap:3px}
+.stepper-btn{width:28px;height:22px;border-radius:7px;background:var(--s3);border-color:var(--bd);color:var(--text);font-size:15px}
+.stepper-btn:active{background:var(--acc);color:var(--acc-fg)}
+.set-btn{display:flex;align-items:center;justify-content:center;min-width:42px;height:42px;border-radius:12px;padding:0 8px;background:rgba(47,214,161,.12);border-color:rgba(47,214,161,.4);font-size:15px}
+.set-note-input,.rate-note-input{font-size:16px;padding:9px 12px;border-radius:10px}
+.guide-btn{width:36px;height:36px;border-radius:11px;background:var(--s2);border:1px solid var(--bd);color:var(--blue)}
+.skip-link{font-size:12px;padding:12px 2px 0}
+.skip-pill{font-family:var(--fb);font-weight:600;font-size:12px;padding:8px 13px}
+@media (max-width:370px){
+  .set-in{width:44px;font-size:19px}
+  .stepper-btn{width:24px}
+  .set-lbl{width:24px;font-size:13px}
+  .card-bd{padding:0 10px 12px}
+  .set-box{padding:7px 6px;gap:4px}
+  .set-btn{min-width:36px;height:38px}
+  .hdr-title{font-size:36px}
+}
+
+/* Butoane */
+.btn{border-radius:14px;font-weight:700;font-size:15px;letter-spacing:.01em}
+.btn-acc{background:var(--acc);color:var(--acc-fg);box-shadow:none}
+.btn-acc:active{filter:brightness(.9)}
+.btn-ghost{background:var(--s2);border:1px solid var(--bd);color:var(--text)}
+.btn-danger{border-color:rgba(244,63,94,.45);color:var(--red)}
+.dp-btn{font-family:var(--fb);font-weight:700}
+.dp-btn.selected{background:var(--acc);box-shadow:none}
+.date-quick-btn{font-family:var(--fb)}
+
+/* Segmented control tip iOS (fără text alb pe accent) */
+.seg{background:var(--s2);border:1px solid var(--bd);border-radius:12px;padding:3px;gap:2px}
+.seg-btn{font-family:var(--fb);font-size:12.5px;font-weight:600;color:var(--muted);border-radius:9px;padding:8px 12px;flex:1 1 auto}
+.seg-btn.act{background:var(--s3);color:var(--text);box-shadow:0 1px 3px rgba(0,0,0,.35)}
+html[data-mode="light"] .seg-btn.act{background:#fff;box-shadow:0 1px 3px rgba(16,24,40,.14)}
+
+/* Nav plutitor */
+.bnav{left:12px;right:12px;margin:0 auto;transform:none;width:auto;max-width:calc(var(--appw) - 24px);bottom:calc(10px + env(safe-area-inset-bottom));padding:6px;border-radius:24px;background:rgba(22,25,31,.84);backdrop-filter:blur(18px) saturate(1.4);-webkit-backdrop-filter:blur(18px) saturate(1.4);border:1px solid rgba(255,255,255,.08);box-shadow:0 12px 32px rgba(0,0,0,.5);gap:2px}
+html[data-mode="light"] .bnav{background:rgba(255,255,255,.9);border-color:rgba(16,24,40,.08);box-shadow:0 10px 30px rgba(16,24,40,.14)}
+.nb{border-radius:18px;padding:8px 2px 7px;font-size:10.5px;font-weight:600;letter-spacing:.01em;gap:4px;font-family:var(--fb);transition:color .2s,background .2s}
+.nb.act{color:var(--acc2);background:rgba(var(--acc-rgb),.12)}
+.nb.act::after{display:none}
+.nb.act .ico{filter:none;transform:none}
+
+/* Rest timer + RIR — carduri plutitoare deasupra nav-ului */
+.rest-timer{left:12px;right:12px;margin:0 auto;transform:none;width:auto;max-width:calc(var(--appw) - 24px);bottom:calc(86px + env(safe-area-inset-bottom));background:var(--s2);border:1px solid rgba(var(--acc-rgb),.45);border-radius:20px;box-shadow:0 12px 32px rgba(0,0,0,.5);overflow:hidden;padding:12px 14px;gap:10px}
+.rest-timer.done{background:var(--s2);border-color:rgba(47,214,161,.6)}
+html[data-mode="light"] .rest-timer{box-shadow:0 10px 30px rgba(16,24,40,.16)}
+.rest-timer-icon{display:none}
+.rest-timer-time{color:var(--text);font-family:var(--fd);font-size:32px}
+.rest-timer-lbl{color:var(--muted);font-size:10.5px;letter-spacing:.08em}
+.rest-timer-btn{background:var(--s3);border:1px solid var(--bd);color:var(--text);border-radius:12px;padding:10px 12px;font-size:13px;min-height:42px;font-family:var(--fb)}
+.rest-timer-btn:active{background:var(--bd)}
+#restTimerBar{background:var(--acc)!important;height:3px!important}
+#rirPrompt{background:var(--s2)!important;border:1px solid rgba(167,139,250,.55)!important;bottom:calc(158px + env(safe-area-inset-bottom))!important}
+#rirPromptTitle{color:var(--text)!important;font-size:15px!important;font-weight:700!important}
+
+/* Toast-uri */
+.toast{bottom:calc(98px + env(safe-area-inset-bottom));background:var(--s3);font-family:var(--fb);font-weight:700;border-radius:14px}
+html[data-mode="light"] .toast{background:#fff}
+.undo-toast .u-btn{font-family:var(--fb);letter-spacing:.08em}
+
+/* Bannere */
+.install-hint{background:var(--s1);border:1px solid var(--bd);color:var(--text);border-radius:14px;margin:10px 16px;padding:12px 14px;font-size:13px}
+.install-hint button{float:none;font-size:inherit;font-family:inherit;margin-top:0}
+.install-hint>button:first-child{float:right;font-size:20px;line-height:1;margin:-2px 0 0 10px;color:var(--muted);padding:0 2px}
+.temp-banner,.override-banner{border-radius:14px}
+
+/* Nutriție */
+.item-row{border-bottom-color:var(--bd)}
+.rule-row{color:var(--muted)}
+.rules-box{border-radius:var(--r)}
+.meal-hd{padding:14px 16px}
+.meal-nm{font-size:14px;font-weight:600}
+.meal-kc{font-family:var(--fd);font-size:18px;font-weight:700}
+.macro-val{font-family:var(--fd)}
+.day-btn{border-width:1px;border-radius:12px;font-family:var(--fb)}
+
+/* Istoric */
+.hist-card{background:var(--s1);border-color:var(--bd)}
+.hist-card:not(.open){opacity:.92}
+.hist-date-num{font-family:var(--fd);font-size:21px}
+.hist-ton{font-family:var(--fd);font-size:19px;color:var(--text)}
+.hist-set{font-family:var(--fd);font-weight:600;font-size:12.5px;background:var(--s2);color:var(--text);border:1px solid var(--bd);border-radius:8px;padding:5px 9px}
+.hist-set.pr{background:rgba(245,158,11,.1);border-color:rgba(245,158,11,.45);color:var(--amber)}
+.hist-ex{padding:10px 16px}
+.week-nav-btn{background:var(--s2);border-radius:12px;width:42px;height:42px}
+.week-nav-title{font-weight:600}
+.ai-panel{background:var(--s1);border-color:rgba(167,139,250,.35);box-shadow:none}
+.ai-ttl{font-family:var(--fd);font-size:17px;letter-spacing:.04em}
+.ai-ico{background:var(--s2);border-color:var(--bd)}
+.ai-btn-main{background:var(--purple);color:#140a2e;box-shadow:none}
+html[data-mode="light"] .ai-btn-main{color:#fff}
+.export-box{border-radius:12px}
+
+/* Program + rezumat zi — cifre solide, fără text-gradient */
+.hud-hero{background:none;-webkit-background-clip:border-box;background-clip:border-box;-webkit-text-fill-color:currentColor;color:var(--acc2);font-family:var(--fd);font-size:58px}
+.hud-hero-lbl{letter-spacing:.14em;font-size:10.5px}
+.hud-tile{background:var(--s2)!important;border-color:var(--bd)!important;border-radius:12px}
+.hud-tile-val{font-family:var(--fd);font-size:21px}
+.hud-tile-lbl{font-size:10px;letter-spacing:.06em}
+.hud-chip{font-family:var(--fb)}
+.hud-pr{border-radius:14px}
+.hud-pr-ttl{font-family:var(--fb);letter-spacing:.12em}
+#daySummaryCard{background:var(--s1)!important;box-shadow:none!important;border-color:rgba(47,214,161,.5)!important}
+.prog-hud{padding:16px}
+.vol-fill.ok,.vol-fill.high,.ach-ico.on,.dpl-day.on{box-shadow:none}
+#dayProgFill,#chkBar{box-shadow:none!important}
+.chk-count{font-family:var(--fd);font-size:48px;font-weight:700}
+.vol-val{font-family:var(--fd);font-size:16px}
+.vol-status,.hero-badge,.hist-ton-lbl,.snap-badge,.recom-action-tag{font-size:10px}
+
+/* Grafice, ghid, câmpuri */
+.chart-wrap{padding:12px 8px 8px}
+.chart-stat-val{font-family:var(--fd);font-weight:700;font-size:21px}
+.chart-empty{border-radius:12px}
+.ghid-item{padding:14px 16px}
+.ghid-nm{font-weight:600;font-size:15px}
+.ex-thumb{background:var(--s2);border-color:var(--bd);border-radius:11px}
+.meas-field,.wiz-input-box{border-radius:12px}
+.meas-in,.time-input,.select-box{font-family:var(--fb);border-radius:10px}
+.time-input,#setariSearch{font-size:16px!important}
+#setariSearch{border-radius:14px!important;padding:12px 14px!important;background:var(--s1)}
+.date-picker-row input[type="date"]{color-scheme:inherit}
+.notif-row{border-radius:14px}
+.sw{width:50px;height:30px}
+.slider{border-radius:30px}
+.slider:before{height:22px;width:22px;left:3px;bottom:3px}
+input:checked + .slider{background:var(--acc);border-color:var(--acc)}
+input:checked + .slider:before{transform:translateX(20px);background:var(--acc-fg)}
+
+/* Modale + wizard */
+.modal{background:rgba(5,7,10,.72);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px)}
+.modal-content{border:1px solid var(--bd);border-radius:22px;padding:20px}
+.modal-ttl{color:var(--text);font-family:var(--fd);font-size:25px;font-weight:700;letter-spacing:.01em}
+.onboarding-card{border:1px solid var(--bd);border-radius:22px;background:var(--s1)}
+.wiz-title{font-family:var(--fd);font-size:30px;color:var(--text);letter-spacing:.01em}
+.wiz-label{font-family:var(--fb);letter-spacing:.12em;font-weight:700}
+.wiz-choice{border-width:1px;border-radius:14px}
+.wiz-choice.sel{border-color:var(--acc);background:rgba(var(--acc-rgb),.08)}
+html[data-mode="light"] .wiz-choice.sel,html[data-mode="light"] .mode-btn.sel,html[data-mode="light"] .dpl-day.on,html[data-mode="light"] .dpl-seg button.act{border-color:var(--acc-dim)}
+.wiz-choice-title{font-weight:700}
+.mode-btn{border-width:1px;border-radius:12px;font-family:var(--fb)}
+
+/* Cifre care se schimbă live — lățime fixă */
+.azi-stat-val,.hud-tile-val,.chk-count,.morning-count,.set-in,.vol-val,.hist-ton,.macro-val,.rest-timer-time,.hud-hero,.chart-stat-val,.meal-kc,.rating-value{font-variant-numeric:tabular-nums}
+
+@media (prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important;scroll-behavior:auto!important}}
 </style>
 </head>
 <body>
@@ -630,21 +901,21 @@ input:checked + .slider:before{transform:translateX(20px);background:var(--acc)}
   <div class="hdr-title" id="hdrTitle">BLOC FRIENDLY</div>
   <div class="hdr-sub">Bancă · Gantere · Bară · Fără zgomot</div>
   <div class="hdr-date" id="hdrDate"></div>
-  <div class="settings-gear" onclick="showTab('setari')" title="Setări"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3.2"/><path d="M19.2 12c0-.4 0-.8-.1-1.2l2-1.5-2-3.4-2.3 1a7.2 7.2 0 0 0-2.1-1.2L14.2 3h-4l-.5 2.7c-.8.3-1.5.7-2.1 1.2l-2.3-1-2 3.4 2 1.5a7.4 7.4 0 0 0 0 2.4l-2 1.5 2 3.4 2.3-1c.6.5 1.3.9 2.1 1.2l.5 2.7h4l.5-2.7c.8-.3 1.5-.7 2.1-1.2l2.3 1 2-3.4-2-1.5c.1-.4.1-.8.1-1.2z"/></svg></div>
+  <div class="settings-gear" onclick="showTab('setari')" title="Setări" role="button" tabindex="0" aria-label="Setări"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3.2"/><path d="M19.2 12c0-.4 0-.8-.1-1.2l2-1.5-2-3.4-2.3 1a7.2 7.2 0 0 0-2.1-1.2L14.2 3h-4l-.5 2.7c-.8.3-1.5.7-2.1 1.2l-2.3-1-2 3.4 2 1.5a7.4 7.4 0 0 0 0 2.4l-2 1.5 2 3.4 2.3-1c.6.5 1.3.9 2.1 1.2l.5 2.7h4l.5-2.7c.8-.3 1.5-.7 2.1-1.2l2.3 1 2-3.4-2-1.5c.1-.4.1-.8.1-1.2z"/></svg></div>
 </div>
 
 <div class="install-hint" id="installHint">
-  <button onclick="dismissInstallHint()">×</button>
+  <button onclick="dismissInstallHint()" aria-label="Închide">×</button>
   💡 <strong>Adaugă pe telefon:</strong> Share → "Add to Home Screen" (iOS) sau meniu → "Install app" (Android)
 </div>
 
-<div class="install-hint" id="updateBanner" style="background:rgba(var(--acc-rgb),.12);border-color:rgba(var(--acc-rgb),.4);color:var(--acc)">
-  🚀 <strong>Versiune nouă disponibilă!</strong> <button onclick="applyUpdate()" style="color:var(--acc);font-weight:800;text-decoration:underline;background:none;border:none;cursor:pointer;padding:0 4px">Actualizează →</button>
+<div class="install-hint" id="updateBanner" style="background:rgba(var(--acc-rgb),.12);border-color:rgba(var(--acc-rgb),.4);color:var(--acc2)">
+  🚀 <strong>Versiune nouă disponibilă!</strong> <button onclick="applyUpdate()" style="color:var(--acc2);font-weight:800;text-decoration:underline;background:none;border:none;cursor:pointer;padding:0 4px">Actualizează →</button>
 </div>
 
-<div class="install-hint" id="fsaReconnectBanner" style="background:rgba(245,158,11,.12);border-color:rgba(245,158,11,.5);color:#fbbf24">
+<div class="install-hint" id="fsaReconnectBanner" style="background:rgba(245,158,11,.12);border-color:rgba(245,158,11,.5);color:var(--amber)">
   🔒 <strong>Sync fișier întrerupt</strong> (permisiune pierdută după update).
-  <button onclick="fsaReconnect()" style="color:#fbbf24;font-weight:800;text-decoration:underline;background:none;border:none;cursor:pointer;padding:0 4px">🔓 Reconectează →</button>
+  <button onclick="fsaReconnect()" style="color:var(--amber);font-weight:800;text-decoration:underline;background:none;border:none;cursor:pointer;padding:0 4px">🔓 Reconectează →</button>
 </div>
 
 <div class="install-hint" id="backupOverdueBanner" style="background:rgba(244,63,94,.12);border-color:rgba(244,63,94,.5);color:#f87a8c">
@@ -675,21 +946,21 @@ input:checked + .slider:before{transform:translateX(20px);background:var(--acc)}
   <div id="nutMeals"></div>
   <div id="nutNote"></div>
 
-  <div class="stitle">🧬 De ce aceste numere?</div>
+  <div class="stitle">De ce aceste numere?</div>
   <div class="card" id="nutScienceCard">
     <div class="card-hd" onclick="document.getElementById('nutScienceCard').classList.toggle('open')">
-      <div class="card-ico" style="background:rgba(167,139,250,.15)">🔬</div>
+      <div class="card-ico" style="color:var(--purple)"><svg viewBox="0 0 24 24"><path d="M9 3h6M10 3v6.5L4.5 19a1.5 1.5 0 0 0 1.3 2.2h12.4a1.5 1.5 0 0 0 1.3-2.2L14 9.5V3"/><path d="M7 15h10"/></svg></div>
       <div style="flex:1"><div class="card-ttl">Știința din spatele țintelor</div><div class="card-sub">proteine · grăsimi · carbo · deficit · timing</div></div>
       <div class="card-chev">▼</div>
     </div>
     <div class="card-bd"><div style="padding-top:10px;font-size:12px;line-height:1.65;color:var(--text)">
       <p style="margin-bottom:10px"><strong style="color:#f87171">🥩 Proteine (1.8-2.2 g/kg corp)</strong><br>
       Meta-analiza pe 49 de studii: creșterea musculară urcă odată cu proteina până la ~1.6 g/kg, cu marjă de siguranță până la 2.2 la cei antrenați <em>(Morton 2018, Br J Sports Med)</em>. În deficit caloric ai nevoie de MAI multă — proteina e scutul mușchiului când slăbești <em>(Helms 2014)</em>. Bonus: e cel mai sățios macronutrient — ~25% din caloriile ei se ard doar digerând-o.</p>
-      <p style="margin-bottom:10px"><strong style="color:#fbbf24">🥑 Grăsimi (~0.9 g/kg — nu mai puțin)</strong><br>
+      <p style="margin-bottom:10px"><strong style="color:var(--amber)">🥑 Grăsimi (~0.9 g/kg — nu mai puțin)</strong><br>
       Dietele foarte sărace în grăsimi (sub ~20% din calorii) scad testosteronul — hormonul care construiește mușchi, la ambele sexe <em>(Whittaker 2021, meta-analiză)</em>. Grăsimile transportă și vitaminele A, D, E, K. De-asta nu-ți dăm niciodată sub acest prag.</p>
       <p style="margin-bottom:10px"><strong style="color:#38bdf8">🍚 Carbohidrați (restul caloriilor)</strong><br>
       Combustibilul seturilor grele — glicogenul din mușchi. Fără ei, seturile 3-4 se prăbușesc. Carbii NU îngrașă prin ei înșiși — surplusul caloric TOTAL îngrașă <em>(Hall 2017, studii metabolice controlate)</em>.</p>
-      <p style="margin-bottom:10px"><strong style="color:var(--acc)">📉 De ce deficit MODERAT, nu drastic</strong><br>
+      <p style="margin-bottom:10px"><strong style="color:var(--acc2)">📉 De ce deficit MODERAT, nu drastic</strong><br>
       La pierdere de ~0.7% din greutate/săptămână sportivii au păstrat mușchiul; la 1.4%/săpt. au pierdut și mușchi <em>(Garthe 2011)</em>. Mai încet = mai definit la final. De-asta app-ul refuză să-ți dea sub 1200/1500 kcal.</p>
       <p style="margin-bottom:10px"><strong style="color:var(--acc2)">⏰ "Fereastra anabolică" e un mit (aproape)</strong><br>
       Nu trebuie shake-ul în 30 min după antrenament — contează TOTALUL zilnic de proteine, distribuit rezonabil în 3-4 mese <em>(Schoenfeld 2013)</em>. Postul intermitent e doar o unealtă de control al caloriilor — funcționează dacă ție îți convine.</p>
@@ -699,7 +970,7 @@ input:checked + .slider:before{transform:translateX(20px);background:var(--acc)}
   </div>
 
   <div id="nutVariationWrap">
-  <div class="stitle">🐟 Variație săptămânală (1 zi/săpt)</div>
+  <div class="stitle">Variație săptămânală (1 zi/săpt)</div>
   <div class="meal-card" style="border-color:rgba(56,189,248,.35)">
     <div class="meal-hd" onclick="this.parentElement.classList.toggle('open')"><div><div class="meal-nm">🐟 Somon + quinoa (în loc de Masa 3)</div><div class="meal-tm">Orice zi PUI sau TON · 1x/săpt</div></div><div style="text-align:right"><div class="meal-kc" style="color:#38bdf8">~700 kcal</div><div class="meal-pr">~45g proteine · Omega 3</div></div><span class="meal-chev">▼</span></div>
     <div class="meal-items">
@@ -726,11 +997,11 @@ input:checked + .slider:before{transform:translateX(20px);background:var(--acc)}
 <div id="tab-program" class="sec"><div id="prog-content"></div></div>
 
 <div id="tab-progres" class="sec">
-  <div class="stitle">📈 Progres</div>
+  <div class="stitle">Progres</div>
 
   <div class="sgroup open" id="pgExercitii">
     <div class="sgroup-hd" onclick="this.parentElement.classList.toggle('open');pgRerender('pgExercitii')">
-      <div class="sgroup-ico">🏋️</div>
+      <div class="sgroup-ico"><svg viewBox="0 0 24 24"><path d="M6.5 6.5v11M17.5 6.5v11M3 9.5v5M21 9.5v5M6.5 12h11"/></svg></div>
       <div style="flex:1;min-width:0"><div class="sgroup-ttl">Progres exerciții</div><div class="sgroup-sub">Evoluție kg / volum + recorduri personale</div></div>
       <div class="sgroup-chev">▼</div>
     </div>
@@ -754,14 +1025,14 @@ input:checked + .slider:before{transform:translateX(20px);background:var(--acc)}
         <div id="exerChart"></div>
         <div class="chart-stats" id="exerStats"></div>
       </div>
-      <div class="stitle">🏆 Recorduri personale</div>
+      <div class="stitle">Recorduri personale</div>
       <div id="prList"></div>
     </div>
   </div>
 
   <div class="sgroup" id="pgCalendar">
     <div class="sgroup-hd" onclick="this.parentElement.classList.toggle('open');pgRerender('pgCalendar')">
-      <div class="sgroup-ico">🗓️</div>
+      <div class="sgroup-ico"><svg viewBox="0 0 24 24"><rect x="3.5" y="5" width="17" height="15" rx="2.5"/><path d="M3.5 10h17M8 3v4M16 3v4"/></svg></div>
       <div style="flex:1;min-width:0"><div class="sgroup-ttl">Calendar activitate</div><div class="sgroup-sub">20 săptămâni · intensitatea = tonajul zilei</div></div>
       <div class="sgroup-chev">▼</div>
     </div>
@@ -772,7 +1043,7 @@ input:checked + .slider:before{transform:translateX(20px);background:var(--acc)}
 
   <div class="sgroup" id="pgRealizari">
     <div class="sgroup-hd" onclick="this.parentElement.classList.toggle('open');pgRerender('pgRealizari')">
-      <div class="sgroup-ico">🏅</div>
+      <div class="sgroup-ico"><svg viewBox="0 0 24 24"><circle cx="12" cy="14.5" r="5.5"/><path d="M8.5 3l3.5 6 3.5-6"/></svg></div>
       <div style="flex:1;min-width:0"><div class="sgroup-ttl">Realizări</div><div class="sgroup-sub" id="pgAchSub">Praguri atinse pe drum</div></div>
       <div class="sgroup-chev">▼</div>
     </div>
@@ -783,7 +1054,7 @@ input:checked + .slider:before{transform:translateX(20px);background:var(--acc)}
 
   <div class="sgroup" id="pgMasuratori">
     <div class="sgroup-hd" onclick="this.parentElement.classList.toggle('open');pgRerender('pgMasuratori')">
-      <div class="sgroup-ico">📏</div>
+      <div class="sgroup-ico"><svg viewBox="0 0 24 24"><rect x="2.5" y="8" width="19" height="8" rx="2"/><path d="M7 8v3M11 8v4M15 8v3M19 8v2"/></svg></div>
       <div style="flex:1;min-width:0"><div class="sgroup-ttl">Măsurători corp</div><div class="sgroup-sub" id="pgMasSub">Adaugă + istoric cu BF% estimat</div></div>
       <div class="sgroup-chev">▼</div>
     </div>
@@ -844,7 +1115,7 @@ input:checked + .slider:before{transform:translateX(20px);background:var(--acc)}
 
   <div class="sgroup" id="pgCorp">
     <div class="sgroup-hd" onclick="this.parentElement.classList.toggle('open');pgRerender('pgCorp')">
-      <div class="sgroup-ico">📊</div>
+      <div class="sgroup-ico"><svg viewBox="0 0 24 24"><path d="M5 20v-8M12 20V5M19 20v-5M3 20h18"/></svg></div>
       <div style="flex:1;min-width:0"><div class="sgroup-ttl">Grafice corp</div><div class="sgroup-sub">Greutate, talie, BF% + verdictul recomp</div></div>
       <div class="sgroup-chev">▼</div>
     </div>
@@ -862,7 +1133,7 @@ input:checked + .slider:before{transform:translateX(20px);background:var(--acc)}
         <div class="chart-stats" id="bodyStats"></div>
       </div>
 
-      <div class="stitle">⚖️ Recomp: greutate vs masă slabă</div>
+      <div class="stitle">Recomp: greutate vs masă slabă</div>
       <p style="font-size:11px;color:var(--muted);margin-bottom:8px;line-height:1.4">
         🟠 greutate · 🟢 masă slabă. Ideal: greutatea scade, masa slabă rămâne stabilă/crește = pierzi grăsime, nu mușchi.
       </p>
@@ -875,7 +1146,7 @@ input:checked + .slider:before{transform:translateX(20px);background:var(--acc)}
 
   <div class="sgroup" id="pgPoze">
     <div class="sgroup-hd" onclick="this.parentElement.classList.toggle('open');pgRerender('pgPoze')">
-      <div class="sgroup-ico">📸</div>
+      <div class="sgroup-ico"><svg viewBox="0 0 24 24"><path d="M4 8h3l2-3h6l2 3h3v11H4z"/><circle cx="12" cy="13" r="3.5"/></svg></div>
       <div style="flex:1;min-width:0"><div class="sgroup-ttl">Poze de progres</div><div class="sgroup-sub">Compară în timp — stocate doar pe telefonul tău</div></div>
       <div class="sgroup-chev">▼</div>
     </div>
@@ -891,7 +1162,7 @@ input:checked + .slider:before{transform:translateX(20px);background:var(--acc)}
   </div>
 
   <p style="font-size:11px;color:var(--muted);margin-top:16px;line-height:1.5;text-align:center">
-    🔔 Notificări · ☁️ Sync · 💾 Backup — găsești toate în <a onclick="showTab('setari')" style="color:var(--acc);cursor:pointer;text-decoration:underline">Setări ⚙️</a>
+    🔔 Notificări · ☁️ Sync · 💾 Backup — găsești toate în <a onclick="showTab('setari')" style="color:var(--acc2);cursor:pointer;text-decoration:underline">Setări ⚙️</a>
   </p>
 </div>
 
@@ -914,44 +1185,44 @@ input:checked + .slider:before{transform:translateX(20px);background:var(--acc)}
     </div>
   </div>
 
-  <div class="stitle">🎉 Rezumatul săptămânii</div>
+  <div class="stitle">Rezumatul săptămânii</div>
   <button class="btn btn-ghost" onclick="showWeeklyDigest(currentWeekOffset)">🎉 Vezi rezumatul săptămânii afișate</button>
 
-  <div class="stitle">📊 Istoricul</div>
+  <div class="stitle">Istoricul</div>
   <div class="week-nav">
-    <button class="week-nav-btn" id="weekPrev" onclick="changeWeek(-1)">‹</button>
+    <button class="week-nav-btn" id="weekPrev" onclick="changeWeek(-1)" aria-label="Săptămâna anterioară">‹</button>
     <div class="week-nav-title">
       <div id="weekTitle">Săptămâna curentă</div>
       <div class="week-nav-sub" id="weekRange"></div>
     </div>
-    <button class="week-nav-btn" id="weekNext" onclick="changeWeek(1)">›</button>
+    <button class="week-nav-btn" id="weekNext" onclick="changeWeek(1)" aria-label="Săptămâna următoare">›</button>
   </div>
   <div id="weekSummary" style="font-size:11px;color:var(--muted);text-align:center;margin-bottom:12px"></div>
   <div id="volumePanel"></div>
   <div id="hist-content"></div>
 
   <p style="font-size:11px;color:var(--muted);margin-top:20px;text-align:center">
-    💾 Backup · ☁️ Sync · ⚡ Share → <a onclick="showTab('setari')" style="color:var(--acc);cursor:pointer;text-decoration:underline">Setări ⚙️</a>
+    💾 Backup · ☁️ Sync · ⚡ Share → <a onclick="showTab('setari')" style="color:var(--acc2);cursor:pointer;text-decoration:underline">Setări ⚙️</a>
   </p>
 </div>
 
 <div id="tab-setari" class="sec">
-  <div class="stitle">⚙️ Setări</div>
+  <div class="stitle">Setări</div>
   <input class="meas-in" type="search" id="setariSearch" placeholder="🔍 Caută în setări (timer, temă, backup...)" autocomplete="off" oninput="filterSetari(this.value)" style="font-size:14px;padding:10px 12px;margin-bottom:10px;border-radius:10px">
   <div id="setariNoResults" style="display:none;font-size:12px;color:var(--muted);text-align:center;padding:14px">Nimic găsit — încearcă alt cuvânt (ex: notificări, sunet, nume, șterge)</div>
 
   <div class="sgroup open" id="sgProfil">
     <div class="sgroup-hd" onclick="this.parentElement.classList.toggle('open')">
-      <div class="sgroup-ico">👤</div>
+      <div class="sgroup-ico"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21c1.5-4 4.5-6 8-6s6.5 2 8 6"/></svg></div>
       <div style="flex:1;min-width:0"><div class="sgroup-ttl">Profil & personalizare</div><div class="sgroup-sub">Nume, corp, temă de culoare</div></div>
       <div class="sgroup-chev">▼</div>
     </div>
     <div class="sgroup-bd">
-      <div class="stitle">👋 Numele tău</div>
+      <div class="stitle">Numele tău</div>
       <input class="meas-in" type="text" id="profileName" placeholder="ex: Robert" maxlength="20" autocomplete="off" onchange="saveProfile()" style="font-size:15px;padding:9px 10px">
       <p style="font-size:11px;color:var(--muted);margin:6px 0 0">Apare în header — jurnalul tău, cu numele tău.</p>
 
-      <div class="stitle">📏 Corp</div>
+      <div class="stitle">Corp</div>
       <div class="meas-grid">
         <div class="meas-field">
           <div class="meas-lbl">Înălțime</div>
@@ -974,11 +1245,11 @@ input:checked + .slider:before{transform:translateX(20px);background:var(--acc)}
       </div>
       <p style="font-size:11px;color:var(--muted);margin:0 0 4px">Folosite pentru calcul BF% (Navy) și estimare TDEE.</p>
 
-      <div class="stitle">🎨 Temă de culoare</div>
+      <div class="stitle">Temă de culoare</div>
       <div class="theme-row" id="themeRow"></div>
       <p style="font-size:11px;color:var(--muted);margin:8px 0 0">Schimbă culoarea de accent a întregii aplicații — instant, pe acest device.</p>
 
-      <div class="stitle">🌗 Aspect</div>
+      <div class="stitle">Aspect</div>
       <div class="mode-row" id="modeRow"></div>
       <p style="font-size:11px;color:var(--muted);margin:8px 0 0">Deschis = mai lizibil ziua · Întunecat = ideal seara la sală. Se salvează pe acest device.</p>
     </div>
@@ -986,7 +1257,7 @@ input:checked + .slider:before{transform:translateX(20px);background:var(--acc)}
 
   <div class="sgroup" id="sgProgram">
     <div class="sgroup-hd" onclick="this.parentElement.classList.toggle('open')">
-      <div class="sgroup-ico">🏋️</div>
+      <div class="sgroup-ico"><svg viewBox="0 0 24 24"><rect x="5" y="4" width="14" height="17" rx="2.5"/><path d="M9 4V3h6v1M9 10h6M9 14h6M9 18h3"/></svg></div>
       <div style="flex:1;min-width:0"><div class="sgroup-ttl">Programul meu</div><div class="sgroup-sub" id="sgProgramSub">Plan antrenament & obiectiv</div></div>
       <div class="sgroup-chev">▼</div>
     </div>
@@ -1006,7 +1277,7 @@ input:checked + .slider:before{transform:translateX(20px);background:var(--acc)}
 
   <div class="sgroup" id="sgTimer">
     <div class="sgroup-hd" onclick="this.parentElement.classList.toggle('open')">
-      <div class="sgroup-ico">⏱️</div>
+      <div class="sgroup-ico"><svg viewBox="0 0 24 24"><circle cx="12" cy="13.5" r="7.5"/><path d="M12 13.5V9.5M10 2.5h4M12 2.5V6"/></svg></div>
       <div style="flex:1;min-width:0"><div class="sgroup-ttl">Rest timer</div><div class="sgroup-sub" id="sgTimerSub">Pauză între seturi</div></div>
       <div class="sgroup-chev">▼</div>
     </div>
@@ -1061,7 +1332,7 @@ input:checked + .slider:before{transform:translateX(20px);background:var(--acc)}
 
   <div class="sgroup" id="sgNotif">
     <div class="sgroup-hd" onclick="this.parentElement.classList.toggle('open')">
-      <div class="sgroup-ico">🔔</div>
+      <div class="sgroup-ico"><svg viewBox="0 0 24 24"><path d="M6 16v-5a6 6 0 0 1 12 0v5l1.5 2h-15z"/><path d="M10 20.5a2 2 0 0 0 4 0"/></svg></div>
       <div style="flex:1;min-width:0"><div class="sgroup-ttl">Notificări</div><div class="sgroup-sub" id="sgNotifSub">Reminder antrenament & backup</div></div>
       <div class="sgroup-chev">▼</div>
     </div>
@@ -1127,18 +1398,18 @@ input:checked + .slider:before{transform:translateX(20px);background:var(--acc)}
 
   <div class="sgroup" id="sgBackup">
     <div class="sgroup-hd" onclick="this.parentElement.classList.toggle('open')">
-      <div class="sgroup-ico">💾</div>
+      <div class="sgroup-ico"><svg viewBox="0 0 24 24"><path d="M12 3l7.5 3v5.5c0 4.5-3.2 8.2-7.5 9.5-4.3-1.3-7.5-5-7.5-9.5V6z"/><path d="M9 12l2 2 4-4"/></svg></div>
       <div style="flex:1;min-width:0"><div class="sgroup-ttl">Backup & sincronizare</div><div class="sgroup-sub">Plasă de siguranță, share, fișier local, sync</div></div>
       <div class="sgroup-chev">▼</div>
     </div>
     <div class="sgroup-bd">
-      <div class="stitle">🛟 Plasă de siguranță (automat)</div>
+      <div class="stitle">Plasă de siguranță (automat)</div>
       <p style="font-size:12px;color:var(--muted);margin-bottom:8px;line-height:1.5">
         App-ul salvează <strong style="color:var(--acc2)">singur</strong>, zilnic, un snapshot complet al datelor — ultimele 7 zile, doar pe acest device. Dacă ceva se pierde sau se strică, restaurezi de aici cu un tap.
       </p>
       <div id="snapList"><div style="font-size:11px;color:var(--muted);text-align:center;padding:8px">Se încarcă…</div></div>
 
-      <div class="stitle" id="shareTitle">⚡ Share backup rapid</div>
+      <div class="stitle" id="shareTitle">Share backup rapid</div>
       <p style="font-size:12px;color:var(--muted);margin-bottom:10px;line-height:1.5" id="shareDesc">
         Un tap → meniul de share al telefonului → trimite datele către Drive, Mail, Telegram, orice. Zero setup.
       </p>
@@ -1151,9 +1422,9 @@ input:checked + .slider:before{transform:translateX(20px);background:var(--acc)}
         💡 <strong>Pe mobile = sincronizarea ta.</strong> Apasă Share o dată pe săptămână → salvează în Drive.
       </p>
 
-      <div class="stitle">💾 Backup local (fișier)</div>
+      <div class="stitle">Backup local (fișier)</div>
       <p style="font-size:12px;color:var(--muted);margin-bottom:10px;line-height:1.5">
-        Fișier salvat cu numele <code style="background:var(--bg);padding:1px 4px;border-radius:3px;font-size:11px;color:var(--acc)">fitness-data dd.mm.yyyy.json</code> (un fișier per zi, vezi data clar).
+        Fișier salvat cu numele <code style="background:var(--bg);padding:1px 4px;border-radius:3px;font-size:11px;color:var(--acc2)">fitness-data dd.mm.yyyy.json</code> (un fișier per zi, vezi data clar).
       </p>
       <div class="btn-row">
         <button class="btn btn-ghost" onclick="downloadJSON()">⬇️ Descarcă</button>
@@ -1162,7 +1433,7 @@ input:checked + .slider:before{transform:translateX(20px);background:var(--acc)}
       <input type="file" id="fileImport" accept="application/json" style="display:none" onchange="importJSON(event)">
 
       <div id="fsaWrapper" style="display:none">
-        <div class="stitle">🗂️ Sincronizare fișier (desktop)</div>
+        <div class="stitle">Sincronizare fișier (desktop)</div>
         <div class="drive-card" id="fsaCard">
           <div class="drive-status" id="fsaStatus">⚪ Deconectat</div>
           <div class="drive-sub" id="fsaSub">
@@ -1193,13 +1464,13 @@ input:checked + .slider:before{transform:translateX(20px);background:var(--acc)}
 
   <div class="sgroup" id="sgInfo">
     <div class="sgroup-hd" onclick="this.parentElement.classList.toggle('open')">
-      <div class="sgroup-ico">ℹ️</div>
+      <div class="sgroup-ico"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 11v5.5M12 7.5v.5"/></svg></div>
       <div style="flex:1;min-width:0"><div class="sgroup-ttl">Despre aplicație</div><div class="sgroup-sub">Versiune, update, status</div></div>
       <div class="sgroup-chev">▼</div>
     </div>
     <div class="sgroup-bd">
       <div class="rules-box" style="margin:12px 0 10px">
-        <div class="rule-row">📦 Versiune curentă: <strong id="infoSw" style="color:var(--acc)">—</strong></div>
+        <div class="rule-row">📦 Versiune curentă: <strong id="infoSw" style="color:var(--acc2)">—</strong></div>
         <div class="rule-row" style="color:var(--muted);font-size:11px;line-height:1.4">
           App-ul verifică automat update-uri când îl deschizi sau intri pe el. Dacă apare banner "Versiune nouă disponibilă" → apasă "Actualizează".
         </div>
@@ -1217,7 +1488,7 @@ input:checked + .slider:before{transform:translateX(20px);background:var(--acc)}
 
   <div class="sgroup danger" id="sgDanger">
     <div class="sgroup-hd" onclick="this.parentElement.classList.toggle('open')">
-      <div class="sgroup-ico">⚠️</div>
+      <div class="sgroup-ico"><svg viewBox="0 0 24 24"><path d="M12 3.5l9.5 16.5h-19z"/><path d="M12 10v4.5M12 17.5v.5"/></svg></div>
       <div style="flex:1;min-width:0"><div class="sgroup-ttl">Zona periculoasă</div><div class="sgroup-sub">Ștergere definitivă a datelor</div></div>
       <div class="sgroup-chev">▼</div>
     </div>
@@ -1231,10 +1502,10 @@ input:checked + .slider:before{transform:translateX(20px);background:var(--acc)}
 </div>
 
 <div id="tab-ghid" class="sec">
-  <div class="stitle">🧬 Principii dovedite (cercetare 2020-2025)</div>
+  <div class="stitle">Principii dovedite (cercetare 2020-2025)</div>
   <div class="card" id="principiiCard">
     <div class="card-hd" onclick="document.getElementById('principiiCard').classList.toggle('open')">
-      <div class="card-ico" style="background:rgba(167,139,250,.15)">🔬</div>
+      <div class="card-ico" style="color:var(--purple)"><svg viewBox="0 0 24 24"><path d="M9 3h6M10 3v6.5L4.5 19a1.5 1.5 0 0 0 1.3 2.2h12.4a1.5 1.5 0 0 0 1.3-2.2L14 9.5V3"/><path d="M7 15h10"/></svg></div>
       <div style="flex:1"><div class="card-ttl">De ce e construit programul așa</div><div class="card-sub">7 principii din meta-analize recente</div></div>
       <div class="card-chev">▼</div>
     </div>
@@ -1253,10 +1524,10 @@ input:checked + .slider:before{transform:translateX(20px);background:var(--acc)}
   <p style="font-size:12px;color:var(--muted);margin-bottom:12px">Apasă pentru detalii complete · sfaturile marcate cu autori = dovezi din studii</p>
   <div id="ghid-content"></div>
 
-  <div class="stitle">📚 Biblioteca completă</div>
+  <div class="stitle">Biblioteca completă</div>
   <div class="card" id="libCard">
     <div class="card-hd" onclick="toggleLib()">
-      <div class="card-ico" style="background:rgba(var(--acc-rgb),.12)">📚</div>
+      <div class="card-ico"><svg viewBox="0 0 24 24"><path d="M4 5.5A2.5 2.5 0 0 1 6.5 3H20v15H6.5A2.5 2.5 0 0 0 4 20.5z"/><path d="M4 20.5V5.5"/></svg></div>
       <div style="flex:1;min-width:0"><div class="card-ttl">Toate exercițiile din bibliotecă</div><div class="card-sub">inclusiv cele care nu-s în programul tău · grupate pe mușchi</div></div>
       <div class="card-chev">▼</div>
     </div>
@@ -1731,7 +2002,7 @@ function dpComputeUntil(){
 function dpGoWizard(){closeDayPlan();openWizard(true);}
 
 function renderDayPlan(){
-  var CH="font-family:'Chakra Petch','Segoe UI',Arial,sans-serif";
+  var CH="font-family:var(--fd)";
   var need=dayPlanState.count;
   var progCount=dayPlanCount();
   var sel=dayPlanState.days.slice().sort(function(a,b){return a-b;});
@@ -1752,7 +2023,7 @@ function renderDayPlan(){
     h+='<div style="font-size:11.5px;color:var(--acc2);font-weight:600;margin-bottom:3px">'+(DP_SPLIT_NAME[need]||'')+'</div>';
     h+='<div style="font-size:11px;color:var(--muted);line-height:1.5;margin-bottom:'+(willRegen?'8':'14')+'px">'+(DP_SPLIT_NOTE[need]||'')+'</div>';
     if(willRegen){
-      h+='<div style="background:rgba(245,158,11,.09);border:1px solid rgba(245,158,11,.4);border-radius:10px;padding:9px 11px;margin-bottom:14px;font-size:11px;color:#fbbf24;line-height:1.5">⚠️ Programul se regenerează pe <strong>'+need+' zile</strong>, pe profilul tău. Istoricul, PR-urile și măsurătorile rămân neatinse.</div>';
+      h+='<div style="background:rgba(245,158,11,.09);border:1px solid rgba(245,158,11,.4);border-radius:10px;padding:9px 11px;margin-bottom:14px;font-size:11px;color:var(--amber);line-height:1.5">⚠️ Programul se regenerează pe <strong>'+need+' zile</strong>, pe profilul tău. Istoricul, PR-urile și măsurătorile rămân neatinse.</div>';
     }
   }else{
     h+='<div style="background:var(--s2);border:1px solid var(--bd);border-radius:10px;padding:10px 12px;margin-bottom:14px;font-size:11.5px;color:var(--muted);line-height:1.5">Ai <strong style="color:var(--text)">'+progCount+' zile</strong> de antrenament. Ca să schimb numărul, am nevoie de profilul complet (echipament, nivel, obiectiv) — durează un minut.<br><button class="dpl-pill" style="margin-top:8px" onclick="dpGoWizard()">🔄 Completează profilul</button></div>';
@@ -1768,7 +2039,7 @@ function renderDayPlan(){
   h+='</div>';
   var missing=need-sel.length;
   var statusTxt=ok?'✓ '+need+'/'+need+' ZILE ALESE':(missing>0?sel.length+'/'+need+' — mai alege '+missing:sel.length+'/'+need+' — deselectează '+(-missing));
-  h+='<div style="font-size:11px;'+CH+';letter-spacing:1px;color:'+(ok?'var(--green)':'#fbbf24')+';margin-bottom:14px">'+statusTxt+'</div>';
+  h+='<div style="font-size:11px;'+CH+';letter-spacing:1px;color:'+(ok?'var(--green)':'var(--amber)')+';margin-bottom:14px">'+statusTxt+'</div>';
 
   // 3) Permanent vs temporar
   h+='<div class="dpl-seg">';
@@ -1880,7 +2151,7 @@ function renderMyDaysRow(){
   if(!el)return;
   var t=getTempPlan();
   el.innerHTML='🗓️ <strong style="color:var(--text)">'+dayPlanCount()+' zile</strong> · '+dayPlanSummaryText()+
-    (t?' · <span style="color:#fbbf24">temporar, până '+dpUntilLabel(t.until)+'</span>':'');
+    (t?' · <span style="color:var(--amber)">temporar, până '+dpUntilLabel(t.until)+'</span>':'');
 }
 
 (function(){try{applyDayPlan();}catch(e){console.error('applyDayPlan failed',e);}})();
@@ -2052,6 +2323,13 @@ function today(){return new Date().toLocaleDateString('ro-RO');}
 function escHtml(t){return String(t==null?'':t).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');}
 // Cheie sigură pentru onclick="fn('...')" — encodeURIComponent NU codifică apostroful
 function encKey(t){return encodeURIComponent(t).replace(/'/g,'%27');}
+// Iconițe SVG (stroke = currentColor) — Atelier: fără emoji ca iconițe de interfață
+var ICON_BOOK='<svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5.5A2.5 2.5 0 0 1 6.5 3H20v15H6.5A2.5 2.5 0 0 0 4 20.5z"/><path d="M4 20.5V5.5"/></svg>';
+var ICON_CHECK='<svg viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>';
+function dayIconSvg(ex){
+  var tr=!!(ex&&ex.list&&ex.list.some(function(e){return e.star;}));
+  return '<svg viewBox="0 0 24 24">'+(tr?'<path d="M6.5 6.5v11M17.5 6.5v11M3 9.5v5M21 9.5v5M6.5 12h11"/>':'<path d="M5 19c8 0 14-6 14-14-8 0-14 6-14 14z"/><path d="M5 19l7-7"/>')+'</svg>';
+}
 function todayIdx(){var d=new Date().getDay();return d===0?6:d-1;}
 
 function getEffectiveDateISO(){return currentWorkoutDate||todayISO();}
@@ -2173,7 +2451,7 @@ function showTab(name,btn){
       if(isCustomProgram){
         var goalL={slabit:'Slăbit',recomp:'Recompoziție',masa:'Masă'}[p.goal]||p.goal||'—';
         var eqL={bodyweight:'Bodyweight',home_min:'Gantere+bancă'+(p.hasBara?'+bară':''),gym:'Sală'}[p.equipment]||'—';
-        mpi.innerHTML='✨ <strong style="color:var(--acc)">Program personalizat</strong> · '+goalL+' · '+eqL+' · '+(p.days||'?')+' zile/săpt · '+(p.experience==='incepator'?'Începător':'Intermediar')+(p.emphasis==='glute'?' · 🍑 Accent fesieri':'');
+        mpi.innerHTML='✨ <strong style="color:var(--acc2)">Program personalizat</strong> · '+goalL+' · '+eqL+' · '+(p.days||'?')+' zile/săpt · '+(p.experience==='incepator'?'Începător':'Intermediar')+(p.emphasis==='glute'?' · 🍑 Accent fesieri':'');
       }else{
         mpi.innerHTML='📘 <strong style="color:var(--text)">Program standard</strong> (gantere+bancă+bară · 4 zile · recompoziție)';
       }
@@ -2327,17 +2605,17 @@ function renderToday(){
   for(var k in checkData){if(checkData[k])checkDone++;}
 
   html+='<div class="azi-stats">';
-  html+='<div class="azi-stat as1"><div class="azi-stat-val">'+setsToday+'/'+totalSetsExpected+'</div><div class="azi-stat-lbl">💪 Sets</div></div>';
-  html+='<div class="azi-stat as2"><div class="azi-stat-val">'+morningDone+'/'+morningTotal+'</div><div class="azi-stat-lbl">☀️ Dim</div></div>';
-  html+='<div class="azi-stat as3"><div class="azi-stat-val">'+checkDone+'/'+checkItems.length+'</div><div class="azi-stat-lbl">✅ Check</div></div>';
-  html+='<div class="azi-stat as4"><div class="azi-stat-val">'+coachWeek+'/8</div><div class="azi-stat-lbl">📍 Săpt</div></div>';
+  html+='<div class="azi-stat as1"><div class="azi-stat-val">'+setsToday+'/'+totalSetsExpected+'</div><div class="azi-stat-lbl">Seturi</div></div>';
+  html+='<div class="azi-stat as2"><div class="azi-stat-val">'+morningDone+'/'+morningTotal+'</div><div class="azi-stat-lbl">Dimineață</div></div>';
+  html+='<div class="azi-stat as3"><div class="azi-stat-val">'+checkDone+'/'+checkItems.length+'</div><div class="azi-stat-lbl">Checklist</div></div>';
+  html+='<div class="azi-stat as4"><div class="azi-stat-val">'+coachWeek+'/8</div><div class="azi-stat-lbl">Săptămâna</div></div>';
   html+='</div>';
 
   // Bara „PROGRESUL ZILEI" (design: canvas 3.1)
   if(totalSetsExpected>0){
     var dayPct=Math.min(100,Math.round(setsToday/totalSetsExpected*100));
     html+='<div style="margin:0 0 12px">';
-    html+='<div style="display:flex;justify-content:space-between;font-size:9.5px;letter-spacing:1.5px;color:var(--muted);font-family:\'Chakra Petch\',\'Segoe UI\',Arial,sans-serif;margin-bottom:4px"><span>PROGRESUL ZILEI</span><span id="dayProgPct" style="color:var(--acc2)">'+dayPct+'%</span></div>';
+    html+='<div style="display:flex;justify-content:space-between;font-size:9.5px;letter-spacing:1.5px;color:var(--muted);font-family:var(--fd);margin-bottom:4px"><span>PROGRESUL ZILEI</span><span id="dayProgPct" style="color:var(--acc2)">'+dayPct+'%</span></div>';
     html+='<div style="height:6px;border-radius:3px;background:var(--s2);overflow:hidden"><div id="dayProgFill" data-total="'+totalSetsExpected+'" style="height:100%;border-radius:3px;background:linear-gradient(90deg,var(--acc),var(--acc2));box-shadow:0 0 12px rgba(var(--acc-rgb),.7);width:'+dayPct+'%;transition:width .5s ease"></div></div>';
     html+='</div>';
   }
@@ -2372,7 +2650,7 @@ function renderToday(){
   var sleepVal=ratingData.sleep||5;
   html+='<div class="rating-card">';
   html+='<div class="hud-strip" style="background:linear-gradient(90deg,var(--purple),#c4b5fd)"></div>';
-  html+='<div style="font-size:10px;font-weight:700;color:var(--purple);letter-spacing:2.5px;text-transform:uppercase;margin-bottom:6px;font-family:\'Chakra Petch\',\'Segoe UI\',Arial,sans-serif">📊 STARE DE AZI</div>';
+  html+='<div style="font-size:10px;font-weight:700;color:var(--purple);letter-spacing:2.5px;text-transform:uppercase;margin-bottom:6px;font-family:var(--fd)">STARE DE AZI</div>';
   html+='<div class="rating-row"><div class="rating-emoji">⚡</div><div class="rating-label">Energie</div><input type="range" min="1" max="10" value="'+energyVal+'" class="rating-slider" id="ratEnergy" oninput="updateRating(\'energy\',this.value)"><div class="rating-value" id="ratEnergyVal">'+energyVal+'/10</div></div>';
   html+='<input class="rate-note-input" type="text" id="noteEnergy" placeholder="📝 De ce? (ex: somn prost, zi grea, cafea târziu)" value="'+(rateNoteData.energy||'').replace(/"/g,'&quot;')+'" onchange="saveRateNote(\'energy\',this.value)">';
   html+='<div class="rating-row"><div class="rating-emoji">😴</div><div class="rating-label">Calitate somn</div><input type="range" min="1" max="10" value="'+sleepVal+'" class="rating-slider" id="ratSleep" oninput="updateRating(\'sleep\',this.value)"><div class="rating-value" id="ratSleepVal">'+sleepVal+'/10</div></div>';
@@ -2384,9 +2662,9 @@ function renderToday(){
   html+='<span style="font-size:11px;color:var(--muted);margin-left:4px">kg</span></div>';
   html+='</div>';
 
-  html+='<div class="stitle">'+ex.icon+' Antrenament'+(dateOverride||dayOverride?' · '+schedule[idx].day:' seară')+'</div>';
+  html+='<div class="stitle">Antrenament'+(dateOverride||dayOverride?' · '+schedule[idx].day:' seară')+'</div>';
   html+='<div class="card" style="margin-bottom:12px;border-color:rgba(var(--acc-rgb),.35)">';
-  html+='<div class="card-hd" style="cursor:default"><div class="card-ico" style="background:rgba(var(--acc-rgb),.15);font-size:18px">'+ex.icon+'</div>';
+  html+='<div class="card-hd" style="cursor:default"><div class="card-ico">'+dayIconSvg(ex)+'</div>';
   html+='<div><div class="card-ttl">'+ex.label+'</div><div class="card-sub">'+ex.duration+' &nbsp;·&nbsp; ⭐ = progres &nbsp;·&nbsp; Tempo 2–1–2</div></div></div></div>';
 
   // Găsim primul exercițiu cu seturi nesalvate (auto-expand)
@@ -2475,7 +2753,7 @@ function renderToday(){
       setsHtml+='<input class="set-in" type="number" inputmode="decimal" enterkeyhint="done" step="0.5" min="0" max="999" placeholder="kg" value="'+(saved.kg||'')+'" oninput="upSet(\''+sk+'\','+s+',\'kg\',this.value,this)">';
       setsHtml+='<div class="stepper"><button class="stepper-btn" onclick="stepInput(\''+sk+'\','+s+',\'kg\',1,'+ei+')">+</button><button class="stepper-btn" onclick="stepInput(\''+sk+'\','+s+',\'kg\',-1,'+ei+')">−</button></div>';
       setsHtml+='</div>';
-      setsHtml+='<button class="set-btn" onclick="saveSet(\''+sk+'\','+s+','+ei+')">'+(isSaved?'✓':'💾')+'</button></div>';
+      setsHtml+='<button class="set-btn" aria-label="Salvează setul" onclick="saveSet(\''+sk+'\','+s+','+ei+')">'+(isSaved?'✓':ICON_CHECK)+'</button></div>';
     }
     setsHtml+='</div>';
 
@@ -2499,7 +2777,7 @@ function renderToday(){
       // Stagnation alert
       var stag=detectStagnation(e.name);
       if(stag){
-        smartHint+='<div style="background:rgba(245,158,11,.1);border-left:3px solid #fbbf24;padding:4px 10px;margin:4px 14px 0;border-radius:0 6px 6px 0;font-size:11px;color:#fbbf24">⚠️ <strong>Stagnare 2 săpt.</strong>: '+stag.prevReps+'×'+stag.prevKg+' → '+stag.lastReps+'×'+stag.lastKg+'. Verifică: somn, calorii, deload mini?</div>';
+        smartHint+='<div style="background:rgba(245,158,11,.1);border-left:3px solid var(--amber);padding:4px 10px;margin:4px 14px 0;border-radius:0 6px 6px 0;font-size:11px;color:var(--amber)">⚠️ <strong>Stagnare 2 săpt.</strong>: '+stag.prevReps+'×'+stag.prevKg+' → '+stag.lastReps+'×'+stag.lastKg+'. Verifică: somn, calorii, deload mini?</div>';
       }
     }else{
       var accRec=getAccessoryRec(e.name,e);
@@ -2522,7 +2800,7 @@ function renderToday(){
     html+='<div style="flex:1;min-width:0"><div class="card-ttl">'+escHtml(e.name)+'</div><div class="card-sub">'+(ei===aziAddSetIdx?effSets+' seturi ('+e.sets+'+1 azi)':e.sets+' seturi')+' · Țintă: '+targetLbl+'</div></div>';
     html+=progressBadge;
     if(isHero)html+='<span class="hero-badge">ÎN LUCRU</span>';
-    html+='<button class="guide-btn" onclick="event.stopPropagation();openGuideByName(\''+sk+'\')" title="Cum se face">📖</button>';
+    html+='<button class="guide-btn" onclick="event.stopPropagation();openGuideByName(\''+sk+'\')" title="Cum se face" aria-label="Cum se face">'+ICON_BOOK+'</button>';
     html+='<div class="card-chev">▼</div></div>';
     html+='<div class="hint-wrap">'+smartHint+'</div>';
     var exNote=(exNoteData[key]||'');
@@ -2589,7 +2867,7 @@ function renderToday(){
     html+='<div class="hud-strip"></div>';
     html+='<div class="card-hd" onclick="toggleDaySummary()">';
     html+='<div class="hud-dot" style="margin:0 6px 0 2px"></div>';
-    html+='<div style="flex:1;min-width:0"><div class="card-ttl" style="font-family:\'Chakra Petch\',\'Segoe UI\',Arial,sans-serif;letter-spacing:3px;color:var(--green)">'+(skippedList.length?'ZI ÎNCHEIATĂ':'ZI COMPLETĂ')+'</div>';
+    html+='<div style="flex:1;min-width:0"><div class="card-ttl" style="font-family:var(--fd);letter-spacing:3px;color:var(--green)">'+(skippedList.length?'ZI ÎNCHEIATĂ':'ZI COMPLETĂ')+'</div>';
     html+='<div class="card-sub">'+setsToday+' seturi'+(prKeys.length?' · 🏆 '+prKeys.length+' PR':'')+(skippedList.length?' · ⤼ '+skippedList.length+' sărit'+(skippedList.length===1?'':'e'):'')+'</div></div>';
     html+='<div class="card-chev">▼</div></div>';
     html+='<div class="card-bd"><div style="padding-top:12px;display:flex;flex-direction:column;gap:13px;font-size:12.5px">';
@@ -2627,7 +2905,7 @@ function renderToday(){
       prKeys.forEach(function(k){
         var r=prBest[k].r;
         var prLbl={kg:'GREUTATE MAX',reps:'REP MAX',volume:'VOLUM MAX'}[r.note.slice(3)]||r.note.slice(3).toUpperCase();
-        html+='<div class="hud-pr-row"><div style="flex:1;font-size:12.5px;font-weight:600;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+escHtml(r.exercise)+'</div><div style="font-size:13px;font-weight:700;font-family:\'Chakra Petch\',\'Segoe UI\',Arial,sans-serif;color:#fbbf24;flex-shrink:0">'+r.reps+'×'+r.kg+' kg</div><div style="font-size:9px;color:var(--muted);flex-shrink:0">'+prLbl+'</div></div>';
+        html+='<div class="hud-pr-row"><div style="flex:1;font-size:12.5px;font-weight:600;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+escHtml(r.exercise)+'</div><div style="font-size:13px;font-weight:700;font-family:var(--fd);color:var(--amber);flex-shrink:0">'+r.reps+'×'+r.kg+' kg</div><div style="font-size:9px;color:var(--muted);flex-shrink:0">'+prLbl+'</div></div>';
       });
       html+='</div>';
     }
@@ -2649,7 +2927,7 @@ function renderToday(){
       html+='</div>';
     }
     if(skippedList.length){
-      html+='<div style="font-size:11px;color:#fbbf24;opacity:.9">⤼ Sărite: '+skippedList.map(function(s){return escHtml(s.name)+' <span style="color:var(--muted)">('+escHtml(s.reason)+')</span>';}).join(' · ')+'</div>';
+      html+='<div style="font-size:11px;color:var(--amber);opacity:.9">⤼ Sărite: '+skippedList.map(function(s){return escHtml(s.name)+' <span style="color:var(--muted)">('+escHtml(s.reason)+')</span>';}).join(' · ')+'</div>';
     }
     html+='<div style="border-top:1px solid var(--bd);padding-top:10px;font-size:11px;color:var(--muted);line-height:1.55">😴 Recuperarea începe acum — proteinele + somnul de 7+ ore fac creșterea.</div>';
     html+='</div></div></div>';
@@ -3004,7 +3282,7 @@ function renderPlateCalc(ei){
   var out=document.getElementById('plcOut_'+ei);if(!out)return;
   var kg=parseFloat((document.getElementById('plcKg_'+ei)||{}).value);
   if(!kg||kg<=0){out.innerHTML='<span style="color:var(--muted)">Scrie greutatea totală dorită.</span>';return;}
-  if(kg<bw){out.innerHTML='<span style="color:#fbbf24">⚠️ '+kg+' kg e sub bara goală ('+bw+' kg). Pornește cu bara goală.</span>';return;}
+  if(kg<bw){out.innerHTML='<span style="color:var(--amber)">⚠️ '+kg+' kg e sub bara goală ('+bw+' kg). Pornește cu bara goală.</span>';return;}
   var plates=[25,20,15,10,5,2.5,1.25,0.5];
   var side=(kg-bw)/2,rem=side,parts=[];
   plates.forEach(function(p){
@@ -3012,10 +3290,10 @@ function renderPlateCalc(ei){
     if(n>0){parts.push((2*n)+'×'+p);rem=Math.round((rem-n*p)*1000)/1000;}
   });
   var achieved=Math.round((kg-2*rem)*100)/100;
-  var chak='font-family:\'Chakra Petch\',\'Segoe UI\',Arial,sans-serif;font-weight:700';
+  var chak='font-family:var(--fd);font-weight:700';
   var line='<strong style="'+chak+';color:var(--acc2)">'+achieved+' kg</strong> <span style="color:var(--muted)">=</span> bară '+bw+(parts.length?' <span style="color:var(--muted)">+</span> '+parts.join(' <span style="color:var(--muted)">+</span> '):' (goală)');
   if(rem>0.001){
-    line+='<br><span style="font-size:10.5px;color:#fbbf24">⚠️ '+kg+' kg nu iese exact cu discuri standard — cel mai apropiat: '+achieved+' kg.</span>';
+    line+='<br><span style="font-size:10.5px;color:var(--amber)">⚠️ '+kg+' kg nu iese exact cu discuri standard — cel mai apropiat: '+achieved+' kg.</span>';
   }
   out.innerHTML=line;
 }
@@ -3035,7 +3313,7 @@ function skipExercise(keyEnc,reason){
     showToast('⤼ Sărit — zi încheiată ✓','var(--green)');
     setTimeout(function(){sum.scrollIntoView({behavior:'smooth',block:'center'});},350);
   }else{
-    showToast('⤼ Sărit azi — se reia data viitoare','#fbbf24');
+    showToast('⤼ Sărit azi — se reia data viitoare','var(--amber)');
   }
 }
 
@@ -3101,7 +3379,7 @@ function undoLastSet(){
   }
   stopRestTimer();
   renderToday();
-  showToast('↩ Set anulat'+(c.prevRow?' — valorile anterioare au revenit':''),'#fbbf24');
+  showToast('↩ Set anulat'+(c.prevRow?' — valorile anterioare au revenit':''),'var(--amber)');
   if(navigator.vibrate)navigator.vibrate(20);
 }
 
@@ -3386,7 +3664,7 @@ function restTimerDone(){
   // Dacă app-ul e minimizat → notificare (necesită permisiunea de notificări activată)
   if(document.hidden&&'Notification' in window&&Notification.permission==='granted'&&navigator.serviceWorker){
     navigator.serviceWorker.getRegistration().then(function(reg){
-      if(reg)reg.showNotification('⏱️ Pauza s-a terminat',{body:'Următorul set — hai! 💪',tag:'rest-timer',vibrate:[200,100,200],icon:'./manifest.json'});
+      if(reg)reg.showNotification('⏱️ Pauza s-a terminat',{body:'Următorul set — hai! 💪',tag:'rest-timer',vibrate:[200,100,200],icon:'./icons/icon-192.png'});
     });
   }
   restTimerState.deadline=null;
@@ -3635,7 +3913,7 @@ function morningSwapHtml(id){
     return true;
   }).slice(0,3);
   if(!alts.length&&!morningOrigById[id])return '';
-  var h='<div class="g-row"><div class="g-lbl" style="color:#fbbf24">↔</div><div><strong>Nu-l poți face?</strong> Înlocuiește-l (aceeași grupă de mișcare):<br>';
+  var h='<div class="g-row"><div class="g-lbl" style="color:var(--amber)">↔</div><div><strong>Nu-l poți face?</strong> Înlocuiește-l (aceeași grupă de mișcare):<br>';
   alts.forEach(function(k){
     h+='<button class="btn btn-ghost" style="font-size:12px;padding:8px;margin:6px 0 0" onclick="swapMorning(\''+origId+'\',\''+k+'\')">↔ '+MORNING_SWAP_POOL[k].name+' <span style="color:var(--muted)">· '+MORNING_SWAP_POOL[k].target+'</span></button>';
   });
@@ -3696,7 +3974,7 @@ function unilateralHintRow(name){
 function kgConventionRow(name){
   var msg=kgConventionFor({name:name});
   if(!msg)return '';
-  return '<div class="g-row"><div class="g-lbl" style="color:var(--acc)">kg</div><div><strong>Ce treci la kg:</strong> '+msg+'</div></div>';
+  return '<div class="g-row"><div class="g-lbl" style="color:var(--acc2)">kg</div><div><strong>Ce treci la kg:</strong> '+msg+'</div></div>';
 }
 
 // Alternative pentru "nu-mi place exercițiul ăsta" — același pattern, echipamentul userului
@@ -3736,7 +4014,7 @@ function swapAlternativesHtml(name){
     return true;
   }).sort(function(a,b){return a.prio-b.prio;}).slice(0,3);
   if(!alts.length&&!swapOriginalByName[name])return '';
-  var h='<div class="g-row"><div class="g-lbl" style="color:#fbbf24">↔</div><div><strong>Nu-ți place?</strong> Înlocuiește-l permanent (istoricul lui rămâne salvat):<br>';
+  var h='<div class="g-row"><div class="g-lbl" style="color:var(--amber)">↔</div><div><strong>Nu-ți place?</strong> Înlocuiește-l permanent (istoricul lui rămâne salvat):<br>';
   alts.forEach(function(a){
     h+='<button class="btn btn-ghost" style="font-size:12px;padding:8px;margin:6px 0 0" onclick="swapExercise(\''+encKey(origName)+'\',\''+a.id+'\')">↔ '+a.name+'</button>';
   });
@@ -3760,7 +4038,7 @@ function toggleLib(){
     });
     var h='';
     Object.keys(byMuscle).sort().forEach(function(m){
-      h+='<div style="font-size:10px;font-weight:700;letter-spacing:1.5px;color:var(--acc);text-transform:uppercase;margin:10px 0 4px">'+m+' ('+byMuscle[m].length+')</div>';
+      h+='<div style="font-size:10px;font-weight:700;letter-spacing:1.5px;color:var(--acc2);text-transform:uppercase;margin:10px 0 4px">'+m+' ('+byMuscle[m].length+')</div>';
       byMuscle[m].forEach(function(x){
         h+='<div style="padding:6px 0;border-bottom:1px solid var(--bd);font-size:13px;cursor:pointer;display:flex;align-items:center;gap:9px" onclick="openGuideByName(\''+encKey(x.name)+'\')"><span class="ex-thumb" style="width:28px;height:30px;border-radius:8px">'+muscleThumb(volumeGroupFor(x.muscle),20)+'</span><span style="flex:1;min-width:0">'+x.name+'</span><span style="color:var(--muted);font-size:11px;flex-shrink:0">📖</span></div>';
       });
@@ -3958,7 +4236,7 @@ function macroVisualHtml(protein,carbs,fat){
   var h='<div class="macro-split">';
   h+='<div style="flex:'+kcalP+';background:linear-gradient(90deg,#ef4444,#f87171);box-shadow:0 0 8px rgba(248,113,113,.35)"></div>';
   h+='<div style="flex:'+kcalC+';background:linear-gradient(90deg,#0ea5e9,#38bdf8);box-shadow:0 0 8px rgba(56,189,248,.35)"></div>';
-  h+='<div style="flex:'+kcalF+';background:linear-gradient(90deg,#f59e0b,#fbbf24);box-shadow:0 0 8px rgba(251,191,36,.35)"></div>';
+  h+='<div style="flex:'+kcalF+';background:linear-gradient(90deg,#f59e0b,var(--amber));box-shadow:0 0 8px rgba(251,191,36,.35)"></div>';
   h+='</div>';
   h+='<div class="macro-row" style="margin-bottom:0">';
   h+='<div class="macro-box" style="border-color:rgba(248,113,113,.3);background:rgba(248,113,113,.05)"><div class="macro-val mp">'+protein+'<span>g</span></div><div class="macro-lbl">PROTEINE · '+pp+'%</div></div>';
@@ -3979,7 +4257,7 @@ function renderNutritionAuto(){
     '<div><div style="font-size:22px;font-weight:900">Planul tău caloric</div>'+
     '<div style="font-size:11px;color:var(--purple);font-weight:600;margin-top:2px">Obiectiv: '+goalLabel+' · TDEE estimat '+n.tdee+' kcal</div></div>'+
     '<div style="background:rgba(var(--acc-rgb),.08);border:1px solid rgba(var(--acc-rgb),.4);border-radius:12px;padding:8px 14px;text-align:center;box-shadow:0 0 16px rgba(var(--acc-rgb),.14)">'+
-    '<div style="font-size:22px;font-weight:700;font-family:\'Chakra Petch\',\'Segoe UI\',Arial,sans-serif;color:var(--acc2)">'+n.kcal+'</div>'+
+    '<div style="font-size:22px;font-weight:700;font-family:var(--fd);color:var(--acc2)">'+n.kcal+'</div>'+
     '<div style="font-size:10px;color:var(--muted);letter-spacing:1px">KCAL/ZI</div></div></div>';
   document.getElementById('nutMacros').innerHTML=macroVisualHtml(n.protein,n.carbs,n.fat);
   var meals=document.getElementById('nutMeals');
@@ -4020,7 +4298,7 @@ function renderNutDay(){
     '<div><div style="font-size:22px;font-weight:900">'+s.day+'</div>'+
     '<div style="font-size:11px;color:var(--purple);font-weight:600;margin-top:2px">'+p.subtitle+'</div></div>'+
     '<div style="background:rgba(var(--acc-rgb),.08);border:1px solid rgba(var(--acc-rgb),.4);border-radius:12px;padding:8px 14px;text-align:center;box-shadow:0 0 16px rgba(var(--acc-rgb),.14)">'+
-    '<div style="font-size:22px;font-weight:700;font-family:\'Chakra Petch\',\'Segoe UI\',Arial,sans-serif;color:'+p.color+'">'+p.kcal+'</div>'+
+    '<div style="font-size:22px;font-weight:700;font-family:var(--fd);color:'+p.color+'">'+p.kcal+'</div>'+
     '<div style="font-size:9px;color:var(--muted);letter-spacing:1px">KCAL/ZI</div></div></div>';
   document.getElementById('nutMacros').innerHTML=macroVisualHtml(p.protein,p.carbs,p.fat);
   var meals=document.getElementById('nutMeals');meals.innerHTML='';
@@ -4045,7 +4323,7 @@ function initProgram(){
 
   // Header săptămână — HUD (design: canvas „Program si Restul")
   var cycleInfo=getCycleInfo();
-  var CHAK='font-family:\'Chakra Petch\',\'Segoe UI\',Arial,sans-serif';
+  var CHAK='font-family:var(--fd)';
   html+='<div class="prog-hud">';
   html+='<div class="hud-strip"></div>';
   html+='<div style="display:flex;align-items:baseline;gap:10px">';
@@ -4077,7 +4355,7 @@ function initProgram(){
   html+='</div>';
 
   // 7 zile cu status
-  html+='<div class="stitle">📋 Zilele săptămânii</div>';
+  html+='<div class="stitle">Zilele săptămânii</div>';
   var dayLabels=['LUNI','MARȚI','MIERCURI','JOI','VINERI','SÂMBĂTĂ','DUMINICĂ'];
   // zilele vin din schedule (respectă planul de zile al userului)
 
@@ -4106,14 +4384,14 @@ function initProgram(){
       statusBadge='<span class="hero-badge">AZI</span>';
     }else if(isPast){
       dayCls+=' card-idle';
-      statusBadge='<span style="background:rgba(245,158,11,.1);color:#fbbf24;font-size:9.5px;font-weight:800;padding:2px 7px;border-radius:5px;opacity:.8">NEFĂCUT</span>';
+      statusBadge='<span style="background:rgba(245,158,11,.1);color:var(--amber);font-size:9.5px;font-weight:800;padding:2px 7px;border-radius:5px;opacity:.8">NEFĂCUT</span>';
     }else{
       dayCls+=' card-idle';
       statusBadge='<span style="background:rgba(125,141,154,.1);color:var(--muted);font-size:9.5px;font-weight:800;padding:2px 7px;border-radius:5px">🕓 VIITOR</span>';
     }
 
     html+='<div class="'+dayCls+'" id="pc_'+di+'"><div class="card-hd" onclick="document.getElementById(\'pc_'+di+'\').classList.toggle(\'open\')">';
-    html+='<div class="card-ico" style="background:rgba(var(--acc-rgb),.12)">'+ex.icon+'</div>';
+    html+='<div class="card-ico">'+dayIconSvg(ex)+'</div>';
     html+='<div style="flex:1;min-width:0"><div class="card-ttl">'+dayLabel+' — '+ex.label+'</div><div class="card-sub">'+ex.duration+' · '+totalExercises+' exerciții · '+setsTotal+' seturi</div></div>';
     html+='<div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px">'+statusBadge+'<div class="card-chev">▼</div></div>';
     html+='</div>';
@@ -4138,14 +4416,14 @@ function initProgram(){
       html+='<div style="display:flex;align-items:flex-start;gap:8px;padding:8px 0;border-bottom:1px solid var(--bd);font-size:13px">';
       html+='<div style="color:'+(e.star?'var(--acc2)':'transparent')+';width:18px;flex-shrink:0;padding-top:1px">'+(e.star?'⭐':'·')+'</div>';
       html+='<div style="flex:1"><div style="font-weight:500">'+e.name+'</div>'+smartTarget+'</div>';
-      html+='<div style="font-size:10.5px;font-family:\'Chakra Petch\',\'Segoe UI\',Arial,sans-serif;color:'+(e.star?'var(--acc)':'var(--muted)')+';background:rgba('+(e.star?'var(--acc-rgb)':'125,141,154')+',.1);padding:2px 8px;border-radius:12px;flex-shrink:0;align-self:flex-start;margin-top:1px">'+(e.sets+extraPill)+'×'+e.target+(extraPill?' ↗':'')+'</div>';
+      html+='<div style="font-size:10.5px;font-family:var(--fd);color:'+(e.star?'var(--acc)':'var(--muted)')+';background:rgba('+(e.star?'var(--acc-rgb)':'125,141,154')+',.1);padding:2px 8px;border-radius:12px;flex-shrink:0;align-self:flex-start;margin-top:1px">'+(e.sets+extraPill)+'×'+e.target+(extraPill?' ↗':'')+'</div>';
       html+='</div>';
     });
     html+='</div></div></div>';
   }
 
   // Plan general 8 săpt. — rândul curent evidențiat, făcutele bifate
-  html+='<div class="stitle">📅 Plan 8 săptămâni</div>';
+  html+='<div class="stitle">Plan 8 săptămâni</div>';
   html+='<div class="card"><div class="card-bd" style="display:block;padding:4px 14px;border-top:none">';
   WEEK_FOCUS.forEach(function(f,i){
     var wNo=i+1;
@@ -4400,7 +4678,7 @@ function renderHistoric(){
     html+='<div class="hist-card-hd" onclick="document.getElementById(\''+cardId+'\').classList.toggle(\'open\')">';
     html+='<div class="hist-date-col"><div class="hist-date-day">'+(dayShort[d]||d.slice(0,2))+'</div><div class="hist-date-num">'+dayNum+'</div></div>';
     html+='<div style="flex:1;min-width:0">';
-    html+='<div style="display:flex;align-items:baseline;gap:8px"><span style="font-size:12px;font-weight:700;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+(trained?progLabel:d.charAt(0)+d.slice(1).toLowerCase())+'</span>'+(D.prCount?'<span style="font-size:10px;color:#fbbf24;font-weight:800;flex-shrink:0">🏆 '+D.prCount+' PR</span>':'')+'</div>';
+    html+='<div style="display:flex;align-items:baseline;gap:8px"><span style="font-size:12px;font-weight:700;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+(trained?progLabel:d.charAt(0)+d.slice(1).toLowerCase())+'</span>'+(D.prCount?'<span style="font-size:10px;color:var(--amber);font-weight:800;flex-shrink:0">🏆 '+D.prCount+' PR</span>':'')+'</div>';
     if(trained){
       // Micro-viz: un segment per exercițiu, lățime ∝ seturi, intensitate descrescătoare
       html+='<div class="hist-viz">';
@@ -4433,14 +4711,14 @@ function renderHistoric(){
         if(found){
           html+='<span class="hist-set'+(found.pr?' pr':'')+'" onclick="openEdit(\''+d+'\',\''+exEnc+'\','+setNum+')">S'+setNum+' · '+found.reps+'×'+found.kg+(found.pr?' 🏆':' ✎')+'</span>';
         }else{
-          html+='<span class="hist-set" style="background:rgba(245,158,11,.08);color:#fbbf24;border:1px dashed rgba(245,158,11,.4)" onclick="openAddSet(\''+d+'\',\''+exEnc+'\','+setNum+')">+ S'+setNum+'</span>';
+          html+='<span class="hist-set" style="background:rgba(245,158,11,.08);color:var(--amber);border:1px dashed rgba(245,158,11,.4)" onclick="openAddSet(\''+d+'\',\''+exEnc+'\','+setNum+')">+ S'+setNum+'</span>';
         }
       }
       html+='</div></div>';
     });
     if(D.skips.length){
       D.skips.forEach(function(sk){
-        html+='<div class="hist-ex" style="border:1px dashed rgba(245,158,11,.35);background:repeating-linear-gradient(-45deg,rgba(245,158,11,.04) 0 6px,transparent 6px 16px)"><div class="hist-ex-nm" style="color:var(--muted);margin-bottom:0">⤼ '+escHtml(sk.exercise)+' <span style="color:#fbbf24;font-size:10px;font-weight:400">SĂRIT'+(sk.reason?' · '+escHtml(sk.reason):'')+'</span></div></div>';
+        html+='<div class="hist-ex" style="border:1px dashed rgba(245,158,11,.35);background:repeating-linear-gradient(-45deg,rgba(245,158,11,.04) 0 6px,transparent 6px 16px)"><div class="hist-ex-nm" style="color:var(--muted);margin-bottom:0">⤼ '+escHtml(sk.exercise)+' <span style="color:var(--amber);font-size:10px;font-weight:400">SĂRIT'+(sk.reason?' · '+escHtml(sk.reason):'')+'</span></div></div>';
       });
     }
     if(morningTotal||D.checks.length){
@@ -4574,7 +4852,7 @@ function volumeHint(data){
   });
   if(worst){
     var need=Math.ceil(worst.gap);
-    return '⚠️ <strong style="color:#fbbf24">'+worst.g.label+'</strong> e la '+volFmt(worst.g.val)+' seturi — sub bandă. <strong style="color:var(--text)">+'+need+' seturi de '+(VOL_SUGGEST[worst.g.id]||'lucru direct')+'</strong> ar închide golul.';
+    return '⚠️ <strong style="color:var(--amber)">'+worst.g.label+'</strong> e la '+volFmt(worst.g.val)+' seturi — sub bandă. <strong style="color:var(--text)">+'+need+' seturi de '+(VOL_SUGGEST[worst.g.id]||'lucru direct')+'</strong> ar închide golul.';
   }
   var over=null;
   data.groups.forEach(function(g){
@@ -4599,7 +4877,7 @@ function renderVolumePanel(){
   html+='<div class="card-bd"><div style="padding-top:12px">';
   html+='<div style="font-size:11px;color:var(--muted);margin-bottom:10px">'+data.sessions+' antrenament'+(data.sessions===1?'':'e')+' logat'+(data.sessions===1?'':'e')+' · '+data.counted+' seturi numărate</div>';
   // Axa 0 / 10 / 20 (aliniată cu banda de pe track)
-  html+='<div style="position:relative;height:13px;margin-bottom:3px;font-family:\'Chakra Petch\',\'Segoe UI\',Arial,sans-serif;font-size:9px;color:var(--muted)">';
+  html+='<div style="position:relative;height:13px;margin-bottom:3px;font-family:var(--fd);font-size:9px;color:var(--muted)">';
   html+='<span style="position:absolute;left:0">0</span>';
   html+='<span style="position:absolute;left:'+bandL.toFixed(1)+'%;transform:translateX(-50%);color:var(--green)">10</span>';
   html+='<span style="position:absolute;left:'+(bandL+bandW).toFixed(1)+'%;transform:translateX(-50%);color:var(--green)">20</span>';
@@ -4615,7 +4893,7 @@ function renderVolumePanel(){
   });
   // Legendă compactă
   html+='<div style="display:flex;gap:12px;font-size:9.5px;color:var(--muted);margin:2px 0 0;align-items:center">';
-  html+='<span><span style="display:inline-block;width:8px;height:8px;border-radius:2px;background:#fbbf24;vertical-align:-1px"></span> sub țintă</span>';
+  html+='<span><span style="display:inline-block;width:8px;height:8px;border-radius:2px;background:var(--amber);vertical-align:-1px"></span> sub țintă</span>';
   html+='<span><span style="display:inline-block;width:8px;height:8px;border-radius:2px;background:var(--acc2);vertical-align:-1px"></span> în bandă</span>';
   html+='<span><span style="display:inline-block;width:8px;height:8px;border-radius:2px;background:#fb7185;vertical-align:-1px"></span> peste</span>';
   html+='</div>';
@@ -5098,7 +5376,8 @@ function saveProfile(){
 
 // ─── Teme de accent (personalizare) ───
 var THEMES=[
-  {id:'',lbl:'Turcoaz',color:'#14b8a6'},
+  {id:'',lbl:'Volt',color:'#c6f135'},
+  {id:'teal',lbl:'Turcoaz',color:'#14b8a6'},
   {id:'ocean',lbl:'Ocean',color:'#0ea5e9'},
   {id:'mov',lbl:'Mov',color:'#8b5cf6'},
   {id:'roz',lbl:'Roz',color:'#ec4899'},
@@ -5127,7 +5406,7 @@ function applyMode(m){
   if(m)document.documentElement.setAttribute('data-mode',m);
   else document.documentElement.removeAttribute('data-mode');
   var tc=document.querySelector('meta[name="theme-color"]');
-  if(tc)tc.setAttribute('content',m==='light'?'#f5f7f9':'#0e1822');
+  if(tc)tc.setAttribute('content',m==='light'?'#f4f5f7':'#0b0d10');
 }
 function setMode(m){
   if(m)localStorage.setItem('app_mode',m);else localStorage.removeItem('app_mode');
@@ -5144,7 +5423,7 @@ function renderModeRow(){
 }
 
 // Culorile temei curente, pentru grafice SVG și canvas (unde var() nu merge)
-function themeAcc(){var v=getComputedStyle(document.documentElement).getPropertyValue('--acc').trim();return v||'#14b8a6';}
+function themeAcc(){var v=getComputedStyle(document.documentElement).getPropertyValue('--acc').trim();return v||'#c6f135';}
 function themeAcc2(){var v=getComputedStyle(document.documentElement).getPropertyValue('--acc2').trim();return v||'#5eead4';}
 
 // ─── Căutare în Setări — filtrează grupurile după text (fără diacritice) ───
@@ -6053,10 +6332,10 @@ function renderActivityCalendar(){
   html+=' mai mult</div>';
   // Statistici streak
   var curStreak=getActivityStreak(),bestStreak=getLongestStreak();
-  var chk='font-family:\'Chakra Petch\',\'Segoe UI\',Arial,sans-serif;font-weight:700';
+  var chk='font-family:var(--fd);font-weight:700';
   html+='<div style="display:flex;flex-direction:column;gap:7px;margin-top:14px;font-size:12px">';
   html+='<div style="display:flex;justify-content:space-between;align-items:baseline"><span style="color:var(--muted)">🔥 Streak curent</span><strong style="'+chk+';color:#fb923c">'+curStreak+' zile</strong></div>';
-  html+='<div style="display:flex;justify-content:space-between;align-items:baseline"><span style="color:var(--muted)">🏆 Cel mai lung streak</span><strong style="'+chk+';color:#fbbf24">'+bestStreak+' zile</strong></div>';
+  html+='<div style="display:flex;justify-content:space-between;align-items:baseline"><span style="color:var(--muted)">🏆 Cel mai lung streak</span><strong style="'+chk+';color:var(--amber)">'+bestStreak+' zile</strong></div>';
   html+='<div style="display:flex;justify-content:space-between;align-items:baseline"><span style="color:var(--muted)">💪 Antrenamente în perioadă</span><strong style="'+chk+';color:var(--acc2)">'+Object.keys(trainDays).length+'</strong></div>';
   html+='</div>';
   el.innerHTML=html;
@@ -6409,7 +6688,7 @@ function getAccessoryRec(exerciseName,exMeta){
       lastStr:last.reps+'×'+last.kg+'kg',
       targetStr:last.reps+' rep × '+last.kg+' kg',
       why:'ultima a fost la limită 😮‍💨 — repetă, consolidezi',
-      color:'#fbbf24'
+      color:'var(--amber)'
     };
   }
   // Returnează ȚINTA EXPLICITĂ (rep × kg concrete), nu doar delta —
@@ -6519,7 +6798,7 @@ function renderLineChart(containerId, points, opts){
   for(var i=0;i<=3;i++){
     var y=padT+(i/3)*plotH;
     var val=maxY-(i/3)*(maxY-minY);
-    grid+='<line x1="'+padL+'" y1="'+y+'" x2="'+(padL+plotW)+'" y2="'+y+'" stroke="#273340" stroke-width="1" stroke-dasharray="2,3"/>';
+    grid+='<line x1="'+padL+'" y1="'+y+'" x2="'+(padL+plotW)+'" y2="'+y+'" style="stroke:var(--bd)" stroke-width="1" stroke-dasharray="2,3"/>';
     grid+='<text x="'+(padL-6)+'" y="'+(y+3)+'" fill="#7d8d9a" font-size="9" text-anchor="end">'+val.toFixed(1)+'</text>';
   }
   var sp=points.map(function(p){return {x:sx(p.x.getTime()),y:sy(p.y)};});
@@ -6529,7 +6808,7 @@ function renderLineChart(containerId, points, opts){
   sp.forEach(function(p,i){
     if(i===sp.length-1){
       dots+='<circle cx="'+p.x.toFixed(1)+'" cy="'+p.y.toFixed(1)+'" r="6" fill="'+color+'" fill-opacity=".25"/>';
-      dots+='<circle cx="'+p.x.toFixed(1)+'" cy="'+p.y.toFixed(1)+'" r="3.5" fill="'+color+'" stroke="#0a1117" stroke-width="1.5"/>';
+      dots+='<circle cx="'+p.x.toFixed(1)+'" cy="'+p.y.toFixed(1)+'" r="3.5" fill="'+color+'" style="stroke:var(--s1)" stroke-width="1.5"/>';
     }else{
       dots+='<circle cx="'+p.x.toFixed(1)+'" cy="'+p.y.toFixed(1)+'" r="2.5" fill="'+color+'"/>';
     }
@@ -6537,7 +6816,7 @@ function renderLineChart(containerId, points, opts){
   // Eticheta ultimei valori, lângă punct (nu iese din cadru)
   var lastP=sp[sp.length-1],lastV=points[points.length-1].y;
   var lblX=Math.min(lastP.x,padL+plotW-4),lblY=Math.max(11,lastP.y-9);
-  var lastLbl='<text x="'+lblX.toFixed(1)+'" y="'+lblY.toFixed(1)+'" fill="'+themeAcc2()+'" font-size="11" font-weight="700" text-anchor="end" font-family="Chakra Petch,sans-serif">'+(lastV%1===0?lastV:lastV.toFixed(1))+'</text>';
+  var lastLbl='<text x="'+lblX.toFixed(1)+'" y="'+lblY.toFixed(1)+'" fill="'+themeAcc2()+'" font-size="11" font-weight="700" text-anchor="end" font-family="Barlow Condensed,sans-serif">'+(lastV%1===0?lastV:lastV.toFixed(1))+'</text>';
   function fd(d){return d.toLocaleDateString('ro-RO',{day:'numeric',month:'short'});}
   var xl='<text x="'+padL+'" y="'+(H-6)+'" fill="#7d8d9a" font-size="9">'+fd(points[0].x)+'</text>';
   xl+='<text x="'+(padL+plotW)+'" y="'+(H-6)+'" fill="#7d8d9a" font-size="9" text-anchor="end">'+fd(points[points.length-1].x)+'</text>';
@@ -6615,7 +6894,7 @@ function renderBodyChart(){
   if(points.length===0){
     document.getElementById('bodyChart').innerHTML=
       '<div class="chart-empty">Nicio dată la <strong style="color:var(--text)">'+field.label+'</strong> încă.<br><br>'+
-      '<a onclick="showTab(\'istoric\',document.querySelectorAll(\'.nb\')[4])" style="color:var(--acc);text-decoration:underline;cursor:pointer">Introdu măsurători în tab «Istoric» →</a></div>';
+      '<a onclick="showTab(\'istoric\',document.querySelectorAll(\'.nb\')[4])" style="color:var(--acc2);text-decoration:underline;cursor:pointer">Introdu măsurători în tab «Istoric» →</a></div>';
     document.getElementById('bodyStats').innerHTML='';
     return;
   }
@@ -6672,7 +6951,7 @@ function renderDualChart(containerId,series1,series2,opts){
   for(var i=0;i<=3;i++){
     var y=padT+(i/3)*plotH;
     var val=maxY-(i/3)*(maxY-minY);
-    grid+='<line x1="'+padL+'" y1="'+y+'" x2="'+(padL+plotW)+'" y2="'+y+'" stroke="#273340" stroke-width="1" stroke-dasharray="2,3"/>';
+    grid+='<line x1="'+padL+'" y1="'+y+'" x2="'+(padL+plotW)+'" y2="'+y+'" style="stroke:var(--bd)" stroke-width="1" stroke-dasharray="2,3"/>';
     grid+='<text x="'+(padL-6)+'" y="'+(y+3)+'" fill="#7d8d9a" font-size="9" text-anchor="end">'+val.toFixed(0)+'</text>';
   }
   var dgid=containerId.replace(/[^a-zA-Z0-9]/g,'')+'_dg';
@@ -6681,7 +6960,7 @@ function renderDualChart(containerId,series1,series2,opts){
     var sp=pts.map(function(p){return {x:sx(p.x.getTime()),y:sy(p.y)};});
     var path=smoothPath(sp);
     var dots=sp.map(function(p,i){
-      if(i===sp.length-1)return '<circle cx="'+p.x.toFixed(1)+'" cy="'+p.y.toFixed(1)+'" r="3.5" fill="'+color+'" stroke="#0a1117" stroke-width="1.5"/>';
+      if(i===sp.length-1)return '<circle cx="'+p.x.toFixed(1)+'" cy="'+p.y.toFixed(1)+'" r="3.5" fill="'+color+'" style="stroke:var(--s1)" stroke-width="1.5"/>';
       return '<circle cx="'+p.x.toFixed(1)+'" cy="'+p.y.toFixed(1)+'" r="2.5" fill="'+color+'"/>';
     }).join('');
     return '<path d="'+path+'" fill="none" stroke="'+color+'" stroke-width="5" stroke-opacity=".3" stroke-linejoin="round" stroke-linecap="round" filter="url(#'+dgid+'b)"/>'
@@ -6798,7 +7077,7 @@ function renderExerciseChart(){
   }).filter(function(p){return p.x&&!isNaN(p.y);});
   points=filterByRange(points,progresState.exerRange);
   var unit=progresState.exerMetric==='maxkg'?'kg':(progresState.exerMetric==='volume'?'kg·rep':'rep');
-  renderLineChart('exerChart',points,{color:'#22c55e',hint:'seturi la '+ex});
+  renderLineChart('exerChart',points,{color:themeAcc(),hint:'seturi la '+ex});
   if(!points.length){stats.innerHTML='';return;}
   var curr=points[points.length-1].y;
   var first=points[0].y;
@@ -6853,10 +7132,10 @@ function renderPRList(){
   }
   // Clasament PR-uri după 1RM estimat — top 3 cu accent auriu
   var html='';
-  var CHAKp='font-family:\'Chakra Petch\',\'Segoe UI\',Arial,sans-serif;font-weight:700';
+  var CHAKp='font-family:var(--fd);font-weight:700';
   records.forEach(function(pr,i){
     html+='<div style="display:flex;align-items:center;gap:10px;background:var(--s1);border:1px solid '+(i===0?'rgba(245,158,11,.45)':'var(--bd)')+';border-radius:12px;padding:10px 12px;margin-bottom:8px'+(i===0?';background:linear-gradient(120deg,rgba(245,158,11,.06),var(--s1) 55%)':'')+'">';
-    html+='<div style="width:24px;text-align:center;'+CHAKp+';font-size:'+(i<3?'15px':'13px')+';color:'+(i<3?'#fbbf24':'var(--muted)')+';flex-shrink:0">'+(i+1)+'</div>';
+    html+='<div style="width:24px;text-align:center;'+CHAKp+';font-size:'+(i<3?'15px':'13px')+';color:'+(i<3?'var(--amber)':'var(--muted)')+';flex-shrink:0">'+(i+1)+'</div>';
     html+='<div style="flex:1;min-width:0"><div style="font-weight:600;font-size:12.5px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+(pr.star?'<span style="color:var(--acc2)">⭐</span> ':'')+escHtml(pr.exercise)+'</div>';
     html+='<div style="font-size:10.5px;color:var(--muted);margin-top:1px">'+pr.reps+'×'+pr.maxKg+' kg ('+pr.date+') · volum max '+pr.vol.toFixed(0)+'</div></div>';
     html+='<div style="text-align:right;flex-shrink:0"><div style="'+CHAKp+';font-size:15px;color:var(--acc2)">'+pr.orm.toFixed(1)+'</div><div style="font-size:8px;letter-spacing:1px;color:var(--muted)">KG 1RM</div></div>';
@@ -7112,7 +7391,7 @@ function fireReminder(){
     navigator.serviceWorker.getRegistration().then(function(reg){
       if(reg){
         reg.showNotification('Fitness Jurnal',{
-          body:body,icon:'./manifest.json',badge:'./manifest.json',
+          body:body,icon:'./icons/icon-192.png',badge:'./icons/icon-192.png',
           tag:'daily-reminder',requireInteraction:false,vibrate:[200,100,200]
         });
       }else{new Notification('Fitness Jurnal',{body:body});}
@@ -7126,7 +7405,7 @@ function testNotif(){
   if(Notification.permission!=='granted'){showToast('Activează mai întâi notificările','var(--acc2)');return;}
   if(navigator.serviceWorker){
     navigator.serviceWorker.getRegistration().then(function(reg){
-      if(reg) reg.showNotification('Fitness Jurnal',{body:'🎯 Test notificare OK! Așa va arăta reminder-ul zilnic.',icon:'./manifest.json',tag:'test',vibrate:[200,100,200]});
+      if(reg) reg.showNotification('Fitness Jurnal',{body:'🎯 Test notificare OK! Așa va arăta reminder-ul zilnic.',icon:'./icons/icon-192.png',tag:'test',vibrate:[200,100,200]});
       else new Notification('Fitness Jurnal',{body:'Test OK!'});
     });
   }else{new Notification('Fitness Jurnal',{body:'Test OK!'});}
@@ -7261,7 +7540,7 @@ function fireBackupReminder(){
     navigator.serviceWorker.getRegistration().then(function(reg){
       if(reg){
         reg.showNotification('Fitness — Backup zilnic',{
-          body:body,icon:'./manifest.json',badge:'./manifest.json',
+          body:body,icon:'./icons/icon-192.png',badge:'./icons/icon-192.png',
           tag:'backup-reminder',requireInteraction:true,vibrate:[200,100,200],
           data:{action:'backup'}
         });
@@ -7344,7 +7623,7 @@ function showWeeklyDigest(offset){
   html+='<circle cx="46" cy="46" r="40" fill="none" stroke="var(--s2)" stroke-width="7"></circle>';
   html+='<circle cx="46" cy="46" r="40" fill="none" stroke="var(--acc)" stroke-width="7" stroke-linecap="round" stroke-dasharray="'+C+'" stroke-dashoffset="'+(C*(1-ratio)).toFixed(1)+'" transform="rotate(-90 46 46)" style="filter:drop-shadow(0 0 4px rgba(var(--acc-rgb),.6))"></circle>';
   html+='</svg>';
-  html+='<div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center"><div style="font-size:20px;font-weight:700;font-family:\'Chakra Petch\',\'Segoe UI\',Arial,sans-serif;color:var(--acc2);line-height:1">'+d.sessions+'/'+d.target+'</div><div style="font-size:7.5px;letter-spacing:1.5px;color:var(--muted)">SESIUNI</div></div>';
+  html+='<div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center"><div style="font-size:20px;font-weight:700;font-family:var(--fd);color:var(--acc2);line-height:1">'+d.sessions+'/'+d.target+'</div><div style="font-size:7.5px;letter-spacing:1.5px;color:var(--muted)">SESIUNI</div></div>';
   html+='</div>';
   html+='<div style="display:flex;flex-direction:column;gap:2px;min-width:0">';
   html+='<div class="hud-hero" style="font-size:34px">'+d.tonnage.toLocaleString('ro-RO')+'</div>';
@@ -7373,7 +7652,7 @@ function showWeeklyDigest(offset){
       else if(i===filled)h+='<div class="hud-seg" style="background:'+glow+';box-shadow:0 0 8px '+glow+'"></div>';
       else h+='<div class="hud-seg"></div>';
     }
-    h+='</div><div style="width:32px;text-align:right;font-size:12px;font-weight:700;font-family:\'Chakra Petch\',\'Segoe UI\',Arial,sans-serif;color:'+glow+'">'+avg+'</div></div>';
+    h+='</div><div style="width:32px;text-align:right;font-size:12px;font-weight:700;font-family:var(--fd);color:'+glow+'">'+avg+'</div></div>';
     return h;
   };
   if(d.energyAvg||d.sleepAvg){
@@ -7387,7 +7666,7 @@ function showWeeklyDigest(offset){
     html+='<div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:6px">';
     d.deltas.forEach(function(dl){
       var good=dl.goodDown?dl.v<0:dl.v>0;
-      html+='<div style="display:inline-flex;align-items:center;gap:6px;background:rgba('+(good?'34,197,94':'245,158,11')+',.08);border:1px solid rgba('+(good?'34,197,94':'245,158,11')+',.35);border-radius:16px;padding:5px 11px;font-size:11px"><span style="color:var(--muted)">'+dl.label+'</span><strong style="color:'+(good?'var(--green)':'#fbbf24')+'">'+(dl.v>0?'▲ +':'▼ −')+Math.abs(dl.v).toFixed(1)+' '+dl.unit+'</strong></div>';
+      html+='<div style="display:inline-flex;align-items:center;gap:6px;background:rgba('+(good?'34,197,94':'245,158,11')+',.08);border:1px solid rgba('+(good?'34,197,94':'245,158,11')+',.35);border-radius:16px;padding:5px 11px;font-size:11px"><span style="color:var(--muted)">'+dl.label+'</span><strong style="color:'+(good?'var(--green)':'var(--amber)')+'">'+(dl.v>0?'▲ +':'▼ −')+Math.abs(dl.v).toFixed(1)+' '+dl.unit+'</strong></div>';
     });
     html+='</div>';
   }
@@ -7437,10 +7716,10 @@ function downloadDigestImage(){
   var H=980+(hasBars?190:0)+(hasDeltas?110:0)+120;
   var cv=document.createElement('canvas');cv.width=W;cv.height=H;
   var ctx=cv.getContext('2d');
-  var CHAKRA='"Chakra Petch",sans-serif';
+  var CHAKRA='"Barlow Condensed",sans-serif';
   // Fundal + stripe
   var grad=ctx.createLinearGradient(0,0,W*.4,H);
-  grad.addColorStop(0,'#101c27');grad.addColorStop(.55,'#0c1620');grad.addColorStop(1,'#0a1117');
+  grad.addColorStop(0,'#16191e');grad.addColorStop(.55,'#101317');grad.addColorStop(1,'#0b0d10');
   ctx.fillStyle=grad;ctx.fillRect(0,0,W,H);
   var grad2=ctx.createLinearGradient(0,0,W,0);
   grad2.addColorStop(0,themeAcc());grad2.addColorStop(.5,themeAcc2());grad2.addColorStop(1,themeAcc());
@@ -7449,12 +7728,12 @@ function downloadDigestImage(){
   ctx.textAlign='center';
   ctx.fillStyle=themeAcc2();ctx.font='700 46px '+CHAKRA;
   ctx.fillText('S Ă P T Ă M Â N A   M E A',W/2,120);
-  ctx.fillStyle='#7d8d9a';ctx.font='400 32px sans-serif';
+  ctx.fillStyle='#8a929e';ctx.font='400 32px sans-serif';
   ctx.fillText(d.period,W/2,172);
   // Inel sesiuni (stânga) + volum-erou (dreapta)
   var cy=400,cx=260,R=120;
   ctx.lineWidth=24;ctx.lineCap='round';
-  ctx.strokeStyle='#1a2530';
+  ctx.strokeStyle='#1f242b';
   ctx.beginPath();ctx.arc(cx,cy,R,0,Math.PI*2);ctx.stroke();
   var ratio=Math.min(1,d.sessions/Math.max(1,d.target));
   if(ratio>0){
@@ -7465,14 +7744,14 @@ function downloadDigestImage(){
   }
   ctx.fillStyle=themeAcc2();ctx.font='700 62px '+CHAKRA;
   ctx.fillText(d.sessions+'/'+d.target,cx,cy+16);
-  ctx.fillStyle='#7d8d9a';ctx.font='600 22px '+CHAKRA;
+  ctx.fillStyle='#8a929e';ctx.font='600 22px '+CHAKRA;
   ctx.fillText('SESIUNI',cx,cy+56);
   var hx=(W+cx+R)/2+20;
   var tg=ctx.createLinearGradient(hx-220,0,hx+220,0);
   tg.addColorStop(0,themeAcc2());tg.addColorStop(1,themeAcc());
   ctx.fillStyle=tg;ctx.font='700 96px '+CHAKRA;
   ctx.fillText(d.tonnage.toLocaleString('ro-RO'),hx,cy+8);
-  ctx.fillStyle='#7d8d9a';ctx.font='600 26px '+CHAKRA;
+  ctx.fillStyle='#8a929e';ctx.font='600 26px '+CHAKRA;
   ctx.fillText('KG VOLUM TOTAL',hx,cy+56);
   if(d.prevTonnage>0&&d.tonnage>0){
     var wDelta=d.tonnage-d.prevTonnage;
@@ -7497,7 +7776,7 @@ function downloadDigestImage(){
     else{ctx.fillRect(x,ty,tw,160);ctx.strokeRect(x,ty,tw,160);}
     ctx.fillStyle=t.c;ctx.font='700 64px '+CHAKRA;
     ctx.fillText(t.v,x+tw/2,ty+88);
-    ctx.fillStyle='#7d8d9a';ctx.font='600 20px '+CHAKRA;
+    ctx.fillStyle='#8a929e';ctx.font='600 20px '+CHAKRA;
     ctx.fillText(t.l,x+tw/2,ty+130);
   });
   var y=ty+230;
@@ -7506,12 +7785,12 @@ function downloadDigestImage(){
     var drawSeg=function(lbl,avg,color,glow){
       var filled=Math.round(parseFloat(avg));
       ctx.textAlign='left';
-      ctx.fillStyle='#7d8d9a';ctx.font='600 24px '+CHAKRA;
+      ctx.fillStyle='#8a929e';ctx.font='600 24px '+CHAKRA;
       ctx.fillText(lbl,90,y+12);
       var bx=300,bw=560,seg=(bw-9*8)/10;
       for(var i=1;i<=10;i++){
         var sx=bx+(i-1)*(seg+8);
-        ctx.fillStyle=i<filled?color:(i===filled?glow:'#1a2530');
+        ctx.fillStyle=i<filled?color:(i===filled?glow:'#1f242b');
         if(ctx.roundRect){ctx.beginPath();ctx.roundRect(sx,y-8,seg,22,5);ctx.fill();}
         else ctx.fillRect(sx,y-8,seg,22);
       }
@@ -7826,7 +8105,7 @@ function renderWizard(){
   }
   // Indicator de pași — „PASUL X/7" + segmente (stunning pass)
   html+='<div style="display:flex;align-items:center;gap:10px;margin-bottom:16px">';
-  html+='<div style="font-size:9px;letter-spacing:2px;font-weight:700;color:var(--acc2);font-family:\'Chakra Petch\',\'Segoe UI\',Arial,sans-serif;flex-shrink:0">PASUL '+(s+1)+'/'+WIZ_STEPS+'</div>';
+  html+='<div style="font-size:9px;letter-spacing:2px;font-weight:700;color:var(--acc2);font-family:var(--fd);flex-shrink:0">PASUL '+(s+1)+'/'+WIZ_STEPS+'</div>';
   html+='<div style="flex:1;display:flex;gap:4px">';
   for(var i=0;i<WIZ_STEPS;i++){
     var wsBg=i<s?'var(--acc)':(i===s?'var(--acc2);box-shadow:0 0 8px rgba(var(--acc2-rgb),.7)':'var(--s2)');
@@ -7932,7 +8211,7 @@ function renderWizard(){
       });
       html+='<p style="font-size:11px;color:var(--muted);margin:6px 0 0;line-height:1.45">🗓️ Nu-ți convin zilele? Le muți oricând din <strong style="color:var(--text)">Setări → Programul meu</strong> (sau temporar, pe o perioadă).</p>';
       html+='<div class="wiz-label">Nutriția ta</div>';
-      html+='<div class="wiz-preview-stat"><span>Calorii/zi</span><strong style="color:var(--acc)">'+n.kcal+' kcal</strong></div>';
+      html+='<div class="wiz-preview-stat"><span>Calorii/zi</span><strong style="color:var(--acc2)">'+n.kcal+' kcal</strong></div>';
       html+='<div class="wiz-preview-stat"><span>Proteine · Carbo · Grăsimi</span><strong>'+n.protein+'g · '+n.carbs+'g · '+n.fat+'g</strong></div>';
       html+='<div class="wiz-preview-stat"><span>Apă · Pași</span><strong>'+n.waterL+'L · '+n.stepsTarget+'</strong></div>';
       html+='<div class="wiz-sub" style="margin-top:12px">📈 Progresie automată: săpt. 1-2 înveți · 3-4 +repetări · 5-6 +kg · 7 +set · 8 recuperare — apoi ciclu nou. Smart Coach îți spune zilnic exact ce să faci.</div>';
@@ -8118,6 +8397,10 @@ function showUpdateBanner(sw){
   document.getElementById('updateBanner').classList.add('show');
   showToast('Versiune nouă disponibilă 🚀');
 }
+document.addEventListener('keydown',function(ev){
+  if(ev.key==='Escape'){var ms=document.querySelectorAll('.modal.show');if(ms.length)ms[ms.length-1].click();}
+  else if((ev.key==='Enter'||ev.key===' ')&&ev.target&&ev.target.getAttribute&&ev.target.getAttribute('role')==='button'){ev.preventDefault();ev.target.click();}
+});
 function applyUpdate(){
   document.getElementById('updateBanner').classList.remove('show');
   if(_pendingSW&&!_swActivated){

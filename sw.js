@@ -1,9 +1,18 @@
 // Service Worker — network-first pentru HTML (updates vizibile imediat)
 // cache-first pentru restul (viteză)
-const CACHE = 'fitness-v97-audit-fixes';
+const CACHE = 'fitness-v98-atelier';
 const PRECACHE = ['./', './index.html', './manifest.json', './generator.js', './privacy.html',
-  './fonts/chakra-600-latin.woff2', './fonts/chakra-600-latin-ext.woff2',
-  './fonts/chakra-700-latin.woff2', './fonts/chakra-700-latin-ext.woff2'];
+  './fonts/barlow-400-latin-ext.woff2',
+  './fonts/barlow-400-latin.woff2',
+  './fonts/barlow-600-latin-ext.woff2',
+  './fonts/barlow-600-latin.woff2',
+  './fonts/barlow-700-latin-ext.woff2',
+  './fonts/barlow-700-latin.woff2',
+  './fonts/barlowc-600-latin-ext.woff2',
+  './fonts/barlowc-600-latin.woff2',
+  './fonts/barlowc-700-latin-ext.woff2',
+  './fonts/barlowc-700-latin.woff2',
+  './icons/icon-192.png', './icons/favicon-32.png', './icons/apple-touch-icon.png'];
 
 self.addEventListener('install', e => {
   e.waitUntil(
