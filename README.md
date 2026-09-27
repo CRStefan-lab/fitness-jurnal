@@ -22,3 +22,7 @@ Aplicația e un singur fișier `index.html`, plus `generator.js` pentru programe
 ```bash
 node test-generator.js
 ```
+
+## English
+
+Fitness Jurnal is a workout journal with a smart coach. It builds a personalized 8-week program for 2–6 days a week, tells you what weight and reps to try for each exercise, and tracks sets, records, body measurements, and progress photos. All data stays on your phone. The app follows your phone's language, and you can switch between Romanian and English in Settings.

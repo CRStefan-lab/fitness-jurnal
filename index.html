@@ -15,7 +15,7 @@
 <link rel="preload" href="./fonts/barlow-400-latin.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="./fonts/barlowc-700-latin.woff2" as="font" type="font/woff2" crossorigin>
 <title>Fitness Jurnal</title>
-<script>try{var _t=localStorage.getItem('app_theme');if(_t)document.documentElement.setAttribute('data-theme',_t);var _m=localStorage.getItem('app_mode');if(_m)document.documentElement.setAttribute('data-mode',_m);if(_m==='light'){var _tc=document.querySelector('meta[name="theme-color"]');if(_tc)_tc.setAttribute('content','#f4f5f7');}}catch(e){}</script>
+<script>window.APP_LANG='ro';try{var _t=localStorage.getItem('app_theme');if(_t)document.documentElement.setAttribute('data-theme',_t);var _m=localStorage.getItem('app_mode');if(_m)document.documentElement.setAttribute('data-mode',_m);if(_m==='light'){var _tc=document.querySelector('meta[name="theme-color"]');if(_tc)_tc.setAttribute('content','#f4f5f7');}var _l=localStorage.getItem('app_lang');if(_l!=='ro'&&_l!=='en'){var _h=localStorage.getItem('fitness_jurnal_v1')||localStorage.getItem('custom_program')||localStorage.getItem('legacy_program')||localStorage.getItem('onboarding_done');_l=_h?'ro':(/^ro/i.test(navigator.language||'')?'ro':'en');localStorage.setItem('app_lang',_l);}window.APP_LANG=_l;document.documentElement.lang=_l;}catch(e){}</script>
 <style>
 /* Barlow + Barlow Condensed — self-hostate (offline PWA); latin-ext = ă ș ț */
 @font-face{font-family:'Barlow';font-style:normal;font-weight:400;font-display:swap;src:url('./fonts/barlow-400-latin-ext.woff2') format('woff2');unicode-range:U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF}
@@ -1335,6 +1335,13 @@ html[data-mode="light"] .glist-cards>.card.card-hero{box-shadow:inset 3px 0 0 va
       <div class="stitle">Aspect</div>
       <div class="mode-row" id="modeRow"></div>
       <p style="font-size:11px;color:var(--muted);margin:8px 0 0">Deschis = mai lizibil ziua · Întunecat = ideal seara la sală. Se salvează pe acest device.</p>
+
+      <div class="stitle">Limba</div>
+      <div class="mode-row" data-noi18n>
+        <button class="mode-btn" id="langRo" onclick="setLang('ro')">Română</button>
+        <button class="mode-btn" id="langEn" onclick="setLang('en')">English</button>
+      </div>
+      <p style="font-size:11px;color:var(--muted);margin:8px 0 0">Aplicația se reîncarcă în limba aleasă. Jurnalul și recordurile tale nu se schimbă.</p>
     </div>
   </div>
 
@@ -1712,8 +1719,108 @@ html[data-mode="light"] .glist-cards>.card.card-hero{box-shadow:inset 3px 0 0 va
   <div class="u-bar" id="undoBar"></div>
 </div>
 
+<script>if(window.APP_LANG==='en')document.write('<script src="./i18n-en.js"><\/script>');</script>
 <script src="./generator.js"></script>
 <script>
+// ═══════════════════════════════════════════════════════════════
+// i18n — traducere la AFIȘARE (DOM). Datele (jurnal, chei, nume de exerciții
+// salvate) rămân în română, deci istoricul nu se strică la schimbarea limbii.
+// Ordinea: potrivire exactă → numere normalizate {#} → fără emoji la început →
+// înlocuire de fragmente la granițe de cuvânt (propozițiile compuse din bucăți).
+// ═══════════════════════════════════════════════════════════════
+var I18N={on:false,T:function(s){return s;}};
+(function(){
+  if(window.APP_LANG!=='en'||!window.I18N_EN)return;
+  var D=window.I18N_EN,cache=Object.create(null),OUT=Object.create(null);
+  var LETTER=/[A-Za-zĂÂÎȘȚăâîșțŞŢşţ]/;
+  var NUM=/\d+(?:[.,]\d+)*/g;
+  var keys=Object.keys(D).filter(function(k){return k.length>=2&&k.indexOf('{#}')<0&&LETTER.test(k)&&D[k]!==k;})
+    .sort(function(a,b){return b.length-a.length;});
+  var esc=function(k){return k.replace(/[.*+?^${}()|[\]\\]/g,'\\$&');};
+  var BIG=null;
+  try{BIG=new RegExp('(^|[^\\p{L}\\p{N}])('+keys.map(esc).join('|')+')(?=[^\\p{L}\\p{N}]|$)','gu');}catch(e){BIG=null;}
+  var LEAD=/^(?:[\s‍️•·—–→←↩⤼✓✕×▲▼↺↗+\-←-⇿☀-➿]|\uD83C[\uDC00-\uDFFF]|\uD83D[\uDC00-\uDFFF]|\uD83E[\uDC00-\uDFFF])+/;
+  function withNums(core){
+    if(!/\d/.test(core))return null;
+    var nums=core.match(NUM)||[],k=core.replace(NUM,'{#}');
+    if(D[k]===undefined)return null;
+    var i=0;return D[k].replace(/\{#\}/g,function(){return nums[i++]||'';});
+  }
+  function tr(s){
+    if(s.indexOf('\n')>=0)return s.split('\n').map(T).join('\n');
+    var m=/^(\s*)([\s\S]*?)(\s*)$/.exec(s),pre=m[1],core=m[2],post=m[3];
+    if(!core)return s;
+    if(D[core]!==undefined)return pre+D[core]+post;
+    var r=withNums(core);if(r!==null)return pre+r+post;
+    var e=LEAD.exec(core);
+    if(e&&e[0].length<core.length){
+      var rest=core.slice(e[0].length);
+      if(D[rest]!==undefined)return pre+e[0]+D[rest]+post;
+      r=withNums(rest);if(r!==null)return pre+e[0]+r+post;
+    }
+    if(BIG){BIG.lastIndex=0;return pre+core.replace(BIG,function(a,p1,key){return p1+D[key];})+post;}
+    return s;
+  }
+  function T(s){
+    if(s==null)return s;s=String(s);
+    if(!LETTER.test(s)||OUT[s])return s;
+    var c=cache[s];if(c!==undefined)return c;
+    var o=tr(s);cache[s]=o;OUT[o]=1;return o;
+  }
+  I18N.on=true;I18N.T=T;
+  // DOM: text + placeholder/title/aria-label, la inserare și la schimbare
+  var SKIPTAG={SCRIPT:1,STYLE:1,TEXTAREA:1,NOSCRIPT:1};
+  var ATTRS=['placeholder','title','aria-label'];
+  function skip(el){return !el||SKIPTAG[el.nodeName]||(el.closest&&el.closest('[data-noi18n]'));}
+  function trText(n){var v=n.nodeValue;if(!v||OUT[v]||!LETTER.test(v)||skip(n.parentNode))return;var t=T(v);if(t!==v)n.nodeValue=t;}
+  function trAttrs(el){
+    if(!el.getAttribute)return;
+    for(var i=0;i<ATTRS.length;i++){var v=el.getAttribute(ATTRS[i]);if(v&&!OUT[v]&&LETTER.test(v)){var t=T(v);if(t!==v)el.setAttribute(ATTRS[i],t);}}
+  }
+  function trTree(root){
+    if(!root)return;
+    if(root.nodeType===3){trText(root);return;}
+    if(root.nodeType!==1||skip(root))return;
+    trAttrs(root);
+    var w=document.createTreeWalker(root,NodeFilter.SHOW_TEXT|NodeFilter.SHOW_ELEMENT,null),n;
+    while((n=w.nextNode())){if(n.nodeType===3)trText(n);else trAttrs(n);}
+  }
+  new MutationObserver(function(recs){
+    for(var i=0;i<recs.length;i++){
+      var r=recs[i];
+      if(r.type==='characterData')trText(r.target);
+      else if(r.type==='attributes')trAttrs(r.target);
+      else for(var j=0;j<r.addedNodes.length;j++)trTree(r.addedNodes[j]);
+    }
+  }).observe(document.body,{childList:true,subtree:true,characterData:true,attributes:true,attributeFilter:ATTRS});
+  trTree(document.body);
+  document.title=T(document.title);
+  // Dialoguri native, canvas (imaginea de share), notificări, share
+  var _c=window.confirm,_p=window.prompt,_a=window.alert;
+  window.confirm=function(m){return _c.call(window,T(m));};
+  window.prompt=function(m,d){return _p.call(window,T(m),d);};
+  window.alert=function(m){return _a.call(window,T(m));};
+  if(window.CanvasRenderingContext2D){
+    var CP=CanvasRenderingContext2D.prototype,_ft=CP.fillText,_mt=CP.measureText;
+    CP.fillText=function(t,x,y,mw){return mw===undefined?_ft.call(this,T(t),x,y):_ft.call(this,T(t),x,y,mw);};
+    CP.measureText=function(t){return _mt.call(this,T(t));};
+  }
+  if(window.ServiceWorkerRegistration){
+    var SR=ServiceWorkerRegistration.prototype,_sn=SR.showNotification;
+    SR.showNotification=function(title,o){if(o&&o.body)o.body=T(o.body);return _sn.call(this,T(title),o);};
+  }
+  if(navigator.share){var _sh=navigator.share.bind(navigator);navigator.share=function(d){if(d){if(d.title)d.title=T(d.title);if(d.text)d.text=T(d.text);}return _sh(d);};}
+  // Numere și date afișate în format englezesc (cheile de dată dd.mm.yyyy, fără opțiuni, rămân neatinse)
+  var _nls=Number.prototype.toLocaleString;
+  Number.prototype.toLocaleString=function(l,o){return _nls.call(this,l==='ro-RO'?'en-US':l,o);};
+  var _dls=Date.prototype.toLocaleDateString;
+  Date.prototype.toLocaleDateString=function(l,o){return _dls.call(this,(l==='ro-RO'&&o)?'en-GB':l,o);};
+})();
+function setLang(l){
+  try{localStorage.setItem('app_lang',l);}catch(e){}
+  location.reload();
+}
+
 // ═══════════════════════════════════════════════════════════════
 // DATE STATICE
 // ═══════════════════════════════════════════════════════════════
@@ -4448,7 +4555,7 @@ function initNutritie(){
     var plan=nutPlans[s.nutType];
     var btn=document.createElement('button');
     btn.className='day-btn'+(i===currentNutDay?' '+plan.cls:'');
-    btn.innerHTML='<span class="day-abbr">'+s.day.substring(0,3)+'</span><span class="ntag '+plan.tagCls+'">'+plan.tag+'</span>';
+    btn.innerHTML='<span class="day-abbr">'+(I18N.on?I18N.T(s.day):s.day).substring(0,3)+'</span><span class="ntag '+plan.tagCls+'">'+plan.tag+'</span>';
     (function(idx){btn.onclick=function(){currentNutDay=idx;initNutritie();};})(i);
     scroll.appendChild(btn);
   });
@@ -5455,7 +5562,7 @@ function doExport(){
 
 function copyExport(){
   var text=document.getElementById('exportBox').textContent;
-  if(!text||text.indexOf('Apasă butonul')===0){text=buildWeekSummary();document.getElementById('exportBox').textContent=text;}
+  if(!text||document.getElementById('exportBox').style.display==='none'){text=buildWeekSummary();document.getElementById('exportBox').textContent=text;}
   if(navigator.clipboard&&navigator.clipboard.writeText){
     navigator.clipboard.writeText(text).then(function(){showToast('Copiat! Lipește lui Claude 📋');}).catch(function(){fallbackCopy(text);});
   }else{fallbackCopy(text);}
@@ -8773,6 +8880,7 @@ window.addEventListener('load',function(){
 
   // Accesibilitate: rol de buton pe elementele clicabile + dialoguri cu fundal inert
   a11yModalWatch();
+  var lb=document.getElementById(window.APP_LANG==='en'?'langEn':'langRo');if(lb)lb.classList.add('sel');
 
   // File System Access sync (desktop Chrome/Edge) — restaurează handle-ul salvat
   fsaInit();
