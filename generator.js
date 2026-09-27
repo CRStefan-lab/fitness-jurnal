@@ -46,7 +46,7 @@ var EXERCISE_DB=[
    ghid:{start:'Scaun reglat: mânerele la nivelul umerilor.',move:'Împingi sus complet, revii controlat.',err:'Umerii ridicați spre urechi.',tip:'Spatele lipit de spătar.'}},
   {id:'bw_pike_pushup',name:'Pike push-up',muscle:'Umeri',pattern:'push_v',equipment:[],level:2,compound:true,starEligible:true,prio:4,
    ghid:{start:'Poziție V inversat — fese sus, palme pe podea.',move:'Cobori capul spre podea, împingi înapoi.',err:'Corp prea orizontal (devine flotare).',tip:'Alternativă bodyweight pentru împins umeri.'}},
-  {id:'bw_pike_genunchi',name:'Pike push-up pe genunchi',muscle:'Umeri',pattern:'push_v',equipment:[],level:1,compound:true,starEligible:true,prio:5,
+  {id:'bw_pike_genunchi',regressionOf:'bw_pike_pushup',name:'Pike push-up pe genunchi',muscle:'Umeri',pattern:'push_v',equipment:[],level:1,compound:true,starEligible:true,prio:5,
    ghid:{start:'În patru labe, fesele spre călcâie, palmele în față — greutatea pe umeri.',move:'Cobori fruntea spre podea îndoind coatele, împingi înapoi.',err:'Coatele evazate complet lateral.',tip:'Versiunea de start pentru pike push-up — progresezi la varianta cu picioarele întinse.'}},
 
   // ── IZOLĂRI UMERI ──
@@ -88,7 +88,7 @@ var EXERCISE_DB=[
    ghid:{start:'Picioare late, vârfuri la 45°. Gantera cu ambele mâini.',move:'Cobori drept în jos, revii strângând fesierii.',err:'Trunchiul se apleacă prea mult.',tip:'Simți interiorul coapsei.'}},
   {id:'bw_squat',name:'Genuflexiuni bodyweight',muscle:'Cvadriceps',pattern:'squat',equipment:[],level:1,compound:true,starEligible:true,prio:5,
    ghid:{start:'Picioare la lățimea umerilor, brațele în față pentru echilibru.',move:'Cobori până coapsele paralele, revii.',err:'Călcâiele se ridică.',tip:'Progresezi prin tempo mai lent și mai multe rep.'}},
-  {id:'bw_bulgarian',name:'Bulgarian split squat',muscle:'Cvadriceps',pattern:'squat',equipment:[],level:2,compound:true,starEligible:true,prio:6,
+  {id:'bw_bulgarian',unilateral:true,name:'Bulgarian split squat',muscle:'Cvadriceps',pattern:'squat',equipment:[],level:2,compound:true,starEligible:true,prio:6,
    ghid:{start:'Un picior în spate pe bancă/scaun, celălalt în față.',move:'Cobori pe piciorul din față până coapsa paralelă. Revii.',err:'Genunchiul din față trece mult de vârf.',tip:'Cel mai greu exercițiu bodyweight de picioare — și cel mai eficient. Cu gantere devine și mai valoros.'}},
   {id:'gym_leg_extension',name:'Extensii cvadriceps la aparat',muscle:'Cvadriceps',pattern:'squat',equipment:['aparate'],level:1,compound:false,starEligible:false,prio:7,
    ghid:{start:'Scaun reglat, glezna sub rolă. Dacă spătarul se lasă pe spate, înclină-l.',move:'Extinzi complet, cobori controlat.',err:'Balans cu avânt.',tip:'Spătar înclinat (șold extins) = singurul mod fiabil de a crește dreptul femural — squat-ul NU îl crește (Larsen 2025).'}},
@@ -102,7 +102,7 @@ var EXERCISE_DB=[
    ghid:{start:'La aparatul de leg curl ȘEZÂND (nu culcat), glezna sub rolă.',move:'Flexezi complet, revii lent cu întindere.',err:'Șoldurile se ridică de pe scaun.',tip:'Șezând > culcat: +14% vs +9% creștere (Maeo 2021) — șoldul flexat = ischio la lungime mare.'}},
   {id:'bw_glute_bridge',name:'Glute bridge',muscle:'Fesieri',pattern:'hinge',equipment:[],level:1,compound:true,starEligible:true,prio:4,
    ghid:{start:'Pe spate, genunchi îndoiți, tălpile pe podea.',move:'Împingi șoldurile sus strângând fesierii, ții 1 sec.',err:'Arcuirea lombară exagerată.',tip:'Progresie: cu un singur picior.'}},
-  {id:'bw_single_bridge',name:'Glute bridge cu un picior',muscle:'Fesieri',pattern:'hinge',equipment:[],level:2,compound:true,starEligible:true,prio:5,
+  {id:'bw_single_bridge',unilateral:true,name:'Glute bridge cu un picior',muscle:'Fesieri',pattern:'hinge',equipment:[],level:2,compound:true,starEligible:true,prio:5,
    ghid:{start:'Ca glute bridge, dar un picior întins în aer.',move:'Împingi șoldurile sus pe un singur picior.',err:'Șoldul cade pe partea piciorului ridicat.',tip:'Șoldurile paralele tot timpul.'}},
   {id:'bw_sliding_leg_curl',name:'Leg curl cu prosop pe podea',muscle:'Ischio',pattern:'hinge',equipment:[],level:2,compound:true,starEligible:false,prio:6,
    ghid:{start:'Pe spate ca la glute bridge, călcâiele pe un prosop (podea alunecoasă) sau șosete pe parchet.',move:'Ridici șoldurile și aluneci călcâiele spre fesieri, apoi întinzi lent picioarele menținând șoldurile sus.',err:'Șoldurile cad în timpul alunecării.',tip:'Singura variantă bodyweight care lucrează ischio prin flexia genunchiului — faza de întindere lentă e cheia.'}},
@@ -116,9 +116,9 @@ var EXERCISE_DB=[
    ghid:{start:'Omoplații pe bancă/canapea, tălpile pe podea.',move:'Împingi șoldurile sus, ții 2 sec contracția.',err:'Prea rapid, fără contracție.',tip:'Progresezi prin tempo + un singur picior.'}},
 
   // ── LUNGE / UNILATERAL ──
-  {id:'db_step_back',name:'Step-back lunges',muscle:'Cvadriceps + fesieri',pattern:'lunge',equipment:['gantere'],level:1,compound:true,starEligible:false,prio:1,
+  {id:'db_step_back',unilateral:true,name:'Step-back lunges',muscle:'Cvadriceps + fesieri',pattern:'lunge',equipment:['gantere'],level:1,compound:true,starEligible:false,prio:1,
    ghid:{start:'Gantere în mâini, stând drept.',move:'Pas mare în spate, cobori genunchiul, revii împingând în călcâiul din față.',err:'Genunchiul din față trece de vârf. Trunchi aplecat.',tip:'Pasul înapoi e mai blând pentru genunchi decât înainte.'}},
-  {id:'bw_fandari',name:'Fandări în loc',muscle:'Cvadriceps + fesieri',pattern:'lunge',equipment:[],level:1,compound:true,starEligible:false,prio:2,
+  {id:'bw_fandari',unilateral:true,name:'Fandări în loc',muscle:'Cvadriceps + fesieri',pattern:'lunge',equipment:[],level:1,compound:true,starEligible:false,prio:2,
    ghid:{start:'Stând drept, mâinile pe șolduri.',move:'Pas în spate, cobori, revii. Alternezi picioarele.',err:'Genunchiul din față instabil.',tip:'Control total, nu viteză.'}},
 
   // ── GAMBE ──
@@ -144,7 +144,7 @@ var EXERCISE_DB=[
    ghid:{start:'Prosop solid trecut peste clanțele ușii (ușa închisă). Prins de capete, corpul lăsat pe spate.',move:'Tragi pieptul spre ușă strângând omoplații, revii controlat.',err:'Tras cu brațele în loc de spate. Corp îndoit din șold.',tip:'Cu cât te lași mai pe spate (picioarele mai aproape de ușă), cu atât mai greu. Verifică ușa/prosopul înainte!'}},
   {id:'bw_tractiuni',name:'Tracțiuni la bară',muscle:'Spate',pattern:'pull',equipment:['tractiuni'],level:2,compound:true,starEligible:true,prio:2,
    ghid:{start:'Atârnat de bară, priza puțin mai lată decât umerii.',move:'Tragi bărbia peste bară, cobori complet controlat.',err:'Jumătăți de repetări. Balans (kipping).',tip:'Nu poți încă? Sărituri + coborâre lentă (negative).'}},
-  {id:'db_ramat_un_brat',name:'Ramat un braț sprijinit pe bancă',muscle:'Spate',pattern:'pull',equipment:['gantere','banca'],level:1,compound:true,starEligible:false,prio:7,
+  {id:'db_ramat_un_brat',unilateral:true,name:'Ramat un braț sprijinit pe bancă',muscle:'Spate',pattern:'pull',equipment:['gantere','banca'],level:1,compound:true,starEligible:false,prio:5.5,
    ghid:{start:'Genunchiul și mâna pe bancă, gantera în cealaltă mână.',move:'Tragi gantera spre șold, strângi omoplatul.',err:'Rotirea trunchiului.',tip:'Spatele paralel cu podeaua.'}},
   {id:'db_pullover',name:'Pullover cu ganteră pe bancă plată',muscle:'Spate + piept',pattern:'pull',equipment:['gantere','banca'],level:1,compound:false,starEligible:false,prio:8,
    ghid:{start:'Culcat pe bancă, gantera cu ambele mâini deasupra pieptului.',move:'Cobori în arc peste cap, revii.',err:'Coatele prea îndoite.',tip:'Coatele ușor îndoite pe tot parcursul.'}},
@@ -167,6 +167,11 @@ var EXERCISE_DB=[
   // Dovezi (Kassiano 2025, IJSM): incline curl crește partea PROXIMALĂ,
   // preacher partea DISTALĂ — complementare; flexia la cot la lungime
   // mare superioară (Sato 2021: +8.9% vs +3.4%)
+  // Bodyweight nu avea NICIUN exercițiu de biceps → ziua „Spate / Biceps" ieșea fără biceps
+  {id:'bw_prosop_curl',name:'Flexii biceps cu prosopul (autorezistență)',muscle:'Biceps',pattern:'biceps',equipment:[],level:1,compound:false,starEligible:false,prio:6,
+   ghid:{start:'Așezat pe scaun, prosopul trecut pe sub talpa unui picior, capetele în mâini, palmele în sus, coatele lipite de corp.',move:'Tragi prosopul în sus flexând coatele, în timp ce piciorul împinge în jos cât să simți rezistență mare. Cobori la fel de controlat, tot rezistând.',err:'Piciorul nu opune rezistență — mișcare goală. Coatele pleacă în față.',tip:'Tu dozezi „greutatea" din picior: ultimele 2-3 repetări trebuie să fie grele. Coborârea lentă contează cât urcarea.'}},
+  {id:'bw_row_supinat',name:'Ramat sub masă, priză supinată',muscle:'Biceps + spate',pattern:'biceps',equipment:[],level:2,compound:true,starEligible:false,prio:7,
+   ghid:{start:'Sub o masă solidă, prins de margine cu palmele spre tine, corpul drept.',move:'Tragi pieptul spre masă ținând coatele aproape de corp, cobori controlat.',err:'Șoldurile cad. Tras din umeri în loc de coate.',tip:'Priza supinată mută accentul pe biceps. Genunchii îndoiți = mai ușor.'}},
   {id:'db_incline_curl',name:'Flexii biceps pe bancă înclinată',muscle:'Biceps (proximal)',pattern:'biceps',equipment:['gantere','banca'],level:1,compound:false,starEligible:false,prio:1,
    ghid:{start:'Bancă la ~45-60°, spatele lipit, brațele atârnă în spatele corpului (umăr extins).',move:'Flexezi coatele fără să miști umerii, cobori COMPLET până brațul e întins.',err:'Umerii se mișcă în față. Coborâre incompletă.',tip:'Poziția cu brațul în spate = biceps la lungime mare — crește mai mult (Kassiano 2025).'}},
   {id:'db_flexii_alternante',name:'Flexii biceps alternante',muscle:'Biceps',pattern:'biceps',equipment:['gantere'],level:1,compound:false,starEligible:false,prio:2,
@@ -234,7 +239,7 @@ var SPLIT_4DAY={
     {key:'vineri',label:'Full Body',icon:'⚡',type:'full',slots:[
       {pattern:'glute',star:true,sets:4,target:'8–12'},
       {pattern:'push_h',star:true,sets:3,target:'8–12'},
-      {pattern:'pull',star:false,sets:3,target:'10/parte'},
+      {pattern:'pull',star:false,sets:3,target:'10–15'},
       {pattern:'core',star:false,sets:3,target:'12–20'}]},
     {key:'sambata',label:'Recovery + Mobilitate',icon:'🧘',type:'recovery',slots:[]}
   ],
@@ -254,7 +259,8 @@ var SPLIT_3DAY={
       {pattern:'hinge',star:true,sets:4,target:'8–12'},
       {pattern:'push_v',star:true,sets:3,target:'8–12'},
       {pattern:'pull',star:false,sets:3,target:'10–15'},
-      {pattern:'gambe',star:false,sets:3,target:'15–20'}]},
+      {pattern:'gambe',star:false,sets:3,target:'15–20'},
+      {pattern:'triceps',star:false,sets:3,target:'10–15',optional:true}]},
     {key:'joi',label:'Recovery — Pași + Core',icon:'🚶',type:'recovery',slots:[]},
     {key:'vineri',label:'Full Body C',icon:'💪',type:'full',slots:[
       {pattern:'glute',star:true,sets:4,target:'8–12'},
@@ -276,7 +282,7 @@ var SPLIT_2DAY={
       {pattern:'push_h',star:true,sets:4,target:'6–10'},
       {pattern:'pull',star:false,sets:4,target:'8–12'},
       {pattern:'core',star:false,sets:3,target:'12–20'},
-      {pattern:'izo_umeri',star:false,sets:3,target:'12–15',optional:true}]},
+      {pattern:'triceps',star:false,sets:3,target:'10–15',optional:true}]},
     {key:'marti',label:'Recovery — Pași + Core',icon:'🚶',type:'recovery',slots:[]},
     {key:'joi',label:'Full Body B',icon:'⚡',type:'full',slots:[
       {pattern:'hinge',star:true,sets:4,target:'8–12'},
@@ -402,10 +408,10 @@ function buildSplit(profile){
         });
       }
       if((profile.days===5&&day.key==='vineri')||(profile.days===6&&day.key==='sambata')){
-        // Ziua de picioare secundară: squat-ul non-⭐ → al doilea hip thrust/glute
+        // Ziua de picioare secundară: squat-ul non-⭐ → fandare (fesieri), nu încă un hip thrust după ⭐
         day.label='Picioare & Fesieri';
         day.slots.forEach(function(s){
-          if(s.pattern==='squat'&&!s.star){s.pattern='glute';s.target='10–15';}
+          if(s.pattern==='squat'&&!s.star){s.pattern='lunge';s.target='10/picior';}
         });
       }
     });
@@ -488,7 +494,7 @@ function poolFor(profile){
 var FALLBACK_PATTERNS={
   biceps:['pull'],
   spate_post:['pull'],
-  izo_umeri:['push_v','spate_post'],
+  izo_umeri:['spate_post','push_v'],
   izo_piept:['push_h'],
   triceps:['push_h'],
   glute:['hinge'],
@@ -502,16 +508,27 @@ var FALLBACK_PATTERNS={
   core:[]
 };
 
+// Regresie + progresie a aceleiași mișcări (ex. pike push-up și pike pe genunchi) = redundant în aceeași zi
+function isRegressionConflict(ex,usedIds){
+  if(ex.regressionOf&&usedIds.indexOf(ex.regressionOf)>=0)return true;
+  for(var i=0;i<EXERCISE_DB.length;i++){
+    var o=EXERCISE_DB[i];
+    if(o.regressionOf===ex.id&&usedIds.indexOf(o.id)>=0)return true;
+  }
+  return false;
+}
+
 function pickFromPattern(pool,pattern,starWanted,usedIds){
   var candidates=pool.filter(function(ex){
     if(ex.pattern!==pattern)return false;
     if(usedIds.indexOf(ex.id)>=0)return false;
+    if(isRegressionConflict(ex,usedIds))return false;
     if(starWanted&&!ex.starEligible)return false;
     return true;
   });
   if(!candidates.length&&starWanted){
     candidates=pool.filter(function(ex){
-      return ex.pattern===pattern&&usedIds.indexOf(ex.id)<0;
+      return ex.pattern===pattern&&usedIds.indexOf(ex.id)<0&&!isRegressionConflict(ex,usedIds);
     });
   }
   if(!candidates.length)return null;
@@ -535,6 +552,16 @@ function pickExercise(pool,slot,usedIds,softAvoid){
     }
   }
   return null;
+}
+
+// Ținta afișată: secunde la exercițiile pe timp; „/parte" doar la cele unilaterale
+function targetFor(ex,slot){
+  if(ex.timeBased)return '30–45 sec';
+  var t=slot.target;
+  var perSide=/\/(parte|picior)/.test(t);
+  if(perSide&&!ex.unilateral)return '10–15';
+  if(!perSide&&ex.unilateral)return t+'/parte';
+  return t;
 }
 
 /* ───────────────────────────────────────────────────────────────
@@ -574,21 +601,29 @@ function calcNutrition(profile){
   // podea de siguranță
   var minKcal=profile.sex==='F'?1200:1500;
   if(kcal<minKcal)kcal=minKcal;
+  var kcalAtFloor=kcal===minKcal;
   var proteinPerKg={slabit:2.2,recomp:2.0,masa:1.8}[profile.goal]||2.0;
-  var protein=Math.round(profile.weight*proteinPerKg);
-  var fat=Math.round(profile.weight*0.9);
+  // Peste IMC 30, proteinele/grăsimile pe kg de corp total ar ieși absurde (ex. 286 g la 130 kg):
+  // folosim greutatea corespunzătoare IMC 30 ca referință (masa slabă nu crește cu grăsimea)
+  var hM=profile.height/100;
+  var refW=Math.min(profile.weight,Math.round(30*hM*hM));
+  var protein=Math.round(refW*proteinPerKg);
+  var fat=Math.round(refW*0.9);
   var carbs=Math.max(50,Math.round((kcal-protein*4-fat*9)/4));
+  var macroKcal=protein*4+carbs*4+fat*9;
+  if(macroKcal>kcal+10)kcal=Math.round(macroKcal/10)*10; // podeaua de carbo a urcat totalul — rămânem consecvenți
   var steps={slabit:'8.000–10.000',recomp:'6.000–8.000',masa:'6.000'}[profile.goal];
   return {
     bmr:Math.round(bmr),tdee:Math.round(tdee),kcal:kcal,
     protein:protein,fat:fat,carbs:carbs,
-    waterL:Math.round(profile.weight*0.035*10)/10,
+    waterL:Math.min(4.5,Math.round(profile.weight*0.035*10)/10),
     stepsTarget:steps,
     principles:[
+      kcalAtFloor?'Caloriile sunt la pragul minim sigur ('+kcal+' kcal) — nu coborâm mai jos; progresul vine din pași și antrenament.':
       profile.goal==='slabit'?'Deficit ~20% — pierdere ~0.5-0.8 kg/săpt. Mai rapid = pierzi mușchi.':
       profile.goal==='masa'?'Surplus ~10% — creștere lentă și curată. Mai mult = grăsime.':
       'Deficit moderat ~12% — recompoziție: pierzi grăsime, menții/crești mușchiul.',
-      'Proteine la fiecare masă — '+proteinPerKg+' g/kg corp = '+protein+' g/zi.',
+      'Proteine la fiecare masă — '+proteinPerKg+' g/kg'+(refW<profile.weight?' (pe greutatea de referință '+refW+' kg)':' corp')+' = '+protein+' g/zi.',
       'Post intermitent (ex. 19:6) = unealtă opțională pentru controlul caloriilor, nu magie.',
       'Cântărește mâncarea — estimările din ochi sunt greșite cu 30-50%.',
       'Zero calorii lichide (suc, alcool) — cea mai ușoară economie.'
@@ -641,19 +676,11 @@ function generateProgram(profile){
   var warnings=[];
   var programUsed=[]; // variație între zile (Push A ≠ Push B)
 
+  // Pas 1: alegem întâi exercițiile ⭐ din TOATE zilele, apoi accesoriile — altfel un accesoriu
+  // dintr-o zi anterioară „consumă" varianta cea mai bună, iar ⭐-ul primește una slabă.
+  var dayPicks={};
   split.days.forEach(function(day){
-    if(day.type==='recovery'){
-      exercises[day.key]={label:day.label,icon:day.icon,duration:'Ușor',list:[
-        {star:false,name:'Pași parcurși (țintă zilnică)',sets:1,target:'—'},
-        {star:false,name:'Plank + Dead bug',sets:2,target:'30 sec + 10/parte'}
-      ]};
-      morningRoutines[day.key]=morningFor('recovery',profile);
-      return;
-    }
-    var usedIds=[];
-    var list=[];
-    // Tăiere inteligentă la limita de exerciții/zi: sacrificăm întâi sloturile 'optional',
-    // nu pe cele care definesc eticheta zilei (ex. tricepsul la Piept/Umeri/Triceps)
+    if(day.type==='recovery')return;
     var slots=day.slots;
     var excess=slots.length-maxEx;
     if(excess>0){
@@ -664,20 +691,47 @@ function generateProgram(profile){
       });
       slots=kept;
     }
-    slots.forEach(function(slot){
-      if(list.length>=maxEx&&!slot.star)return;
-      var ex=pickExercise(pool,slot,usedIds,programUsed);
-      if(!ex){
-        warnings.push(day.key+': niciun exercițiu pentru pattern "'+slot.pattern+'"'+(slot.star?' (⭐)':''));
-        return;
-      }
-      usedIds.push(ex.id);
-      programUsed.push(ex.id);
+    dayPicks[day.key]={slots:slots,picked:[],usedIds:[]};
+  });
+  [true,false].forEach(function(starPass){
+    split.days.forEach(function(day){
+      var dp=dayPicks[day.key];if(!dp)return;
+      dp.slots.forEach(function(slot,si){
+        if(!!slot.star!==starPass)return;
+        var count=dp.picked.filter(Boolean).length;
+        if(!slot.star&&count>=maxEx)return;
+        var ex=pickExercise(pool,slot,dp.usedIds,programUsed);
+        if(!ex){
+          warnings.push(day.key+': niciun exercițiu pentru pattern "'+slot.pattern+'"'+(slot.star?' (⭐)':''));
+          return;
+        }
+        dp.usedIds.push(ex.id);
+        programUsed.push(ex.id);
+        dp.picked[si]={slot:slot,ex:ex};
+      });
+    });
+  });
+
+  split.days.forEach(function(day){
+    if(day.type==='recovery'){
+      exercises[day.key]={label:day.label,icon:day.icon,duration:'Ușor',list:[
+        {star:false,name:'Pași parcurși (țintă zilnică)',sets:1,target:'—'},
+        {star:false,name:'Plank + Dead bug',sets:2,target:'30 sec + 10/parte'}
+      ]};
+      morningRoutines[day.key]=morningFor('recovery',profile);
+      return;
+    }
+    // Pas 2: lista zilei în ordinea sloturilor din template (tăierea la limita/zi s-a făcut mai sus:
+    // se sacrifică întâi sloturile 'optional', nu cele care dau eticheta zilei)
+    var list=[];
+    dayPicks[day.key].picked.forEach(function(pk){
+      if(!pk)return;
+      var slot=pk.slot,ex=pk.ex;
       list.push({
         star:slot.star&&ex.starEligible,
         name:ex.name,
         sets:adjustVolume(slot.sets,slot.star,profile),
-        target:ex.timeBased?'30–45 sec':slot.target,
+        target:targetFor(ex,slot),
         exId:ex.id,
         risky:!!ex.risky
       });
@@ -696,7 +750,7 @@ function generateProgram(profile){
     exercises[k].list.forEach(function(e){if(e.exId)usedExIds[e.exId]=true;});
   });
   var ghid=EXERCISE_DB.filter(function(ex){return usedExIds[ex.id];}).map(function(ex){
-    var eqLabel=ex.equipment.length===0?'bodyweight':(ex.equipment.indexOf('bara')>=0?'bară':(ex.equipment.indexOf('cablu')>=0||ex.equipment.indexOf('aparate')>=0?'aparat':'gantere'));
+    var eqLabel=ex.equipment.length===0?'bodyweight':(ex.equipment.indexOf('bara')>=0||ex.equipment.indexOf('tractiuni')>=0?'bară':(ex.equipment.indexOf('cablu')>=0||ex.equipment.indexOf('aparate')>=0?'aparat':'gantere'));
     return {name:ex.name,tag:eqLabel,start:ex.ghid.start,move:ex.ghid.move,err:ex.ghid.err,tip:ex.ghid.tip};
   });
 

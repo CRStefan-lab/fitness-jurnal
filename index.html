@@ -1832,7 +1832,7 @@ function getSwaps(){try{return JSON.parse(localStorage.getItem('exercise_swaps')
         item.exId=db.id;
         item.name=db.name;
         if(ghidEx&&!ghidEx.some(function(g){return g.name===db.name;})){
-          var eqLabel=db.equipment.length===0?'bodyweight':(db.equipment.indexOf('bara')>=0?'bară':(db.equipment.indexOf('cablu')>=0||db.equipment.indexOf('aparate')>=0?'aparat':'gantere'));
+          var eqLabel=db.equipment.length===0?'bodyweight':(db.equipment.indexOf('bara')>=0||db.equipment.indexOf('tractiuni')>=0?'bară':(db.equipment.indexOf('cablu')>=0||db.equipment.indexOf('aparate')>=0?'aparat':'gantere'));
           ghidEx.push({name:db.name,tag:eqLabel,start:db.ghid.start,move:db.ghid.move,err:db.ghid.err,tip:db.ghid.tip});
         }
       });
@@ -4090,7 +4090,7 @@ function openGuideByName(nameEnc){
   if(window.ProgramGenerator){
     var dbg=ProgramGenerator.EXERCISE_DB.find(function(x){return x.name===name;});
     if(dbg&&dbg.ghid){
-      var eqLbl=dbg.equipment.length===0?'bodyweight':(dbg.equipment.indexOf('bara')>=0?'bară':(dbg.equipment.indexOf('cablu')>=0||dbg.equipment.indexOf('aparate')>=0?'aparat':'gantere'));
+      var eqLbl=dbg.equipment.length===0?'bodyweight':(dbg.equipment.indexOf('bara')>=0||dbg.equipment.indexOf('tractiuni')>=0?'bară':(dbg.equipment.indexOf('cablu')>=0||dbg.equipment.indexOf('aparate')>=0?'aparat':'gantere'));
       g={name:dbg.name,tag:eqLbl,start:dbg.ghid.start,move:dbg.ghid.move,err:dbg.ghid.err,tip:dbg.ghid.tip};
     }
   }
@@ -8279,6 +8279,9 @@ function renderWizard(){
         html+='<div class="wiz-preview-stat"><span>'+DAY_N[i]+'</span><span style="color:'+(isRec?'var(--muted)':'var(--acc2)')+';font-weight:700">'+day.icon+' '+day.label+'</span></div>';
       });
       html+='<p style="font-size:11px;color:var(--muted);margin:6px 0 0;line-height:1.45">🗓️ Nu-ți convin zilele? Le muți oricând din <strong style="color:var(--text)">Setări → Programul meu</strong> (sau temporar, pe o perioadă).</p>';
+      if(g.warnings&&g.warnings.length){
+        html+='<div class="note-box" style="margin-top:10px;font-size:11.5px">⚠️ Cu echipamentul ales, câteva sloturi n-au avut exercițiu potrivit — programul e complet, dar puțin mai scurt în acele zile.</div>';
+      }
       html+='<div class="wiz-label">Nutriția ta</div>';
       html+='<div class="wiz-preview-stat"><span>Calorii/zi</span><strong style="color:var(--acc2)">'+n.kcal+' kcal</strong></div>';
       html+='<div class="wiz-preview-stat"><span>Proteine · Carbo · Grăsimi</span><strong>'+n.protein+'g · '+n.carbs+'g · '+n.fat+'g</strong></div>';

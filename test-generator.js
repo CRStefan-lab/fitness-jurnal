@@ -12,7 +12,10 @@ var PERSONAS=[
   {name:'Prieten sală (masă)',p:{sex:'M',age:28,height:182,weight:75,experience:'intermediar',equipment:'gym',days:4,goal:'masa',morningRoutine:false}},
   {name:'Bodyweight begin (F, slăbit)',p:{sex:'F',age:45,height:170,weight:80,experience:'incepator',equipment:'bodyweight',days:3,goal:'slabit',morningRoutine:true}},
   {name:'Senior 58 (M, recomp, sală)',p:{sex:'M',age:58,height:175,weight:95,experience:'incepator',equipment:'gym',days:3,goal:'recomp',morningRoutine:true}},
-  {name:'Bodyweight intermediar (M)',p:{sex:'M',age:25,height:180,weight:70,experience:'intermediar',equipment:'bodyweight',days:4,goal:'masa',morningRoutine:true}}
+  {name:'Bodyweight intermediar (M)',p:{sex:'M',age:25,height:180,weight:70,experience:'intermediar',equipment:'bodyweight',days:4,goal:'masa',morningRoutine:true}},
+  {name:'2 zile, acasă (F, recomp)',p:{sex:'F',age:40,height:168,weight:66,experience:'incepator',equipment:'home_min',hasBara:false,days:2,goal:'recomp',morningRoutine:true}},
+  {name:'5 zile, sală (M, masă)',p:{sex:'M',age:27,height:185,weight:82,experience:'intermediar',equipment:'gym',days:5,goal:'masa',morningRoutine:false}},
+  {name:'6 zile, acasă + bară (F, fesieri)',p:{sex:'F',age:30,height:165,weight:60,experience:'intermediar',equipment:'home_min',hasBara:true,days:6,goal:'recomp',emphasis:'glute',morningRoutine:true}}
 ];
 
 console.log('══════ TESTE GENERATOR ══════\n');
@@ -25,7 +28,7 @@ PERSONAS.forEach(function(persona){
 
   // 1. Structura: toate zilele au listă
   var dayKeys=Object.keys(r.exercises);
-  assert(dayKeys.length>=5,'minim 5 zile definite (are '+dayKeys.length+')');
+  assert(dayKeys.length>=4,'minim 4 zile definite (are '+dayKeys.length+')');
   assert(r.schedule.length===7,'schedule acoperă 7 zile calendaristice');
   r.schedule.forEach(function(k){assert(!!r.exercises[k],'schedule referă zi existentă: '+k);});
 
@@ -211,5 +214,60 @@ assert(refNames.indexOf('Împins gantere bancă înclinată 30–45°')>=0,'refe
 assert(refNames.indexOf('Goblet squat')>=0,'referință: goblet prezent');
 assert(refNames.indexOf('Hip thrust cu bara pe bancă plată')>=0,'referință: hip thrust bara prezent (hasBara)');
 
+
+// 17. Invarianți pe TOATE combinațiile de profil (2592+) — ce nu prind personele de mai sus
+console.log('▸ Invarianți pe toate combinațiile');
+var DBI={};G.EXERCISE_DB.forEach(function(e){DBI[e.id]=e;});
+var combos=0,bad={};
+function flag(k,msg){if(!bad[k]){bad[k]=0;console.error('  ❌ '+k+': '+msg);}bad[k]++;}
+['M','F'].forEach(function(sex){[25,47,60].forEach(function(age){['incepator','intermediar'].forEach(function(exp){
+  [['bodyweight',false],['home_min',false],['home_min',true],['gym',false]].forEach(function(eq){
+    G.allowedDays(eq[0]).forEach(function(days){['slabit','recomp','masa'].forEach(function(goal){['echilibrat','glute'].forEach(function(emph){
+      var prof={sex:sex,age:age,height:sex==='M'?178:165,weight:sex==='M'?85:65,experience:exp,equipment:eq[0],hasBara:eq[1],days:days,goal:goal,emphasis:emph,morningRoutine:true};
+      var r=G.generateProgram(prof);combos++;
+      var tag=sex+'/'+age+'/'+exp+'/'+eq[0]+(eq[1]?'+bară':'')+'/'+days+'z/'+goal+'/'+emph;
+      if(r.errors){flag('erori',tag+' '+JSON.stringify(r.errors));return;}
+      if(r.warnings.length)flag('warnings',tag+' '+r.warnings.join('; '));
+      var trainDays=0;
+      Object.keys(r.exercises).forEach(function(k){
+        var list=r.exercises[k].list;
+        if(!list.some(function(e){return e.exId;}))return; // zi de recuperare
+        trainDays++;
+        var ids=list.map(function(e){return e.exId;});
+        if(!list.some(function(e){return e.star;}))flag('fără ⭐',tag+' '+k);
+        ids.forEach(function(id,i){
+          if(ids.indexOf(id)!==i)flag('duplicat în zi',tag+' '+k+' '+id);
+          var ex=DBI[id];
+          if(ex.regressionOf&&ids.indexOf(ex.regressionOf)>=0)flag('regresie+progresie',tag+' '+k+' '+id);
+          var t=list[i].target;
+          if(ex.timeBased&&t.indexOf('sec')<0)flag('timp fără sec',tag+' '+id+' '+t);
+          if(/\/(parte|picior)/.test(t)&&!ex.unilateral)flag('/parte pe bilateral',tag+' '+id+' '+t);
+        });
+        if(ids.filter(function(id){return DBI[id].pattern==='glute';}).length>1)flag('2× glute în zi',tag+' '+k);
+      });
+      if(trainDays!==days)flag('nr. zile',tag+' are '+trainDays);
+      var n=r.nutrition;
+      if(Math.abs(n.protein*4+n.carbs*4+n.fat*9-n.kcal)>10)flag('macro≠kcal',tag+' '+n.kcal);
+      if(n.waterL>4.5)flag('apă',tag+' '+n.waterL);
+    });});});
+  });
+});});});
+assert(combos>1000,'combinații generate: '+combos);
+['erori','warnings','fără ⭐','duplicat în zi','regresie+progresie','timp fără sec','/parte pe bilateral','2× glute în zi','nr. zile','macro≠kcal','apă'].forEach(function(k){
+  assert(!bad[k],'invariant „'+k+'" ('+(bad[k]||0)+' cazuri)');
+});
+// Obezitate: macro-urile nu mai explodează, rămân consecvente cu caloriile
+var ob=G.calcNutrition({sex:'M',age:40,height:175,weight:150,days:3,goal:'slabit'});
+assert(ob.protein<=220,'150 kg: proteine pe greutatea de referință ('+ob.protein+' g)');
+assert(Math.abs(ob.protein*4+ob.carbs*4+ob.fat*9-ob.kcal)<=10,'150 kg: macro-urile = caloriile');
+assert(ob.waterL<=4.5,'150 kg: apa plafonată ('+ob.waterL+' L)');
+// ⭐ primește hip thrust-ul cel mai bun (4 zile, fesieri, gantere fără bară)
+var gl=G.generateProgram({sex:'F',age:30,height:165,weight:60,experience:'intermediar',equipment:'home_min',hasBara:false,days:4,goal:'recomp',emphasis:'glute',morningRoutine:true});
+var starGlute=gl.exercises.vineri.list.filter(function(e){return e.star&&DBI[e.exId].pattern==='glute';})[0];
+assert(starGlute&&starGlute.exId==='db_hip_thrust','4 zile fesieri: ⭐ de vineri = hip thrust cu gantera ('+(starGlute&&starGlute.exId)+')');
+// Bodyweight 4 zile: ziua de spate are biceps
+var bw4=G.generateProgram({sex:'M',age:25,height:180,weight:70,experience:'incepator',equipment:'bodyweight',days:4,goal:'masa',morningRoutine:true});
+assert(bw4.exercises.joi.list.some(function(e){return DBI[e.exId].pattern==='biceps';}),'bodyweight 4 zile: joi are biceps');
+console.log('');
 console.log('══════ REZULTAT: '+pass+' PASS · '+fail+' FAIL ══════');
 process.exit(fail?1:0);
