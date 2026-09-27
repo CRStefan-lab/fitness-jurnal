@@ -1,14 +1,15 @@
 // Service Worker — network-first pentru HTML (updates vizibile imediat)
 // cache-first pentru restul (viteză)
-const CACHE = 'fitness-v96-coloana-desktop';
-const PRECACHE = ['./', './index.html', './manifest.json', './generator.js',
+const CACHE = 'fitness-v97-audit-fixes';
+const PRECACHE = ['./', './index.html', './manifest.json', './generator.js', './privacy.html',
   './fonts/chakra-600-latin.woff2', './fonts/chakra-600-latin-ext.woff2',
   './fonts/chakra-700-latin.woff2', './fonts/chakra-700-latin-ext.woff2'];
 
 self.addEventListener('install', e => {
   e.waitUntil(
     caches.open(CACHE)
-      .then(c => c.addAll(PRECACHE))
+      // cache:'reload' ocolește HTTP cache-ul GitHub Pages (max-age 10 min) → precache mereu proaspăt
+      .then(c => c.addAll(PRECACHE.map(u => new Request(u, { cache: 'reload' }))))
       .then(() => self.skipWaiting())
   );
 });
@@ -16,7 +17,7 @@ self.addEventListener('install', e => {
 self.addEventListener('activate', e => {
   e.waitUntil(
     caches.keys()
-      .then(keys => Promise.all(keys.filter(k => k !== CACHE).map(k => caches.delete(k))))
+      .then(keys => Promise.all(keys.filter(k => k.startsWith('fitness-') && k !== CACHE).map(k => caches.delete(k))))
       .then(() => self.clients.claim())
   );
 });
@@ -28,6 +29,8 @@ self.addEventListener('message', e => {
 self.addEventListener('fetch', e => {
   if (e.request.method !== 'GET') return;
   const url = new URL(e.request.url);
+  // Doar resursele proprii — nimic cross-origin în cache (răspunsuri opace)
+  if (url.origin !== self.location.origin) return;
 
   // Network-first pentru HTML și navigation requests — updates vizibile imediat când ești online
   const isHtml = e.request.mode === 'navigate'
@@ -39,9 +42,11 @@ self.addEventListener('fetch', e => {
     e.respondWith(
       fetch(e.request, { cache: 'no-store' })
         .then(resp => {
-          // cache copia proaspătă
-          const copy = resp.clone();
-          caches.open(CACHE).then(c => c.put(e.request, copy)).catch(() => {});
+          // cache doar răspunsuri bune (nu 404/5xx sau pagina unui portal WiFi)
+          if (resp.ok && resp.type === 'basic') {
+            const copy = resp.clone();
+            caches.open(CACHE).then(c => c.put(e.request, copy)).catch(() => {});
+          }
           return resp;
         })
         .catch(() => caches.match(e.request).then(r => r || caches.match('./index.html')))
@@ -52,9 +57,11 @@ self.addEventListener('fetch', e => {
   // Cache-first pentru manifest, JS, CSS, imagini
   e.respondWith(
     caches.match(e.request).then(r => r || fetch(e.request).then(resp => {
-      const copy = resp.clone();
-      caches.open(CACHE).then(c => c.put(e.request, copy)).catch(() => {});
+      if (resp.ok && resp.type === 'basic') {
+        const copy = resp.clone();
+        caches.open(CACHE).then(c => c.put(e.request, copy)).catch(() => {});
+      }
       return resp;
-    }).catch(() => caches.match('./index.html')))
+    }).catch(() => Response.error()))
   );
 });

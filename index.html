@@ -1147,7 +1147,7 @@ input:checked + .slider:before{transform:translateX(20px);background:var(--acc)}
         <button class="btn btn-ghost" style="font-size:12px;padding:8px" onclick="emailBackup()">✉️ Trimite pe email</button>
         <button class="btn btn-ghost" style="font-size:12px;padding:8px" onclick="showShareDiag()">🔧 Diagnostic</button>
       </div>
-      <p style="font-size:11px;color:var(--acc2);margin:6px 0 0;line-height:1.5;text-align:center" id="shareHint" style="display:none">
+      <p style="font-size:11px;color:var(--acc2);margin:6px 0 0;line-height:1.5;text-align:center;display:none" id="shareHint">
         💡 <strong>Pe mobile = sincronizarea ta.</strong> Apasă Share o dată pe săptămână → salvează în Drive.
       </p>
 
@@ -1210,7 +1210,7 @@ input:checked + .slider:before{transform:translateX(20px);background:var(--acc)}
         <div class="rule-row">🔔 Notificări: <strong id="infoNotif" style="color:var(--text)">verific...</strong></div>
         <div class="rule-row">☁️ Sync: <strong id="infoSync" style="color:var(--text)">verific...</strong></div>
         <div class="rule-row">📊 Înregistrări: <strong id="infoRows" style="color:var(--text)">—</strong></div>
-        <div class="rule-row">🔗 <a href="https://github.com/CRStefan-lab/fitness-jurnal" target="_blank" style="color:var(--blue)">github.com/CRStefan-lab/fitness-jurnal</a></div>
+        <div class="rule-row">🔗 <a href="https://github.com/CRStefan-lab/fitness-jurnal" target="_blank" rel="noopener" style="color:var(--blue)">github.com/CRStefan-lab/fitness-jurnal</a></div>
       </div>
     </div>
   </div>
@@ -1223,7 +1223,7 @@ input:checked + .slider:before{transform:translateX(20px);background:var(--acc)}
     </div>
     <div class="sgroup-bd">
       <p style="font-size:11px;color:var(--muted);margin:12px 0 10px;line-height:1.5">
-        Șterge tot ce e salvat pe acest device (jurnal, program, măsurători). Fă un backup înainte. Singura scăpare după: snapshot-urile automate din „Backup & sincronizare → Plasă de siguranță" (ultimele 7 zile).
+        Șterge jurnalul de pe acest device (seturi, măsurători, ciclul de progresie). Programul, profilul și setările rămân. Fă un backup înainte. Singura scăpare după: snapshot-urile automate din „Backup & sincronizare → Plasă de siguranță" (ultimele 7 zile).
       </p>
       <button class="btn btn-danger" onclick="resetAll()">🗑️ Șterge toate datele</button>
     </div>
@@ -1436,7 +1436,7 @@ var ghidEx=[
   {name:'Pullover cu ganteră',tag:'gantere',start:'Culcat pe bancă plată, gantera cu ambele mâini deasupra pieptului.',move:'Cobori în arc peste cap, simți întindere. Revii în arc deasupra pieptului.',err:'Coatele prea îndoite. Mișcare prea rapidă.',tip:'Menține coatele ușor îndoite pe tot parcursul.'},
   {name:'Hip Thrust cu bara',tag:'bară',start:'Spatele pe bancă (omoplați pe margine). Bara pe șolduri cu prosop. Picioare la lățimea șoldurilor.',move:'Împingi șoldurile în sus până corpul e drept. Strângi fesierii 1 sec. Cobori controlat.',err:'Șoldurile nu ajung sus. Spatele se arcuiește exagerat.',tip:'Bărbia ușor în piept. Simți în fesieri, nu în spate.'},
   {name:'Deadlift cu bara',tag:'bară',start:'Bara deasupra mijlocului piciorului. Picioare la lățimea șoldurilor. Spatele drept, pieptul sus.',move:'Împingi podeaua cu picioarele. Bara rămâne lipită de corp. Șolduri și umeri urcă simultan.',err:'SPATELE ROTUNJIT (pericol!). Bara departe de corp.',tip:'Respiră adânc, contractă abdomenul înainte. Începe cu greutate FOARTE mică!'},
-  {name:'Flexii biceps alternante',tag:'gantere',start:'Stând sau șezut, gantere pe lângă corp, palme față în față.',move:'Ridici rotind palma în sus. Cobori lent. Alternezi brațele.',err:'Coatul se mișcă înainte. Balansul spatelui.',tip:'Coatul rămâne fix pe lângă corp tot timpul.'},
+  {name:'Flexii biceps alternante',tag:'gantere',start:'Stând sau șezut, gantere pe lângă corp, palme față în față.',move:'Ridici rotind palma în sus. Cobori lent. Alternezi brațele.',err:'Cotul se mișcă înainte. Balansul spatelui.',tip:'Cotul rămâne fix pe lângă corp tot timpul.'},
   {name:'Flotări lente (dimineață)',tag:'bodyweight',start:'Poziție plank cu brațele la lățimea umerilor, corp drept de la cap până la călcâie.',move:'Cobori controlat 3 sec până pieptul aproape atinge podeaua. Împingi 1 sec în sus.',err:'Șoldurile cad. Coatele evazate la 90° lateral.',tip:'Coatele la ~45° față de corp. Tempo: 3-1-1 (ai timp să înveți mișcarea).'},
   {name:'Pike Push-up (dimineață)',tag:'bodyweight',start:'Poziție "pike" — fese sus, formă de V inversat. Palmele pe podea, cap între brațe.',move:'Cobori capul spre podea îndoind coatele. Împingi înapoi sus. Simulează împins umeri.',err:'Corpul prea orizontal. Coatele evazate.',tip:'Alternativă blândă pentru împins umeri — activare umeri fără greutăți.'},
   {name:'Fandări în loc (dimineață)',tag:'bodyweight',start:'Stând drept, picioare la lățimea șoldurilor, mâinile pe șolduri.',move:'Un picior mare în spate, cobori genunchiul spre podea. Revii împingând în călcâi. Alternezi.',err:'Genunchiul din față trece de vârful piciorului. Trunchiul se apleacă.',tip:'Control total — e pattern, nu cardio. Lent și curat.'},
@@ -1525,6 +1525,7 @@ var customMeta=null;
     if(!p||!p.exercises||!p.schedule)return;
     exercises=p.exercises;
     if(p.morningRoutines)morningRoutines=p.morningRoutines;
+    else if(p.morningRoutines===null)morningRoutines={};
     if(p.checklist&&p.checklist.length)checkItems=p.checklist;
     if(p.ghid&&p.ghid.length)ghidEx=p.ghid;
     var DAY_NAMES=['LUNI','MARȚI','MIERCURI','JOI','VINERI','SÂMBĂTĂ','DUMINICĂ'];
@@ -1846,6 +1847,7 @@ function saveDayPlan(){
   if(dayPlanState.mode==='temp'){
     var until=dpComputeUntil();
     if(!until){showToast('Alege data până la care ține excepția','var(--acc2)');return;}
+    if(until<todayISO()){showToast('Data de final e în trecut — alege una de azi încolo','var(--acc2)');return;}
     localStorage.setItem('training_days_temp',JSON.stringify({days:sel,until:until,ts:Date.now()}));
     showToast('⏳ Program temporar activ până '+dpUntilLabel(until));
   }else{
@@ -1888,12 +1890,15 @@ function renderMyDaysRow(){
 // ═══════════════════════════════════════════════════════════════
 var STORAGE_KEY='fitness_jurnal_v1';
 
+var _storeRaw=null,_storeObj=null;
 function loadStore(){
   try{
     var raw=localStorage.getItem(STORAGE_KEY);
     if(!raw) return {version:1,rows:[]};
-    var obj=JSON.parse(raw);
-    if(!obj.rows) obj.rows=[];
+    // Cache: re-parsăm doar dacă string-ul s-a schimbat. Întoarcem o copie a listei (apelanții fac filter/push).
+    if(raw!==_storeRaw||!_storeObj){_storeObj=JSON.parse(raw);if(!_storeObj.rows)_storeObj.rows=[];_storeRaw=raw;}
+    var obj={};for(var k in _storeObj)obj[k]=_storeObj[k];
+    obj.rows=_storeObj.rows.slice();
     return obj;
   }catch(e){
     console.error('Storage read error',e);
@@ -1903,6 +1908,7 @@ function loadStore(){
 
 function saveStore(obj){
   try{
+    _storeObj=null;
     localStorage.setItem(STORAGE_KEY,JSON.stringify(obj));
     return true;
   }catch(e){
@@ -2042,6 +2048,10 @@ var currentWorkoutDate=null; // null = data de azi. altfel = ISO "yyyy-mm-dd"
 var lastDetectedDay=null;    // pentru detectarea trecerii peste miezul nopții
 
 function today(){return new Date().toLocaleDateString('ro-RO');}
+// Escape pentru orice text introdus de user/importat care ajunge în innerHTML
+function escHtml(t){return String(t==null?'':t).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');}
+// Cheie sigură pentru onclick="fn('...')" — encodeURIComponent NU codifică apostroful
+function encKey(t){return encodeURIComponent(t).replace(/'/g,'%27');}
 function todayIdx(){var d=new Date().getDay();return d===0?6:d-1;}
 
 function getEffectiveDateISO(){return currentWorkoutDate||todayISO();}
@@ -2064,7 +2074,19 @@ function isBackdated(){
 
 function checkDayChanged(){
   var now=todayIdx();
-  if(lastDetectedDay!==null && lastDetectedDay!==now){
+  var midSession=false;
+  if(lastDetectedDay!==null && lastDetectedDay!==now && currentWorkoutDate===null){
+    // Set salvat în ultimele 90 min → sesiunea continuă pe data de ieri (nu tăiem antrenamentul în două)
+    var cutoff=Date.now()-90*60000;
+    midSession=loadStore().rows.some(function(r){return r.type==='antrenament'&&r.ts>cutoff;});
+    if(midSession){
+      var yd=new Date();yd.setDate(yd.getDate()-1);
+      currentWorkoutDate=yd.getFullYear()+'-'+String(yd.getMonth()+1).padStart(2,'0')+'-'+String(yd.getDate()).padStart(2,'0');
+      if(currentWorkoutDay===null)currentWorkoutDay=lastDetectedDay;
+      showToast('🌙 A trecut miezul nopții — sesiunea continuă pe ieri');
+    }
+  }
+  if(!midSession && lastDetectedDay!==null && lastDetectedDay!==now){
     // Ziua s-a schimbat (peste miezul nopții)
     currentWorkoutDay=null;
     currentWorkoutDate=null;
@@ -2380,11 +2402,10 @@ function renderToday(){
     if(!allDone){firstIncompleteIdx=fi;break;}
   }
 
-  var escHtml=function(t){return String(t).replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');};
   ex.list.forEach(function(e,ei){
     var key=e.name;
     if(!setData[key])setData[key]={};
-    var sk=encodeURIComponent(key);
+    var sk=encKey(key);
     var effSets=effectiveSets(e,ei);
     // Contor seturi salvate pentru badge progres
     var doneSets=0;
@@ -2398,7 +2419,7 @@ function renderToday(){
       html+='<div class="card card-skip" id="ec_'+ei+'">';
       html+='<div class="card-hd" onclick="document.getElementById(\'ec_'+ei+'\').classList.toggle(\'open\')">';
       html+='<div style="color:var(--muted);opacity:.5;font-size:13px;width:18px;flex-shrink:0">'+(e.star?'⭐':'·')+'</div>';
-      html+='<div style="flex:1;min-width:0"><div class="card-ttl">'+e.name+'</div><div class="card-sub">⤼ '+escHtml(skReason)+(doneSets>0?' · '+doneSets+' set'+(doneSets===1?'':'uri')+' salvate':'')+'</div></div>';
+      html+='<div style="flex:1;min-width:0"><div class="card-ttl">'+escHtml(e.name)+'</div><div class="card-sub">⤼ '+escHtml(skReason)+(doneSets>0?' · '+doneSets+' set'+(doneSets===1?'':'uri')+' salvate':'')+'</div></div>';
       html+='<span class="progress-badge skipb">SĂRIT</span>';
       html+='<div class="card-chev">▼</div></div>';
       html+='<div class="card-bd"><div style="padding-top:10px">';
@@ -2417,7 +2438,7 @@ function renderToday(){
     for(var s=1;s<=effSets;s++){
       var saved=setData[key][s]||{};
       var isSaved=saved.savedOnServer;
-      var sk=encodeURIComponent(key);
+      var sk=encKey(key);
 
       // Pre-fill: set 1 din Smart Coach target / sesiunea anterioară · set 2+ din setul precedent
       if(!isSaved && !saved.reps && !saved.kg){
@@ -2425,7 +2446,7 @@ function renderToday(){
         if(s===1){
           // Set 1: ia din ultima performanță (excluzând azi)
           var lastPerf=getLastPerformance(key,getEffectiveDateRo());
-          if(lastPerf && lastPerf.kg){
+          if(lastPerf && (lastPerf.kg||lastPerf.reps)){
             prefill={reps:lastPerf.reps,kg:lastPerf.kg};
           }
         }else{
@@ -2498,7 +2519,7 @@ function renderToday(){
     html+='<div class="card-hd" onclick="document.getElementById(\'ec_'+ei+'\').classList.toggle(\'open\')">';
     html+='<div style="color:'+(e.star?'var(--acc2)':'transparent')+';font-size:13px;width:18px;flex-shrink:0">'+(e.star?'⭐':'·')+'</div>';
     var targetLbl=/^[\d]+([–—-][\d]+)?$/.test(String(e.target).trim())?e.target+' rep':e.target;
-    html+='<div style="flex:1;min-width:0"><div class="card-ttl">'+e.name+'</div><div class="card-sub">'+(ei===aziAddSetIdx?effSets+' seturi ('+e.sets+'+1 azi)':e.sets+' seturi')+' · Țintă: '+targetLbl+'</div></div>';
+    html+='<div style="flex:1;min-width:0"><div class="card-ttl">'+escHtml(e.name)+'</div><div class="card-sub">'+(ei===aziAddSetIdx?effSets+' seturi ('+e.sets+'+1 azi)':e.sets+' seturi')+' · Țintă: '+targetLbl+'</div></div>';
     html+=progressBadge;
     if(isHero)html+='<span class="hero-badge">ÎN LUCRU</span>';
     html+='<button class="guide-btn" onclick="event.stopPropagation();openGuideByName(\''+sk+'\')" title="Cum se face">📖</button>';
@@ -2810,7 +2831,7 @@ function checkPR(exerciseName,kg,reps){
   });
   var volume=kg*reps;
   if(kg>maxKg) return {type:'kg',label:'GREUTATE MAX'};
-  if(kg===maxKg && reps>maxRepsAtKg) return {type:'reps',label:'REPS MAX la '+kg+'kg'};
+  if(kg===maxKg && reps>maxRepsAtKg) return {type:'reps',label:kg>0?'REPS MAX la '+kg+'kg':'REP MAX'};
   if(volume>maxVolume) return {type:'volume',label:'VOLUM MAX'};
   return null;
 }
@@ -2882,7 +2903,8 @@ function saveSet(keyEnc,setNum,ei){
       if(navigator.vibrate)navigator.vibrate(30);
     }
     // Check dacă exercițiul e complet → mark + colapsare + auto-advance la next exercise
-    var exObj=exercises[schedule[idx].exDay].list[ei];
+    var allExList=exercises[schedule[idx].exDay].list.concat(customExercises[idx]||[]);
+    var exObj=allExList[ei]||{sets:1,star:false};
     var effDone=effectiveSets(exObj,ei);
     var allDone=true;
     for(var ck=1;ck<=effDone;ck++){
@@ -2901,7 +2923,7 @@ function saveSet(keyEnc,setNum,ei){
       // Avansează la următor exercițiu nesalvat
       setTimeout(function(){
         var nextEx=null;
-        var allEx=exercises[schedule[idx].exDay].list;
+        var allEx=allExList;
         for(var ne=ei+1;ne<allEx.length;ne++){
           var nKey=allEx[ne].name;
           if(skipData[nKey]!==undefined)continue; // sărit = rezolvat
@@ -3310,6 +3332,7 @@ function playBeepOsc(){
 function startRestTimer(isStar){
   var cfg=getRestTimerCfg();
   if(!cfg.enabled)return;
+  clearTimeout(restTimerState.hideT);
   ensureAudio(); // suntem într-un tap (Save) — momentul potrivit
   // Mod auto: 90s izolări · 150s compound ⭐ (Singer 2024: beneficiul pauzei
   // se aplatizează ~90s la izolări; compound-urile cer 2-3 min)
@@ -3367,7 +3390,7 @@ function restTimerDone(){
     });
   }
   restTimerState.deadline=null;
-  setTimeout(function(){el.classList.remove('show');},4000);
+  restTimerState.hideT=setTimeout(function(){el.classList.remove('show');},4000);
 }
 
 function restTimerAdjust(delta){
@@ -3715,10 +3738,10 @@ function swapAlternativesHtml(name){
   if(!alts.length&&!swapOriginalByName[name])return '';
   var h='<div class="g-row"><div class="g-lbl" style="color:#fbbf24">↔</div><div><strong>Nu-ți place?</strong> Înlocuiește-l permanent (istoricul lui rămâne salvat):<br>';
   alts.forEach(function(a){
-    h+='<button class="btn btn-ghost" style="font-size:12px;padding:8px;margin:6px 0 0" onclick="swapExercise(\''+encodeURIComponent(origName)+'\',\''+a.id+'\')">↔ '+a.name+'</button>';
+    h+='<button class="btn btn-ghost" style="font-size:12px;padding:8px;margin:6px 0 0" onclick="swapExercise(\''+encKey(origName)+'\',\''+a.id+'\')">↔ '+a.name+'</button>';
   });
   if(swapOriginalByName[name]){
-    h+='<button class="btn btn-ghost" style="font-size:12px;padding:8px;margin:6px 0 0;color:var(--muted)" onclick="swapExercise(\''+encodeURIComponent(origName)+'\',null)">↩ Revino la: '+origName+'</button>';
+    h+='<button class="btn btn-ghost" style="font-size:12px;padding:8px;margin:6px 0 0;color:var(--muted)" onclick="swapExercise(\''+encKey(origName)+'\',null)">↩ Revino la: '+origName+'</button>';
   }
   h+='</div></div>';
   return h;
@@ -3739,7 +3762,7 @@ function toggleLib(){
     Object.keys(byMuscle).sort().forEach(function(m){
       h+='<div style="font-size:10px;font-weight:700;letter-spacing:1.5px;color:var(--acc);text-transform:uppercase;margin:10px 0 4px">'+m+' ('+byMuscle[m].length+')</div>';
       byMuscle[m].forEach(function(x){
-        h+='<div style="padding:6px 0;border-bottom:1px solid var(--bd);font-size:13px;cursor:pointer;display:flex;align-items:center;gap:9px" onclick="openGuideByName(\''+encodeURIComponent(x.name)+'\')"><span class="ex-thumb" style="width:28px;height:30px;border-radius:8px">'+muscleThumb(volumeGroupFor(x.muscle),20)+'</span><span style="flex:1;min-width:0">'+x.name+'</span><span style="color:var(--muted);font-size:11px;flex-shrink:0">📖</span></div>';
+        h+='<div style="padding:6px 0;border-bottom:1px solid var(--bd);font-size:13px;cursor:pointer;display:flex;align-items:center;gap:9px" onclick="openGuideByName(\''+encKey(x.name)+'\')"><span class="ex-thumb" style="width:28px;height:30px;border-radius:8px">'+muscleThumb(volumeGroupFor(x.muscle),20)+'</span><span style="flex:1;min-width:0">'+x.name+'</span><span style="color:var(--muted);font-size:11px;flex-shrink:0">📖</span></div>';
       });
     });
     cont.innerHTML=h;
@@ -3780,7 +3803,7 @@ function openGuideByName(nameEnc){
   var title=document.getElementById('guideTitle');
   var tag=document.getElementById('guideTag');
   var body=document.getElementById('guideBody');
-  title.innerHTML='<span style="display:flex;align-items:center;gap:9px"><span class="ex-thumb" style="width:40px;height:42px">'+thumbForExercise(name)+'</span><span style="flex:1;min-width:0">'+name+'</span></span>';
+  title.innerHTML='<span style="display:flex;align-items:center;gap:9px"><span class="ex-thumb" style="width:40px;height:42px">'+thumbForExercise(name)+'</span><span style="flex:1;min-width:0">'+escHtml(name)+'</span></span>';
   if(g){
     tag.textContent=g.tag||'';
     body.innerHTML=
@@ -4214,7 +4237,7 @@ function renderMeasurements(){
   var visible=measShowAll?history:history.slice(0,6);
   visible.forEach(function(r,i){
     var next=history[i+1]; // următoarea = mai veche
-    html+='<div class="meas-hist-row"><div class="meas-hist-date">📅 '+r.date+(r.note?' · <span style="color:var(--muted);font-weight:400">'+r.note+'</span>':'')+'</div>';
+    html+='<div class="meas-hist-row"><div class="meas-hist-date">📅 '+r.date+(r.note?' · <span style="color:var(--muted);font-weight:400">'+escHtml(r.note)+'</span>':'')+'</div>';
     html+='<div class="meas-hist-vals">';
     MEAS_FIELDS.forEach(function(f){
       if(r[f.id]==null) return;
@@ -4399,11 +4422,12 @@ function renderHistoric(){
     html+='<div class="hist-card-bd">';
     D.exOrder.forEach(function(ex){
       var sets=D.exercises[ex].sort(function(a,b){return a.set-b.set;});
-      var exEnc=encodeURIComponent(ex);
+      var exEnc=encKey(ex);
       var meta=findExerciseMeta(ex);
-      var totalSets=meta?meta.ex.sets:Math.max.apply(null,sets.map(function(s){return s.set;}));
+      var maxSaved=Math.max.apply(null,sets.map(function(s){return s.set;}));
+      var totalSets=Math.max(meta?meta.ex.sets:0,maxSaved);
       var starIcon=(meta&&meta.ex.star)?'<span style="color:var(--acc2);margin-right:4px">⭐</span>':'';
-      html+='<div class="hist-ex"><div class="hist-ex-nm">'+starIcon+ex+'<span style="color:var(--muted);font-size:10px;font-weight:400"> · '+sets.length+'/'+totalSets+'</span></div><div class="hist-sets">';
+      html+='<div class="hist-ex"><div class="hist-ex-nm">'+starIcon+escHtml(ex)+'<span style="color:var(--muted);font-size:10px;font-weight:400"> · '+sets.length+'/'+totalSets+'</span></div><div class="hist-sets">';
       for(var setNum=1;setNum<=totalSets;setNum++){
         var found=sets.find(function(s){return s.set===setNum;});
         if(found){
@@ -4416,7 +4440,7 @@ function renderHistoric(){
     });
     if(D.skips.length){
       D.skips.forEach(function(sk){
-        html+='<div class="hist-ex" style="border:1px dashed rgba(245,158,11,.35);background:repeating-linear-gradient(-45deg,rgba(245,158,11,.04) 0 6px,transparent 6px 16px)"><div class="hist-ex-nm" style="color:var(--muted);margin-bottom:0">⤼ '+sk.exercise+' <span style="color:#fbbf24;font-size:10px;font-weight:400">SĂRIT'+(sk.reason?' · '+sk.reason:'')+'</span></div></div>';
+        html+='<div class="hist-ex" style="border:1px dashed rgba(245,158,11,.35);background:repeating-linear-gradient(-45deg,rgba(245,158,11,.04) 0 6px,transparent 6px 16px)"><div class="hist-ex-nm" style="color:var(--muted);margin-bottom:0">⤼ '+escHtml(sk.exercise)+' <span style="color:#fbbf24;font-size:10px;font-weight:400">SĂRIT'+(sk.reason?' · '+escHtml(sk.reason):'')+'</span></div></div>';
       });
     }
     if(morningTotal||D.checks.length){
@@ -4703,7 +4727,7 @@ function buildAdherenceStats(){
   trainingRows.forEach(function(r){sessionDays[r.date]=true;});
   // Zile așteptate: 5/săpt (LUNI,MARȚI,JOI,VINERI active + opt MIE recovery)
   var weeks=Math.max(1,getProgramWeek());
-  var expectedSessions=weeks*4; // 4 zile active/săpt
+  var expectedSessions=weeks*(dayPlanCount()||4); // zilele active/săpt din program
   var actualSessions=Object.keys(sessionDays).length;
   var adherence=Math.min(100,Math.round((actualSessions/expectedSessions)*100));
   // Streak morning — zile consecutive cu cel puțin 1 bifă matinală
@@ -4756,7 +4780,7 @@ function buildWeekSummary(){
   // === HEADER ===
   var out='🏋️ FITNESS JURNAL — EXPORT COMPLET PT. ANALIZA AI\n';
   out+='Generat: '+new Date().toLocaleDateString('ro-RO')+'\n';
-  out+='Profil: '+profile.age+' ani · '+profile.height+' cm · Bărbat\n';
+  out+='Profil: '+profile.age+' ani · '+profile.height+' cm · '+(profile.sex==='F'?'Femeie':'Bărbat')+'\n';
   // Program start
   var oldestDate=null;
   allTraining.forEach(function(r){
@@ -5016,11 +5040,18 @@ function importJSON(ev){
   reader.onload=function(e){
     try{
       var obj=JSON.parse(e.target.result);
-      if(!obj.rows||!Array.isArray(obj.rows)) throw new Error('Fișier invalid');
+      if(!obj||!obj.rows||!Array.isArray(obj.rows)) throw new Error('Fișier invalid');
+      // Normalizare: rânduri fără tip/dată aruncate, set/reps/kg numerice (altfel dedup-ul și editarea eșuează)
+      obj.rows=obj.rows.filter(function(r){return r&&typeof r==='object'&&typeof r.type==='string'&&typeof r.date==='string';}).map(function(r){
+        if(r.type==='antrenament'){r.set=parseInt(r.set)||1;r.reps=parseFloat(r.reps)||0;r.kg=parseFloat(r.kg)||0;r.exercise=String(r.exercise||'');}
+        else if(r.exercise!=null)r.exercise=String(r.exercise);
+        return r;
+      }).filter(function(r){return r.type!=='antrenament'||r.exercise;});
+      if(!obj.version)obj.version=1;
       if(!confirm('Suprascrie datele curente cu '+obj.rows.length+' înregistrări din backup?'))return;
       saveStore(obj);
       showToast('Import reușit: '+obj.rows.length+' rânduri');
-      location.reload();
+      fsaAfterReplace().then(function(){location.reload();});
     }catch(err){showToast('Eroare import: '+err.message,'var(--red)');}
   };
   reader.readAsText(f);
@@ -5031,8 +5062,17 @@ function resetAll(){
   if(!confirm('Ștergi TOATE datele? Această acțiune nu poate fi anulată.'))return;
   if(!confirm('Sigur? Ultima confirmare.'))return;
   localStorage.removeItem(STORAGE_KEY);
+  // Starea derivată din jurnal (ciclu, deload, digest, backup) — altfel Smart Coach ar crede că ești în săpt. 6
+  ['program_cycle_start','manual_deload_until','deload_dismissed_until','digest_shown_week','last_backup_ts'].forEach(function(k){localStorage.removeItem(k);});
   showToast('Date șterse');
-  setTimeout(function(){location.reload();},800);
+  fsaAfterReplace().then(function(){setTimeout(function(){location.reload();},500);});
+}
+
+// Datele locale au fost ÎNLOCUITE (import/reset/restaurare): scriem fișierul sincronizat cu noua stare,
+// altfel la reload merge-ul din fișier ar aduce înapoi exact datele șterse. Fără permisiune → deconectăm.
+function fsaAfterReplace(){
+  if(typeof fsaState==='undefined'||!fsaState||!fsaState.handle)return Promise.resolve();
+  return fsaWriteFile().then(function(ok){if(ok===false)return fsaClearHandle();}).catch(function(){return fsaClearHandle();});
 }
 
 function getProfile(){
@@ -5913,7 +5953,7 @@ function checkAutoDeloadSuggest(){
 function getActivityStreak(){
   var days={};
   loadStore().rows.forEach(function(r){
-    if(r.type==='antrenament'||r.type==='dimineata'||(r.type==='checklist'&&r.note==='DA'))days[r.date]=true;
+    if(r.type==='antrenament'||(r.type==='dimineata'&&r.note==='DA')||(r.type==='checklist'&&r.note==='DA'))days[r.date]=true;
   });
   var streak=0;
   var d=new Date();
@@ -5932,7 +5972,7 @@ function getActivityStreak(){
 function getLongestStreak(){
   var act={};
   loadStore().rows.forEach(function(r){
-    if(r.type==='antrenament'||r.type==='dimineata'||(r.type==='checklist'&&r.note==='DA'))act[r.date]=true;
+    if(r.type==='antrenament'||(r.type==='dimineata'&&r.note==='DA')||(r.type==='checklist'&&r.note==='DA'))act[r.date]=true;
   });
   var dayKey=function(d){return d.getFullYear()*10000+(d.getMonth()+1)*100+d.getDate();};
   var keys={};
@@ -5957,7 +5997,7 @@ function renderActivityCalendar(){
     if(r.type==='antrenament'){
       ton[r.date]=(ton[r.date]||0)+(parseFloat(r.kg)||0)*(parseFloat(r.reps)||0);
       act[r.date]=true;
-    }else if(r.type==='dimineata'||(r.type==='checklist'&&r.note==='DA')){
+    }else if((r.type==='dimineata'&&r.note==='DA')||(r.type==='checklist'&&r.note==='DA')){
       act[r.date]=true;
     }
   });
@@ -6029,7 +6069,7 @@ function renderActivityCalendar(){
 function streakFirstReach(n){
   var act={};
   loadStore().rows.forEach(function(r){
-    if(r.type==='antrenament'||r.type==='dimineata'||(r.type==='checklist'&&r.note==='DA'))act[r.date]=true;
+    if(r.type==='antrenament'||(r.type==='dimineata'&&r.note==='DA')||(r.type==='checklist'&&r.note==='DA'))act[r.date]=true;
   });
   var dayKey=function(d){return d.getFullYear()*10000+(d.getMonth()+1)*100+d.getDate();};
   var keys={};Object.keys(act).forEach(function(ro){var d=parseRoDate(ro);if(d)keys[dayKey(d)]=true;});
@@ -6142,6 +6182,25 @@ function buildWarmupHint(exerciseName){
   return '<div style="font-size:11px;color:var(--muted);padding:3px 10px;margin:2px 14px 0;border-left:2px solid rgba(245,158,11,.4);border-radius:0 4px 4px 0">🔥 Încălzire: 10× '+startStr+' → 5× '+w50+'kg → 3× '+w75+'kg → seturile de lucru</div>';
 }
 
+// Exerciții fără greutate (kg=0): progresia se face pe repetări, nu pe kg
+function bwRecommendation(name,week,plannedSets,firstStar,last,minRep,maxRep){
+  var reps=parseInt(last.reps)||0;
+  if(isManualDeload()||week>=8){
+    var dr=Math.max(1,Math.round(reps*0.7)),ds=plannedSets?Math.max(1,Math.round(plannedSets*0.7)):null;
+    return {action:'deload',tag:'DELOAD',last:last,target:dr+' rep'+(ds?' · fă doar '+ds+' din '+plannedSets+' seturi':', -30% seturi'),tip:'Deload — mișcări curate, departe de eșec.'};
+  }
+  if(week<=2)return {action:'stabilize',tag:'BASELINE',last:last,target:reps+' rep (consolidează)',tip:'Săpt. '+week+': fixează tiparul — tempo 2-1-2, amplitudine completă.'};
+  var rir=week<=6?getLastRIR(name):null;
+  if(rir==='hard')return {action:'stabilize',tag:'CONSOLIDARE',last:last,target:reps+' rep (repetă)',tip:'Ultima sesiune a fost la limită 😮‍💨 — repetă, tehnica întâi.'};
+  if(week===7){
+    if(plannedSets&&firstStar)return {action:'add_set',tag:'+1 SET',last:last,target:'se adaugă 1 set → '+reps+' rep × '+(plannedSets+1)+' seturi',tip:'Săpt. 7: volum — aceleași repetări, un set în plus.'};
+    return {action:'hold',tag:'MENȚINE',last:last,target:reps+' rep (menține)',tip:'Săpt. 7: setul extra e doar la primul ⭐ al zilei.'};
+  }
+  if(reps>=maxRep+3)return {action:'harder',tag:'VARIANTĂ ↑',last:last,target:reps+' rep — treci la varianta mai grea (📖)',tip:'Ai depășit clar intervalul ('+minRep+'–'+maxRep+'). Deschide ghidul 📖 și alege progresia următoare.'};
+  var add=rir==='easy'?3:2;
+  return {action:'add_rep',tag:'+'+add+' REP'+(rir==='easy'?' ⚡':''),last:last,target:(reps+add)+' rep',tip:'Fără greutate progresezi pe repetări: +'+add+' față de ultima dată.'};
+}
+
 function getRecommendation(exerciseName,week,plannedSets,firstStar){
   var meta=findExerciseMeta(exerciseName);
   if(!meta)return null;
@@ -6152,6 +6211,7 @@ function getRecommendation(exerciseName,week,plannedSets,firstStar){
   var inc=getKgIncrement(exerciseName);
   // Exclude AZI ca recomandarea să fie STABILĂ în timpul sesiunii (vine din sesiunea anterioară)
   var last=getLastPerformance(exerciseName,getEffectiveDateRo());
+  if(last&&!(parseFloat(last.kg)>0))return bwRecommendation(exerciseName,week,plannedSets,firstStar,last,minRep,maxRep);
 
   // DELOAD MANUAL (acceptat din sugestia auto) — prioritate peste tot
   if(isManualDeload()&&last){
@@ -6259,7 +6319,7 @@ function getTrend(exerciseName){
     var best=0;
     byDate[d].forEach(function(r){
       var kg=parseFloat(r.kg)||0,reps=parseFloat(r.reps)||0;
-      if(kg>0&&reps>0){var o=kg*(1+reps/30);if(o>best)best=o;}
+      if(reps>0){var o=kg>0?kg*(1+reps/30):reps;if(o>best)best=o;}
     });
     return best;
   });
@@ -6438,7 +6498,7 @@ function renderLineChart(containerId, points, opts){
   var container=document.getElementById(containerId);
   if(!container) return;
   if(!points||points.length===0){
-    container.innerHTML='<div class="chart-empty">Nicio dată încă. Începe să introduci '+(opts.hint||'valori')+' pentru a vedea evoluția.</div>';
+    container.innerHTML='<div class="chart-empty">Nicio dată încă. Începe să introduci '+escHtml(opts.hint||'valori')+' pentru a vedea evoluția.</div>';
     return;
   }
   var W=container.clientWidth||320,H=opts.height||180;
@@ -6690,7 +6750,7 @@ function initExerSelect(){
   }else{
     sel.disabled=false;
     sel.innerHTML='<option value="">— Alege exercițiu ('+names.length+' disponibile) —</option>'+names.map(function(n){
-      return '<option value="'+n.replace(/"/g,'&quot;')+'"'+(n===progresState.selectedExer?' selected':'')+'>'+n+'</option>';
+      return '<option value="'+escHtml(n)+'"'+(n===progresState.selectedExer?' selected':'')+'>'+escHtml(n)+'</option>';
     }).join('');
   }
   sel.onchange=function(){progresState.selectedExer=sel.value;renderExerciseChart();};
@@ -6797,7 +6857,7 @@ function renderPRList(){
   records.forEach(function(pr,i){
     html+='<div style="display:flex;align-items:center;gap:10px;background:var(--s1);border:1px solid '+(i===0?'rgba(245,158,11,.45)':'var(--bd)')+';border-radius:12px;padding:10px 12px;margin-bottom:8px'+(i===0?';background:linear-gradient(120deg,rgba(245,158,11,.06),var(--s1) 55%)':'')+'">';
     html+='<div style="width:24px;text-align:center;'+CHAKp+';font-size:'+(i<3?'15px':'13px')+';color:'+(i<3?'#fbbf24':'var(--muted)')+';flex-shrink:0">'+(i+1)+'</div>';
-    html+='<div style="flex:1;min-width:0"><div style="font-weight:600;font-size:12.5px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+(pr.star?'<span style="color:var(--acc2)">⭐</span> ':'')+pr.exercise+'</div>';
+    html+='<div style="flex:1;min-width:0"><div style="font-weight:600;font-size:12.5px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+(pr.star?'<span style="color:var(--acc2)">⭐</span> ':'')+escHtml(pr.exercise)+'</div>';
     html+='<div style="font-size:10.5px;color:var(--muted);margin-top:1px">'+pr.reps+'×'+pr.maxKg+' kg ('+pr.date+') · volum max '+pr.vol.toFixed(0)+'</div></div>';
     html+='<div style="text-align:right;flex-shrink:0"><div style="'+CHAKp+';font-size:15px;color:var(--acc2)">'+pr.orm.toFixed(1)+'</div><div style="font-size:8px;letter-spacing:1px;color:var(--muted)">KG 1RM</div></div>';
     html+='</div>';
@@ -6881,9 +6941,10 @@ function saveEdit(){
     exercise:editCtx.exercise,set:editCtx.set,reps:reps,kg:kg,note:''
   });
   showToast(wasNew?'Set adăugat ✓':'Set actualizat ✓');
+  var wasToday=editCtx.date===today();
   closeEdit();
   renderHistoric();
-  if(editCtx&&editCtx.date===today())preloadToday();
+  if(wasToday){preloadToday();renderToday();}
   renderExerciseChart();
 }
 
@@ -7004,7 +7065,7 @@ function updateNotifPreview(){
   var el=document.getElementById('notifMsgPreview');
   if(!el)return;
   var idx=todayIdx();var sch=schedule[idx];var ex=exercises[sch.exDay];
-  var isRecovery=sch.exDay==='miercuri'||sch.exDay==='sambata';
+  var isRecovery=!isTrainingExDay(sch.exDay);
   el.textContent=isRecovery
     ?'💪 Azi e zi recovery. Nu uita să bifezi obiectivele zilnice!'
     :'💪 '+ex.label+' azi. Nu ai bifat antrenamentul!';
@@ -7031,7 +7092,8 @@ function scheduleReminder(){
   // setTimeout max: ~24 zile. Dacă e mai mult, doar setează la 1h.
   if(delay>86400000) delay=86400000;
   notifTimer=setTimeout(function(){
-    fireReminder();
+    // la delay plafonat (24h) doar re-programăm — nu tragem în ziua greșită
+    if(Date.now()>=next.getTime()-60000)fireReminder();
     scheduleReminder();
   },delay);
   console.log('Next reminder in',(delay/60000).toFixed(1),'min');
@@ -7044,7 +7106,7 @@ function fireReminder(){
   var antrenamentDone=todayRows.some(function(r){return r.type==='checklist'&&r.exercise==='antrenament'&&r.note==='DA';});
   if(antrenamentDone)return; // nu deranja dacă a bifat
   var idx=todayIdx();var sch=schedule[idx];var ex=exercises[sch.exDay];
-  var body='💪 '+ex.label+' azi. Deschide app-ul și bifează antrenamentul!';
+  var body=isTrainingExDay(sch.exDay)?'💪 '+ex.label+' azi. Deschide app-ul și bifează antrenamentul!':'🧘 Zi de recuperare — bifează obiectivele zilnice.';
   // via service worker pentru PWA
   if(navigator.serviceWorker){
     navigator.serviceWorker.getRegistration().then(function(reg){
@@ -7732,11 +7794,11 @@ function wizFinish(){
   localStorage.setItem('custom_program',JSON.stringify(res));
   // Profil complet (folosit de BF%, TDEE, Setări)
   var d=wizState.data;
-  localStorage.setItem('user_profile',JSON.stringify({
+  localStorage.setItem('user_profile',JSON.stringify(Object.assign({},getProfile(),{
     sex:d.sex,age:d.age,height:d.height,weight:d.weight,
     experience:d.experience,equipment:d.equipment,hasBara:d.hasBara,
     days:d.days,goal:d.goal,emphasis:d.emphasis||'echilibrat',morningRoutine:d.morningRoutine
-  }));
+  })));
   localStorage.setItem('onboarding_done','1');
   localStorage.removeItem('legacy_program');
   location.reload(); // aplicare curată a programului nou
@@ -7922,7 +7984,8 @@ function emailBackup(){
 function addCustomExerciseDialog(){
   var name=prompt('Nume exercițiu custom (ex: "Tricep dips"):');
   if(!name||!name.trim())return;
-  name=name.trim();
+  name=name.trim().replace(/[<>"`]/g,'');
+  if(!name)return;
   var sets=parseInt(prompt('Câte seturi? (default 3)','3'))||3;
   var reps=prompt('Țintă rep (ex: "8-12" sau "10"):','8-12')||'8-12';
   // Adaug în setData direct
@@ -8040,7 +8103,7 @@ function restoreSnapshot(dateIso){
       localStorage.clear();
       for(var k in snap.data)localStorage.setItem(k,snap.data[k]);
       showToast('✓ Restaurat din '+isoToRo(dateIso)+' — reîncarc…','var(--green)');
-      setTimeout(function(){location.reload();},900);
+      fsaAfterReplace().then(function(){setTimeout(function(){location.reload();},600);});
     };
     // Siguranță dublă: starea curentă intră în snapshot-ul de azi înainte de restaurare
     if(dateIso!==todayISO()){snapSave(todayISO()).then(doRestore);}
@@ -8049,17 +8112,19 @@ function restoreSnapshot(dateIso){
 }
 
 // SW UPDATE BANNER
-var _pendingSW=null;
+var _pendingSW=null,_hadSWController=false,_userWantsUpdate=false,_swActivated=false;
 function showUpdateBanner(sw){
-  _pendingSW=sw;
+  if(sw)_pendingSW=sw;
   document.getElementById('updateBanner').classList.add('show');
   showToast('Versiune nouă disponibilă 🚀');
 }
 function applyUpdate(){
   document.getElementById('updateBanner').classList.remove('show');
-  if(_pendingSW){
+  if(_pendingSW&&!_swActivated){
+    _userWantsUpdate=true;
     _pendingSW.postMessage({type:'SKIP_WAITING'});
-    // controllerchange listener va reload pagina automat
+    // controllerchange → reload; plasă de siguranță dacă SW-ul era deja activ
+    setTimeout(function(){location.reload();},2500);
   }else{
     location.reload();
   }
@@ -8119,6 +8184,7 @@ window.addEventListener('load',function(){
 
   // Service Worker cu auto-update
   if('serviceWorker' in navigator){
+    _hadSWController=!!navigator.serviceWorker.controller;
     navigator.serviceWorker.register('./sw.js').then(function(reg){
       // La fiecare revenire în app, caută update-uri
       function checkForUpdate(){reg.update().catch(function(){});}
@@ -8139,12 +8205,15 @@ window.addEventListener('load',function(){
         });
       });
 
-      // Auto-reload când noul SW preia controlul
+      // Noul SW a preluat controlul: reîncărcăm DOAR dacă userul a cerut (banner). Prima instalare = fără reload
+      // (altfel userul nou pierdea wizard-ul), iar în mijlocul unui set nu mai pierzi timer-ul/valorile tastate.
       var refreshing=false;
       navigator.serviceWorker.addEventListener('controllerchange',function(){
+        if(!_hadSWController){_hadSWController=true;return;}
         if(refreshing)return;
-        refreshing=true;
-        window.location.reload();
+        if(_userWantsUpdate){refreshing=true;window.location.reload();return;}
+        _swActivated=true;
+        showUpdateBanner(null);
       });
     }).catch(function(err){console.warn('SW register failed',err);});
   }
@@ -8174,14 +8243,7 @@ window.addEventListener('load',function(){
   var ncfg=getNotifCfg();
   if(ncfg.enabled && 'Notification' in window && Notification.permission==='granted'){
     scheduleReminder();
-    // check dacă am ratat reminder-ul de azi
-    var now=new Date();
-    var parts=ncfg.time.split(':');var h=parseInt(parts[0]),m=parseInt(parts[1]);
-    var todayReminder=new Date();todayReminder.setHours(h,m,0,0);
-    if(now>todayReminder && ncfg.days.indexOf(now.getDay())>=0){
-      // reminder pentru azi a trecut — verificăm dacă antrenamentul e bifat
-      setTimeout(fireReminder,500);
-    }
+    // (fără notificare „ai ratat” la deschidere — userul are deja app-ul în față)
   }
 
   // Backup reminder zilnic — re-programare

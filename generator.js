@@ -170,7 +170,7 @@ var EXERCISE_DB=[
   {id:'db_incline_curl',name:'Flexii biceps pe bancă înclinată',muscle:'Biceps (proximal)',pattern:'biceps',equipment:['gantere','banca'],level:1,compound:false,starEligible:false,prio:1,
    ghid:{start:'Bancă la ~45-60°, spatele lipit, brațele atârnă în spatele corpului (umăr extins).',move:'Flexezi coatele fără să miști umerii, cobori COMPLET până brațul e întins.',err:'Umerii se mișcă în față. Coborâre incompletă.',tip:'Poziția cu brațul în spate = biceps la lungime mare — crește mai mult (Kassiano 2025).'}},
   {id:'db_flexii_alternante',name:'Flexii biceps alternante',muscle:'Biceps',pattern:'biceps',equipment:['gantere'],level:1,compound:false,starEligible:false,prio:2,
-   ghid:{start:'Gantere pe lângă corp, palme față în față.',move:'Ridici rotind palma în sus. Cobori COMPLET (braț întins). Alternezi.',err:'Coatul se mișcă înainte. Balans.',tip:'Coatele fixe. Extensia completă jos contează mai mult decât vârful de sus.'}},
+   ghid:{start:'Gantere pe lângă corp, palme față în față.',move:'Ridici rotind palma în sus. Cobori COMPLET (braț întins). Alternezi.',err:'Cotul se mișcă înainte. Balans.',tip:'Coatele fixe. Extensia completă jos contează mai mult decât vârful de sus.'}},
   {id:'gym_preacher_curl',name:'Flexii la banca preacher',muscle:'Biceps (distal)',pattern:'biceps',equipment:['aparate'],level:1,compound:false,starEligible:false,prio:3,
    ghid:{start:'Brațele pe perna înclinată, pieptul lipit.',move:'Flexezi complet, cobori lent până brațul e aproape întins.',err:'Ridici umerii. Coborâre bruscă.',tip:'Crește partea de jos a bicepsului (distal) — combinat cu incline curl acoperi tot (Kassiano 2025).'}},
   {id:'db_hammer',name:'Hammer curl',muscle:'Biceps + antebraț',pattern:'biceps',equipment:['gantere'],level:1,compound:false,starEligible:false,prio:4,
@@ -677,7 +677,7 @@ function generateProgram(profile){
         star:slot.star&&ex.starEligible,
         name:ex.name,
         sets:adjustVolume(slot.sets,slot.star,profile),
-        target:slot.target,
+        target:ex.timeBased?'30–45 sec':slot.target,
         exId:ex.id,
         risky:!!ex.risky
       });
