@@ -285,6 +285,11 @@ html[data-mode="light"] .seg-btn.act{background:#fff}
 .install-hint{display:none;background:var(--s1);border:1px solid var(--bd);border-radius:var(--r);padding:12px 14px;margin:8px 20px;font-size:13px;color:var(--text);line-height:1.5}
 .install-hint.show{display:block}
 .install-hint button{background:none;border:none;color:inherit;font:inherit;font-weight:700;text-decoration:underline;padding:0 2px;cursor:pointer}
+.install-hint.acc{background:var(--acc-soft);border-color:rgba(var(--acc-rgb),.4);color:var(--acc2)}
+.install-hint.warn{background:rgba(232,184,74,.1);border-color:rgba(232,184,74,.45);color:var(--amber)}
+.install-hint.err{background:rgba(240,106,91,.1);border-color:rgba(240,106,91,.45);color:var(--red)}
+.install-hint.info{background:rgba(127,181,255,.1);border-color:rgba(127,181,255,.4);color:var(--blue)}
+.install-hint strong{color:inherit}
 .install-hint>button:first-child{float:right;font-size:20px;line-height:1;text-decoration:none;margin:-2px 0 0 10px;color:var(--muted)}
 
 /* ── Grupuri (Setări, Progres): rânduri cu linii ── */
@@ -976,6 +981,124 @@ body.in-session .ss-dock:has(>.show){display:flex}
 .vol-hint{background:var(--acc-soft);border-radius:12px;padding:10px 12px;margin-top:8px;font-size:13.5px;line-height:1.5}
 .vol-hint b{font-weight:700}
 .vol-note{font-size:12.5px;color:var(--muted);margin-top:8px;line-height:1.5}
+
+/* ═══════════════════════════════════════════════════════════════
+   NIVELUL URMĂTOR, lotul C (v111): Nutriție (inelul macro-urilor),
+   ferestrele și wizard-ul pe același sistem, textele mici = .help.
+   ═══════════════════════════════════════════════════════════════ */
+.help{font-size:13px;color:var(--muted);line-height:1.5;margin:8px 0}
+.help.c{text-align:center}
+.help b,.help strong{color:var(--text);font-weight:600}
+.ai-ico svg{width:20px;height:20px}
+
+/* Nutriție */
+.nt-days{margin-bottom:14px}
+.nt-dy.a-pui{--c:var(--green)}.nt-dy.a-ton{--c:var(--blue)}.nt-dy.a-omad{--c:var(--orange)}
+.nt-head{display:flex;align-items:center;justify-content:space-between;gap:10px;margin:0 0 6px}
+.nt-sub{font-size:13.5px;color:var(--muted);min-width:0}
+.nt-sub b{color:var(--text);font-weight:600}
+.nt-ring-wrap{display:flex;align-items:center;gap:18px;margin:8px 0 6px}
+.nt-ring{width:132px;height:132px;position:relative;flex-shrink:0}
+.nt-ring svg{width:132px;height:132px;transform:rotate(-90deg);display:block}
+.nt-track{fill:none;stroke:var(--s3);stroke-width:12}
+.nt-arc{fill:none;stroke-width:12}
+.nt-arc.p{stroke:var(--acc)}.nt-arc.c{stroke:var(--amber)}.nt-arc.f{stroke:var(--orange)}
+.nt-c{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center}
+.nt-c b{font-family:var(--fd);font-weight:700;font-size:30px;line-height:1;font-variant-numeric:tabular-nums}
+.nt-c small{font-size:11.5px;color:var(--muted);margin-top:3px}
+.nt-leg{flex:1;min-width:0;display:flex;flex-direction:column;gap:9px}
+.nt-leg div{display:flex;align-items:center;gap:8px;font-size:13.5px}
+.nt-leg i{width:9px;height:9px;border-radius:3px;flex-shrink:0}
+.nt-leg i.p{background:var(--acc)}.nt-leg i.c{background:var(--amber)}.nt-leg i.f{background:var(--orange)}
+.nt-leg b{font-family:var(--fd);font-weight:700;font-size:18px;margin-left:auto;white-space:nowrap}
+.nt-leg p{font-size:12.5px;color:var(--muted);line-height:1.35;margin-top:2px}
+.nt-kc{font-family:var(--fd);font-weight:700;font-size:19px;flex-shrink:0;font-variant-numeric:tabular-nums;white-space:nowrap}
+.nt-kc.hot{color:var(--orange)}.nt-kc.gold{color:var(--amber)}
+.nt-row{cursor:default}
+.nt-row .gl-ico{color:var(--acc2)}
+.nt-princ p{font-size:14px;line-height:1.5;padding:9px 0;border-bottom:1px solid var(--bd)}
+.nt-princ p:last-child{border-bottom:0}
+.nt-tile{display:block;width:100%;margin-top:16px}
+.pg-tile .nt-tr{display:flex;align-items:center;gap:8px;margin-top:8px}
+.nt-time{width:54px;flex-shrink:0;font-family:var(--fd);font-weight:700;font-size:15px;color:var(--muted);line-height:1.15}
+.meal-hd{justify-content:flex-start}
+.meal-kc{font-family:var(--fd)}
+.meal-items{padding-left:66px}
+.meal-kc small{font-size:12px;color:var(--muted);margin-left:2px;font-family:var(--fb);font-weight:600}
+.nt-sci p{font-size:14px;line-height:1.55;margin:10px 0 0}
+.nt-sci p b{font-weight:700}
+.nt-rules .rule-row{font-size:14px;color:var(--text);padding:10px 0}
+
+/* Fereastra „Zilele mele de antrenament" */
+.dp-lbl{font-size:13px;font-weight:600;color:var(--muted);margin:16px 0 8px}
+#dayPlanBody>.dp-lbl:first-child{margin-top:2px}
+.dp-row{display:flex;gap:5px;margin-bottom:8px}
+.dp-row .dpl-day{flex:1}
+.dp-split{font-size:14px;font-weight:600;color:var(--acc2)}
+.dp-warn{border-left:3px solid var(--amber);background:rgba(232,184,74,.1);border-radius:0 10px 10px 0;padding:9px 12px;font-size:13px;color:var(--amber);line-height:1.5;margin:8px 0}
+.dp-warn b{color:var(--amber)}
+.dp-box{background:var(--s2);border-radius:12px;padding:10px 12px;font-size:13.5px;color:var(--muted);line-height:1.5}
+.dp-box b{color:var(--text)}
+.dp-box .dpl-pill{margin-top:8px}
+.dp-status{font-size:13px;font-weight:600;color:var(--amber);margin:0 0 14px}
+.dp-status.ok{color:var(--green)}
+.dp-pills{display:flex;gap:6px;flex-wrap:wrap}
+.dp-date{width:100%;margin-top:9px}
+.dp-prev{border-top:1px solid var(--bd)}
+.dp-prev-row{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--bd);font-size:14px;color:var(--muted)}
+.dp-prev-row b{width:26px;font-family:var(--fd);font-size:16px;color:var(--muted2);flex-shrink:0}
+.dp-prev-row span{flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.dp-prev-row.w{color:var(--text)}
+.dp-prev-row.w b{color:var(--c,var(--acc2))}
+.btn.is-off{opacity:.45}
+
+/* Rezumatul săptămânii (digest) */
+.dg-tiles{margin:10px 0 4px}
+.dg-bar{display:flex;align-items:center;gap:10px;padding:6px 0}
+.dg-bar>span{width:64px;font-size:13.5px;color:var(--muted);flex-shrink:0}
+.dg-bar b{width:34px;text-align:right;font-family:var(--fd);font-weight:700;font-size:16px}
+.dg-bar .hud-bar{height:6px;border-radius:3px}
+.dg-en{background:var(--acc)}.dg-sl{background:var(--purple)}
+.dg-row{min-height:44px;cursor:default}
+#digestBody{font-size:14px;line-height:1.5}
+
+/* Calendarul pe 20 de săptămâni */
+.hm-scroll{overflow-x:auto;padding-top:4px}
+.hm-months{display:flex;gap:3px;margin:0 0 3px 22px}
+.hm-months span{width:12px;flex-shrink:0;font-size:9px;color:var(--muted);white-space:nowrap;overflow:visible}
+.hm-grid{display:flex;gap:3px}
+.hm-days{display:flex;flex-direction:column;gap:3px;width:19px;flex-shrink:0}
+.hm-days span{height:12px;font-size:8.5px;line-height:12px;color:var(--muted)}
+.hm-col{display:flex;flex-direction:column;gap:3px}
+.hm-col i,.hm-leg i{display:block;width:12px;height:12px;border-radius:3px;flex-shrink:0;background:var(--s2)}
+.hm-col i.l1,.hm-leg i.l1{background:rgba(var(--acc-rgb),.25)}
+.hm-col i.l2,.hm-leg i.l2{background:rgba(var(--acc-rgb),.45)}
+.hm-col i.l3,.hm-leg i.l3{background:rgba(var(--acc-rgb),.7)}
+.hm-col i.l4,.hm-leg i.l4{background:var(--acc)}
+.hm-col i.f{background:transparent}
+.hm-col i.t{outline:1.5px solid var(--acc2);outline-offset:1px}
+.hm-col i[onclick]{cursor:pointer}
+.hm-leg{display:flex;align-items:center;gap:4px;justify-content:flex-end;margin-top:8px;font-size:11px;color:var(--muted)}
+.hm-leg i{width:10px;height:10px}
+.hm-stats{margin-top:10px}
+.hm-stats .ag-row{cursor:default;min-height:46px}
+
+/* Wizard */
+.wiz-steps{display:flex;align-items:center;gap:10px;margin:0 44px 16px 0}
+.wiz-steps>span{font-size:12.5px;font-weight:600;color:var(--muted);flex-shrink:0}
+.wiz-steps>div{flex:1;display:flex;gap:4px}
+.wiz-steps i{flex:1;height:5px;border-radius:3px;background:var(--s3)}
+.wiz-steps i.d{background:var(--acc)}
+.wiz-steps i.c{background:var(--acc2)}
+.wiz-x{position:absolute;top:12px;right:12px;width:36px;height:36px;border-radius:50%;background:var(--s2);border:0;color:var(--muted);font-size:20px;line-height:1;z-index:10}
+.wiz-split{font-size:14px;font-weight:600;color:var(--acc2);margin-bottom:2px}
+.wiz-box{display:inline-block;width:18px;height:18px;border-radius:5px;border:1.6px solid var(--bd2);vertical-align:-3px;margin-right:8px;position:relative}
+.wiz-box.on{background:var(--acc-solid);border-color:var(--acc-solid)}
+.wiz-box.on::after{content:'';position:absolute;left:5px;top:1px;width:5px;height:9px;border:solid var(--acc-fg);border-width:0 2px 2px 0;transform:rotate(45deg)}
+.wiz-skip{font-size:13px;padding:10px;margin-top:6px}
+.onboarding-card{text-align:left;max-height:88vh;overflow-y:auto;position:relative}
+#editModal .modal-inputs span{color:var(--muted);font-weight:600}
+#digestModal .modal-content,#dayPlanModal .modal-content{max-height:88vh;overflow-y:auto}
 </style>
 </head>
 <body>
@@ -990,26 +1113,26 @@ body.in-session .ss-dock:has(>.show){display:flex}
 
 <div class="install-hint" id="installHint">
   <button onclick="dismissInstallHint()" aria-label="Închide">×</button>
-  💡 <strong>Adaugă pe telefon:</strong> Share → "Add to Home Screen" (iOS) sau meniu → "Install app" (Android)
+  <strong>Adaugă pe telefon:</strong> Share → "Add to Home Screen" (iOS) sau meniu → "Install app" (Android)
 </div>
 
-<div class="install-hint" id="updateBanner" style="background:rgba(var(--acc-rgb),.12);border-color:rgba(var(--acc-rgb),.4);color:var(--acc2)">
-  🚀 <strong>Versiune nouă disponibilă!</strong> <button onclick="applyUpdate()" style="color:var(--acc2);font-weight:800;text-decoration:underline;background:none;border:none;cursor:pointer;padding:0 4px">Actualizează →</button>
+<div class="install-hint acc" id="updateBanner">
+  <strong>Versiune nouă disponibilă!</strong> <button onclick="applyUpdate()">Actualizează →</button>
 </div>
 
-<div class="install-hint" id="fsaReconnectBanner" style="background:rgba(245,158,11,.12);border-color:rgba(245,158,11,.5);color:var(--amber)">
-  🔒 <strong>Sync fișier întrerupt</strong> (permisiune pierdută după update).
-  <button onclick="fsaReconnect()" style="color:var(--amber);font-weight:800;text-decoration:underline;background:none;border:none;cursor:pointer;padding:0 4px">Reconectează →</button>
+<div class="install-hint warn" id="fsaReconnectBanner">
+  <strong>Sync fișier întrerupt</strong> (permisiune pierdută după update).
+  <button onclick="fsaReconnect()">Reconectează →</button>
 </div>
 
-<div class="install-hint" id="backupOverdueBanner" style="background:rgba(244,63,94,.12);border-color:rgba(244,63,94,.5);color:#f87a8c">
-  <button onclick="dismissBackupBanner()" aria-label="Închide" style="background:none;border:none;color:var(--muted);float:right;cursor:pointer;font-size:18px;margin-top:-4px">×</button>
-  ⚠️ <strong>Backup vechi</strong> — <span id="backupOverdueDays">n-ai salvat de mult</span>. <button onclick="shareBackup()" style="color:#f87a8c;font-weight:800;text-decoration:underline;background:none;border:none;cursor:pointer;padding:0 4px">Backup acum →</button>
+<div class="install-hint err" id="backupOverdueBanner">
+  <button onclick="dismissBackupBanner()" aria-label="Închide">×</button>
+  <strong>Backup vechi</strong> — <span id="backupOverdueDays">n-ai salvat de mult</span>. <button onclick="shareBackup()">Backup acum →</button>
 </div>
 
-<div class="install-hint" id="measOverdueBanner" style="background:rgba(56,189,248,.1);border-color:rgba(56,189,248,.4);color:#7cc6f0">
-  <button onclick="dismissMeasBanner()" aria-label="Închide" style="background:none;border:none;color:var(--muted);float:right;cursor:pointer;font-size:18px;margin-top:-4px">×</button>
-  📏 <strong>Măsoară-te</strong> — <span id="measOverdueDays"></span> pentru a urmări recomp-ul. <button onclick="goMeasure()" style="color:#7cc6f0;font-weight:800;text-decoration:underline;background:none;border:none;cursor:pointer;padding:0 4px">Acum →</button>
+<div class="install-hint info" id="measOverdueBanner">
+  <button onclick="dismissMeasBanner()" aria-label="Închide">×</button>
+  <strong>Măsoară-te</strong> — <span id="measOverdueDays"></span> pentru a urmări recomp-ul. <button onclick="goMeasure()">Acum →</button>
 </div>
 
 <nav class="bnav">
@@ -1023,57 +1146,48 @@ body.in-session .ss-dock:has(>.show){display:flex}
 <div id="tab-sesiune" class="sec"><div id="sesiune-content"></div></div>
 
 <div id="tab-nutritie" class="sec">
-  <div class="day-scroll" id="nutDays"></div>
+  <div class="pl-days nt-days" id="nutDays"></div>
   <div id="nutDayHdr"></div>
-  <div id="nutMacros" style="margin-bottom:10px"></div>
+  <div id="nutMacros"></div>
   <div id="nutMeals"></div>
   <div id="nutNote"></div>
 
-  <div class="stitle">De ce aceste numere?</div>
-  <div class="card" id="nutScienceCard">
-    <div class="card-hd" onclick="document.getElementById('nutScienceCard').classList.toggle('open')">
-      <div class="card-ico" style="color:var(--purple)"><svg viewBox="0 0 24 24"><path d="M9 3h6M10 3v6.5L4.5 19a1.5 1.5 0 0 0 1.3 2.2h12.4a1.5 1.5 0 0 0 1.3-2.2L14 9.5V3"/><path d="M7 15h10"/></svg></div>
-      <div style="flex:1"><div class="card-ttl">Știința din spatele țintelor</div><div class="card-sub">proteine · grăsimi · carbo · deficit · timing</div></div>
-      <div class="card-chev" aria-hidden="true">▼</div>
-    </div>
-    <div class="card-bd"><div style="padding-top:10px;font-size:12px;line-height:1.65;color:var(--text)">
-      <p style="margin-bottom:10px"><strong style="color:#f87171">🥩 Proteine (1.8-2.2 g/kg corp)</strong><br>
-      Meta-analiza pe 49 de studii: creșterea musculară urcă odată cu proteina până la ~1.6 g/kg, cu marjă de siguranță până la 2.2 la cei antrenați <em>(Morton 2018, Br J Sports Med)</em>. În deficit caloric ai nevoie de MAI multă — proteina e scutul mușchiului când slăbești <em>(Helms 2014)</em>. Bonus: e cel mai sățios macronutrient — ~25% din caloriile ei se ard doar digerând-o.</p>
-      <p style="margin-bottom:10px"><strong style="color:var(--amber)">🥑 Grăsimi (~0.9 g/kg — nu mai puțin)</strong><br>
-      Dietele foarte sărace în grăsimi (sub ~20% din calorii) scad testosteronul — hormonul care construiește mușchi, la ambele sexe <em>(Whittaker 2021, meta-analiză)</em>. Grăsimile transportă și vitaminele A, D, E, K. De-asta nu-ți dăm niciodată sub acest prag.</p>
-      <p style="margin-bottom:10px"><strong style="color:#38bdf8">🍚 Carbohidrați (restul caloriilor)</strong><br>
-      Combustibilul seturilor grele — glicogenul din mușchi. Fără ei, seturile 3-4 se prăbușesc. Carbii NU îngrașă prin ei înșiși — surplusul caloric TOTAL îngrașă <em>(Hall 2017, studii metabolice controlate)</em>.</p>
-      <p style="margin-bottom:10px"><strong style="color:var(--acc2)">📉 De ce deficit MODERAT, nu drastic</strong><br>
-      La pierdere de ~0.7% din greutate/săptămână sportivii au păstrat mușchiul; la 1.4%/săpt. au pierdut și mușchi <em>(Garthe 2011)</em>. Mai încet = mai definit la final. De-asta app-ul refuză să-ți dea sub 1200/1500 kcal.</p>
-      <p style="margin-bottom:10px"><strong style="color:var(--acc2)">⏰ "Fereastra anabolică" e un mit (aproape)</strong><br>
-      Nu trebuie shake-ul în 30 min după antrenament — contează TOTALUL zilnic de proteine, distribuit rezonabil în 3-4 mese <em>(Schoenfeld 2013)</em>. Postul intermitent e doar o unealtă de control al caloriilor — funcționează dacă ție îți convine.</p>
-      <p><strong style="color:var(--blue)">💧 Apa (35 ml/kg — standardul EFSA)</strong><br>
-      Deshidratarea de doar 2% îți scade vizibil forța și concentrarea la antrenament. Ținta ta e calculată exact pe greutatea ta.</p>
-    </div></div>
-  </div>
+  <div class="ag-st">De ce aceste numere?</div>
+  <details class="ss-more nt-sci" id="nutScienceCard"><summary>Știința din spatele țintelor</summary>
+    <p><b>Proteine (1.8-2.2 g/kg corp)</b><br>
+    Meta-analiza pe 49 de studii: creșterea musculară urcă odată cu proteina până la ~1.6 g/kg, cu marjă de siguranță până la 2.2 la cei antrenați <em>(Morton 2018, Br J Sports Med)</em>. În deficit caloric ai nevoie de MAI multă — proteina e scutul mușchiului când slăbești <em>(Helms 2014)</em>. Bonus: e cel mai sățios macronutrient — ~25% din caloriile ei se ard doar digerând-o.</p>
+    <p><b>Grăsimi (~0.9 g/kg — nu mai puțin)</b><br>
+    Dietele foarte sărace în grăsimi (sub ~20% din calorii) scad testosteronul — hormonul care construiește mușchi, la ambele sexe <em>(Whittaker 2021, meta-analiză)</em>. Grăsimile transportă și vitaminele A, D, E, K. De-asta nu-ți dăm niciodată sub acest prag.</p>
+    <p><b>Carbohidrați (restul caloriilor)</b><br>
+    Combustibilul seturilor grele — glicogenul din mușchi. Fără ei, seturile 3-4 se prăbușesc. Carbii NU îngrașă prin ei înșiși — surplusul caloric TOTAL îngrașă <em>(Hall 2017, studii metabolice controlate)</em>.</p>
+    <p><b>De ce deficit MODERAT, nu drastic</b><br>
+    La pierdere de ~0.7% din greutate/săptămână sportivii au păstrat mușchiul; la 1.4%/săpt. au pierdut și mușchi <em>(Garthe 2011)</em>. Mai încet = mai definit la final. De-asta app-ul refuză să-ți dea sub 1200/1500 kcal.</p>
+    <p><b>"Fereastra anabolică" e un mit (aproape)</b><br>
+    Nu trebuie shake-ul în 30 min după antrenament — contează TOTALUL zilnic de proteine, distribuit rezonabil în 3-4 mese <em>(Schoenfeld 2013)</em>. Postul intermitent e doar o unealtă de control al caloriilor — funcționează dacă ție îți convine.</p>
+    <p><b>Apa (35 ml/kg — standardul EFSA)</b><br>
+    Deshidratarea de doar 2% îți scade vizibil forța și concentrarea la antrenament. Ținta ta e calculată exact pe greutatea ta.</p>
+  </details>
 
   <div id="nutVariationWrap">
-  <div class="stitle">Variație săptămânală (1 zi/săpt)</div>
-  <div class="meal-card" style="border-color:rgba(56,189,248,.35)">
-    <div class="meal-hd" onclick="this.parentElement.classList.toggle('open')"><div><div class="meal-nm">Somon + quinoa (în loc de Masa 3)</div><div class="meal-tm">Orice zi PUI sau TON · 1x/săpt</div></div><div style="text-align:right"><div class="meal-kc" style="color:#38bdf8">~700 kcal</div><div class="meal-pr">~45g proteine · Omega 3</div></div><span class="meal-chev" aria-hidden="true">▼</span></div>
+  <div class="ag-st">Variație săptămânală (1 zi/săpt)</div>
+  <div class="meal-card">
+    <div class="meal-hd" onclick="this.parentElement.classList.toggle('open')"><span class="nt-time">1×/săpt</span><div class="ag-rm"><div class="meal-nm">Somon + quinoa (în loc de Masa 3)</div><div class="meal-tm">~45g proteine · Omega 3</div></div><div class="meal-kc">~700<small>kcal</small></div><span class="meal-chev" aria-hidden="true"></span></div>
     <div class="meal-items">
       <div class="item-row"><div><div class="item-nm">Somon (file, raw)</div><div class="item-am">200g</div></div><div class="item-kc">420 kcal</div></div>
       <div class="item-row"><div><div class="item-nm">Quinoa (raw)</div><div class="item-am">80g</div></div><div class="item-kc">300 kcal</div></div>
       <div class="item-row"><div><div class="item-nm">Legume frunze verzi + ulei măsline</div><div class="item-am">200g + 1 lg</div></div><div class="item-kc">150 kcal</div></div>
     </div>
   </div>
-  <div class="note-box" style="background:rgba(56,189,248,.08);border-color:rgba(56,189,248,.3);color:#38bdf8">
-    💡 <strong>De ce</strong>: Omega 3 (reducere inflamație), fier (energie), folat (recuperare). Lidl/Profi au somon și quinoa — ~25 lei/săpt în plus.
-  </div>
+  <p class="help"><b>De ce</b>: Omega 3 (reducere inflamație), fier (energie), folat (recuperare). Lidl/Profi au somon și quinoa — ~25 lei/săpt în plus.</p>
   </div>
 
-  <div class="rules-box">
-    <div style="font-size:10px;font-weight:800;color:var(--purple);letter-spacing:2px;margin-bottom:10px">REGULI ZILNICE</div>
-    <div class="rule-row">🚫 Zero dulciuri — banană dacă ai poftă de dulce</div>
-    <div class="rule-row" id="ruleApa">💧 Minimum 3L apă pe zi</div>
-    <div class="rule-row">☕ Cafea/ceai fără zahăr în fereastra de fasting</div>
-    <div class="rule-row">⚖️ Cântărește mâncarea — estimările sunt greșite</div>
-    <div class="rule-row">📏 Măsoară talia săptămânal, nu greutatea zilnic</div>
+  <div class="ag-st">Reguli zilnice</div>
+  <div class="nt-rules">
+    <div class="rule-row">Zero dulciuri — banană dacă ai poftă de dulce</div>
+    <div class="rule-row" id="ruleApa">Minimum 3L apă pe zi</div>
+    <div class="rule-row">Cafea/ceai fără zahăr în fereastra de fasting</div>
+    <div class="rule-row">Cântărește mâncarea — estimările sunt greșite</div>
+    <div class="rule-row">Măsoară talia săptămânal, nu greutatea zilnic</div>
   </div>
 </div>
 
@@ -1088,7 +1202,7 @@ body.in-session .ss-dock:has(>.show){display:flex}
     <div class="sgroup-hd" onclick="this.parentElement.classList.toggle('open');pgRerender('pgExercitii')">
       <div class="sgroup-ico"><svg viewBox="0 0 24 24"><path d="M6.5 6.5v11M17.5 6.5v11M3 9.5v5M21 9.5v5M6.5 12h11"/></svg></div>
       <div style="flex:1;min-width:0"><div class="sgroup-ttl">Progres exerciții</div><div class="sgroup-sub">Evoluție kg / volum + recorduri personale</div></div>
-      <div class="sgroup-chev" aria-hidden="true">▼</div>
+      <div class="sgroup-chev" aria-hidden="true"></div>
     </div>
     <div class="sgroup-bd">
       <div style="height:12px"></div>
@@ -1119,7 +1233,7 @@ body.in-session .ss-dock:has(>.show){display:flex}
     <div class="sgroup-hd" onclick="this.parentElement.classList.toggle('open');pgRerender('pgCalendar')">
       <div class="sgroup-ico"><svg viewBox="0 0 24 24"><rect x="3.5" y="5" width="17" height="15" rx="2.5"/><path d="M3.5 10h17M8 3v4M16 3v4"/></svg></div>
       <div style="flex:1;min-width:0"><div class="sgroup-ttl">Calendar activitate</div><div class="sgroup-sub">20 săptămâni · intensitatea = tonajul zilei</div></div>
-      <div class="sgroup-chev" aria-hidden="true">▼</div>
+      <div class="sgroup-chev" aria-hidden="true"></div>
     </div>
     <div class="sgroup-bd">
       <div id="heatmapWrap" style="padding-top:12px"></div>
@@ -1130,7 +1244,7 @@ body.in-session .ss-dock:has(>.show){display:flex}
     <div class="sgroup-hd" onclick="this.parentElement.classList.toggle('open');pgRerender('pgRealizari')">
       <div class="sgroup-ico"><svg viewBox="0 0 24 24"><circle cx="12" cy="14.5" r="5.5"/><path d="M8.5 3l3.5 6 3.5-6"/></svg></div>
       <div style="flex:1;min-width:0"><div class="sgroup-ttl">Realizări</div><div class="sgroup-sub" id="pgAchSub">Praguri atinse pe drum</div></div>
-      <div class="sgroup-chev" aria-hidden="true">▼</div>
+      <div class="sgroup-chev" aria-hidden="true"></div>
     </div>
     <div class="sgroup-bd">
       <div id="achWrap" style="padding-top:6px"></div>
@@ -1141,13 +1255,13 @@ body.in-session .ss-dock:has(>.show){display:flex}
     <div class="sgroup-hd" onclick="this.parentElement.classList.toggle('open');pgRerender('pgMasuratori')">
       <div class="sgroup-ico"><svg viewBox="0 0 24 24"><rect x="2.5" y="8" width="19" height="8" rx="2"/><path d="M7 8v3M11 8v4M15 8v3M19 8v2"/></svg></div>
       <div style="flex:1;min-width:0"><div class="sgroup-ttl">Măsurători corp</div><div class="sgroup-sub" id="pgMasSub">Adaugă + istoric cu BF% estimat</div></div>
-      <div class="sgroup-chev" aria-hidden="true">▼</div>
+      <div class="sgroup-chev" aria-hidden="true"></div>
     </div>
     <div class="sgroup-bd">
       <div style="height:12px"></div>
       <div class="date-toggle" id="measFormToggle" onclick="toggleMeasForm()">
-        <span>📏 <strong style="color:var(--text)" id="measFormLabel">Adaugă măsurătoare</strong></span>
-        <span id="measFormChev">▾</span>
+        <span><strong style="color:var(--text)" id="measFormLabel">Adaugă măsurătoare</strong></span>
+        <span id="measFormChev"></span>
       </div>
       <div class="date-drawer" id="measFormWrap">
       <div class="meas-date">
@@ -1156,7 +1270,7 @@ body.in-session .ss-dock:has(>.show){display:flex}
       </div>
       <div class="meas-grid">
         <div class="meas-field">
-          <div class="meas-lbl">⚖️ Greutate</div>
+          <div class="meas-lbl">Greutate</div>
           <div class="meas-input-row"><input class="meas-in" type="number" step="0.1" inputmode="decimal" id="mWeight" aria-label="Greutate în kg" placeholder="kg"><span class="meas-unit">kg</span></div>
         </div>
         <div class="meas-field">
@@ -1202,7 +1316,7 @@ body.in-session .ss-dock:has(>.show){display:flex}
     <div class="sgroup-hd" onclick="this.parentElement.classList.toggle('open');pgRerender('pgCorp')">
       <div class="sgroup-ico"><svg viewBox="0 0 24 24"><path d="M5 20v-8M12 20V5M19 20v-5M3 20h18"/></svg></div>
       <div style="flex:1;min-width:0"><div class="sgroup-ttl">Grafice corp</div><div class="sgroup-sub">Greutate, talie, BF% + verdictul recomp</div></div>
-      <div class="sgroup-chev" aria-hidden="true">▼</div>
+      <div class="sgroup-chev" aria-hidden="true"></div>
     </div>
     <div class="sgroup-bd">
       <div style="height:12px"></div>
@@ -1219,7 +1333,7 @@ body.in-session .ss-dock:has(>.show){display:flex}
       </div>
 
       <div class="stitle">Recomp: greutate vs masă slabă</div>
-      <p style="font-size:11px;color:var(--muted);margin-bottom:8px;line-height:1.4">
+      <p class="help">
         🟠 greutate · 🟢 masă slabă. Ideal: greutatea scade, masa slabă rămâne stabilă/crește = pierzi grăsime, nu mușchi.
       </p>
       <div class="chart-wrap">
@@ -1233,10 +1347,10 @@ body.in-session .ss-dock:has(>.show){display:flex}
     <div class="sgroup-hd" onclick="this.parentElement.classList.toggle('open');pgRerender('pgPoze')">
       <div class="sgroup-ico"><svg viewBox="0 0 24 24"><path d="M4 8h3l2-3h6l2 3h3v11H4z"/><circle cx="12" cy="13" r="3.5"/></svg></div>
       <div style="flex:1;min-width:0"><div class="sgroup-ttl">Poze de progres</div><div class="sgroup-sub">Compară în timp — stocate doar pe telefonul tău</div></div>
-      <div class="sgroup-chev" aria-hidden="true">▼</div>
+      <div class="sgroup-chev" aria-hidden="true"></div>
     </div>
     <div class="sgroup-bd">
-      <p style="font-size:11px;color:var(--muted);margin:12px 0 8px;line-height:1.4">
+      <p class="help">
         Cântarul minte, oglinda minte — pozele nu. O poză pe lună, aceeași poziție și lumină.
       </p>
       <button class="btn btn-ghost" onclick="document.getElementById('photoInput').click()">Adaugă poză de progres</button>
@@ -1245,10 +1359,6 @@ body.in-session .ss-dock:has(>.show){display:flex}
       <div id="photoGrid" style="display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-top:8px"></div>
     </div>
   </div>
-
-  <p style="font-size:11px;color:var(--muted);margin-top:16px;line-height:1.5;text-align:center">
-    🔔 Notificări · ☁️ Sync · 💾 Backup — găsești toate în <a onclick="showTab('setari')" style="color:var(--acc2);cursor:pointer;text-decoration:underline">Setări ⚙️</a>
-  </p>
 </div>
 
 <div id="tab-istoric" class="sec">
@@ -1257,10 +1367,10 @@ body.in-session .ss-dock:has(>.show){display:flex}
     <div class="ai-strip"></div>
     <div style="padding:14px;display:flex;flex-direction:column;gap:10px">
       <div style="display:flex;align-items:center;gap:10px">
-        <div class="ai-ico">🤖</div>
+        <div class="ai-ico"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5h16v11H9l-5 4z"/><path d="M8.5 10.5h.01M12 10.5h.01M15.5 10.5h.01"/></svg></div>
         <div style="flex:1;min-width:0">
           <div class="ai-ttl">ANTRENORUL AI</div>
-          <div style="font-size:11px;color:var(--muted);margin-top:1px">Tot istoricul, gata de analiză — lipește-l în Claude sau orice AI</div>
+          <div class="help">Tot istoricul, gata de analiză — lipește-l în Claude sau orice AI</div>
         </div>
       </div>
       <div style="display:flex;gap:8px">
@@ -1286,26 +1396,22 @@ body.in-session .ss-dock:has(>.show){display:flex}
   <div id="weekSummary"></div>
   <div id="volumePanel"></div>
   <div id="hist-content"></div>
-
-  <p style="font-size:11px;color:var(--muted);margin-top:20px;text-align:center">
-    💾 Backup · ☁️ Sync · ⚡ Share → <a onclick="showTab('setari')" style="color:var(--acc2);cursor:pointer;text-decoration:underline">Setări ⚙️</a>
-  </p>
 </div>
 
 <div id="tab-setari" class="sec">
-  <input class="meas-in" type="search" id="setariSearch" aria-label="Caută în setări" placeholder="🔍 Caută în setări (timer, temă, backup...)" autocomplete="off" oninput="filterSetari(this.value)" style="font-size:14px;padding:10px 12px;margin-bottom:10px;border-radius:10px">
-  <div id="setariNoResults" style="display:none;font-size:12px;color:var(--muted);text-align:center;padding:14px">Nimic găsit — încearcă alt cuvânt (ex: notificări, sunet, nume, șterge)</div>
+  <input class="meas-in" type="search" id="setariSearch" aria-label="Caută în setări" placeholder="Caută în setări (timer, temă, backup...)" autocomplete="off" oninput="filterSetari(this.value)" style="font-size:14px;padding:10px 12px;margin-bottom:10px;border-radius:10px">
+  <div id="setariNoResults" class="help c" style="display:none">Nimic găsit — încearcă alt cuvânt (ex: notificări, sunet, nume, șterge)</div>
 
   <div class="sgroup open" id="sgProfil">
     <div class="sgroup-hd" onclick="this.parentElement.classList.toggle('open')">
       <div class="sgroup-ico"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21c1.5-4 4.5-6 8-6s6.5 2 8 6"/></svg></div>
       <div style="flex:1;min-width:0"><div class="sgroup-ttl">Profil & personalizare</div><div class="sgroup-sub">Nume, corp, temă de culoare</div></div>
-      <div class="sgroup-chev" aria-hidden="true">▼</div>
+      <div class="sgroup-chev" aria-hidden="true"></div>
     </div>
     <div class="sgroup-bd">
       <div class="stitle">Numele tău</div>
       <input class="meas-in" type="text" id="profileName" aria-label="Numele tău" placeholder="ex: Robert" maxlength="20" autocomplete="off" onchange="saveProfile()" style="font-size:15px;padding:9px 10px">
-      <p style="font-size:11px;color:var(--muted);margin:6px 0 0">Apare în header — jurnalul tău, cu numele tău.</p>
+      <p class="help">Apare în header — jurnalul tău, cu numele tău.</p>
 
       <div class="stitle">Corp</div>
       <div class="meas-grid">
@@ -1328,22 +1434,22 @@ body.in-session .ss-dock:has(>.show){display:flex}
           <option value="F">Feminin</option>
         </select>
       </div>
-      <p style="font-size:11px;color:var(--muted);margin:0 0 4px">Folosite pentru calcul BF% (Navy) și estimare TDEE.</p>
+      <p class="help">Folosite pentru calcul BF% (Navy) și estimare TDEE.</p>
 
       <div class="stitle">Temă de culoare</div>
       <div class="theme-row" id="themeRow"></div>
-      <p style="font-size:11px;color:var(--muted);margin:8px 0 0">Schimbă culoarea de accent a întregii aplicații — instant, pe acest device.</p>
+      <p class="help">Schimbă culoarea de accent a întregii aplicații — instant, pe acest device.</p>
 
       <div class="stitle">Aspect</div>
       <div class="mode-row" id="modeRow"></div>
-      <p style="font-size:11px;color:var(--muted);margin:8px 0 0">Deschis = mai lizibil ziua · Întunecat = ideal seara la sală. Se salvează pe acest device.</p>
+      <p class="help">Deschis = mai lizibil ziua · Întunecat = ideal seara la sală. Se salvează pe acest device.</p>
 
       <div class="stitle">Limba</div>
       <div class="mode-row" data-noi18n>
         <button class="mode-btn" id="langRo" onclick="setLang('ro')">Română</button>
         <button class="mode-btn" id="langEn" onclick="setLang('en')">English</button>
       </div>
-      <p style="font-size:11px;color:var(--muted);margin:8px 0 0">Aplicația se reîncarcă în limba aleasă. Jurnalul și recordurile tale nu se schimbă.</p>
+      <p class="help">Aplicația se reîncarcă în limba aleasă. Jurnalul și recordurile tale nu se schimbă.</p>
     </div>
   </div>
 
@@ -1351,7 +1457,7 @@ body.in-session .ss-dock:has(>.show){display:flex}
     <div class="sgroup-hd" onclick="this.parentElement.classList.toggle('open')">
       <div class="sgroup-ico"><svg viewBox="0 0 24 24"><rect x="5" y="4" width="14" height="17" rx="2.5"/><path d="M9 4V3h6v1M9 10h6M9 14h6M9 18h3"/></svg></div>
       <div style="flex:1;min-width:0"><div class="sgroup-ttl">Programul meu</div><div class="sgroup-sub" id="sgProgramSub">Plan antrenament & obiectiv</div></div>
-      <div class="sgroup-chev" aria-hidden="true">▼</div>
+      <div class="sgroup-chev" aria-hidden="true"></div>
     </div>
     <div class="sgroup-bd">
       <div class="rules-box" style="margin:12px 0 10px">
@@ -1359,9 +1465,9 @@ body.in-session .ss-dock:has(>.show){display:flex}
         <div class="rule-row" id="myDaysInfo">—</div>
       </div>
       <button class="btn btn-acc" onclick="openDayPlan()">Schimbă zilele de antrenament</button>
-      <p style="font-size:11px;color:var(--muted);margin:-4px 0 10px;line-height:1.45">Nu poți lunea? Mută antrenamentele pe orice zile — sau pune o excepție temporară (o săptămână, o lună) după care revii singur la program.</p>
+      <p class="help">Nu poți lunea? Mută antrenamentele pe orice zile — sau pune o excepție temporară (o săptămână, o lună) după care revii singur la program.</p>
       <button class="btn btn-ghost" onclick="openWizard(true)" id="myProgramBtn">Reia wizard-ul (modifică programul)</button>
-      <p style="font-size:11px;color:var(--muted);margin-bottom:2px;line-height:1.4">
+      <p class="help">
         Istoricul și PR-urile tale rămân intacte la regenerare — se schimbă doar planul de exerciții/nutriție.
       </p>
     </div>
@@ -1371,7 +1477,7 @@ body.in-session .ss-dock:has(>.show){display:flex}
     <div class="sgroup-hd" onclick="this.parentElement.classList.toggle('open')">
       <div class="sgroup-ico"><svg viewBox="0 0 24 24"><circle cx="12" cy="13.5" r="7.5"/><path d="M12 13.5V9.5M10 2.5h4M12 2.5V6"/></svg></div>
       <div style="flex:1;min-width:0"><div class="sgroup-ttl">Rest timer</div><div class="sgroup-sub" id="sgTimerSub">Pauză între seturi</div></div>
-      <div class="sgroup-chev" aria-hidden="true">▼</div>
+      <div class="sgroup-chev" aria-hidden="true"></div>
     </div>
     <div class="sgroup-bd">
       <div class="notif-row" style="margin-top:12px">
@@ -1397,14 +1503,14 @@ body.in-session .ss-dock:has(>.show){display:flex}
       </div>
       <div class="notif-row" id="restTimerSoundRow">
         <div style="flex:1">
-          <div class="notif-lbl">🔊 Sunet la final</div>
+          <div class="notif-lbl">Sunet la final</div>
           <div class="notif-sub">Melodie când pauza s-a terminat</div>
         </div>
         <label class="sw"><input type="checkbox" id="restTimerSound" aria-label="Sunet la final" onchange="toggleRestTimerSound()"><span class="slider"></span></label>
       </div>
       <div class="notif-row" id="restTimerMelodyRow">
         <div style="flex:1">
-          <div class="notif-lbl">🎵 Melodia</div>
+          <div class="notif-lbl">Melodia</div>
           <div class="notif-sub">La schimbare o auzi instant (preview)</div>
         </div>
         <select id="restTimerMelody" aria-label="Melodia de final" class="time-input" style="width:auto" onchange="changeMelody()">
@@ -1415,7 +1521,7 @@ body.in-session .ss-dock:has(>.show){display:flex}
           <option value="melodie">Alertă (sală zgomotoasă)</option>
         </select>
       </div>
-      <p style="font-size:11px;color:var(--muted);margin-top:4px;line-height:1.5">
+      <p class="help">
         💡 Timerul merge și când minimizezi app-ul (calculează pe ceas, nu pe cronometru). Dacă ai notificările activate, primești și notificare cu vibrație când expiră în fundal.<br>
         🔊 <strong style="color:var(--acc2)">Sunetul folosește volumul MEDIA al telefonului</strong> — dă volumul media mai tare la sală (nu cel de sonerie). Testează cu toggle-ul de mai sus.
       </p>
@@ -1426,7 +1532,7 @@ body.in-session .ss-dock:has(>.show){display:flex}
     <div class="sgroup-hd" onclick="this.parentElement.classList.toggle('open')">
       <div class="sgroup-ico"><svg viewBox="0 0 24 24"><path d="M6 16v-5a6 6 0 0 1 12 0v5l1.5 2h-15z"/><path d="M10 20.5a2 2 0 0 0 4 0"/></svg></div>
       <div style="flex:1;min-width:0"><div class="sgroup-ttl">Notificări</div><div class="sgroup-sub" id="sgNotifSub">Reminder antrenament & backup</div></div>
-      <div class="sgroup-chev" aria-hidden="true">▼</div>
+      <div class="sgroup-chev" aria-hidden="true"></div>
     </div>
     <div class="sgroup-bd">
       <div class="notif-row" style="margin-top:12px">
@@ -1454,13 +1560,13 @@ body.in-session .ss-dock:has(>.show){display:flex}
           <button class="btn btn-ghost" style="margin:4px 0 0" onclick="testNotif()">Trimite notificare test</button>
         </div>
       </div>
-      <p style="font-size:11px;color:var(--muted);margin-top:8px;line-height:1.5">
+      <p class="help">
         ⚠️ Notificările merg când app-ul e deschis sau instalat ca PWA. Pe iOS trebuie neapărat instalat pe Home Screen.
       </p>
 
       <div class="notif-row" style="margin-top:12px">
         <div style="flex:1">
-          <div class="notif-lbl">💾 Reminder backup</div>
+          <div class="notif-lbl">Reminder backup</div>
           <div class="notif-sub" id="backupReminderStatus">Dezactivat</div>
         </div>
         <label class="sw"><input type="checkbox" id="backupReminderToggle" aria-label="Reminder backup" onchange="toggleBackupReminder()"><span class="slider"></span></label>
@@ -1492,17 +1598,17 @@ body.in-session .ss-dock:has(>.show){display:flex}
     <div class="sgroup-hd" onclick="this.parentElement.classList.toggle('open')">
       <div class="sgroup-ico"><svg viewBox="0 0 24 24"><path d="M12 3l7.5 3v5.5c0 4.5-3.2 8.2-7.5 9.5-4.3-1.3-7.5-5-7.5-9.5V6z"/><path d="M9 12l2 2 4-4"/></svg></div>
       <div style="flex:1;min-width:0"><div class="sgroup-ttl">Backup & sincronizare</div><div class="sgroup-sub">Plasă de siguranță, share, fișier local, sync</div></div>
-      <div class="sgroup-chev" aria-hidden="true">▼</div>
+      <div class="sgroup-chev" aria-hidden="true"></div>
     </div>
     <div class="sgroup-bd">
       <div class="stitle">Plasă de siguranță (automat)</div>
-      <p style="font-size:12px;color:var(--muted);margin-bottom:8px;line-height:1.5">
+      <p class="help">
         App-ul salvează <strong style="color:var(--acc2)">singur</strong>, zilnic, un snapshot complet al datelor — ultimele 7 zile, doar pe acest device. Dacă ceva se pierde sau se strică, restaurezi de aici cu un tap.
       </p>
-      <div id="snapList"><div style="font-size:11px;color:var(--muted);text-align:center;padding:8px">Se încarcă…</div></div>
+      <div id="snapList"><div class="help c">Se încarcă…</div></div>
 
       <div class="stitle" id="shareTitle">Share backup rapid</div>
-      <p style="font-size:12px;color:var(--muted);margin-bottom:10px;line-height:1.5" id="shareDesc">
+      <p class="help" id="shareDesc">
         Un tap → meniul de share al telefonului → trimite datele către Drive, Mail, Telegram, orice. Zero setup.
       </p>
       <button class="btn btn-acc" onclick="shareBackup()">Share backup (Drive / Mail / ...)</button>
@@ -1515,7 +1621,7 @@ body.in-session .ss-dock:has(>.show){display:flex}
       </p>
 
       <div class="stitle">Backup local (fișier)</div>
-      <p style="font-size:12px;color:var(--muted);margin-bottom:10px;line-height:1.5">
+      <p class="help">
         Fișier salvat cu numele <code style="background:var(--bg);padding:1px 4px;border-radius:3px;font-size:11px;color:var(--acc2)">fitness-data dd.mm.yyyy.json</code> (un fișier per zi, vezi data clar).
       </p>
       <div class="btn-row">
@@ -1527,7 +1633,7 @@ body.in-session .ss-dock:has(>.show){display:flex}
       <div id="fsaWrapper" style="display:none">
         <div class="stitle">Sincronizare fișier (desktop)</div>
         <div class="drive-card" id="fsaCard">
-          <div class="drive-status" id="fsaStatus">⚪ Deconectat</div>
+          <div class="drive-status" id="fsaStatus">Deconectat</div>
           <div class="drive-sub" id="fsaSub">
             Conectează app-ul la un fișier JSON din Drive. Schimbările se salvează automat în fișier și sync-ul între device-uri se face prin Drive.
           </div>
@@ -1536,8 +1642,8 @@ body.in-session .ss-dock:has(>.show){display:flex}
           <div class="setup-box" id="fsaSetupBox">
             <strong>Workflow recomandat:</strong>
             <ol>
-              <li><strong>Pe telefon</strong> (la sală): introduci datele → salvează local. Săptămânal: <code>📤 Share backup</code> → Drive</li>
-              <li><strong>Pe laptop</strong> (pentru analiză): apeși <strong>📁 Alege fișier</strong> → alegi <code>fitness-data.json</code> din folder-ul tău Drive (ex: <code>G:\My Drive\Fitness\</code>)</li>
+              <li><strong>Pe telefon</strong> (la sală): introduci datele → salvează local. Săptămânal: <code>Share backup</code> Drive</li>
+              <li><strong>Pe laptop</strong> (pentru analiză): apeși <strong>Alege fișier</strong> alegi <code>fitness-data.json</code> din folder-ul tău Drive (ex: <code>G:\My Drive\Fitness\</code>)</li>
               <li>App-ul citește fișierul + scrie automat orice modificare (debounce 2s)</li>
               <li>Drive-ul sincronizează fișierul între device-uri la nivel de OS</li>
               <li>La fiecare 30 sec app-ul verifică schimbări externe → merge automat</li>
@@ -1548,7 +1654,7 @@ body.in-session .ss-dock:has(>.show){display:flex}
           </div>
         </div>
       </div>
-      <p style="font-size:11px;color:var(--muted);margin-top:12px;text-align:center">
+      <p class="help c">
         <span id="storageInfo"></span>
       </p>
     </div>
@@ -1558,23 +1664,23 @@ body.in-session .ss-dock:has(>.show){display:flex}
     <div class="sgroup-hd" onclick="this.parentElement.classList.toggle('open')">
       <div class="sgroup-ico"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 11v5.5M12 7.5v.5"/></svg></div>
       <div style="flex:1;min-width:0"><div class="sgroup-ttl">Despre aplicație</div><div class="sgroup-sub">Versiune, update, status</div></div>
-      <div class="sgroup-chev" aria-hidden="true">▼</div>
+      <div class="sgroup-chev" aria-hidden="true"></div>
     </div>
     <div class="sgroup-bd">
       <div class="rules-box" style="margin:12px 0 10px">
-        <div class="rule-row">📦 Versiune curentă: <strong id="infoSw" style="color:var(--acc2)">—</strong></div>
+        <div class="rule-row">Versiune curentă: <strong id="infoSw" style="color:var(--acc2)">—</strong></div>
         <div class="rule-row" style="color:var(--muted);font-size:11px;line-height:1.4">
           App-ul verifică automat update-uri când îl deschizi sau intri pe el. Dacă apare banner "Versiune nouă disponibilă" → apasă "Actualizează".
         </div>
       </div>
       <button class="btn btn-ghost" onclick="manualUpdateCheck()">Verifică update acum</button>
       <div class="rules-box">
-        <div class="rule-row">📱 PWA instalat: <strong id="infoPwa" style="color:var(--text)">verific...</strong></div>
-        <div class="rule-row">🔔 Notificări: <strong id="infoNotif" style="color:var(--text)">verific...</strong></div>
-        <div class="rule-row">☁️ Sync: <strong id="infoSync" style="color:var(--text)">verific...</strong></div>
-        <div class="rule-row">📊 Înregistrări: <strong id="infoRows" style="color:var(--text)">—</strong></div>
-        <div class="rule-row">🔒 <a href="./privacy.html" target="_blank" rel="noopener" style="color:var(--blue)">Politica de confidențialitate</a> — datele tale stau doar pe acest telefon</div>
-        <div class="rule-row">🔗 <a href="https://github.com/CRStefan-lab/fitness-jurnal" target="_blank" rel="noopener" style="color:var(--blue)">github.com/CRStefan-lab/fitness-jurnal</a></div>
+        <div class="rule-row">PWA instalat: <strong id="infoPwa" style="color:var(--text)">verific...</strong></div>
+        <div class="rule-row">Notificări: <strong id="infoNotif" style="color:var(--text)">verific...</strong></div>
+        <div class="rule-row">Sync: <strong id="infoSync" style="color:var(--text)">verific...</strong></div>
+        <div class="rule-row">Înregistrări: <strong id="infoRows" style="color:var(--text)">—</strong></div>
+        <div class="rule-row"><a href="./privacy.html" target="_blank" rel="noopener" style="color:var(--blue)">Politica de confidențialitate</a> — datele tale stau doar pe acest telefon</div>
+        <div class="rule-row"><a href="https://github.com/CRStefan-lab/fitness-jurnal" target="_blank" rel="noopener" style="color:var(--blue)">github.com/CRStefan-lab/fitness-jurnal</a></div>
       </div>
     </div>
   </div>
@@ -1583,10 +1689,10 @@ body.in-session .ss-dock:has(>.show){display:flex}
     <div class="sgroup-hd" onclick="this.parentElement.classList.toggle('open')">
       <div class="sgroup-ico"><svg viewBox="0 0 24 24"><path d="M12 3.5l9.5 16.5h-19z"/><path d="M12 10v4.5M12 17.5v.5"/></svg></div>
       <div style="flex:1;min-width:0"><div class="sgroup-ttl">Zona periculoasă</div><div class="sgroup-sub">Ștergere definitivă a datelor</div></div>
-      <div class="sgroup-chev" aria-hidden="true">▼</div>
+      <div class="sgroup-chev" aria-hidden="true"></div>
     </div>
     <div class="sgroup-bd">
-      <p style="font-size:11px;color:var(--muted);margin:12px 0 10px;line-height:1.5">
+      <p class="help">
         Șterge jurnalul de pe acest device (seturi, măsurători, ciclul de progresie). Programul, profilul și setările rămân. Fă un backup înainte. Singura scăpare după: snapshot-urile automate din „Backup & sincronizare → Plasă de siguranță" (ultimele 7 zile).
       </p>
       <button class="btn btn-danger" onclick="resetAll()">Șterge toate datele</button>
@@ -1601,21 +1707,21 @@ body.in-session .ss-dock:has(>.show){display:flex}
     <div class="card-hd" onclick="document.getElementById('principiiCard').classList.toggle('open')">
       <div class="card-ico" style="color:var(--purple)"><svg viewBox="0 0 24 24"><path d="M9 3h6M10 3v6.5L4.5 19a1.5 1.5 0 0 0 1.3 2.2h12.4a1.5 1.5 0 0 0 1.3-2.2L14 9.5V3"/><path d="M7 15h10"/></svg></div>
       <div style="flex:1"><div class="card-ttl">De ce e construit programul așa</div><div class="card-sub">7 principii din meta-analize recente</div></div>
-      <div class="card-chev" aria-hidden="true">▼</div>
+      <div class="card-chev" aria-hidden="true"></div>
     </div>
     <div class="card-bd"><div style="padding-top:10px;font-size:12px;line-height:1.6;color:var(--text)">
-      <p style="margin-bottom:8px">💪 <strong>Amplitudine completă, cu accent pe întindere.</strong> Mușchiul crește cel mai mult lucrat în poziția întinsă — coboară adânc și controlat la fiecare exercițiu. (Wolf 2023, Kassiano 2023)</p>
-      <p style="margin-bottom:8px">⏱️ <strong>Pauze: 90s la izolări, 2-3 min la ⭐.</strong> Sub 60s pierzi creștere. Timerul "Auto" face asta pentru tine. (Singer 2024)</p>
-      <p style="margin-bottom:8px">📊 <strong>10-20 seturi pe mușchi pe săptămână.</strong> Programul tău e calibrat în acest interval — mai mult nu înseamnă automat mai bine. (Pelland 2025, 67 studii)</p>
-      <p style="margin-bottom:8px">🔁 <strong>Aceleași exerciții 6-12 săptămâni.</strong> Variația nu crește mușchiul — progresia da. De-asta ciclul de 8 săptămâni păstrează exercițiile fixe. (Kassiano 2024)</p>
-      <p style="margin-bottom:8px">🧠 <strong>Aproape de eșec, nu la eșec.</strong> Oprește-te cu 1-3 repetări "în rezervor" la majoritatea seturilor — crești la fel, recuperezi mai bine.</p>
-      <p style="margin-bottom:8px">✨ <strong>"Tonifierea" = mușchi + mai puțină grăsime.</strong> Nu există exerciții care "doar tonifică" — aceleași mișcări construiesc mușchiul care dă forma fermă. Să devii masiv(ă) cere ani de surplus caloric intenționat; nu se întâmplă din greșeală, cu atât mai puțin în deficit. Femeile au de 10-15× mai puțin testosteron — frica de "mă fac prea mare" e cel mai costisitor mit din sală.</p>
-      <p>⚖️ <strong>Stânga vs. dreapta: partea slabă conduce.</strong> Diferențele de forță între brațe/picioare sunt normale (dominanta e mai puternică cu 5-10%). La gantere și exerciții pe o parte: începi cu partea slabă, iar cea puternică face EXACT aceleași repetări și kg — niciodată mai mult. Decalajul se închide singur în câteva săptămâni. Diferență mare (>20%) sau după accidentare → +1 set doar pe partea slabă.</p>
+      <p><strong>Amplitudine completă, cu accent pe întindere.</strong> Mușchiul crește cel mai mult lucrat în poziția întinsă — coboară adânc și controlat la fiecare exercițiu. (Wolf 2023, Kassiano 2023)</p>
+      <p><strong>Pauze: 90s la izolări, 2-3 min la ⭐.</strong> Sub 60s pierzi creștere. Timerul "Auto" face asta pentru tine. (Singer 2024)</p>
+      <p><strong>10-20 seturi pe mușchi pe săptămână.</strong> Programul tău e calibrat în acest interval — mai mult nu înseamnă automat mai bine. (Pelland 2025, 67 studii)</p>
+      <p><strong>Aceleași exerciții 6-12 săptămâni.</strong> Variația nu crește mușchiul — progresia da. De-asta ciclul de 8 săptămâni păstrează exercițiile fixe. (Kassiano 2024)</p>
+      <p><strong>Aproape de eșec, nu la eșec.</strong> Oprește-te cu 1-3 repetări "în rezervor" la majoritatea seturilor — crești la fel, recuperezi mai bine.</p>
+      <p><strong>"Tonifierea" = mușchi + mai puțină grăsime.</strong> Nu există exerciții care "doar tonifică" — aceleași mișcări construiesc mușchiul care dă forma fermă. Să devii masiv(ă) cere ani de surplus caloric intenționat; nu se întâmplă din greșeală, cu atât mai puțin în deficit. Femeile au de 10-15× mai puțin testosteron — frica de "mă fac prea mare" e cel mai costisitor mit din sală.</p>
+      <p><strong>Stânga vs. dreapta: partea slabă conduce.</strong> Diferențele de forță între brațe/picioare sunt normale (dominanta e mai puternică cu 5-10%). La gantere și exerciții pe o parte: începi cu partea slabă, iar cea puternică face EXACT aceleași repetări și kg — niciodată mai mult. Decalajul se închide singur în câteva săptămâni. Diferență mare (>20%) sau după accidentare → +1 set doar pe partea slabă.</p>
     </div></div>
   </div>
 
   <div class="stitle">Ghid exerciții</div>
-  <p style="font-size:12px;color:var(--muted);margin-bottom:12px">Apasă pentru detalii complete · sfaturile marcate cu autori = dovezi din studii</p>
+  <p class="help">Apasă pentru detalii complete · sfaturile marcate cu autori = dovezi din studii</p>
   <div id="ghid-content"></div>
 
   <div class="stitle">Biblioteca completă</div>
@@ -1623,7 +1729,7 @@ body.in-session .ss-dock:has(>.show){display:flex}
     <div class="card-hd" onclick="toggleLib()">
       <div class="card-ico"><svg viewBox="0 0 24 24"><path d="M4 5.5A2.5 2.5 0 0 1 6.5 3H20v15H6.5A2.5 2.5 0 0 0 4 20.5z"/><path d="M4 20.5V5.5"/></svg></div>
       <div style="flex:1;min-width:0"><div class="card-ttl">Toate exercițiile din bibliotecă</div><div class="card-sub">inclusiv cele care nu-s în programul tău · grupate pe mușchi</div></div>
-      <div class="card-chev" aria-hidden="true">▼</div>
+      <div class="card-chev" aria-hidden="true"></div>
     </div>
     <div class="card-bd"><div id="libContent" style="padding-top:10px"></div></div>
   </div>
@@ -1637,9 +1743,9 @@ body.in-session .ss-dock:has(>.show){display:flex}
     <div class="modal-sub" id="editSub"></div>
     <div class="modal-inputs">
       <input id="editReps" aria-label="Repetări" type="number" inputmode="numeric" enterkeyhint="next" min="0" max="99" placeholder="rep">
-      <span style="color:var(--muted);font-weight:700">rep ×</span>
+      <span>rep ×</span>
       <input id="editKg" aria-label="Kilograme" type="number" inputmode="decimal" enterkeyhint="done" step="0.5" min="0" max="999" placeholder="kg">
-      <span style="color:var(--muted);font-weight:600">kg</span>
+      <span>kg</span>
     </div>
     <div class="modal-btns">
       <button class="btn btn-acc" onclick="saveEdit()">Salvează</button>
@@ -1650,16 +1756,16 @@ body.in-session .ss-dock:has(>.show){display:flex}
 </div>
 
 <div class="onboarding" id="onboarding">
-  <div class="onboarding-card" role="dialog" aria-modal="true" aria-label="Configurarea programului" style="text-align:left;max-height:88vh;overflow-y:auto;width:100%;max-width:380px;position:relative">
+  <div class="onboarding-card" role="dialog" aria-modal="true" aria-label="Configurarea programului">
     <div id="wizardContent"></div>
   </div>
 </div>
 
 <div class="modal" id="digestModal" onclick="if(event.target===this)closeDigest()">
-  <div class="modal-content" role="dialog" aria-modal="true" aria-labelledby="digestTitle" style="max-height:85vh;overflow-y:auto;border-color:var(--acc2)">
-    <div class="modal-ttl" style="color:var(--acc2)" id="digestTitle">🎉 Săptămâna ta</div>
+  <div class="modal-content" role="dialog" aria-modal="true" aria-labelledby="digestTitle">
+    <div class="modal-ttl" id="digestTitle">Săptămâna ta</div>
     <div class="modal-sub" id="digestPeriod"></div>
-    <div id="digestBody" style="font-size:13px;line-height:1.7"></div>
+    <div id="digestBody"></div>
     <button class="btn btn-acc" style="margin-top:12px" onclick="downloadDigestImage()">Salvează ca imagine</button>
     <div class="btn-row" style="margin-top:8px">
       <button class="btn btn-ghost" onclick="copyDigestText()">Copiază text</button>
@@ -1673,7 +1779,7 @@ body.in-session .ss-dock:has(>.show){display:flex}
     <div class="modal-ttl" id="guideTitle">Exercițiu</div>
     <div class="modal-sub" id="guideTag"></div>
     <div id="guideBody" style="font-size:13px;line-height:1.6"></div>
-    <a class="video-btn" id="guideVideoBtn" target="_blank" rel="noopener">▶️ Vezi demonstrație video (YouTube)</a>
+    <a class="video-btn" id="guideVideoBtn" target="_blank" rel="noopener">Vezi demonstrație video (YouTube)</a>
     <button class="btn btn-ghost" style="margin-top:10px;margin-bottom:0" onclick="closeGuide()">Închide</button>
   </div>
 </div>
@@ -1687,7 +1793,7 @@ body.in-session .ss-dock:has(>.show){display:flex}
     <button class="rest-timer-btn" onclick="saveRIR('easy')">🥱 Ușor</button>
     <button class="rest-timer-btn" onclick="saveRIR('ok')">💪 OK</button>
     <button class="rest-timer-btn" onclick="saveRIR('hard')">😮‍💨 Limită</button>
-    <button class="rest-timer-btn" style="flex:0 0 auto;padding:8px 11px;opacity:.55" onclick="dismissRIR()" title="Sar peste" aria-label="Sar peste">✕</button>
+    <button class="rest-timer-btn" style="flex:0 0 auto;padding:8px 11px;opacity:.55" onclick="dismissRIR()" title="Sar peste" aria-label="Sar peste"></button>
   </div>
 </div>
 
@@ -1705,12 +1811,12 @@ body.in-session .ss-dock:has(>.show){display:flex}
 </div>
 
 <div class="modal" id="dayPlanModal" onclick="if(event.target===this)closeDayPlan()">
-  <div class="modal-content" role="dialog" aria-modal="true" aria-labelledby="dayPlanTtl" style="max-height:88vh;overflow-y:auto">
-    <div class="modal-ttl" id="dayPlanTtl">🗓️ Zilele mele de antrenament</div>
+  <div class="modal-content" role="dialog" aria-modal="true" aria-labelledby="dayPlanTtl">
+    <div class="modal-ttl" id="dayPlanTtl">Zilele mele de antrenament</div>
     <div class="modal-sub">Muți programul pe zilele care ți se potrivesc — conținutul rămâne neschimbat</div>
     <div id="dayPlanBody" style="margin-top:12px"></div>
     <button class="btn btn-acc" style="margin-top:14px" id="dayPlanSave" onclick="saveDayPlan()">Salvează zilele</button>
-    <button class="btn btn-ghost" id="dayPlanRevert" style="display:none;margin-bottom:8px" onclick="revertTempPlan()">↩ Revino la programul obișnuit</button>
+    <button class="btn btn-ghost" id="dayPlanRevert" style="display:none;margin-bottom:8px" onclick="revertTempPlan()">Revino la programul obișnuit</button>
     <button class="btn btn-ghost" style="margin-bottom:0" onclick="closeDayPlan()">Închide</button>
   </div>
 </div>
@@ -2207,7 +2313,6 @@ function dpComputeUntil(){
 function dpGoWizard(){closeDayPlan();openWizard(true);}
 
 function renderDayPlan(){
-  var CH="font-family:var(--fd)";
   var need=dayPlanState.count;
   var progCount=dayPlanCount();
   var sel=dayPlanState.days.slice().sort(function(a,b){return a-b;});
@@ -2217,78 +2322,65 @@ function renderDayPlan(){
   var h='';
 
   // 1) Câte zile pe săptămână
-  h+='<div style="font-size:10px;'+CH+';letter-spacing:2px;color:var(--muted);margin-bottom:7px">CÂTE ZILE PE SĂPTĂMÂNĂ</div>';
+  h+='<div class="dp-lbl">Câte zile pe săptămână</div>';
   if(ready){
-    var counts=dpAllowedCounts();
-    h+='<div style="display:flex;gap:5px;margin-bottom:7px">';
-    counts.forEach(function(c){
-      h+='<button class="dpl-day'+(c===need?' on':'')+'" style="flex:1" onclick="dpSetCount('+c+')">'+c+'</button>';
+    h+='<div class="dp-row">';
+    dpAllowedCounts().forEach(function(c){
+      h+='<button class="dpl-day'+(c===need?' on':'')+'" onclick="dpSetCount('+c+')">'+c+'</button>';
     });
     h+='</div>';
-    h+='<div style="font-size:11.5px;color:var(--acc2);font-weight:600;margin-bottom:3px">'+(DP_SPLIT_NAME[need]||'')+'</div>';
-    h+='<div style="font-size:11px;color:var(--muted);line-height:1.5;margin-bottom:'+(willRegen?'8':'14')+'px">'+(DP_SPLIT_NOTE[need]||'')+'</div>';
-    if(willRegen){
-      h+='<div style="background:rgba(245,158,11,.09);border:1px solid rgba(245,158,11,.4);border-radius:10px;padding:9px 11px;margin-bottom:14px;font-size:11px;color:var(--amber);line-height:1.5">⚠️ Programul se regenerează pe <strong>'+need+' zile</strong>, pe profilul tău. Istoricul, PR-urile și măsurătorile rămân neatinse.</div>';
-    }
+    h+='<div class="dp-split">'+(DP_SPLIT_NAME[need]||'')+'</div>';
+    h+='<p class="help">'+(DP_SPLIT_NOTE[need]||'')+'</p>';
+    if(willRegen)h+='<div class="dp-warn">Programul se regenerează pe <b>'+need+' zile</b>, pe profilul tău. Istoricul, recordurile și măsurătorile rămân neatinse.</div>';
   }else{
-    h+='<div style="background:var(--s2);border:1px solid var(--bd);border-radius:10px;padding:10px 12px;margin-bottom:14px;font-size:11.5px;color:var(--muted);line-height:1.5">Ai <strong style="color:var(--text)">'+progCount+' zile</strong> de antrenament. Ca să schimb numărul, am nevoie de profilul complet (echipament, nivel, obiectiv) — durează un minut.<br><button class="dpl-pill" style="margin-top:8px" onclick="dpGoWizard()">Completează profilul</button></div>';
+    h+='<div class="dp-box">Ai <b>'+progCount+' zile</b> de antrenament. Ca să schimb numărul, am nevoie de profilul complet (echipament, nivel, obiectiv); durează un minut.<br><button class="dpl-pill" onclick="dpGoWizard()">Completează profilul</button></div>';
   }
 
   // 2) În ce zile
-  h+='<div style="font-size:10px;'+CH+';letter-spacing:2px;color:var(--muted);margin-bottom:7px">ÎN CE ZILE</div>';
-  h+='<div style="display:flex;gap:5px;margin-bottom:6px">';
+  h+='<div class="dp-lbl">În ce zile</div>';
+  h+='<div class="dp-row">';
   for(var d=0;d<7;d++){
-    var on=sel.indexOf(d)>=0;
-    h+='<button class="dpl-day'+(on?' on':'')+'" onclick="dpToggle('+d+')">'+DP_SHORT[d]+'</button>';
+    h+='<button class="dpl-day'+(sel.indexOf(d)>=0?' on':'')+'" onclick="dpToggle('+d+')" aria-pressed="'+(sel.indexOf(d)>=0)+'">'+DP_SHORT[d]+'</button>';
   }
   h+='</div>';
   var missing=need-sel.length;
-  var statusTxt=ok?'✓ '+need+'/'+need+' ZILE ALESE':(missing>0?sel.length+'/'+need+' — mai alege '+missing:sel.length+'/'+need+' — deselectează '+(-missing));
-  h+='<div style="font-size:11px;'+CH+';letter-spacing:1px;color:'+(ok?'var(--green)':'var(--amber)')+';margin-bottom:14px">'+statusTxt+'</div>';
+  h+='<div class="dp-status'+(ok?' ok':'')+'">'+(ok?need+' din '+need+' zile alese':(missing>0?sel.length+' din '+need+', mai alege '+missing:sel.length+' din '+need+', scoate '+(-missing)))+'</div>';
 
-  // 3) Permanent vs temporar
+  // 3) Permanent sau temporar
   h+='<div class="dpl-seg">';
   h+='<button class="'+(dayPlanState.mode==='perm'?'act':'')+'" onclick="dpSetMode(\'perm\')">Permanent</button>';
-  h+='<button class="'+(dayPlanState.mode==='temp'?'act':'')+'" onclick="dpSetMode(\'temp\')">⏳ Temporar</button>';
+  h+='<button class="'+(dayPlanState.mode==='temp'?'act':'')+'" onclick="dpSetMode(\'temp\')">Temporar</button>';
   h+='</div>';
   if(dayPlanState.mode==='temp'){
-    h+='<div style="font-size:11.5px;color:var(--muted);margin:10px 0 7px;line-height:1.5">Cât ține excepția? După, revii automat la programul obișnuit. (Temporar mută doar zilele, nu schimbă structura programului.)</div>';
-    h+='<div style="display:flex;gap:6px;flex-wrap:wrap">';
+    h+='<p class="help">Cât ține excepția? După, revii automat la programul obișnuit. Temporar mută doar zilele, nu schimbă structura programului.</p>';
+    h+='<div class="dp-pills">';
     [['1w','1 săptămână'],['2w','2 săptămâni'],['1m','1 lună'],['date','Până la o dată']].forEach(function(o){
       h+='<button class="dpl-pill'+(dayPlanState.dur===o[0]?' on':'')+'" onclick="dpSetDur(\''+o[0]+'\')">'+o[1]+'</button>';
     });
     h+='</div>';
-    if(dayPlanState.dur==='date'){
-      h+='<input type="date" class="time-input" style="width:100%;margin-top:9px" value="'+(dayPlanState.until||'')+'" onchange="dpSetDate(this.value)">';
-    }
+    if(dayPlanState.dur==='date')h+='<input type="date" class="time-input dp-date" aria-label="Până la data" value="'+(dayPlanState.until||'')+'" onchange="dpSetDate(this.value)">';
     var u=dpComputeUntil();
-    if(u)h+='<div style="font-size:11px;color:var(--acc2);margin-top:9px">⏳ Activ până '+dpUntilLabel(u)+' inclusiv</div>';
+    if(u)h+='<div class="dp-status ok">Activ până '+dpUntilLabel(u)+' inclusiv</div>';
   }else{
-    h+='<div style="font-size:11.5px;color:var(--muted);margin:10px 0 0;line-height:1.5">Devine programul tău obișnuit. Îl poți schimba oricând de aici.</div>';
+    h+='<p class="help">Devine programul tău obișnuit. Îl poți schimba oricând de aici.</p>';
   }
 
-  // 4) Previzualizare (doar când nu se regenerează — altfel exercițiile încă nu există)
+  // 4) Previzualizarea săptămânii (doar când nu se regenerează: altfel exercițiile încă nu există)
   if(ok&&!willRegen){
     var prev=buildScheduleFor(sel);
-    h+='<div style="font-size:10px;'+CH+';letter-spacing:2px;color:var(--muted);margin:16px 0 7px">CUM ARATĂ SĂPTĂMÂNA</div>';
-    h+='<div style="border:1px solid var(--bd);border-radius:12px;overflow:hidden">';
+    h+='<div class="dp-lbl">Cum arată săptămâna</div><div class="dp-prev">';
     prev.forEach(function(s,i){
-      var exd=exercises[s.exDay]||{label:'—',icon:'·'};
+      var exd=exercises[s.exDay]||{label:'—'};
       var isW=isTrainingExDay(s.exDay);
-      h+='<div style="display:flex;align-items:center;gap:9px;padding:7px 11px;font-size:12px;'+(i<6?'border-bottom:1px solid var(--bd);':'')+(isW?'background:rgba(var(--acc-rgb),.06)':'opacity:.6')+'">';
-      h+='<div style="width:26px;'+CH+';font-weight:700;color:'+(isW?'var(--acc2)':'var(--muted)')+'">'+DP_SHORT[i]+'</div>';
-      h+='<div style="flex-shrink:0">'+exd.icon+'</div>';
-      h+='<div style="flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:'+(isW?'var(--text)':'var(--muted)')+'">'+exd.label+'</div>';
-      if(isW)h+='<div style="font-size:8.5px;letter-spacing:1.2px;'+CH+';font-weight:700;color:var(--acc2);flex-shrink:0">ANTRENAMENT</div>';
-      h+='</div>';
+      h+='<div class="dp-prev-row'+(isW?' w g-'+dayGroup(s.exDay):'')+'"><b>'+DP_SHORT[i]+'</b><span>'+escHtml(exd.label)+'</span></div>';
     });
     h+='</div>';
   }
   document.getElementById('dayPlanBody').innerHTML=h;
   var btn=document.getElementById('dayPlanSave');
   btn.disabled=!ok;
-  btn.style.opacity=ok?'1':'.45';
-  btn.textContent=willRegen?('🔄 Regenerează pe '+need+' zile'):(dayPlanState.mode==='temp'?'⏳ Aplică temporar':'📌 Salvează zilele');
+  btn.classList.toggle('is-off',!ok);
+  btn.textContent=willRegen?('Regenerează pe '+need+' zile'):(dayPlanState.mode==='temp'?'Aplică temporar':'Salvează zilele');
   var rb=document.getElementById('dayPlanRevert');
   if(rb)rb.style.display=getTempPlan()?'block':'none';
 }
@@ -2691,9 +2783,9 @@ function showTab(name,btn){
       if(isCustomProgram){
         var goalL={slabit:'Slăbit',recomp:'Recompoziție',masa:'Masă'}[p.goal]||p.goal||'—';
         var eqL={bodyweight:'Bodyweight',home_min:'Gantere+bancă'+(p.hasBara?'+bară':''),gym:'Sală'}[p.equipment]||'—';
-        mpi.innerHTML='✨ <strong style="color:var(--acc2)">Program personalizat</strong> · '+goalL+' · '+eqL+' · '+(p.days||'?')+' zile/săpt · '+(p.experience==='incepator'?'Începător':'Intermediar')+(p.emphasis==='glute'?' · 🍑 Accent fesieri':'');
+        mpi.innerHTML='<strong>Program personalizat</strong> · '+goalL+' · '+eqL+' · '+(p.days||'?')+' zile/săpt · '+(p.experience==='incepator'?'Începător':'Intermediar')+(p.emphasis==='glute'?' · Accent fesieri':'');
       }else{
-        mpi.innerHTML='📘 <strong style="color:var(--text)">Program standard</strong> (gantere+bancă+bară · 4 zile · recompoziție)';
+        mpi.innerHTML='<strong>Program standard</strong> (gantere+bancă+bară · 4 zile · recompoziție)';
       }
     }
   }
@@ -4856,52 +4948,69 @@ function updateChkCount(){
 // Nutriție pentru programe GENERATE: calculator kcal/macros + principii
 // (planurile de mese hardcodate rămân doar pentru programul standard)
 // Macro-uri vizuale (3.4): bară de compoziție calorică + pastile cu % din calorii
-function macroVisualHtml(protein,carbs,fat){
-  var kcalP=protein*4,kcalC=carbs*4,kcalF=fat*9;
-  var tot=kcalP+kcalC+kcalF;if(tot<=0)tot=1;
-  var pp=Math.round(kcalP/tot*100),pc=Math.round(kcalC/tot*100),pf=Math.max(0,100-pp-pc);
-  var h='<div class="macro-split">';
-  h+='<div style="flex:'+kcalP+';background:linear-gradient(90deg,#ef4444,#f87171);box-shadow:0 0 8px rgba(248,113,113,.35)"></div>';
-  h+='<div style="flex:'+kcalC+';background:linear-gradient(90deg,#0ea5e9,#38bdf8);box-shadow:0 0 8px rgba(56,189,248,.35)"></div>';
-  h+='<div style="flex:'+kcalF+';background:linear-gradient(90deg,#f59e0b,var(--amber));box-shadow:0 0 8px rgba(251,191,36,.35)"></div>';
-  h+='</div>';
-  h+='<div class="macro-row" style="margin-bottom:0">';
-  h+='<div class="macro-box" style="border-color:rgba(248,113,113,.3);background:rgba(248,113,113,.05)"><div class="macro-val mp">'+protein+'<span>g</span></div><div class="macro-lbl">PROTEINE · '+pp+'%</div></div>';
-  h+='<div class="macro-box" style="border-color:rgba(56,189,248,.3);background:rgba(56,189,248,.05)"><div class="macro-val mc">'+carbs+'<span>g</span></div><div class="macro-lbl">CARBO · '+pc+'%</div></div>';
-  h+='<div class="macro-box" style="border-color:rgba(251,191,36,.3);background:rgba(251,191,36,.05)"><div class="macro-val mf">'+fat+'<span>g</span></div><div class="macro-lbl">GRĂSIMI · '+pf+'%</div></div>';
-  h+='</div>';
+// Nutriție (nivelul următor, lotul C): inelul macro-urilor = proporția din calorii, ținta kcal în centru
+SVI.drop='<path d="M12 3s6 7 6 11a6 6 0 0 1-12 0c0-4 6-11 6-11z"/>';
+SVI.walk='<circle cx="13" cy="4.5" r="1.8"/><path d="M10 21l2.5-6.5L15 17v4M9.5 12.5l1.5-4.5 3.5 1.5 2 3.5M11 8l-3 2v3"/>';
+SVI.egg='<path d="M12 3c3.5 0 6.5 5.5 6.5 10a6.5 6.5 0 0 1-13 0C5.5 8.5 8.5 3 12 3z"/>';
+function macroVisualHtml(protein,carbs,fat,kcal,basis){
+  var kP=protein*4,kC=carbs*4,kF=fat*9,tot=kP+kC+kF;if(tot<=0)tot=1;
+  var pp=Math.round(kP/tot*100),pc=Math.round(kC/tot*100),pf=Math.max(0,100-pp-pc);
+  var C=2*Math.PI*56,gap=3,pos=0,arcs='';
+  [[kP,'p'],[kC,'c'],[kF,'f']].forEach(function(a){
+    var len=a[0]/tot*C;
+    arcs+='<circle cx="66" cy="66" r="56" class="nt-arc '+a[1]+'" stroke-dasharray="'+Math.max(0,len-gap).toFixed(1)+' '+C.toFixed(1)+'" stroke-dashoffset="'+(-pos).toFixed(1)+'"/>';
+    pos+=len;
+  });
+  var kc=kcal||Math.round(tot);
+  var h='<div class="nt-ring-wrap"><div class="nt-ring"><svg viewBox="0 0 132 132" aria-hidden="true"><circle cx="66" cy="66" r="56" class="nt-track"/>'+arcs+'</svg>';
+  h+='<div class="nt-c"><b>'+Number(kc).toLocaleString('ro-RO')+'</b><small>kcal pe zi</small></div></div>';
+  h+='<div class="nt-leg"><div><i class="p"></i>Proteine<b>'+protein+' g</b></div><div><i class="c"></i>Carbohidrați<b>'+carbs+' g</b></div><div><i class="f"></i>Grăsimi<b>'+fat+' g</b></div>';
+  h+='<p>'+pp+' / '+pc+' / '+pf+' % din calorii'+(basis?' · '+basis:'')+'</p></div></div>';
   return h;
 }
-
+function nutWeights(){
+  return getMeasurements().filter(function(m){return parseFloat(m.weight)>0&&parseRoDate(m.date);})
+    .sort(function(a,b){return parseRoDate(a.date)-parseRoDate(b.date);});
+}
+function nutWeightChip(){
+  var ms=nutWeights(),l=ms[ms.length-1];
+  return '<button class="ag-chip'+(l?'':' todo')+'" onclick="goMeasure()">'+svi('scale')+(l?parseFloat(l.weight)+' kg':'Cântar')+'</button>';
+}
+// Plăcuța greutății: ultimele 5 măsurători ca bare + diferența pe ~30 de zile
+function nutWeightTile(){
+  var ms=nutWeights();if(ms.length<2)return '';
+  var last=ms[ms.length-1],ld=parseRoDate(last.date),ref=null;
+  for(var i=ms.length-2;i>=0;i--){if((ld-parseRoDate(ms[i].date))/86400000>=28){ref=ms[i];break;}}
+  if(!ref)ref=ms[0];
+  var d=Math.round((parseFloat(last.weight)-parseFloat(ref.weight))*10)/10;
+  var days=Math.max(1,Math.round((ld-parseRoDate(ref.date))/86400000));
+  var vals=ms.slice(-5).map(function(m){return parseFloat(m.weight);});
+  return '<button class="pg-tile nt-tile" onclick="goMeasure()"><span>Greutatea ta</span><b>'+parseFloat(last.weight)+'<small>kg</small></b><span class="nt-tr">'+trendBarsHtml(vals)+'<em class="'+(d<=0?'ag-up':'ag-dn')+'">'+(d>0?'+':(d<0?'−':''))+Math.abs(d)+' kg</em> în '+roCount(days,'zi','zile')+'</span></button>';
+}
 function renderNutritionAuto(){
   var n=customNutrition;
   document.getElementById('nutDays').style.display='none';
   var vw=document.getElementById('nutVariationWrap');
   if(vw)vw.style.display='none';
   var goalLabel={slabit:'Slăbit',recomp:'Recompoziție',masa:'Masă musculară'}[customMeta&&customMeta.goal]||'';
-  document.getElementById('nutDayHdr').innerHTML=
-    '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">'+
-    '<div><div style="font-size:22px;font-weight:900">Planul tău caloric</div>'+
-    '<div style="font-size:11px;color:var(--purple);font-weight:600;margin-top:2px">Obiectiv: '+goalLabel+' · TDEE estimat '+n.tdee+' kcal'+(n.basedOn?' · pe greutatea de '+n.basedOn.weight+' kg ('+String(n.basedOn.date).slice(0,5)+')':'')+'</div></div>'+
-    '<div style="background:rgba(var(--acc-rgb),.08);border:1px solid rgba(var(--acc-rgb),.4);border-radius:12px;padding:8px 14px;text-align:center">'+
-    '<div style="font-size:22px;font-weight:700;font-family:var(--fd);color:var(--acc2)">'+n.kcal+'</div>'+
-    '<div style="font-size:10px;color:var(--muted);letter-spacing:1px">KCAL/ZI</div></div></div>';
-  document.getElementById('nutMacros').innerHTML=macroVisualHtml(n.protein,n.carbs,n.fat);
-  var meals=document.getElementById('nutMeals');
-  var html='<div class="meal-card open"><div class="meal-hd" onclick="this.parentElement.classList.toggle(\'open\')"><div><div class="meal-nm">Principiile planului tău</div><div class="meal-tm">generat pe profilul tău — nu mese impuse</div></div><span class="meal-chev" aria-hidden="true">▼</span></div><div class="meal-items">';
-  (n.principles||[]).forEach(function(p){
-    html+='<div class="item-row"><div class="item-nm" style="font-weight:500;line-height:1.4">'+p+'</div></div>';
-  });
-  html+='</div></div>';
-  html+='<div class="meal-card open"><div class="meal-hd" onclick="this.parentElement.classList.toggle(\'open\')"><div><div class="meal-nm">Ținte zilnice</div></div><span class="meal-chev" aria-hidden="true">▼</span></div><div class="meal-items">';
-  html+='<div class="item-row"><div class="item-nm">Apă</div><div class="item-kc">'+n.waterL+' L</div></div>';
-  html+='<div class="item-row"><div class="item-nm">Pași</div><div class="item-kc">'+n.stepsTarget+'</div></div>';
-  html+='</div></div>';
-  meals.innerHTML=html;
-  document.getElementById('nutNote').innerHTML=(customMeta&&customMeta.goalNotes)?'<div class="note-box">💡 '+customMeta.goalNotes+'</div>':'';
+  document.getElementById('nutDayHdr').innerHTML='<div class="nt-head"><div class="nt-sub">'+(goalLabel?'<b>'+goalLabel+'</b> · ':'')+'necesar estimat '+n.tdee+' kcal</div>'+nutWeightChip()+'</div>';
+  document.getElementById('nutMacros').innerHTML=macroVisualHtml(n.protein,n.carbs,n.fat,n.kcal,n.basedOn?'calculat pentru '+n.basedOn.weight+' kg':'calculat pe profilul tău');
+  var html='<div class="ag-st">Ținte zilnice</div><div class="ag-rows">';
+  html+='<div class="ag-row nt-row"><span class="gl-ico">'+svi('egg')+'</span><span class="ag-rm"><span class="ag-rt">Proteine</span><span class="ag-rs">împărțite în 3–4 mese</span></span><span class="nt-kc">'+n.protein+' g</span></div>';
+  html+='<div class="ag-row nt-row"><span class="gl-ico">'+svi('drop')+'</span><span class="ag-rm"><span class="ag-rt">Apă</span><span class="ag-rs">35 ml pe kilogram de corp</span></span><span class="nt-kc">'+n.waterL+' L</span></div>';
+  html+='<div class="ag-row nt-row"><span class="gl-ico">'+svi('walk')+'</span><span class="ag-rm"><span class="ag-rt">Pași</span><span class="ag-rs">mișcarea din afara sălii</span></span><span class="nt-kc">'+n.stepsTarget+'</span></div>';
+  html+='</div>';
+  if((n.principles||[]).length){
+    html+='<div class="ag-st">Principiile planului tău<span>generat pe profilul tău</span></div><div class="nt-princ">';
+    n.principles.forEach(function(p){html+='<p>'+String(p).replace(EMO_EDGE_RE,'')+'</p>';});
+    html+='</div>';
+  }
+  html+=nutWeightTile();
+  document.getElementById('nutMeals').innerHTML=html;
+  document.getElementById('nutNote').innerHTML=(customMeta&&customMeta.goalNotes)?'<div class="note-box">'+String(customMeta.goalNotes).replace(EMO_EDGE_RE,'')+'</div>':'';
   // Sincronizez regulile cu țintele calculate (o singură sursă de adevăr)
   var ruleApa=document.getElementById('ruleApa');
-  if(ruleApa)ruleApa.textContent='💧 Apă: '+n.waterL+'L pe zi (calculat pe corpul tău)';
+  if(ruleApa)ruleApa.textContent='Apă: '+n.waterL+'L pe zi (calculat pe corpul tău)';
 }
 
 // Recalculează caloriile/macro-urile pe ultima greutate măsurată (dacă diferă de cea din wizard)
@@ -4933,36 +5042,31 @@ function initNutritie(){
     document.getElementById('nutDayHdr').innerHTML='<div class="chart-empty">Planul caloric lipsește din programul tău. Reia wizard-ul din Setări → Programul meu.</div>';
     return;
   }
-  var scroll=document.getElementById('nutDays');scroll.innerHTML='';scroll.style.display='';
+  // Programul standard: banda zilelor, fiecare zi cu tipul ei de masă (PUI / TON / OMAD)
+  var scroll=document.getElementById('nutDays');scroll.style.display='';
+  var real=todayIdx(),h='';
   schedule.forEach(function(s,i){
     var plan=nutPlans[s.nutType];
-    var btn=document.createElement('button');
-    btn.className='day-btn'+(i===currentNutDay?' '+plan.cls:'');
-    btn.innerHTML='<span class="day-abbr">'+(I18N.on?I18N.T(s.day):s.day).substring(0,3)+'</span><span class="ntag '+plan.tagCls+'">'+plan.tag+'</span>';
-    (function(idx){btn.onclick=function(){currentNutDay=idx;initNutritie();};})(i);
-    scroll.appendChild(btn);
+    h+='<button class="pl-dy nt-dy '+plan.cls+(i===currentNutDay?' sel':'')+(i===real?' today':'')+'" onclick="currentNutDay='+i+';initNutritie()" aria-label="'+DP_LONG[i]+', '+escHtml(plan.tag)+'"><b>'+DP_SHORT[i]+'</b><small>'+escHtml(plan.tag)+'</small><i></i></button>';
   });
+  scroll.innerHTML=h;
   renderNutDay();
 }
 
 function renderNutDay(){
   var s=schedule[currentNutDay],p=nutPlans[s.nutType];
-  document.getElementById('nutDayHdr').innerHTML=
-    '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">'+
-    '<div><div style="font-size:22px;font-weight:900">'+s.day+'</div>'+
-    '<div style="font-size:11px;color:var(--purple);font-weight:600;margin-top:2px">'+p.subtitle+'</div></div>'+
-    '<div style="background:rgba(var(--acc-rgb),.08);border:1px solid rgba(var(--acc-rgb),.4);border-radius:12px;padding:8px 14px;text-align:center">'+
-    '<div style="font-size:22px;font-weight:700;font-family:var(--fd);color:'+p.color+'">'+p.kcal+'</div>'+
-    '<div style="font-size:9px;color:var(--muted);letter-spacing:1px">KCAL/ZI</div></div></div>';
-  document.getElementById('nutMacros').innerHTML=macroVisualHtml(p.protein,p.carbs,p.fat);
-  var meals=document.getElementById('nutMeals');meals.innerHTML='';
+  document.getElementById('nutDayHdr').innerHTML='<div class="nt-head"><div class="nt-sub"><b>'+DP_LONG[currentNutDay]+'</b> · '+escHtml(p.subtitle)+'</div>'+nutWeightChip()+'</div>';
+  document.getElementById('nutMacros').innerHTML=macroVisualHtml(p.protein,p.carbs,p.fat,p.kcal,'ziua '+p.tag);
+  var html='<div class="ag-st">Mesele zilei<span>orientative</span></div>';
   p.meals.forEach(function(meal,mi){
     var itemsHtml=meal.items.map(function(it){
       return '<div class="item-row"><div><div class="item-nm">'+it.name+'</div><div class="item-am">'+it.amount+'</div></div><div class="item-kc">'+it.kcal+' kcal</div></div>';
     }).join('');
-    meals.innerHTML+='<div class="meal-card'+(mi===0?' open':'')+'"><div class="meal-hd" onclick="this.parentElement.classList.toggle(\'open\')"><div><div class="meal-nm">'+meal.emoji+' '+meal.name+'</div><div class="meal-tm">⏰ '+meal.time+'</div></div><div style="text-align:right"><div class="meal-kc" style="color:'+p.color+'">'+meal.kcal+' kcal</div><div class="meal-pr">~'+meal.protein+'g proteine</div></div><span class="meal-chev" aria-hidden="true">▼</span></div><div class="meal-items">'+itemsHtml+'</div></div>';
+    html+='<div class="meal-card'+(mi===0?' open':'')+'"><div class="meal-hd" onclick="this.parentElement.classList.toggle(\'open\')"><span class="nt-time">'+escHtml(meal.time)+'</span><div class="ag-rm"><div class="meal-nm">'+escHtml(meal.name)+'</div><div class="meal-tm">~'+meal.protein+' g proteine</div></div><div class="meal-kc">'+meal.kcal+'<small>kcal</small></div><span class="meal-chev" aria-hidden="true"></span></div><div class="meal-items">'+itemsHtml+'</div></div>';
   });
-  document.getElementById('nutNote').innerHTML=p.note?'<div class="note-box">💡 '+p.note+'</div>':'';
+  html+=nutWeightTile();
+  document.getElementById('nutMeals').innerHTML=html;
+  document.getElementById('nutNote').innerHTML=p.note?'<div class="note-box">'+p.note+'</div>':'';
 }
 
 // ═══════════════════════════════════════════════════════════════
@@ -6085,13 +6189,13 @@ function saveProfile(){
 
 // ─── Teme de accent (personalizare) ───
 var THEMES=[
-  {id:'',lbl:'Volt',color:'#c6f135'},
-  {id:'teal',lbl:'Turcoaz',color:'#14b8a6'},
-  {id:'ocean',lbl:'Ocean',color:'#0ea5e9'},
-  {id:'mov',lbl:'Mov',color:'#8b5cf6'},
-  {id:'roz',lbl:'Roz',color:'#ec4899'},
-  {id:'foc',lbl:'Chihlimbar',color:'#f59e0b'},
-  {id:'verde',lbl:'Verde',color:'#22c55e'}
+  {id:'',lbl:'Cobalt',color:'#4d7cfe'},
+  {id:'teal',lbl:'Turcoaz',color:'#2fb8a4'},
+  {id:'ocean',lbl:'Ocean',color:'#3aa6e4'},
+  {id:'mov',lbl:'Mov',color:'#8b72f0'},
+  {id:'roz',lbl:'Roz',color:'#e86a98'},
+  {id:'foc',lbl:'Chihlimbar',color:'#e8a622'},
+  {id:'verde',lbl:'Verde',color:'#62b873'}
 ];
 function applyTheme(t){
   if(t)document.documentElement.setAttribute('data-theme',t);
@@ -6132,7 +6236,7 @@ function renderModeRow(){
 }
 
 // Culorile temei curente, pentru grafice SVG și canvas (unde var() nu merge)
-function themeAcc(){var v=getComputedStyle(document.documentElement).getPropertyValue('--acc').trim();return v||'#c6f135';}
+function themeAcc(){var v=getComputedStyle(document.documentElement).getPropertyValue('--acc').trim();return v||'#5b86ff';}
 function themeAcc2(){var v=getComputedStyle(document.documentElement).getPropertyValue('--acc2').trim();return v||'#5eead4';}
 
 // ─── Căutare în Setări — filtrează grupurile după text (fără diacritice) ───
@@ -7003,54 +7107,32 @@ function renderActivityCalendar(){
     if(sc>0)return sc<=s1?1:(sc<=s2?2:(sc<=s3?3:4));
     return act[ro]?1:0;
   };
-  var shades=['var(--s2)','rgba(var(--acc-rgb),.25)','rgba(var(--acc-rgb),.45)','rgba(var(--acc-rgb),.7)','var(--acc)'];
   var start=getWeekBounds(-(WEEKS-1)).monday;
-  var todayRo=today();
-  var now=new Date();
-  var months=['IAN','FEB','MAR','APR','MAI','IUN','IUL','AUG','SEP','OCT','NOI','DEC'];
-  var dayLbl=['L','Ma','Mi','J','V','S','D'];
-  var CELL=12,GAP=3;
+  var todayRo=today(),now=new Date();
+  var months=['ian','feb','mar','apr','mai','iun','iul','aug','sep','oct','noi','dec'];
   var monthRow='',cols='',lastMonth=-1,trainDays={};
   for(var w=0;w<WEEKS;w++){
     var monday=new Date(start);monday.setDate(start.getDate()+w*7);
     var mLbl='';
     if(monday.getMonth()!==lastMonth){mLbl=months[monday.getMonth()];lastMonth=monday.getMonth();}
-    monthRow+='<div style="width:'+CELL+'px;flex-shrink:0;font-size:7.5px;color:var(--muted);white-space:nowrap;overflow:visible">'+mLbl+'</div>';
+    monthRow+='<span>'+mLbl+'</span>';
     var cells='';
     for(var dd=0;dd<7;dd++){
       var day=new Date(monday);day.setDate(monday.getDate()+dd);
       var ro=day.toLocaleDateString('ro-RO');
-      var future=day>now;
-      var lvl=future?-1:levelFor(ro);
+      var lvl=day>now?-1:levelFor(ro);
       if(((ton[ro]||0)>0||(nsets[ro]||0)>0)&&day>=start)trainDays[ro]=true;
-      var st='width:'+CELL+'px;height:'+CELL+'px;border-radius:3px;flex-shrink:0;background:'+(lvl<0?'transparent':shades[lvl]);
-      if(ro===todayRo)st+=';outline:1.5px solid var(--acc2);outline-offset:1px';
-      if(lvl>0)st+=';cursor:pointer';
-      cells+='<div style="'+st+'"'+(lvl>0?' onclick="hmInfo(\''+ro+'\')"':'')+'></div>';
+      cells+='<i class="'+(lvl<0?'f':'l'+lvl)+(ro===todayRo?' t':'')+'"'+(lvl>0?' onclick="hmInfo(\''+ro+'\')"':'')+'></i>';
     }
-    cols+='<div style="display:flex;flex-direction:column;gap:'+GAP+'px">'+cells+'</div>';
+    cols+='<div class="hm-col">'+cells+'</div>';
   }
-  var dayCol='';
-  for(var dl=0;dl<7;dl++){
-    dayCol+='<div style="height:'+CELL+'px;display:flex;align-items:center;font-size:7.5px;color:var(--muted)">'+dayLbl[dl]+'</div>';
-  }
-  var html='<div style="overflow-x:auto">';
-  html+='<div style="display:flex;gap:'+GAP+'px;margin-left:22px;margin-bottom:3px">'+monthRow+'</div>';
-  html+='<div style="display:flex;gap:4px">';
-  html+='<div style="display:flex;flex-direction:column;gap:'+GAP+'px;width:18px;flex-shrink:0">'+dayCol+'</div>';
-  html+='<div style="display:flex;gap:'+GAP+'px">'+cols+'</div>';
-  html+='</div></div>';
-  // Legendă
-  html+='<div style="display:flex;align-items:center;gap:4px;justify-content:flex-end;margin-top:8px;font-size:9.5px;color:var(--muted)">mai puțin ';
-  shades.forEach(function(s){html+='<div style="width:10px;height:10px;border-radius:2px;background:'+s+'"></div>';});
-  html+=' mai mult</div>';
-  // Statistici streak
+  var html='<div class="hm-scroll"><div class="hm-months">'+monthRow+'</div><div class="hm-grid"><div class="hm-days">'+DP_SHORT.map(function(s){return '<span>'+s+'</span>';}).join('')+'</div>'+cols+'</div></div>';
+  html+='<div class="hm-leg">mai puțin <i class="l0"></i><i class="l1"></i><i class="l2"></i><i class="l3"></i><i class="l4"></i> mai mult</div>';
   var curStreak=getActivityStreak(),bestStreak=getLongestStreak();
-  var chk='font-family:var(--fd);font-weight:700';
-  html+='<div style="display:flex;flex-direction:column;gap:7px;margin-top:14px;font-size:12px">';
-  html+='<div style="display:flex;justify-content:space-between;align-items:baseline"><span style="color:var(--muted)">🔥 Streak curent</span><strong style="'+chk+';color:#fb923c">'+curStreak+' zile</strong></div>';
-  html+='<div style="display:flex;justify-content:space-between;align-items:baseline"><span style="color:var(--muted)">🏆 Cel mai lung streak</span><strong style="'+chk+';color:var(--amber)">'+bestStreak+' zile</strong></div>';
-  html+='<div style="display:flex;justify-content:space-between;align-items:baseline"><span style="color:var(--muted)">💪 Antrenamente în perioadă</span><strong style="'+chk+';color:var(--acc2)">'+Object.keys(trainDays).length+'</strong></div>';
+  html+='<div class="ag-rows hm-stats">';
+  html+='<div class="ag-row"><span class="ag-rm"><span class="ag-rt">Seria de acum</span></span><span class="nt-kc hot">'+roCount(curStreak,'zi','zile')+'</span></div>';
+  html+='<div class="ag-row"><span class="ag-rm"><span class="ag-rt">Cea mai lungă serie</span></span><span class="nt-kc gold">'+roCount(bestStreak,'zi','zile')+'</span></div>';
+  html+='<div class="ag-row"><span class="ag-rm"><span class="ag-rt">Antrenamente în 20 de săptămâni</span></span><span class="nt-kc">'+Object.keys(trainDays).length+'</span></div>';
   html+='</div>';
   el.innerHTML=html;
 }
@@ -8292,77 +8374,57 @@ function showWeeklyDigest(offset){
   document.getElementById('digestPeriod').textContent=d.period;
   var html='';
   if(!d.sets){
-    html='<p style="color:var(--muted);text-align:center;padding:12px 0">Săptămână fără antrenamente înregistrate.</p>';
-    document.getElementById('digestBody').innerHTML=html;
+    document.getElementById('digestBody').innerHTML='<div class="chart-empty">Săptămână fără antrenamente înregistrate.</div>';
     document.getElementById('digestModal').classList.add('show');
     return;
   }
-  // Panou HUD (design: canvas 3.5, artboard „Digest săptămânal")
-  // Inel sesiuni + volum-erou
-  var C=251.3,ratio=Math.min(1,d.sessions/Math.max(1,d.target));
-  html+='<div style="display:flex;align-items:center;gap:14px;margin:6px 0 14px">';
-  html+='<div style="position:relative;width:86px;height:86px;flex-shrink:0">';
-  html+='<svg width="86" height="86" viewBox="0 0 92 92">';
-  html+='<circle cx="46" cy="46" r="40" fill="none" stroke="var(--s2)" stroke-width="7"></circle>';
-  html+='<circle cx="46" cy="46" r="40" fill="none" stroke="var(--acc)" stroke-width="7" stroke-linecap="round" stroke-dasharray="'+C+'" stroke-dashoffset="'+(C*(1-ratio)).toFixed(1)+'" transform="rotate(-90 46 46)" style="filter:drop-shadow(0 0 4px rgba(var(--acc-rgb),.6))"></circle>';
-  html+='</svg>';
-  html+='<div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center"><div style="font-size:20px;font-weight:700;font-family:var(--fd);color:var(--acc2);line-height:1">'+d.sessions+'/'+d.target+'</div><div style="font-size:7.5px;letter-spacing:1.5px;color:var(--muted)">SESIUNI</div></div>';
-  html+='</div>';
-  html+='<div style="display:flex;flex-direction:column;gap:2px;min-width:0">';
-  html+='<div class="hud-hero" style="font-size:34px">'+d.tonnage.toLocaleString('ro-RO')+'</div>';
-  html+='<div class="hud-hero-lbl" style="letter-spacing:2.5px">KG VOLUM TOTAL</div>';
-  if(d.prevTonnage>0&&d.tonnage>0){
-    var wDelta=d.tonnage-d.prevTonnage;
-    var wPct=Math.round(wDelta/d.prevTonnage*100);
-    html+='<div class="hud-chip'+(wDelta<0?' down':'')+'" style="margin-top:5px;align-self:flex-start;font-size:10.5px;padding:3px 10px">'+(wDelta>=0?'▲ +':'▼ −')+Math.abs(wPct)+'% vs săpt. anterioară</div>';
+  // Aceeași compoziție ca ecranul Progres: cifra-erou, apoi plăcuțele
+  var useTon=d.tonnage>0;
+  html+='<div class="pg-big"><div class="pg-l">'+(useTon?'Kilograme ridicate':'Seturi făcute')+'</div>';
+  html+='<div class="pg-n">'+(useTon?d.tonnage.toLocaleString('ro-RO')+'<small>kg</small>':d.sets)+'</div>';
+  if(useTon&&d.prevTonnage>0){
+    var wPct=Math.round((d.tonnage-d.prevTonnage)/d.prevTonnage*100);
+    html+='<div class="pg-d"><em class="'+(wPct>=0?'ag-up':'ag-dn')+'">'+(wPct>=0?'▲ ':'▼ ')+Math.abs(wPct)+' %</em> față de săptămâna dinainte</div>';
   }
-  html+='</div></div>';
-  // Grilă statistici
-  html+='<div class="hud-grid" style="margin-bottom:14px">';
-  html+='<div class="hud-tile hud-t2"><div class="hud-tile-val" style="font-size:17px">'+d.sets+'</div><div class="hud-tile-lbl">SETURI</div></div>';
-  html+='<div class="hud-tile hud-t3"><div class="hud-tile-val" style="font-size:17px">'+d.prs+'</div><div class="hud-tile-lbl">🏆 PR-URI</div></div>';
-  html+='<div class="hud-tile hud-t4"><div class="hud-tile-val" style="font-size:17px">'+d.streak+'</div><div class="hud-tile-lbl">🔥 STREAK</div></div>';
-  html+='<div class="hud-tile hud-t1"><div class="hud-tile-val" style="font-size:17px">'+d.morningDone+'</div><div class="hud-tile-lbl">☀️ DIMINEȚI</div></div>';
   html+='</div>';
-  // Bare segmentate energie / somn
-  var segBar=function(lbl,avg,color,glow){
-    var filled=Math.round(parseFloat(avg));
-    var h='<div style="display:flex;align-items:center;gap:9px;margin-bottom:8px">';
-    h+='<div style="width:70px;font-size:10px;color:var(--muted);flex-shrink:0">'+lbl+'</div>';
-    h+='<div style="flex:1;display:flex;gap:3px">';
-    for(var i=1;i<=10;i++){
-      if(i<filled)h+='<div class="hud-seg" style="background:'+color+'"></div>';
-      else if(i===filled)h+='<div class="hud-seg" style="background:'+glow+';box-shadow:0 0 8px '+glow+'"></div>';
-      else h+='<div class="hud-seg"></div>';
-    }
-    h+='</div><div style="width:32px;text-align:right;font-size:12px;font-weight:700;font-family:var(--fd);color:'+glow+'">'+avg+'</div></div>';
-    return h;
+  html+='<div class="pg-tiles dg-tiles">';
+  html+='<div class="pg-tile"><b>'+d.sessions+'<small>/'+d.target+'</small></b><span>antrenamente</span></div>';
+  html+='<div class="pg-tile"><b>'+d.sets+'</b><span>seturi</span></div>';
+  html+='<div class="pg-tile"><b>'+d.prs+'</b><span>'+(d.prs===1?'record':'recorduri')+'</span></div>';
+  html+='</div>';
+  var extra=[];
+  if(d.streak)extra.push(roCount(d.streak,'zi','zile')+' la rând');
+  if(d.morningDone)extra.push(roCount(d.morningDone,'dimineață bifată','dimineți bifate'));
+  if(extra.length)html+='<p class="help c">'+extra.join(' · ')+'</p>';
+  // Energia și somnul, ca bare pe 10
+  var bar=function(lbl,avg,cls){
+    var v=parseFloat(avg)||0;
+    return '<div class="dg-bar"><span>'+lbl+'</span><div class="hud-bar"><div class="'+cls+'" style="width:'+Math.round(v*10)+'%"></div></div><b>'+avg+'</b></div>';
   };
   if(d.energyAvg||d.sleepAvg){
-    html+='<div style="margin-bottom:12px">';
-    if(d.energyAvg)html+=segBar('⚡ ENERGIE',d.energyAvg,'var(--acc)','var(--acc2)');
-    if(d.sleepAvg)html+=segBar('😴 SOMN',d.sleepAvg,'var(--purple)','#c4b5fd');
-    html+='</div>';
+    html+='<div class="ag-st">Cum te-ai simțit<span>media săptămânii, din 10</span></div>';
+    if(d.energyAvg)html+=bar('Energie',d.energyAvg,'dg-en');
+    if(d.sleepAvg)html+=bar('Somn',d.sleepAvg,'dg-sl');
   }
-  // Chips măsurători
+  // Măsurătorile: diferența față de săptămâna dinainte
   if(d.deltas.length){
-    html+='<div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:6px">';
+    html+='<div class="ag-st">Corpul tău</div><div class="ag-rows">';
     d.deltas.forEach(function(dl){
       var good=dl.goodDown?dl.v<0:dl.v>0;
-      html+='<div style="display:inline-flex;align-items:center;gap:6px;background:rgba('+(good?'34,197,94':'245,158,11')+',.08);border:1px solid rgba('+(good?'34,197,94':'245,158,11')+',.35);border-radius:16px;padding:5px 11px;font-size:11px"><span style="color:var(--muted)">'+dl.label+'</span><strong style="color:'+(good?'var(--green)':'var(--amber)')+'">'+(dl.v>0?'▲ +':'▼ −')+Math.abs(dl.v).toFixed(1)+' '+dl.unit+'</strong></div>';
+      html+='<div class="ag-row dg-row"><span class="ag-rm"><span class="ag-rt">'+dl.label+'</span></span><span class="nt-kc '+(good?'ag-up':'ag-dn')+'">'+(dl.v>0?'+':'−')+Math.abs(dl.v).toFixed(1)+' '+dl.unit+'</span></div>';
     });
     html+='</div>';
   }
-  // Note stare (istoric personal — rămâne în modal, nu intră în imaginea de share)
+  // Notele de stare (rămân în fereastră, nu intră în imaginea de distribuit)
   if(d.stateNotes&&d.stateNotes.length){
-    var escD=function(t){return String(t).replace(/</g,'&lt;').replace(/>/g,'&gt;');};
-    html+='<div style="font-size:10px;font-weight:800;letter-spacing:1.5px;color:var(--purple);text-transform:uppercase;margin:12px 0 6px">&#128221; Note stare</div>';
+    html+='<div class="ag-st">Notele tale</div><div class="ag-rows">';
     d.stateNotes.forEach(function(n){
       var pz=[];
-      if(n.energy)pz.push('&#9889; '+escD(n.energy));
-      if(n.sleep)pz.push('&#128564; '+escD(n.sleep));
-      html+='<div style="font-size:12px;color:var(--muted);line-height:1.5;padding:4px 0;border-bottom:1px solid var(--bd)"><strong style="color:var(--text)">'+(n.day||n.date).slice(0,3)+'</strong> '+pz.join(' · ')+'</div>';
+      if(n.energy)pz.push('energie: '+escHtml(n.energy));
+      if(n.sleep)pz.push('somn: '+escHtml(n.sleep));
+      html+='<div class="ag-row dg-row"><span class="ag-rm"><span class="ag-rt">'+escHtml(dayNice(n.day||n.date))+'</span><span class="ag-rs">'+pz.join(' · ')+'</span></span></div>';
     });
+    html+='</div>';
   }
   document.getElementById('digestBody').innerHTML=html;
   document.getElementById('digestModal').classList.add('show');
@@ -8696,7 +8758,7 @@ function wizChoiceBtn(field,value,title,sub,extraOnclick){
   // String() pe ambele — altfel days (număr 3) !== '3' și selecția nu se evidențiază
   var sel=String(wizState.data[field])===String(value)?' sel':'';
   return '<button class="wiz-choice'+sel+'" onclick="wizSet(\''+field+'\',\''+value+'\')'+(extraOnclick||'')+'">'+
-    '<div class="wiz-choice-title">'+title+'</div>'+(sub?'<div class="wiz-choice-sub">'+sub+'</div>':'')+'</button>';
+    '<div class="wiz-choice-title">'+String(title).replace(EMO_EDGE_RE,'')+'</div>'+(sub?'<div class="wiz-choice-sub">'+sub+'</div>':'')+'</button>';
 }
 
 function wizSet(field,value){
@@ -8794,25 +8856,20 @@ function renderWizard(){
   // userii noi au "Sar peste" la pasul 0
   var isReconfigure=!!(localStorage.getItem('custom_program')||localStorage.getItem('legacy_program'));
   if(isReconfigure){
-    html+='<button onclick="closeWizard()" style="position:absolute;top:10px;right:12px;background:none;border:none;color:var(--muted);font-size:22px;cursor:pointer;padding:4px;z-index:10">×</button>';
+    html+='<button class="wiz-x" onclick="closeWizard()" aria-label="Închide">×</button>';
   }
   // Indicator de pași — „PASUL X/7" + segmente (stunning pass)
-  html+='<div style="display:flex;align-items:center;gap:10px;margin-bottom:16px">';
-  html+='<div style="font-size:9px;letter-spacing:2px;font-weight:700;color:var(--acc2);font-family:var(--fd);flex-shrink:0">PASUL '+(s+1)+'/'+WIZ_STEPS+'</div>';
-  html+='<div style="flex:1;display:flex;gap:4px">';
-  for(var i=0;i<WIZ_STEPS;i++){
-    var wsBg=i<s?'var(--acc)':(i===s?'var(--acc2);box-shadow:0 0 8px rgba(var(--acc2-rgb),.7)':'var(--s2)');
-    html+='<div style="flex:1;height:5px;border-radius:3px;background:'+wsBg+'"></div>';
-  }
+  html+='<div class="wiz-steps"><span>Pasul '+(s+1)+' din '+WIZ_STEPS+'</span><div>';
+  for(var i=0;i<WIZ_STEPS;i++)html+='<i'+(i<s?' class="d"':(i===s?' class="c"':''))+'></i>';
   html+='</div></div>';
 
   if(s===0){
     html+='<div class="wiz-title">Bine ai venit!</div>';
     html+='<div class="wiz-sub">Programul tău de <strong style="color:var(--text)">8 săptămâni</strong>, personalizat pe corpul, echipamentul și obiectivul tău. Progresie săptămânală ghidată automat — tu doar te antrenezi.</div>';
-    html+='<div class="wiz-sub">📝 6 întrebări rapide · ⏱️ sub 1 minut</div>';
-    html+='<div class="wiz-sub" style="font-size:10px">⚠️ Aplicația nu înlocuiește sfatul medical. Dacă ai afecțiuni (cardiace, articulare, tensiune), consultă medicul înainte de a începe un program de forță.</div>';
-    html+='<div class="wiz-nav"><button class="btn btn-acc" onclick="wizNext()">Începe →</button></div>';
-    html+='<button class="btn btn-ghost" style="font-size:12px;padding:8px;margin-top:6px" onclick="wizSkip()">Sar peste — folosesc programul standard</button>';
+    html+='<div class="wiz-sub">6 întrebări rapide · sub 1 minut</div>';
+    html+='<p class="help">Aplicația nu înlocuiește sfatul medical. Dacă ai afecțiuni (cardiace, articulare, tensiune), consultă medicul înainte de a începe un program de forță.</p>';
+    html+='<div class="wiz-nav"><button class="btn btn-acc" onclick="wizNext()">Începe</button></div>';
+    html+='<button class="btn btn-ghost wiz-skip" onclick="wizSkip()">Sar peste — folosesc programul standard</button>';
   }
   else if(s===1){
     html+='<div class="wiz-title">Despre tine</div>';
@@ -8825,14 +8882,14 @@ function renderWizard(){
     html+='<div class="wiz-input-box" style="grid-column:1/3"><label>Greutate actuală</label><input type="number" id="wizWeight" inputmode="decimal" step="0.1" placeholder="kg" value="'+(d.weight||'')+'"></div>';
     html+='</div>';
     html+='<div class="wiz-err" id="wizErr"></div>';
-    html+='<div class="wiz-nav"><button class="btn btn-ghost btn-back" onclick="wizBack()">←</button><button class="btn btn-acc" onclick="wizNext()">Continuă →</button></div>';
+    html+='<div class="wiz-nav"><button class="btn btn-ghost btn-back" onclick="wizBack()">←</button><button class="btn btn-acc" onclick="wizNext()">Continuă</button></div>';
   }
   else if(s===2){
     html+='<div class="wiz-title">Experiența ta</div>';
     html+=wizChoiceBtn('experience','incepator','🌱 Începător','Sub 6 luni de antrenament constant cu greutăți. Primești exerciții sigure, tehnică întâi.');
     html+=wizChoiceBtn('experience','intermediar','💪 Intermediar','6+ luni constant. Cunoști squat, împins, ramat. Primești volum complet.');
     html+='<div class="wiz-err" id="wizErr"></div>';
-    html+='<div class="wiz-nav"><button class="btn btn-ghost btn-back" onclick="wizBack()">←</button><button class="btn btn-acc" onclick="wizNext()">Continuă →</button></div>';
+    html+='<div class="wiz-nav"><button class="btn btn-ghost btn-back" onclick="wizBack()">←</button><button class="btn btn-acc" onclick="wizNext()">Continuă</button></div>';
   }
   else if(s===3){
     html+='<div class="wiz-title">Ce echipament ai?</div>';
@@ -8841,36 +8898,36 @@ function renderWizard(){
     html+=wizChoiceBtn('equipment','gym','🏋️ Sală completă','Acces la aparate, cabluri, bare — programul folosește tot.');
     if(d.equipment==='home_min'){
       html+='<button class="wiz-choice'+(d.hasBara?' sel':'')+'" onclick="wizSet(\'hasBara\',\''+(!d.hasBara)+'\')">';
-      html+='<div class="wiz-choice-title">'+(d.hasBara?'✅':'⬜')+' Am și bară cu discuri</div>';
+      html+='<div class="wiz-choice-title"><span class="wiz-box'+(d.hasBara?' on':'')+'"></span>Am și bară cu discuri</div>';
       html+='<div class="wiz-choice-sub">Deblochează hip thrust cu bara, bent-over row, deadlift</div></button>';
     }
     html+='<div class="wiz-err" id="wizErr"></div>';
-    html+='<div class="wiz-nav"><button class="btn btn-ghost btn-back" onclick="wizBack()">←</button><button class="btn btn-acc" onclick="wizNext()">Continuă →</button></div>';
+    html+='<div class="wiz-nav"><button class="btn btn-ghost btn-back" onclick="wizBack()">←</button><button class="btn btn-acc" onclick="wizNext()">Continuă</button></div>';
   }
   else if(s===4){
     html+='<div class="wiz-title">Timp și obiectiv</div>';
     html+='<div class="wiz-label">Câte zile pe săptămână te poți antrena?</div>';
     var eqDays=(window.ProgramGenerator&&ProgramGenerator.allowedDays)?ProgramGenerator.allowedDays(d.equipment):[2,3,4,5,6];
-    html+='<div style="display:flex;gap:5px;margin-bottom:8px">';
+    html+='<div class="dp-row">';
     eqDays.forEach(function(c){
-      html+='<button class="dpl-day'+(parseInt(d.days)===c?' on':'')+'" style="flex:1" onclick="wizSet(\'days\',\'"+c+"\')">'+c+'</button>';
+      html+='<button class="dpl-day'+(parseInt(d.days)===c?' on':'')+'" onclick="wizSet(\'days\',\'"+c+"\')">'+c+'</button>';
     });
     html+='</div>';
     if(d.days){
-      html+='<div style="font-size:12px;color:var(--acc2);font-weight:600;margin-bottom:3px">'+(DP_SPLIT_NAME[d.days]||'')+'</div>';
-      html+='<div style="font-size:11px;color:var(--muted);line-height:1.5;margin-bottom:6px">'+(DP_SPLIT_NOTE[d.days]||'')+'</div>';
+      html+='<div class="wiz-split">'+(DP_SPLIT_NAME[d.days]||'')+'</div>';
+      html+='<p class="help">'+(DP_SPLIT_NOTE[d.days]||'')+'</p>';
     }
     if(d.equipment==='bodyweight'){
-      html+='<div style="font-size:10.5px;color:var(--muted);margin-bottom:6px;line-height:1.45">ℹ️ Fără echipament, peste 4 zile ai repeta aceleași mișcări fără câștig real — de-asta lista se oprește la 4.</div>';
+      html+='<p class="help">Fără echipament, peste 4 zile ai repeta aceleași mișcări fără câștig real — de-asta lista se oprește la 4.</p>';
     }
-    html+='<div style="font-size:11px;color:var(--muted);margin-bottom:10px;line-height:1.45">🗓️ <strong style="color:var(--text)">Care</strong> zile alegi se stabilește după, din Setări — și poți pune oricând o excepție temporară.</div>';
+    html+='<p class="help"><strong>Care</strong> zile alegi se stabilește după, din Setări — și poți pune oricând o excepție temporară.</p>';
     html+='<div class="wiz-label">Obiectivul principal</div>';
     html+=wizChoiceBtn('goal','slabit','🔥 Slăbit','Vrei în primul rând să dai jos kilograme. Antrenamentul greu îți apără mușchii cât slăbești.');
     html+=wizChoiceBtn('goal','recomp','✨ Tonifiere / Recompoziție','Vrei să fii ferm(ă) și definit(ă): mai puțină grăsime + mușchi conturat. Alegerea potrivită pentru majoritatea. Fără grijă: antrenamentul greu nu te face masiv(ă) — asta ar cere ani de surplus caloric intenționat.');
     html+=wizChoiceBtn('goal','masa','💪 Masă musculară','Vrei să fii vizibil mai mare și mai puternic(ă). Mănânci puțin peste necesar.');
-    html+='<div style="font-size:11px;color:var(--acc2);text-align:center;margin-top:4px">💡 Nu ești sigur(ă)? Alege Tonifiere — poți schimba oricând din Setări.</div>';
+    html+='<p class="help c">Nu ești sigur(ă)? Alege Tonifiere — poți schimba oricând din Setări.</p>';
     html+='<div class="wiz-err" id="wizErr"></div>';
-    html+='<div class="wiz-nav"><button class="btn btn-ghost btn-back" onclick="wizBack()">←</button><button class="btn btn-acc" onclick="wizNext()">Continuă →</button></div>';
+    html+='<div class="wiz-nav"><button class="btn btn-ghost btn-back" onclick="wizBack()">←</button><button class="btn btn-acc" onclick="wizNext()">Continuă</button></div>';
   }
   else if(s===5){
     html+='<div class="wiz-title">Ultimele preferințe</div>';
@@ -8880,7 +8937,7 @@ function renderWizard(){
     html+='<div class="wiz-label">Rutina de dimineață</div>';
     html+='<div class="wiz-sub">10 minute dimineața: înveți tiparul mișcării pe care o încarci seara + mobilitate. Diferențiatorul acestui program — recomandat.</div>';
     html+='<div class="wiz-row">';
-    html+='<button class="wiz-choice'+(d.morningRoutine?' sel':'')+'" onclick="wizSet(\'morningRoutine\',\'true\')"><div class="wiz-choice-title">☀️ Da</div><div class="wiz-choice-sub">recomandat</div></button>';
+    html+='<button class="wiz-choice'+(d.morningRoutine?' sel':'')+'" onclick="wizSet(\'morningRoutine\',\'true\')"><div class="wiz-choice-title">Da</div><div class="wiz-choice-sub">recomandat</div></button>';
     html+='<button class="wiz-choice'+(!d.morningRoutine?' sel':'')+'" onclick="wizSet(\'morningRoutine\',\'false\')"><div class="wiz-choice-title">Nu</div><div class="wiz-choice-sub">doar seara</div></button>';
     html+='</div>';
     html+='<div class="wiz-err" id="wizErr"></div>';
@@ -8900,17 +8957,17 @@ function renderWizard(){
         var day=g.exercises[k];
         if(!day)return;
         var isRec=day.label.toLowerCase().indexOf('recovery')>=0;
-        html+='<div class="wiz-preview-stat"><span>'+DAY_N[i]+'</span><span style="color:'+(isRec?'var(--muted)':'var(--acc2)')+';font-weight:700">'+day.icon+' '+day.label+'</span></div>';
+        html+='<div class="wiz-preview-stat"><span>'+DAY_N[i]+'</span><b class="'+(isRec?'muted':'wiz-split')+'">'+escHtml(day.label)+'</b></div>';
       });
-      html+='<p style="font-size:11px;color:var(--muted);margin:6px 0 0;line-height:1.45">🗓️ Nu-ți convin zilele? Le muți oricând din <strong style="color:var(--text)">Setări → Programul meu</strong> (sau temporar, pe o perioadă).</p>';
+      html+='<p class="help">Nu-ți convin zilele? Le muți oricând din <strong>Setări → Programul meu</strong> (sau temporar, pe o perioadă).</p>';
       if(g.warnings&&g.warnings.length){
-        html+='<div class="note-box" style="margin-top:10px;font-size:11.5px">⚠️ Cu echipamentul ales, câteva sloturi n-au avut exercițiu potrivit — programul e complet, dar puțin mai scurt în acele zile.</div>';
+        html+='<div class="note-box">Cu echipamentul ales, câteva sloturi n-au avut exercițiu potrivit — programul e complet, dar puțin mai scurt în acele zile.</div>';
       }
       html+='<div class="wiz-label">Nutriția ta</div>';
-      html+='<div class="wiz-preview-stat"><span>Calorii/zi</span><strong style="color:var(--acc2)">'+n.kcal+' kcal</strong></div>';
+      html+='<div class="wiz-preview-stat"><span>Calorii/zi</span><strong class="wiz-split">'+n.kcal+' kcal</strong></div>';
       html+='<div class="wiz-preview-stat"><span>Proteine · Carbo · Grăsimi</span><strong>'+n.protein+'g · '+n.carbs+'g · '+n.fat+'g</strong></div>';
       html+='<div class="wiz-preview-stat"><span>Apă · Pași</span><strong>'+n.waterL+'L · '+n.stepsTarget+'</strong></div>';
-      html+='<div class="wiz-sub" style="margin-top:12px">📈 Progresie automată: săpt. 1-2 înveți · 3-4 +repetări · 5-6 +kg · 7 +set · 8 recuperare — apoi ciclu nou. Smart Coach îți spune zilnic exact ce să faci.</div>';
+      html+='<div class="wiz-sub">Progresie automată: săpt. 1-2 înveți · 3-4 +repetări · 5-6 +kg · 7 +set · 8 recuperare — apoi ciclu nou. Smart Coach îți spune zilnic exact ce să faci.</div>';
       html+='<div class="wiz-nav"><button class="btn btn-ghost btn-back" onclick="wizBack()">←</button><button class="btn btn-acc" onclick="wizFinish()">Începe programul</button></div>';
     }
   }
