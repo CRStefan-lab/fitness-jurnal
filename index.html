@@ -3065,6 +3065,18 @@ function saveSet(keyEnc,setNum,ei){
       // Următorul set nu mai e „urmează" — devine activ
       var nfb=document.getElementById('sb_'+ei+'_'+(setNum+1));
       if(nfb)nfb.classList.remove('sb-future');
+      var cardLive=document.getElementById('ec_'+ei);
+      if(cardLive){
+        var pbLive=cardLive.querySelector('.progress-badge');
+        if(!pbLive){
+          pbLive=document.createElement('span');pbLive.className='progress-badge partial';
+          var anchorLive=cardLive.querySelector('.hero-badge')||cardLive.querySelector('.guide-btn');
+          if(anchorLive)anchorLive.parentNode.insertBefore(pbLive,anchorLive);
+        }
+        var doneLive=0,totLive=0;
+        cardLive.querySelectorAll('.set-box').forEach(function(sb){totLive++;if(sb.classList.contains('saved'))doneLive++;});
+        if(totLive)pbLive.textContent=doneLive+'/'+totLive;
+      }
     }
     updateDayProgress();
     // Confirmarea = toast-ul cu Anulează (5s), inclusiv la PR
@@ -3090,10 +3102,18 @@ function saveSet(keyEnc,setNum,ei){
       if(isRIRRelevant(key))setTimeout(function(){showRIRPrompt(key);},900);
       // Marchează cardul ca done
       var card=document.getElementById('ec_'+ei);
+      var wasHero=!!(card&&card.classList.contains('card-hero'));
       if(card){
         card.classList.add('card-done');
+        card.classList.remove('card-hero');card.classList.remove('card-idle');
+        var hbOld=card.querySelector('.hero-badge');if(hbOld)hbOld.remove();
         var pb=card.querySelector('.progress-badge');
-        if(pb){pb.className='progress-badge complete';pb.textContent=effDone+'/'+effDone+' ✓';}
+        if(!pb){
+          pb=document.createElement('span');
+          var gbDone=card.querySelector('.guide-btn');
+          if(gbDone)gbDone.parentNode.insertBefore(pb,gbDone);
+        }
+        pb.className='progress-badge complete';pb.textContent=effDone+'/'+effDone+' ✓';
       }
       // Avansează la următor exercițiu nesalvat
       setTimeout(function(){
@@ -3113,6 +3133,16 @@ function saveSet(keyEnc,setNum,ei){
           if(card)card.classList.remove('open');
           var nextCard=document.getElementById('ec_'+nextEx);
           if(nextCard){
+            if(wasHero&&!document.querySelector('#azi-content .card.card-hero')){
+              nextCard.classList.remove('card-idle');nextCard.classList.add('card-hero');
+              var pb0=nextCard.querySelector('.progress-badge');
+              if(pb0&&/^0\//.test(pb0.textContent))pb0.remove();
+              if(!nextCard.querySelector('.hero-badge')){
+                var hbNew=document.createElement('span');hbNew.className='hero-badge';hbNew.textContent='Acum';
+                var gbtn=nextCard.querySelector('.guide-btn');
+                if(gbtn)gbtn.parentNode.insertBefore(hbNew,gbtn);
+              }
+            }
             nextCard.classList.add('open');
             nextCard.scrollIntoView({behavior:'smooth',block:'start'});
           }
