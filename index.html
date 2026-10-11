@@ -868,6 +868,114 @@ body.in-session .ss-dock:has(>.show){display:flex}
 #aziSheet .set-in{width:96px}
 #aziSheet .plc-row{margin-bottom:10px}
 @media (max-width:370px){.ss-ttl{font-size:26px}.ag-big{font-size:26px}.ss-step input{font-size:38px}.ss-step .bt button{width:46px}}
+
+/* ═══════════════════════════════════════════════════════════════
+   NIVELUL URMĂTOR, lotul B (v110): Plan (bandă de zile, ciclu, tendințe)
+   și Progres (cifră-erou, grafic, plăcuțe, calendar, jurnal pe linii).
+   ═══════════════════════════════════════════════════════════════ */
+.temp-banner>span{flex:1;min-width:0}
+.pl-head{display:flex;align-items:center;justify-content:space-between;gap:10px;margin:0 0 12px}
+.pl-days-lbl{font-size:13px;color:var(--muted);min-width:0}
+.pl-days-lbl b{color:var(--text);font-weight:600}
+.pl-days{display:grid;grid-template-columns:repeat(7,1fr);gap:5px;margin-bottom:16px}
+.pl-dy{min-width:0;border-radius:14px;padding:9px 2px 8px;text-align:center;background:var(--s1);border:1px solid var(--bd);display:flex;flex-direction:column;align-items:center;gap:4px;color:var(--text);box-shadow:0 1px 0 var(--hi) inset}
+.pl-dy b{font-family:var(--fd);font-weight:700;font-size:17px;line-height:1}
+.pl-dy small{max-width:100%;padding:0 2px;font-size:10px;color:var(--muted);line-height:1.1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.pl-dy i{width:7px;height:7px;border-radius:50%;background:var(--c,var(--bd2));margin-top:1px}
+.pl-dy.rest b,.pl-dy.rest small{color:var(--muted2)}
+.pl-dy.rest i{background:transparent;border:1px dotted var(--bd2)}
+.pl-dy.done i{background:var(--green);border:0;box-shadow:0 0 0 2px rgba(var(--green-rgb),.25)}
+.pl-dy.today b{color:var(--acc2)}
+.pl-dy.sel{border-color:var(--acc);box-shadow:0 0 0 3px var(--acc-soft);background:var(--s2)}
+.pl-cycle{margin:0 0 4px}
+.pl-cl{display:flex;justify-content:space-between;gap:10px;font-size:12.5px;color:var(--muted);margin-bottom:6px}
+.pl-cl b{color:var(--text);font-weight:600}
+.pl-cb{height:6px;border-radius:3px;background:var(--s3);overflow:hidden}
+.pl-cb i{display:block;height:100%;background:var(--acc);border-radius:3px}
+.pl-focus{font-size:13px;color:var(--muted);margin-top:8px}
+.pl-newcycle{margin:12px 0 0}
+.pl-rv{display:flex;align-items:center;gap:8px}
+.pl-bars{display:inline-flex;gap:2px;align-items:flex-end;height:14px}
+.pl-bars i{width:4px;background:var(--bd2);border-radius:1px}
+.pl-bars i.l{background:var(--acc)}
+.pl-btn{display:flex;align-items:center;justify-content:center;gap:8px;margin:16px 0 0}
+.pl-weeks{margin-top:10px}
+.pl-wk{display:flex;align-items:center;gap:12px;padding:9px 0;border-bottom:1px solid var(--bd);font-size:14px;color:var(--muted)}
+.pl-wk:last-child{border-bottom:0}
+.pl-wk b{font-family:var(--fd);font-size:17px;width:20px;color:var(--muted2);flex-shrink:0}
+.pl-wk span{flex:1;min-width:0}
+.pl-wk.cur{color:var(--text)}
+.pl-wk.cur b{color:var(--acc2)}
+.pl-wk em{font-style:normal;font-size:11px;font-weight:700;background:var(--acc-solid);color:var(--acc-fg);border-radius:999px;padding:2px 8px;flex-shrink:0}
+.pl-wk.done .svi{color:var(--green)}
+#ghid-content .ag-row{gap:12px}
+.gh-chev{color:var(--muted2);flex-shrink:0}
+
+/* Progres → Evoluție */
+#progHero{margin:0 0 20px}
+.pg-big{margin:2px 0 4px}
+.pg-l{font-size:13px;color:var(--muted);font-weight:600}
+.pg-n{font-family:var(--fd);font-weight:700;font-size:48px;line-height:1;letter-spacing:-.02em;margin:4px 0 3px;font-variant-numeric:tabular-nums}
+.pg-n small{font-size:22px;color:var(--muted);margin-left:4px;font-weight:600}
+.pg-d{font-size:13.5px;color:var(--muted)}
+.pg-d em,.hist-meta em,#weekSummary em{font-style:normal;font-weight:600}
+.pg-spark{display:block;width:100%;height:60px;margin:8px 0 2px}
+.pg-spark .ln{fill:none;stroke:var(--acc);stroke-width:2.5;stroke-linejoin:round;stroke-linecap:round}
+.pg-sl{display:flex;justify-content:space-between;font-size:11px;color:var(--muted2);margin-bottom:12px}
+.pg-tiles{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.pg-tile{min-width:0;background:var(--s1);border:1px solid var(--bd);border-radius:16px;padding:10px 12px;box-shadow:var(--shadow);text-align:left;color:var(--text);font:inherit}
+.pg-tile .svi{display:block;width:17px;height:17px;color:var(--muted);margin-bottom:6px}
+.pg-tile .svi.hot{color:var(--orange)}.pg-tile .svi.gold{color:var(--amber)}.pg-tile .svi.cool{color:var(--blue)}
+.pg-tile b{display:block;font-family:var(--fd);font-weight:700;font-size:24px;line-height:1;font-variant-numeric:tabular-nums}
+.pg-tile b small{font-size:13px;color:var(--muted);font-weight:600;margin-left:3px}
+.pg-tile span{display:block;font-size:11.5px;color:var(--muted);margin-top:4px;line-height:1.25}
+.pg-tile em{font-style:normal;font-weight:600}
+.pg-medal{width:34px;height:34px;border-radius:12px;display:grid;place-items:center;background:rgba(232,184,74,.15);color:var(--amber);flex-shrink:0}
+.pg-medal .svi{width:18px;height:18px}
+.pg-pr{cursor:default}
+.pg-heat{display:grid;grid-template-columns:repeat(7,1fr);gap:5px;margin-top:8px}
+.pg-heat i{height:22px;border-radius:6px;background:var(--s2)}
+.pg-heat i.l1{background:rgba(var(--acc-rgb),.35)}
+.pg-heat i.l2{background:rgba(var(--acc-rgb),.65)}
+.pg-heat i.l3{background:var(--acc)}
+.pg-heat i.t{outline:2px solid var(--text);outline-offset:-2px}
+.pg-heat i.f{opacity:.35}
+.pg-heat-l{display:grid;grid-template-columns:repeat(7,1fr);gap:5px;font-size:10.5px;color:var(--muted2);text-align:center;margin-top:6px;font-weight:600}
+.pg-link{background:none;border:0;padding:0;color:var(--acc2);font:inherit;font-weight:600}
+.pg-more{display:block;margin:10px 0 0 auto;font-size:13px}
+.pr-row{display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid var(--bd)}
+.pr-row:last-child{border-bottom:0}
+.pr-rank{width:26px;text-align:center;font-family:var(--fd);font-weight:700;font-size:16px;color:var(--muted2);flex-shrink:0}
+.pr-row.top .pr-rank{color:var(--amber)}
+
+/* Progres → Jurnal */
+#weekSummary{font-size:13px;color:var(--muted);text-align:center;margin-bottom:12px}
+.hist-mid{flex:1;min-width:0}
+.hist-ttl{font-size:14.5px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.hist-meta{font-size:12.5px;color:var(--muted);margin-top:2px}
+.hist-viz i{display:block;height:5px;border-radius:2px;background:var(--c,var(--acc));min-width:6px}
+.hist-right{text-align:right;flex-shrink:0}
+.hist-ton-lbl{white-space:nowrap}
+.pr-tag{display:inline-flex;align-items:center;gap:3px;font-size:12px;font-weight:700;color:var(--amber);margin-left:7px;vertical-align:1px}
+.pr-tag .svi,.hist-set .svi{width:13px;height:13px;vertical-align:-2px}
+.hist-ex{position:relative}
+.hist-ex::before{content:'';position:absolute;left:44px;top:12px;bottom:12px;width:3px;border-radius:2px;background:var(--c,transparent)}
+.hist-ex.skip::before,.hist-ex.note::before{display:none}
+.hist-ex-nm span{color:var(--muted);font-weight:400;font-size:12.5px}
+.hist-set.add{background:transparent;color:var(--amber);border:1px dashed rgba(232,184,74,.5)}
+.hist-ex.skip .hist-ex-nm{color:var(--muted);margin-bottom:0}
+.hist-ex.skip .hist-ex-nm span{color:var(--amber)}
+.hist-ex.note{font-size:13px;color:var(--muted);line-height:1.5}
+.vol-panel{margin:6px 0 20px}
+.vol-axis{position:relative;height:14px;margin:8px 0 3px;font-family:var(--fd);font-size:11px;color:var(--muted)}
+.vol-axis span{position:absolute;left:0;transform:translateX(-50%)}
+.vol-axis span:first-child{transform:none}
+.vol-axis .b{color:var(--green)}
+.vol-row .vol-fill.low,.vol-row .vol-fill.ok,.vol-row .vol-fill.high{background:var(--c,var(--acc))}
+.vol-name::before{content:'';display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--c,var(--muted));margin-right:7px;vertical-align:1px}
+.vol-hint{background:var(--acc-soft);border-radius:12px;padding:10px 12px;margin-top:8px;font-size:13.5px;line-height:1.5}
+.vol-hint b{font-weight:700}
+.vol-note{font-size:12.5px;color:var(--muted);margin-top:8px;line-height:1.5}
 </style>
 </head>
 <body>
@@ -974,8 +1082,9 @@ body.in-session .ss-dock:has(>.show){display:flex}
 
 <div id="tab-progres" class="sec">
 <div class="subnav"><button data-tab="progres" onclick="showTab('progres')">Evoluție</button><button data-tab="istoric" onclick="showTab('istoric')">Jurnal</button></div>
+<div id="progHero"></div>
 
-  <div class="sgroup open" id="pgExercitii">
+  <div class="sgroup" id="pgExercitii">
     <div class="sgroup-hd" onclick="this.parentElement.classList.toggle('open');pgRerender('pgExercitii')">
       <div class="sgroup-ico"><svg viewBox="0 0 24 24"><path d="M6.5 6.5v11M17.5 6.5v11M3 9.5v5M21 9.5v5M6.5 12h11"/></svg></div>
       <div style="flex:1;min-width:0"><div class="sgroup-ttl">Progres exerciții</div><div class="sgroup-sub">Evoluție kg / volum + recorduri personale</div></div>
@@ -1174,7 +1283,7 @@ body.in-session .ss-dock:has(>.show){display:flex}
     </div>
     <button class="week-nav-btn" id="weekNext" onclick="changeWeek(1)" aria-label="Săptămâna următoare">›</button>
   </div>
-  <div id="weekSummary" style="font-size:11px;color:var(--muted);text-align:center;margin-bottom:12px"></div>
+  <div id="weekSummary"></div>
   <div id="volumePanel"></div>
   <div id="hist-content"></div>
 
@@ -2550,6 +2659,7 @@ function showTab(name,btn){
     initProgram();
   }
   if(name==='progres'){
+    renderProgHero();
     renderMeasurements();
     syncMeasFormState();
     renderPhotos();
@@ -4858,138 +4968,220 @@ function renderNutDay(){
 // ═══════════════════════════════════════════════════════════════
 // SĂPTĂMÂNA — overview săpt. curentă + Smart Coach + zile cu status
 // ═══════════════════════════════════════════════════════════════
-function initProgram(){
-  var cont=document.getElementById('prog-content');
-  var week=getProgramWeek();
-  var focus=WEEK_FOCUS[week-1]||WEEK_FOCUS[7];
-  var realDay=todayIdx();
-  var html='';
-
-  // Header săptămână — HUD (design: canvas „Program si Restul")
-  var cycleInfo=getCycleInfo();
-  var CHAK='font-family:var(--fd)';
-  html+='<div class="prog-hud">';
-  html+='<div class="hud-strip"></div>';
-  html+='<div style="display:flex;align-items:baseline;gap:10px">';
-  html+='<div style="font-size:11px;letter-spacing:3px;font-weight:700;color:var(--acc2);'+CHAK+'">SĂPTĂMÂNA</div>';
-  html+='<div class="hud-hero" style="font-size:30px">'+week+'<span style="font-size:16px">/8</span></div>';
-  html+='<div style="margin-left:auto;font-size:9px;letter-spacing:1.5px;font-weight:700;color:var(--muted);'+CHAK+';border:1px solid var(--bd);border-radius:6px;padding:3px 8px">CICLUL '+cycleInfo.cycle+'</div>';
-  html+='</div>';
-  html+='<div style="font-size:12px;color:var(--text);margin-top:8px">🎯 Focus: <strong style="color:var(--acc2)">'+focus.label+'</strong></div>';
-  html+='<div style="display:flex;gap:4px;margin-top:10px">';
-  for(var i=1;i<=8;i++){
-    var segBg=i<week?'var(--acc)':(i===week?'var(--acc2);box-shadow:0 0 10px rgba(var(--acc2-rgb),.7)':'var(--s2)');
-    html+='<div style="flex:1;height:7px;border-radius:3px;background:'+segBg+'" title="Săpt '+i+': '+WEEK_FOCUS[i-1].short+'"></div>';
-  }
-  html+='</div>';
-  // Buton ciclu nou — apare dacă ești în săpt. 8 sau mai departe
-  if(week>=8 || cycleInfo.absWeek>8){
-    html+='<button class="btn btn-acc" style="margin-top:12px;margin-bottom:0;font-size:13px;padding:10px" onclick="startNewCycle()">Începe ciclul nou (săpt. 1/8)</button>';
-  }
-  html+='</div>';
-
-  // Zilele alese + excepția temporară (dacă e activă)
-  var _tp=getTempPlan();
-  if(_tp){
-    html+='<div class="temp-banner"><span style="flex:1">⏳ <strong>Program temporar</strong> — zilele mutate până '+dpUntilLabel(_tp.until)+'. După, revii automat.</span><button onclick="revertTempPlan()">↩ Revino acum</button></div>';
-  }
-  html+='<div style="display:flex;align-items:center;gap:9px;background:var(--s1);border:1px solid var(--bd);border-radius:12px;padding:9px 12px;margin-bottom:10px;font-size:11.5px">';
-  html+='<span style="flex:1;min-width:0;color:var(--muted)">🗓️ Antrenamente: <strong style="color:var(--text)">'+dayPlanSummaryText()+'</strong></span>';
-  html+='<button onclick="openDayPlan()" style="background:rgba(var(--acc-rgb),.1);border:1px solid rgba(var(--acc-rgb),.4);color:var(--acc2);border-radius:8px;font-size:10.5px;font-weight:700;padding:6px 10px;cursor:pointer;font-family:inherit;flex-shrink:0">Schimbă</button>';
-  html+='</div>';
-
-  // 7 zile cu status
-  html+='<div class="stitle">Zilele săptămânii</div>';
-  html+='<div class="glist glist-cards">';
-  var dayLabels=['LUNI','MARȚI','MIERCURI','JOI','VINERI','SÂMBĂTĂ','DUMINICĂ'];
-  // zilele vin din schedule (respectă planul de zile al userului)
-
-  for(var di=0;di<7;di++){
-    var dk=schedule[di].exDay;
-    var ex=exercises[dk];
-    var dayLabel=dayLabels[di];
-    var isToday=di===realDay;
-    var isPast=di<realDay;
-    var isFuture=di>realDay;
-    // Verifică dacă a fost făcut antrenamentul în săptămâna curentă pentru această zi
-    var weekRows=getRowsForWeek(0).filter(function(r){return r.type==='antrenament' && r.day===dayLabel;});
-    var doneCount={};
-    weekRows.forEach(function(r){doneCount[r.exercise]=true;});
-    var doneExercises=Object.keys(doneCount).length;
-    var totalExercises=ex.list.length;
-    var setsTotal=0;ex.list.forEach(function(e){setsTotal+=e.sets;});
-    // Ierarhie ca în Azi: azi = erou · făcute = comprimate verzi · restul = idle
-    var statusBadge='';
-    var dayCls='card';
-    if(doneExercises>0){
-      dayCls+=' card-done';
-      statusBadge='<span style="background:rgba(34,197,94,.15);color:var(--green);font-size:9.5px;font-weight:800;padding:2px 7px;border-radius:5px">✓ '+doneExercises+'/'+totalExercises+'</span>';
-    }else if(isToday){
-      dayCls+=' card-hero open';
-      statusBadge='<span class="hero-badge">AZI</span>';
-    }else if(isPast){
-      dayCls+=' card-idle';
-      statusBadge='<span style="background:rgba(245,158,11,.1);color:var(--amber);font-size:9.5px;font-weight:800;padding:2px 7px;border-radius:5px;opacity:.8">NEFĂCUT</span>';
-    }else{
-      dayCls+=' card-idle';
-      statusBadge='<span style="background:rgba(125,141,154,.1);color:var(--muted);font-size:9.5px;font-weight:800;padding:2px 7px;border-radius:5px">🕓 VIITOR</span>';
-    }
-
-    html+='<div class="'+dayCls+'" id="pc_'+di+'"><div class="card-hd" onclick="document.getElementById(\'pc_'+di+'\').classList.toggle(\'open\')">';
-    html+='<div class="card-ico">'+dayIconSvg(ex)+'</div>';
-    html+='<div style="flex:1;min-width:0"><div class="card-ttl">'+dayLabel+' — '+ex.label+'</div><div class="card-sub">'+ex.duration+' · '+totalExercises+' exerciții · '+setsTotal+' seturi</div></div>';
-    html+='<div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px">'+statusBadge+'<div class="card-chev" aria-hidden="true">▼</div></div>';
-    html+='</div>';
-    html+='<div class="card-bd"><div style="padding-top:10px">';
-    var dayFirstStar=-1;
-    for(var dfs=0;dfs<ex.list.length;dfs++){if(ex.list[dfs].star){dayFirstStar=dfs;break;}}
-    ex.list.forEach(function(e,eIdx){
-      var smartTarget='';
-      var extraPill=0;
-      if(e.star){
-        var rec=getRecommendation(e.name,week,e.sets,eIdx===dayFirstStar);
-        if(rec){
-          smartTarget='<div style="font-size:11px;color:var(--acc2);margin-top:2px">🎯 '+rec.target+'</div>';
-          if(rec.action==='add_set')extraPill=1;
-        }
-      }else{
-        var accRec=getAccessoryRec(e.name,e);
-        if(accRec){
-          smartTarget='<div style="font-size:11px;color:var(--muted);margin-top:2px">🎯 <strong style="color:'+accRec.color+'">Opțional: '+accRec.targetStr+'</strong> <span style="color:var(--muted)">(ultima: '+accRec.lastStr+')</span></div>';
-        }
-      }
-      html+='<div style="display:flex;align-items:flex-start;gap:8px;padding:8px 0;border-bottom:1px solid var(--bd);font-size:13px">';
-      html+='<div style="color:'+(e.star?'var(--acc2)':'transparent')+';width:18px;flex-shrink:0;padding-top:1px">'+(e.star?'⭐':'·')+'</div>';
-      html+='<div style="flex:1"><div style="font-weight:500">'+e.name+'</div>'+smartTarget+'</div>';
-      html+='<div style="font-size:10.5px;font-family:var(--fd);color:'+(e.star?'var(--acc)':'var(--muted)')+';background:rgba('+(e.star?'var(--acc-rgb)':'125,141,154')+',.1);padding:2px 8px;border-radius:12px;flex-shrink:0;align-self:flex-start;margin-top:1px">'+(e.sets+extraPill)+'×'+e.target+(extraPill?' ↗':'')+'</div>';
-      html+='</div>';
-    });
-    html+='</div></div></div>';
-  }
-
-  // Plan general 8 săpt. — rândul curent evidențiat, făcutele bifate
-  html+='</div>';
-  html+='<div class="stitle">Plan 8 săptămâni</div>';
-  html+='<div class="card"><div class="card-bd" style="display:block;padding:4px 14px;border-top:none">';
-  WEEK_FOCUS.forEach(function(f,i){
-    var wNo=i+1;
-    var isCurrent=wNo===week,isDone=wNo<week;
-    if(isCurrent){
-      html+='<div style="display:flex;gap:12px;padding:9px 0 9px 11px;border-bottom:1px solid var(--bd);font-size:12px;align-items:center;border-left:3px solid var(--acc);margin-left:-14px;background:linear-gradient(90deg,rgba(var(--acc-rgb),.07),transparent)">';
-      html+='<div style="width:22px;flex-shrink:0;'+CHAK+';font-weight:700;font-size:15px;color:var(--acc2)">'+wNo+'</div>';
-      html+='<div style="color:var(--text);font-weight:600;flex:1">'+f.label+'</div>';
-      html+='<div style="font-size:8.5px;letter-spacing:1.5px;color:var(--acc2);'+CHAK+';font-weight:700;flex-shrink:0">ACUM</div>';
-    }else{
-      html+='<div style="display:flex;gap:12px;padding:8px 0;border-bottom:1px solid var(--bd);font-size:12px;align-items:center;opacity:.55">';
-      html+='<div style="width:22px;flex-shrink:0;'+CHAK+';font-weight:700;color:var(--muted)">'+wNo+'</div>';
-      html+='<div style="color:var(--muted);flex:1">'+f.label+'</div>';
-      if(isDone)html+='<div style="color:var(--green);font-size:11px;flex-shrink:0">✓</div>';
-    }
-    html+='</div>';
+// ═══════════════════════════════════════════════════════════════
+// NIVELUL URMĂTOR, lotul B — Plan (banda de zile + ciclul + tendințe) și Progres (cifra-erou)
+// ═══════════════════════════════════════════════════════════════
+SVI.cal='<rect x="3" y="5" width="18" height="16" rx="3"/><path d="M3 10h18M8 3v4M16 3v4"/>';
+SVI.medal='<circle cx="12" cy="15" r="5"/><path d="M8.6 11L6 3h4l2 4 2-4h4l-2.6 8"/>';
+SVI.flame='<path d="M12 3c.5 3.5 4 5.5 4 9.5a4 4 0 0 1-8 0c0-1.6.6-2.7 1.3-3.6.4 1.1 1 1.6 1.7 1.6.3-2.5-.3-4.5 1-7.5z"/>';
+// Starea fiecărei zile din săptămâna curentă (L–D): antrenament salvat / bife de dimineață sau obiective
+function weekStatus(){
+  var real=todayIdx(),mon=new Date();mon.setHours(0,0,0,0);mon.setDate(mon.getDate()-real);
+  var idx={},out=[];
+  for(var i=0;i<7;i++){var d=new Date(mon);d.setDate(mon.getDate()+i);idx[d.toLocaleDateString('ro-RO')]=i;out.push({tr:false,other:false,day:d.getDate()});}
+  loadStore().rows.forEach(function(r){
+    var w=idx[r.date];if(w===undefined)return;
+    if(r.type==='antrenament')out[w].tr=true;
+    else if((r.type==='checklist'||r.type==='dimineata')&&r.note==='DA')out[w].other=true;
   });
-  html+='</div></div>';
-
+  return out;
+}
+// Cel mai bun set al fiecărei ședințe, pe exercițiu: {exercițiu: {dată: {kg,reps}}}
+function exSessionsMap(rows){
+  var m={};
+  rows.forEach(function(r){
+    if(r.type!=='antrenament')return;
+    var e=m[r.exercise]||(m[r.exercise]={});
+    var k=parseFloat(r.kg)||0,p=parseFloat(r.reps)||0,b=e[r.date];
+    if(!b||k>b.kg||(k===b.kg&&p>b.reps))e[r.date]={kg:k,reps:p};
+  });
+  return m;
+}
+// Ultimele 4 ședințe ale unui exercițiu (greutatea, sau repetările la exercițiile fără greutate)
+function exTrendInfo(map,name){
+  var e=map[name];if(!e)return null;
+  var ds=Object.keys(e).sort(function(a,b){return parseRoDate(a)-parseRoDate(b);}).slice(-4);
+  if(!ds.length)return null;
+  var useKg=ds.some(function(d){return e[d].kg>0;});
+  var vals=ds.map(function(d){return useKg?e[d].kg:e[d].reps;});
+  return {vals:vals,useKg:useKg,last:vals[vals.length-1]};
+}
+function trendBarsHtml(vals){
+  var mn=Math.min.apply(null,vals),mx=Math.max.apply(null,vals);
+  return '<span class="pl-bars" aria-hidden="true">'+vals.map(function(v,i){
+    var h=mx>mn?4+Math.round((v-mn)/(mx-mn)*10):9;
+    return '<i'+(i===vals.length-1?' class="l"':'')+' style="height:'+h+'px"></i>';
+  }).join('')+'</span>';
+}
+function planEdit(){
+  showTab('setari');
+  var g=document.getElementById('sgProgram');
+  if(g){g.classList.add('open');setTimeout(function(){g.scrollIntoView({behavior:'smooth',block:'start'});},60);}
+}
+function initProgram(sel){
+  var cont=document.getElementById('prog-content');if(!cont)return;
+  var week=getProgramWeek(),ci=getCycleInfo(),focus=WEEK_FOCUS[week-1]||WEEK_FOCUS[7];
+  var realDay=todayIdx();
+  var selDi=(typeof sel==='number'&&sel>=0&&sel<7)?sel:realDay;
+  var ws=weekStatus();
+  var html='';
+  var tp=getTempPlan();
+  if(tp)html+='<div class="temp-banner"><span>Program temporar până '+dpUntilLabel(tp.until)+'. După, revii automat.</span><button onclick="revertTempPlan()">Revino acum</button></div>';
+  html+='<div class="pl-head"><div class="pl-days-lbl">Antrenamente: <b>'+escHtml(dayPlanSummaryText())+'</b></div><button class="ag-chip" onclick="planEdit()">'+svi('edit')+'Modifică</button></div>';
+  // Banda de zile: litera, ce faci în ziua aceea, bulina (culoarea grupei; verde = făcut săptămâna asta)
+  html+='<div class="pl-days">';
+  for(var di=0;di<7;di++){
+    var exd=schedule[di].exDay,tr=isTrainingExDay(exd),st=ws[di];
+    var done=st.tr||(!tr&&st.other);
+    var lbl=tr?String((exercises[exd]||{}).label||'').split(/[\s\/—–&+,]+/)[0]:'pauză';
+    html+='<button class="pl-dy'+(tr?' g-'+dayGroup(exd):' rest')+(done?' done':'')+(di===selDi?' sel':'')+(di===realDay?' today':'')+'" onclick="initProgram('+di+')" aria-label="'+DP_LONG[di]+(done?', făcut':'')+'"'+(di===selDi?' aria-current="true"':'')+'><b>'+DP_SHORT[di]+'</b><small>'+escHtml(lbl)+'</small><i></i></button>';
+  }
+  html+='</div>';
+  // Ciclul de 8 săptămâni ca linie
+  var left=8-week;
+  var dl=week>=8?'săptămâna de deload':(left===1?'deload săptămâna viitoare':'deload peste '+left+' săptămâni');
+  html+='<div class="pl-cycle"><div class="pl-cl"><span><b>Săptămâna '+week+'</b> din 8'+(ci.cycle>1?' · ciclul '+ci.cycle:'')+'</span><span>'+dl+'</span></div>';
+  html+='<div class="pl-cb"><i style="width:'+Math.round(week/8*100)+'%"></i></div>';
+  html+='<div class="pl-focus">Săptămâna asta: '+escHtml(focus.label)+'</div></div>';
+  if(week>=8||ci.absWeek>8)html+='<button class="btn btn-acc pl-newcycle" onclick="startNewCycle()">Începe ciclul nou</button>';
+  // Ziua aleasă: exercițiile cu greutatea curentă și tendința din ultimele 4 ședințe
+  var sx=exercises[schedule[selDi].exDay];
+  html+='<div class="ag-st">'+DP_LONG[selDi]+' · '+escHtml(sx.label)+'<span>'+escHtml(String(sx.duration||''))+'</span></div>';
+  var smap=exSessionsMap(loadStore().rows);
+  html+='<div class="ag-rows">';
+  sx.list.forEach(function(e){
+    var tgt=String(e.target==null?'':e.target).trim();
+    var tg=/^[\d]+([–—-][\d]+)?$/.test(tgt)?' × '+tgt:((tgt&&tgt!=='—')?' · '+escHtml(tgt):'');
+    var rv='';
+    if(isRIRRelevant(e.name)){
+      var t=exTrendInfo(smap,e.name);
+      if(!t){rv='<span class="ag-rv"><b>—</b><small>prima dată</small></span>';}
+      else{
+        var f=t.vals[0],l=t.last;
+        var w=t.vals.length<2?'o ședință':(l>f?'<em class="ag-up">urcă</em>':(l<f?'<em class="ag-dn">scade</em>':'stabil'));
+        rv='<span class="ag-rv pl-rv">'+trendBarsHtml(t.vals)+'<span><b>'+l+'<small>'+(t.useKg?'kg':'rep')+'</small></b><small>'+w+'</small></span></span>';
+      }
+    }
+    html+='<button class="ag-row g-'+groupOf(e.name)+'" onclick="openGuideByName(\''+encKey(e.name)+'\')"><span class="ag-mus"></span><span class="ag-rm"><span class="ag-rt">'+escHtml(e.name)+'</span><span class="ag-rs">'+(tg.indexOf(' × ')===0?e.sets+tg:roCount(e.sets,'set','seturi')+tg)+(e.star?' · progresie':'')+'</span></span>'+rv+'</button>';
+  });
+  html+='</div>';
+  html+='<button class="btn btn-ghost pl-btn" onclick="openDayPlan()">'+svi('cal')+'Schimbă zilele de antrenament</button>';
+  // Planul pe 8 săptămâni, pliat
+  html+='<details class="ss-more pl-weeks"><summary>Planul pe 8 săptămâni</summary>';
+  WEEK_FOCUS.forEach(function(f,i){
+    var n=i+1;
+    html+='<div class="pl-wk'+(n===week?' cur':'')+(n<week?' done':'')+'"><b>'+n+'</b><span>'+escHtml(f.label)+'</span>'+(n===week?'<em>acum</em>':(n<week?svi('check'):''))+'</div>';
+  });
+  html+='</details>';
   cont.innerHTML=html;
+}
+
+// Ghidul: rânduri cu silueta mușchiului; atingerea deschide foaia cu pașii, greșelile și video
+function initGhid(){
+  var cont=document.getElementById('ghid-content');if(!cont)return;
+  var html='<div class="ag-rows">';
+  ghidEx.forEach(function(ex){
+    html+='<button class="ag-row g-'+groupOf(ex.name)+'" onclick="openGuideByName(\''+encKey(ex.name)+'\')"><span class="ex-thumb">'+thumbForExercise(ex.name)+'</span><span class="ag-rm"><span class="ag-rt">'+escHtml(ex.name)+'</span><span class="ag-rs">'+escHtml(muscleLabelOf(ex.name))+(ex.tag?' · '+escHtml(ex.tag):'')+'</span></span><span class="gh-chev">'+svi('chr')+'</span></button>';
+  });
+  cont.innerHTML=html+'</div>';
+}
+
+// Progres → Evoluție: cifra-erou, graficul pe 8 săptămâni, trei plăcuțe, recorduri, calendarul pe 4 săptămâni
+function weekTonnage(off){
+  var t=0,s=0;
+  getRowsForWeek(off).forEach(function(r){if(r.type==='antrenament'){t+=(parseFloat(r.kg)||0)*(parseFloat(r.reps)||0);s++;}});
+  return {ton:t,sets:s};
+}
+function pgOpen(id){
+  var g=document.getElementById(id);if(!g)return;
+  g.classList.add('open');pgRerender(id);
+  setTimeout(function(){g.scrollIntoView({behavior:'smooth',block:'start'});},60);
+}
+function renderProgHero(){
+  var el=document.getElementById('progHero');if(!el)return;
+  var all=loadStore().rows;
+  var weeks=[];for(var o=-7;o<=0;o++)weeks.push(weekTonnage(o));
+  var useTon=weeks.some(function(w){return w.ton>0;});
+  var val=function(w){return useTon?w.ton:w.sets;};
+  var cur=weeks[7],prev=weeks[6];
+  var html='<div class="pg-big"><div class="pg-l">'+(useTon?'Kilograme ridicate săptămâna asta':'Seturi făcute săptămâna asta')+'</div>';
+  html+='<div class="pg-n">'+Math.round(val(cur)).toLocaleString('ro-RO')+(useTon?'<small>kg</small>':'')+'</div>';
+  if(val(prev)>0){
+    var pct=Math.round((val(cur)-val(prev))/val(prev)*100);
+    html+='<div class="pg-d"><em class="'+(pct>=0?'ag-up':'ag-dn')+'">'+(pct>=0?'▲ ':'▼ ')+Math.abs(pct)+' %</em> față de săptămâna trecută</div>';
+  }
+  html+='</div>';
+  if(weeks.some(function(w){return val(w)>0;})){
+    var W=340,H=64,mx=Math.max.apply(null,weeks.map(val))||1;
+    var pts=weeks.map(function(w,i){return [Math.round(4+i*(W-8)/7),Math.round(H-5-(val(w)/mx)*(H-14))];});
+    var line=pts.map(function(p,i){return (i?'L':'M')+p[0]+' '+p[1];}).join(' ');
+    html+='<svg class="pg-spark" viewBox="0 0 '+W+' '+H+'" preserveAspectRatio="none" aria-hidden="true"><defs><linearGradient id="pgSparkG" x1="0" y1="0" x2="0" y2="1"><stop offset="0" style="stop-color:var(--acc);stop-opacity:.32"/><stop offset="1" style="stop-color:var(--acc);stop-opacity:0"/></linearGradient></defs>';
+    html+='<path d="'+line+' L'+pts[7][0]+' '+H+' L'+pts[0][0]+' '+H+'Z" fill="url(#pgSparkG)"/><path class="ln" d="'+line+'" vector-effect="non-scaling-stroke"/></svg>';
+    html+='<div class="pg-sl"><span>acum 8 săptămâni</span><span>săptămâna asta</span></div>';
+  }
+  // Trei plăcuțe: seria, recordurile lunii, greutatea corporală
+  var streak=getActivityStreak();
+  var now=new Date(),mKey='.'+String(now.getMonth()+1).padStart(2,'0')+'.'+now.getFullYear();
+  var prSeen={},prN=0;
+  all.forEach(function(r){
+    if(r.type==='antrenament'&&r.note&&r.note.indexOf('PR:')===0&&String(r.date).slice(2)===mKey){var k=r.date+'|'+r.exercise;if(!prSeen[k]){prSeen[k]=1;prN++;}}
+  });
+  var ms=all.filter(function(r){return r.type==='masuratoare'&&parseFloat(r.weight)>0;}).sort(function(a,b){return parseRoDate(a.date)-parseRoDate(b.date);});
+  var wTxt='—',wSub='adaugă greutatea';
+  if(ms.length){
+    var lw=ms[ms.length-1],ld=parseRoDate(lw.date),ref=null;
+    for(var mi=ms.length-2;mi>=0;mi--){var dd=parseRoDate(ms[mi].date);if(ld&&dd&&(ld-dd)/86400000>=28){ref=ms[mi];break;}}
+    if(!ref&&ms.length>1)ref=ms[0];
+    wTxt=parseFloat(lw.weight)+'<small>kg</small>';
+    if(ref){
+      var dlt=Math.round((parseFloat(lw.weight)-parseFloat(ref.weight))*10)/10;
+      var days=Math.max(1,Math.round((ld-parseRoDate(ref.date))/86400000));
+      wSub='<em class="'+(dlt<=0?'ag-up':'ag-dn')+'">'+(dlt>0?'+':(dlt<0?'−':''))+Math.abs(dlt)+' kg</em> în '+roCount(days,'zi','zile');
+    }else wSub='kg, ultima măsurare';
+  }
+  html+='<div class="pg-tiles">';
+  html+='<div class="pg-tile">'+svi('flame').replace('class="svi"','class="svi hot"')+'<b>'+streak+'<small>'+(streak===1?'zi':'zile')+'</small></b><span>la rând</span></div>';
+  html+='<div class="pg-tile">'+svi('medal').replace('class="svi"','class="svi gold"')+'<b>'+prN+'</b><span>'+(prN===1?'record luna asta':'recorduri luna asta')+'</span></div>';
+  html+='<button class="pg-tile" onclick="goMeasure()">'+svi('scale').replace('class="svi"','class="svi cool"')+'<b>'+wTxt+'</b><span>'+wSub+'</span></button>';
+  html+='</div>';
+  // Recorduri recente (cel mai bun record per exercițiu și zi)
+  var prBest={};
+  all.forEach(function(r){
+    if(r.type!=='antrenament'||!r.note||r.note.indexOf('PR:')!==0)return;
+    var k=r.date+'|'+r.exercise,sc=(parseFloat(r.kg)||0)*1000+(parseFloat(r.reps)||0);
+    if(!prBest[k]||sc>prBest[k].sc)prBest[k]={r:r,sc:sc};
+  });
+  var prs=Object.keys(prBest).map(function(k){return prBest[k].r;}).sort(function(a,b){return (parseRoDate(b.date)-parseRoDate(a.date))||((b.ts||0)-(a.ts||0));}).slice(0,3);
+  if(prs.length){
+    html+='<div class="ag-st">Recorduri recente<span><button class="pg-link" onclick="pgOpen(\'pgExercitii\')">clasamentul</button></span></div><div class="ag-rows">';
+    prs.forEach(function(r){
+      var kind={kg:'greutate maximă',reps:'repetări maxime',volume:'volum maxim'}[r.note.slice(3)]||'record';
+      var dt=parseRoDate(r.date),dl2=dt?dt.toLocaleDateString('ro-RO',{weekday:'long',day:'numeric',month:'short'}):r.date;
+      var k=parseFloat(r.kg)||0;
+      html+='<div class="ag-row pg-pr"><span class="pg-medal">'+svi('medal')+'</span><span class="ag-rm"><span class="ag-rt">'+escHtml(r.exercise)+'</span><span class="ag-rs">'+kind+' · '+escHtml(dl2)+'</span></span><span class="ag-rv"><b>'+(k>0?k+'<small>kg</small>':r.reps+'<small>rep</small>')+'</b>'+(k>0?'<small>× '+r.reps+'</small>':'')+'</span></div>';
+    });
+    html+='</div>';
+  }
+  // Zile de antrenament: ultimele 4 săptămâni, intensitatea = tonajul (sau seturile) zilei
+  var start=new Date();start.setHours(0,0,0,0);start.setDate(start.getDate()-todayIdx()-21);
+  var dayVal={};
+  all.forEach(function(r){if(r.type==='antrenament'){var v=(parseFloat(r.kg)||0)*(parseFloat(r.reps)||0);dayVal[r.date]=(dayVal[r.date]||0)+(useTon?v:1);}});
+  var cells=[],nz=[];
+  for(var c=0;c<28;c++){var cd=new Date(start);cd.setDate(start.getDate()+c);var key=cd.toLocaleDateString('ro-RO');var v2=dayVal[key]||0;cells.push({v:v2,d:cd});if(v2>0)nz.push(v2);}
+  nz.sort(function(a,b){return a-b;});
+  var q1=nz[Math.floor(nz.length/3)]||0,q2=nz[Math.floor(nz.length*2/3)]||0;
+  var todayT=new Date();todayT.setHours(0,0,0,0);
+  var trainedDays=nz.length;
+  html+='<div class="ag-st">Ultimele 4 săptămâni<span>'+roCount(trainedDays,'zi','zile')+' de antrenament</span></div>';
+  html+='<div class="pg-heat" role="img" aria-label="'+trainedDays+' zile de antrenament în ultimele 4 săptămâni">';
+  cells.forEach(function(x){
+    var lv=x.v<=0?'':(x.v<q1?'l1':(x.v<q2?'l2':'l3'));
+    var cls=[lv,x.d.getTime()===todayT.getTime()?'t':'',x.d>todayT?'f':''].filter(Boolean).join(' ');
+    html+='<i'+(cls?' class="'+cls+'"':'')+'></i>';
+  });
+  html+='</div><div class="pg-heat-l">'+DP_SHORT.map(function(s){return '<span>'+s+'</span>';}).join('')+'</div>';
+  html+='<button class="pg-link pg-more" onclick="pgOpen(\'pgCalendar\')">Calendarul pe 20 de săptămâni</button>';
+  el.innerHTML=html;
 }
 
 // ═══════════════════════════════════════════════════════════════
@@ -5153,22 +5345,16 @@ function renderHistoric(){
   var summaryEl=document.getElementById('weekSummary');
   var rows=getRowsForWeek(currentWeekOffset);
 
-  // Sumar săptămână
+  // Sumarul săptămânii + comparația cu cea dinainte
   var totalSets=rows.filter(function(r){return r.type==='antrenament';}).length;
   var totalMornings=rows.filter(function(r){return r.type==='dimineata'&&r.note==='DA';}).length;
   var totalChecks=rows.filter(function(r){return r.type==='checklist'&&r.note==='DA';}).length;
-  // Comparație cu săpt. anterioară
-  var prevRows=getRowsForWeek(currentWeekOffset-1);
-  var prevSets=prevRows.filter(function(r){return r.type==='antrenament';}).length;
-  var delta=totalSets-prevSets;
-  var deltaStr='';
-  if(prevSets>0){
-    var d=delta>0?' (+'+delta+')':(delta<0?' ('+delta+')':' (=)');
-    deltaStr=' <span style="color:'+(delta>0?'var(--green)':delta<0?'var(--acc2)':'var(--muted)')+'">vs săpt anterioară'+d+'</span>';
-  }
+  var prevSets=getRowsForWeek(currentWeekOffset-1).filter(function(r){return r.type==='antrenament';}).length;
+  var delta=totalSets-prevSets,deltaStr='';
+  if(prevSets>0)deltaStr=' · <em class="'+(delta>0?'ag-up':(delta<0?'ag-dn':''))+'">'+(delta>0?'+'+delta:(delta<0?'−'+Math.abs(delta):'la fel'))+'</em> față de săptămâna dinainte';
   if(summaryEl){
-    summaryEl.innerHTML=totalSets?
-      '📊 '+totalSets+' seturi · ☀️ '+totalMornings+' bife dimineață · ✅ '+totalChecks+' bife checklist'+deltaStr
+    summaryEl.innerHTML=(totalSets||totalMornings||totalChecks)?
+      roCount(totalSets,'set','seturi')+' · '+totalMornings+' bife de dimineață · '+roCount(totalChecks,'obiectiv','obiective')+deltaStr
       :'Nicio activitate înregistrată';
   }
 
@@ -5176,14 +5362,11 @@ function renderHistoric(){
   renderVolumePanel();
 
   if(!rows.length){
-    var emptyMsg=currentWeekOffset===0
-      ?'Nicio dată în această săptămână.<br><span class="empty-state-action" onclick="showTab(\'azi\',document.querySelectorAll(\'.nb\')[0])">→ Începe antrenament azi</span>'
-      :'Nicio dată în această săptămână.<br><span style="font-size:11px">Navighează cu ‹ ›</span>';
-    cont.innerHTML='<div style="color:var(--muted);font-size:13px;text-align:center;padding:30px">'+emptyMsg+'</div>';
+    cont.innerHTML='<div class="chart-empty">Nicio dată în această săptămână.'+(currentWeekOffset===0?'<br><span class="empty-state-action" onclick="showTab(\'azi\')">Începe antrenamentul de azi</span>':'<br>Navighează cu ‹ ›')+'</div>';
     return;
   }
 
-  // Grupare pe zi — cu dată, PR-uri și tonaj pentru micro-viz (design: canvas 3.2)
+  // Grupare pe zi: seturi, recorduri, tonaj, sărite, dimineața și obiectivele
   var byDay={};
   rows.forEach(function(r){
     var hk=r.date||r.day;
@@ -5204,96 +5387,84 @@ function renderHistoric(){
       D.morning.push({id:r.exercise,done:r.note==='DA'});
     }else if(r.type==='skip'){
       D.skips.push({exercise:r.exercise,reason:r.note||''});
+    }else if(r.type==='masuratoare'&&parseFloat(r.weight)>0){
+      D.weight=parseFloat(r.weight);
     }
   });
 
-  // Ziua cea mai recentă cu date e deschisă implicit
   var DAY_ORDER=['LUNI','MARȚI','MIERCURI','JOI','VINERI','SÂMBĂTĂ','DUMINICĂ'];
-  var dayShort={LUNI:'LU',MARȚI:'MA',MIERCURI:'MI',JOI:'JO',VINERI:'VI','SÂMBĂTĂ':'SÂ','DUMINICĂ':'DU'};
-  var HKEYS=Object.keys(byDay).sort(function(a,b){return (parseRoDate(byDay[a].date)||0)-(parseRoDate(byDay[b].date)||0);});
+  // Zilele fără nimic de arătat (doar note de stare, RIR etc.) nu primesc card
+  var HKEYS=Object.keys(byDay).filter(function(k){var D=byDay[k];return D.exOrder.length||D.skips.length||D.morning.length||D.checks.length||D.weight;})
+    .sort(function(a,b){return (parseRoDate(byDay[a].date)||0)-(parseRoDate(byDay[b].date)||0);});
   var openDay=null,openTime=-1;
-  HKEYS.forEach(function(d){
-    if(!byDay[d])return;
-    var dt=parseRoDate(byDay[d].date);
-    var t=dt?dt.getTime():0;
-    if(t>=openTime){openTime=t;openDay=d;}
-  });
+  // Se deschide cea mai recentă zi de antrenament (altfel cea mai recentă zi)
+  HKEYS.forEach(function(d){var dt=parseRoDate(byDay[d].date),t=(dt?dt.getTime():0)+(byDay[d].exOrder.length?1e13:0);if(t>=openTime){openTime=t;openDay=d;}});
+  var chkLbl={};checkItems.forEach(function(c){chkLbl[c.id]=c.lbl;});
 
   var html='';
-  HKEYS.forEach(function(d){
-    if(!byDay[d])return;
+  HKEYS.forEach(function(d,hi){
     var D=byDay[d];
     var exCount=D.exOrder.length;
     var chkDone=D.checks.filter(function(c){return c.value==='DA';}).length;
     var morningDone=D.morning.filter(function(m){return m.done;}).length;
     var morningTotal=D.morning.length;
     var progName=D.progDay||D.day||'';
-    var di=DAY_ORDER.indexOf(progName);if(di<0)di=0;
-    var progLabel=(exercises[schedule[di].exDay]||{}).label||'';
-    var dtCal=parseRoDate(D.date);
-    var calDay=dtCal?DAY_ORDER[(dtCal.getDay()+6)%7]:progName;
+    var pdi=DAY_ORDER.indexOf(progName);if(pdi<0)pdi=0;
+    var progLabel=(exercises[schedule[pdi].exDay]||{}).label||'';
     var dt=parseRoDate(D.date);
-    var dayNum=dt?dt.getDate():'';
+    var cdi=dt?(dt.getDay()+6)%7:pdi;
+    var calDay=DAY_ORDER[cdi];
     var trained=exCount>0;
-    var cardId='hc_'+HKEYS.indexOf(d);
+    var cardId='hc_'+hi;
     html+='<div class="hist-card'+(d===openDay?' open':'')+(trained?' trained':'')+'" id="'+cardId+'">';
     html+='<div class="hist-card-hd" onclick="document.getElementById(\''+cardId+'\').classList.toggle(\'open\')">';
-    html+='<div class="hist-date-col"><div class="hist-date-day">'+(dayShort[calDay]||String(calDay).slice(0,2))+'</div><div class="hist-date-num">'+dayNum+'</div></div>';
-    html+='<div style="flex:1;min-width:0">';
-    html+='<div style="display:flex;align-items:baseline;gap:8px"><span style="font-size:12px;font-weight:700;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+(trained?progLabel+(progName&&progName!==calDay?' <span style="color:var(--muted);font-weight:400">· program '+progName.charAt(0)+progName.slice(1).toLowerCase()+'</span>':''):calDay.charAt(0)+calDay.slice(1).toLowerCase())+'</span>'+(D.prCount?'<span style="font-size:10px;color:var(--amber);font-weight:800;flex-shrink:0">🏆 '+D.prCount+' PR</span>':'')+'</div>';
+    html+='<div class="hist-date-col"><div class="hist-date-day">'+DP_SHORT[cdi]+'</div><div class="hist-date-num">'+(dt?dt.getDate():'')+'</div></div>';
+    html+='<div class="hist-mid"><div class="hist-ttl">'+(trained?escHtml(progLabel):dayNice(calDay))+(D.prCount?'<span class="pr-tag">'+svi('medal')+D.prCount+'</span>':'')+'</div>';
     if(trained){
-      // Micro-viz: un segment per exercițiu, lățime ∝ seturi, intensitate descrescătoare
+      if(progName&&progName!==calDay)html+='<div class="hist-meta">programul de '+dayNice(progName).toLowerCase()+'</div>';
       html+='<div class="hist-viz">';
-      D.exOrder.forEach(function(ex,i){
-        var alpha=Math.max(.25,.95-i*.16);
-        html+='<div style="flex:'+D.exercises[ex].length+';background:rgba(var(--acc-rgb),'+alpha.toFixed(2)+')"></div>';
-      });
+      D.exOrder.forEach(function(ex){html+='<i class="g-'+groupOf(ex)+'" style="flex:'+D.exercises[ex].length+'"></i>';});
       html+='</div>';
-    }else if(morningTotal||D.checks.length){
-      html+='<div style="font-size:10.5px;color:var(--muted);margin-top:3px">'+(morningTotal?'☀️ '+morningDone+'/'+morningTotal:'')+(D.checks.length?(morningTotal?' · ':'')+'✅ '+chkDone:'')+'</div>';
+    }else{
+      var mParts=[];
+      if(D.weight)mParts.push('Cântar '+D.weight+' kg');
+      if(morningTotal)mParts.push('Dimineața '+morningDone+'/'+morningTotal);
+      if(D.checks.length)mParts.push('Obiective '+chkDone);
+      if(mParts.length)html+='<div class="hist-meta">'+mParts.join(' · ')+'</div>';
     }
     html+='</div>';
     if(trained){
-      var bwDay=!(D.tonnage>0);
-      var repsTot=0;if(bwDay)D.exOrder.forEach(function(x){D.exercises[x].forEach(function(st){repsTot+=parseFloat(st.reps)||0;});});
-      html+='<div style="text-align:right;flex-shrink:0"><div class="hist-ton">'+(bwDay?repsTot:Math.round(D.tonnage).toLocaleString('ro-RO'))+'</div><div class="hist-ton-lbl">'+(bwDay?'REP':'KG')+' · '+D.sets+' SETURI</div></div>';
+      var bwDay=!(D.tonnage>0),repsTot=0;
+      if(bwDay)D.exOrder.forEach(function(x){D.exercises[x].forEach(function(st){repsTot+=parseFloat(st.reps)||0;});});
+      html+='<div class="hist-right"><div class="hist-ton">'+(bwDay?repsTot:Math.round(D.tonnage).toLocaleString('ro-RO'))+'</div><div class="hist-ton-lbl">'+(bwDay?'rep':'kg')+' · '+roCount(D.sets,'set','seturi')+'</div></div>';
     }
-    html+='<div class="card-chev" aria-hidden="true" style="flex-shrink:0">▼</div>';
-    html+='</div>';
-    // Corpul: seturile ca pastile (tap = editează, + = adaugă), săritele, dimineața+checklist
+    html+='<div class="card-chev" aria-hidden="true"></div></div>';
+    // Corpul: seturile ca pastile (atinge = corectezi, + = adaugi), săritele, dimineața și obiectivele
     html+='<div class="hist-card-bd">';
     D.exOrder.forEach(function(ex){
       var sets=D.exercises[ex].sort(function(a,b){return a.set-b.set;});
       var exEnc=encKey(ex);
       var meta=findExerciseMeta(ex);
       var maxSaved=Math.max.apply(null,sets.map(function(s){return s.set;}));
-      var totalSets=Math.max(meta?meta.ex.sets:0,maxSaved);
-      var starIcon=(meta&&meta.ex.star)?'<span style="color:var(--acc2);margin-right:4px">⭐</span>':'';
-      html+='<div class="hist-ex"><div class="hist-ex-nm">'+starIcon+escHtml(ex)+'<span style="color:var(--muted);font-size:10px;font-weight:400"> · '+sets.length+'/'+totalSets+'</span></div><div class="hist-sets">';
-      for(var setNum=1;setNum<=totalSets;setNum++){
-        var found=sets.find(function(s){return s.set===setNum;});
-        if(found){
-          html+='<span class="hist-set'+(found.pr?' pr':'')+'" onclick="openEdit(\''+d+'\',\''+exEnc+'\','+setNum+')">S'+setNum+' · '+found.reps+'×'+found.kg+(found.pr?' 🏆':' ✎')+'</span>';
-        }else{
-          html+='<span class="hist-set" style="background:rgba(245,158,11,.08);color:var(--amber);border:1px dashed rgba(245,158,11,.4)" onclick="openAddSet(\''+d+'\',\''+exEnc+'\','+setNum+')">+ S'+setNum+'</span>';
-        }
+      var tot=Math.max(meta?meta.ex.sets:0,maxSaved);
+      html+='<div class="hist-ex g-'+groupOf(ex)+'"><div class="hist-ex-nm">'+escHtml(ex)+' <span>'+sets.length+'/'+tot+'</span></div><div class="hist-sets">';
+      for(var setNum=1;setNum<=tot;setNum++){
+        var found=null;for(var si=0;si<sets.length;si++){if(sets[si].set===setNum){found=sets[si];break;}}
+        if(found)html+='<button class="hist-set'+(found.pr?' pr':'')+'" onclick="openEdit(\''+d+'\',\''+exEnc+'\','+setNum+')" aria-label="Corectează setul '+setNum+'">S'+setNum+' · '+found.reps+'×'+found.kg+(found.pr?' '+svi('medal'):'')+'</button>';
+        else html+='<button class="hist-set add" onclick="openAddSet(\''+d+'\',\''+exEnc+'\','+setNum+')">+ S'+setNum+'</button>';
       }
       html+='</div></div>';
     });
-    if(D.skips.length){
-      D.skips.forEach(function(sk){
-        html+='<div class="hist-ex" style="border:1px dashed rgba(245,158,11,.35);background:repeating-linear-gradient(-45deg,rgba(245,158,11,.04) 0 6px,transparent 6px 16px)"><div class="hist-ex-nm" style="color:var(--muted);margin-bottom:0">⤼ '+escHtml(sk.exercise)+' <span style="color:var(--amber);font-size:10px;font-weight:400">SĂRIT'+(sk.reason?' · '+escHtml(sk.reason):'')+'</span></div></div>';
-      });
-    }
-    if(morningTotal||D.checks.length){
-      html+='<div class="hist-ex" style="background:rgba(var(--acc-rgb),.04);font-size:11px;color:var(--muted)">';
-      if(morningTotal)html+='☀️ Dimineață: '+morningDone+'/'+morningTotal+' bifate';
-      if(morningTotal&&D.checks.length)html+=' · ';
-      if(D.checks.length){
-        var doneList=D.checks.filter(function(c){return c.value==='DA';}).map(function(c){return c.item;}).join(', ');
-        if(doneList)html+='✅ '+doneList;
-      }
-      html+='</div>';
+    D.skips.forEach(function(sk){
+      html+='<div class="hist-ex skip"><div class="hist-ex-nm">'+escHtml(sk.exercise)+' <span>sărit'+(sk.reason?' · '+escHtml(sk.reason):'')+'</span></div></div>';
+    });
+    if(morningTotal||D.checks.length||(D.weight&&trained)){
+      var parts=[];
+      if(D.weight&&trained)parts.push('Cântar: '+D.weight+' kg');
+      if(morningTotal)parts.push('Dimineața: '+morningDone+'/'+morningTotal+' bifate');
+      var doneList=D.checks.filter(function(c){return c.value==='DA';}).map(function(c){return escHtml(chkLbl[c.item]||c.item);});
+      if(doneList.length)parts.push('Obiective: '+doneList.join(', '));
+      if(parts.length)html+='<div class="hist-ex note">'+parts.join(' · ')+'</div>';
     }
     html+='</div></div>';
   });
@@ -5406,24 +5577,19 @@ function buildWeeklyVolume(weekOffset){
 }
 // Hint automat: cel mai mare gol față de bandă → sugestie concretă
 var VOL_SUGGEST={piept:'împins sau fluturări',spate:'ramat sau tracțiuni',umeri:'ridicări laterale',biceps:'flexii biceps',triceps:'extensii triceps',cvadriceps:'squat sau fandări',fesieri:'hip thrust sau RDL',gambe:'ridicări pe vârfuri',core:'plank sau abdomene'};
+
 function volumeHint(data){
   var worst=null;
   data.groups.forEach(function(g){
-    if(g.val<VOL_BAND_LO){
-      var gap=VOL_BAND_LO-g.val;
-      if(!worst||gap>worst.gap)worst={g:g,gap:gap};
-    }
+    if(g.val<VOL_BAND_LO){var gap=VOL_BAND_LO-g.val;if(!worst||gap>worst.gap)worst={g:g,gap:gap};}
   });
   if(worst){
-    var need=Math.ceil(worst.gap);
-    return '⚠️ <strong style="color:var(--amber)">'+worst.g.label+'</strong> e la '+volFmt(worst.g.val)+' seturi — sub bandă. <strong style="color:var(--text)">+'+need+' seturi de '+(VOL_SUGGEST[worst.g.id]||'lucru direct')+'</strong> ar închide golul.';
+    return '<b>'+worst.g.label+'</b> e la '+volFmt(worst.g.val)+' seturi, sub bandă. <b>Încă '+Math.ceil(worst.gap)+' seturi de '+(VOL_SUGGEST[worst.g.id]||'lucru direct')+'</b> ar închide golul.';
   }
   var over=null;
-  data.groups.forEach(function(g){
-    if(g.val>VOL_BAND_HI&&(!over||g.val>over.val))over=g;
-  });
-  if(over)return '🔻 <strong style="color:#fb7185">'+over.label+'</strong> e la '+volFmt(over.val)+' seturi — peste 20 nu crește mai mult, doar obosește. Taie sau mută volumul spre o grupă rămasă în urmă.';
-  return '✅ Toate grupele lucrate sunt în banda 10–20 — exact unde se construiește mușchiul. Ține-o așa.';
+  data.groups.forEach(function(g){if(g.val>VOL_BAND_HI&&(!over||g.val>over.val))over=g;});
+  if(over)return '<b>'+over.label+'</b> e la '+volFmt(over.val)+' seturi. Peste 20 nu mai crește, doar obosește: taie sau mută volumul spre o grupă rămasă în urmă.';
+  return 'Toate grupele lucrate sunt în banda 10–20, exact unde se construiește mușchiul. Ține-o așa.';
 }
 function volFmt(v){return v%1===0?String(v):v.toFixed(1);}
 function renderVolumePanel(){
@@ -5433,41 +5599,21 @@ function renderVolumePanel(){
   var scale=25;
   data.groups.forEach(function(g){if(g.val+2>scale)scale=Math.ceil(g.val)+2;});
   var bandL=VOL_BAND_LO/scale*100,bandW=(VOL_BAND_HI-VOL_BAND_LO)/scale*100;
-  var html='<div class="card open" id="volumeCard" style="margin-bottom:12px">';
-  html+='<div class="card-hd" onclick="document.getElementById(\'volumeCard\').classList.toggle(\'open\')">';
-  html+='<div class="card-ico" style="background:rgba(var(--acc-rgb),.15)">💪</div>';
-  html+='<div style="flex:1;min-width:0"><div class="card-ttl">Volum pe mușchi</div><div class="card-sub">vs banda de creștere 10–20 seturi/săpt.</div></div>';
-  html+='<div class="card-chev" aria-hidden="true">▼</div></div>';
-  html+='<div class="card-bd"><div style="padding-top:12px">';
-  html+='<div style="font-size:11px;color:var(--muted);margin-bottom:10px">'+data.sessions+' antrenament'+(data.sessions===1?'':'e')+' logat'+(data.sessions===1?'':'e')+' · '+data.counted+' seturi numărate</div>';
-  // Axa 0 / 10 / 20 (aliniată cu banda de pe track)
-  html+='<div style="position:relative;height:13px;margin-bottom:3px;font-family:var(--fd);font-size:9px;color:var(--muted)">';
-  html+='<span style="position:absolute;left:0">0</span>';
-  html+='<span style="position:absolute;left:'+bandL.toFixed(1)+'%;transform:translateX(-50%);color:var(--green)">10</span>';
-  html+='<span style="position:absolute;left:'+(bandL+bandW).toFixed(1)+'%;transform:translateX(-50%);color:var(--green)">20</span>';
-  html+='</div>';
+  var html='<div class="vol-panel"><div class="ag-st">Volum pe mușchi<span>'+roCount(data.counted,'set','seturi')+'</span></div>';
+  html+='<div class="vol-axis"><span>0</span><span class="b" style="left:'+bandL.toFixed(1)+'%">10</span><span class="b" style="left:'+(bandL+bandW).toFixed(1)+'%">20</span></div>';
   data.groups.forEach(function(g){
     var st=g.val<VOL_BAND_LO?'low':(g.val<=VOL_BAND_HI?'ok':'high');
-    var stLbl={low:'SUB ȚINTĂ',ok:'OPTIM',high:'PESTE'}[st];
+    var stLbl={low:'sub țintă',ok:'optim',high:'peste'}[st];
     var w=Math.min(100,g.val/scale*100);
-    html+='<div class="vol-row">';
-    html+='<div class="vol-hd"><span class="vol-name">'+g.label+'</span><span class="vol-status '+st+'">'+stLbl+'</span><span class="vol-val">'+volFmt(g.val)+' <small>SET</small></span></div>';
+    html+='<div class="vol-row g-'+(VG_GROUP[g.id]||'core')+'">';
+    html+='<div class="vol-hd"><span class="vol-name">'+g.label+'</span><span class="vol-status '+st+'">'+stLbl+'</span><span class="vol-val">'+volFmt(g.val)+' <small>seturi</small></span></div>';
     html+='<div class="vol-track"><div class="vol-band" style="left:'+bandL.toFixed(1)+'%;width:'+bandW.toFixed(1)+'%"></div><div class="vol-fill '+st+'" data-w="'+w.toFixed(1)+'"></div></div>';
     html+='</div>';
   });
-  // Legendă compactă
-  html+='<div style="display:flex;gap:12px;font-size:9.5px;color:var(--muted);margin:2px 0 0;align-items:center">';
-  html+='<span><span style="display:inline-block;width:8px;height:8px;border-radius:2px;background:var(--amber);vertical-align:-1px"></span> sub țintă</span>';
-  html+='<span><span style="display:inline-block;width:8px;height:8px;border-radius:2px;background:var(--acc2);vertical-align:-1px"></span> în bandă</span>';
-  html+='<span><span style="display:inline-block;width:8px;height:8px;border-radius:2px;background:#fb7185;vertical-align:-1px"></span> peste</span>';
+  if(data.zeros.length)html+='<p class="vol-note">Fără volum săptămâna asta: '+data.zeros.join(' · ')+'</p>';
+  html+='<div class="vol-hint">'+volumeHint(data)+'</div>';
+  html+='<p class="vol-note">10–20 seturi pe mușchi pe săptămână = zona de creștere maximă (Pelland 2025, 67 de studii). Exercițiile compuse numără ½ set pentru mușchii secundari (împinsul → ½ triceps). Banda verde de pe fiecare bară e ținta.</p>';
   html+='</div>';
-  if(data.zeros.length){
-    html+='<div style="font-size:10.5px;color:var(--muted);margin-top:8px">Fără volum săpt. asta: '+data.zeros.join(' · ')+'</div>';
-  }
-  // Hint generat automat din cel mai mare gol
-  html+='<div style="background:rgba(var(--acc-rgb),.06);border-left:3px solid var(--acc);border-radius:0 8px 8px 0;padding:8px 11px;margin-top:10px;font-size:11.5px;line-height:1.55;color:var(--text)">'+volumeHint(data)+'</div>';
-  html+='<div style="font-size:10.5px;color:var(--muted);margin-top:10px;line-height:1.55;border-top:1px solid var(--bd);padding-top:8px">🎯 <strong style="color:var(--acc2)">10–20 seturi/mușchi/săpt.</strong> = zona de creștere maximă (Pelland 2025, 67 studii). Compusele numără ½ pentru mușchii secundari (ex: împinsul → ½ triceps). Sub bandă = sub-optim, nu zero; peste 20 = risc pentru recuperare.</div>';
-  html+='</div></div></div>';
   el.innerHTML=html;
   // Barele cresc animat la afișare
   requestAnimationFrame(function(){requestAnimationFrame(function(){
@@ -6567,23 +6713,6 @@ function thumbForExercise(name){
   return muscleThumb(volumeInfoFor(name).group);
 }
 
-function initGhid(){
-  var cont=document.getElementById('ghid-content'),html='';
-  ghidEx.forEach(function(ex,i){
-    var id='gh_'+i;
-    html+='<div class="ghid-item" id="'+id+'" onclick="document.getElementById(\''+id+'\').classList.toggle(\'open\')">';
-    var tagCls=ex.tag==='bară'?'g-bara':(ex.tag==='bodyweight'?'g-bodyweight':'g-gantere');
-    html+='<div class="ghid-nm"><span class="ex-thumb">'+thumbForExercise(ex.name)+'</span><span style="flex:1;min-width:0">'+ex.name+'</span><span class="gtag '+tagCls+'">'+ex.tag+'</span><span class="card-chev" aria-hidden="true">▼</span></div>';
-    html+='<div class="ghid-body">';
-    html+='<div class="g-row"><div class="g-lbl">Start</div><div>'+ex.start+'</div></div>';
-    html+='<div class="g-row"><div class="g-lbl">Mișcare</div><div>'+ex.move+'</div></div>';
-    html+='<div class="g-row"><div class="g-lbl" style="color:var(--red)">❌</div><div style="color:var(--red)">'+ex.err+'</div></div>';
-    html+='<div class="g-row"><div class="g-lbl" style="color:var(--green)">✅</div><div style="color:var(--green);font-style:italic">'+ex.tip+'</div></div>';
-    html+='<a class="video-btn" href="https://www.youtube.com/results?search_query='+encodeURIComponent(ex.name+' tutorial forma corecta')+'" target="_blank" rel="noopener" onclick="event.stopPropagation()">▶️ Vezi demonstrație video</a>';
-    html+='</div></div>';
-  });
-  cont.innerHTML=html;
-}
 
 // ═══════════════════════════════════════════════════════════════
 // PRELOAD DATE PENTRU DATA SELECTATĂ (azi sau backdated)
@@ -7680,24 +7809,17 @@ function renderPRList(){
       var v=kg*reps;if(v>maxVol)maxVol=v;
       if(kg>0&&reps>0){var orm=kg*(1+reps/30);if(orm>best1RM)best1RM=orm;}
     });
-    var meta=findExerciseMeta(ex);
-    records.push({exercise:ex,maxKg:maxKg,reps:maxRepsAtKg,date:bestSet?bestSet.date:'',vol:maxVol,orm:best1RM,star:meta&&meta.ex.star});
+    records.push({exercise:ex,maxKg:maxKg,reps:maxRepsAtKg,date:bestSet?bestSet.date:'',vol:maxVol,orm:best1RM});
   });
   records.sort(function(a,b){return b.orm-a.orm;});
   if(!records.length){
-    cont.innerHTML='<div style="color:var(--muted);font-size:12px;text-align:center;padding:20px">Niciun record încă. Salvează seturi pentru a vedea PR-urile.</div>';
+    cont.innerHTML='<div class="chart-empty">Niciun record încă. Salvează seturi ca să apară recordurile.</div>';
     return;
   }
-  // Clasament PR-uri după 1RM estimat — top 3 cu accent auriu
+  // Clasament după 1RM estimat (Epley); primele trei au rangul auriu
   var html='';
-  var CHAKp='font-family:var(--fd);font-weight:700';
   records.forEach(function(pr,i){
-    html+='<div style="display:flex;align-items:center;gap:10px;background:var(--s1);border:1px solid '+(i===0?'rgba(245,158,11,.45)':'var(--bd)')+';border-radius:12px;padding:10px 12px;margin-bottom:8px'+(i===0?';background:linear-gradient(120deg,rgba(245,158,11,.06),var(--s1) 55%)':'')+'">';
-    html+='<div style="width:24px;text-align:center;'+CHAKp+';font-size:'+(i<3?'15px':'13px')+';color:'+(i<3?'var(--amber)':'var(--muted)')+';flex-shrink:0">'+(i+1)+'</div>';
-    html+='<div style="flex:1;min-width:0"><div style="font-weight:600;font-size:12.5px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+(pr.star?'<span style="color:var(--acc2)">⭐</span> ':'')+escHtml(pr.exercise)+'</div>';
-    html+='<div style="font-size:10.5px;color:var(--muted);margin-top:1px">'+pr.reps+'×'+pr.maxKg+' kg ('+pr.date+') · volum max '+pr.vol.toFixed(0)+'</div></div>';
-    html+='<div style="text-align:right;flex-shrink:0"><div style="'+CHAKp+';font-size:15px;color:var(--acc2)">'+pr.orm.toFixed(1)+'</div><div style="font-size:8px;letter-spacing:1px;color:var(--muted)">KG 1RM</div></div>';
-    html+='</div>';
+    html+='<div class="pr-row g-'+groupOf(pr.exercise)+(i<3?' top':'')+'"><span class="pr-rank">'+(i+1)+'</span><span class="ag-rm"><span class="ag-rt">'+escHtml(pr.exercise)+'</span><span class="ag-rs">'+pr.reps+' × '+pr.maxKg+' kg · '+escHtml(String(pr.date).slice(0,5))+' · volum maxim '+Math.round(pr.vol).toLocaleString('ro-RO')+'</span></span><span class="ag-rv"><b>'+pr.orm.toFixed(1)+'<small>kg</small></b><small>1RM estimat</small></span></div>';
   });
   cont.innerHTML=html;
 }
