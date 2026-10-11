@@ -79,6 +79,7 @@ Aplicația e **feature-complete** ca "antrenor în buzunar", construită integra
 - `app_theme` = id temă accent ('' implicit / ocean / mov / roz / foc / verde) — aplicată de snippet-ul din `<head>` + `applyTheme()`; graficele/canvas folosesc `themeAcc()`/`themeAcc2()`
 - `legacy_program`='1' = grandfathered · `program_cycle_start` = deload/cicluri · `manual_deload_until` = deload acceptat
 - Poze de progres: IndexedDB `fitness-photos` · FSA handle (desktop): IndexedDB `fitness-fsa` · Snapshot-uri auto (7 zile): IndexedDB `fitness-snapshots` (tot localStorage-ul, cheie = data ISO)
+- `show_morning` = '0' ascunde rutina de dimineață pe Azi (comutator în Setări → Programul meu, `morningShown()`/`toggleMorningShown()`; per device, nu atinge programul, jurnalul sau seria)
 - `bar_weight` = greutatea barei pt. calculatorul de discuri (20 implicit)
 - `training_days` = {days:[0..6]} zilele de antrenament alese (0=Luni) · `training_days_temp` = {days, until:'yyyy-mm-dd'} excepție temporară care expiră singură
 - Dedup: `addRow()` șterge rândul existent cu aceeași cheie (vezi `mergeRemote key()`)

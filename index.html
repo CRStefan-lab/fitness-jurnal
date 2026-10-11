@@ -1051,6 +1051,7 @@ body.in-session .ss-dock:has(>.show){display:flex}
 .dp-prev-row.w{color:var(--text)}
 .dp-prev-row.w b{color:var(--c,var(--acc2))}
 .btn.is-off{opacity:.45}
+#sgProgram .notif-row{margin-bottom:14px}
 
 /* Rezumatul săptămânii (digest) */
 .dg-tiles{margin:10px 0 4px}
@@ -1463,6 +1464,10 @@ body.in-session .ss-dock:has(>.show){display:flex}
       <div class="rules-box" style="margin:12px 0 10px">
         <div class="rule-row" id="myProgramInfo">—</div>
         <div class="rule-row" id="myDaysInfo">—</div>
+      </div>
+      <div class="notif-row">
+        <div><div class="notif-lbl">Rutina de dimineață</div><div class="notif-sub">Apare pe Azi. Dacă o ascunzi, programul, istoricul și seria rămân neschimbate.</div></div>
+        <label class="sw"><input type="checkbox" id="morningToggle" aria-label="Arată rutina de dimineață" onchange="toggleMorningShown(this.checked)"><span class="slider"></span></label>
       </div>
       <button class="btn btn-acc" onclick="openDayPlan()">Schimbă zilele de antrenament</button>
       <p class="help">Nu poți lunea? Mută antrenamentele pe orice zile — sau pune o excepție temporară (o săptămână, o lună) după care revii singur la program.</p>
@@ -2443,6 +2448,14 @@ function refreshAfterDayPlan(){
   initProgram();
   renderMyDaysRow();
 }
+// Rutina de dimineață: afișare opțională, per device (cheie `show_morning`, '0' = ascunsă).
+// Ascunderea nu atinge programul și nici datele: bifele deja făcute rămân în jurnal și în serie.
+function morningShown(){try{return localStorage.getItem('show_morning')!=='0';}catch(e){return true;}}
+function toggleMorningShown(on){
+  try{localStorage.setItem('show_morning',on?'1':'0');}catch(e){}
+  renderToday();
+  showToast(on?'Rutina de dimineață apare pe Azi':'Rutina de dimineață e ascunsă',null,true);
+}
 function renderMyDaysRow(){
   var el=document.getElementById('myDaysInfo');
   if(!el)return;
@@ -2777,6 +2790,7 @@ function showTab(name,btn){
     renderThemeRow();
     renderModeRow();
     renderMyDaysRow();
+    var mtg=document.getElementById('morningToggle');if(mtg)mtg.checked=morningShown();
     // Programul meu
     var mpi=document.getElementById('myProgramInfo');
     if(mpi){
@@ -3056,7 +3070,7 @@ function renderToday(){
       totalSetsExpected+=effS;
     }
   });
-  var morningR=morningRoutines[sch.exDay];
+  var morningR=morningShown()?morningRoutines[sch.exDay]:null;
   if(morningR){
     morningTotal=morningR.list.length;
     morningR.list.forEach(function(mi){if(morningData[mi.id])morningDone++;});
