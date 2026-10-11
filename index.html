@@ -50,7 +50,7 @@ html[data-theme="ocean"]{--acc:#4db6f0;--acc-rgb:77,182,240;--acc2:#9ad6fa;--acc
 html[data-theme="mov"]{--acc:#9d86f5;--acc-rgb:157,134,245;--acc2:#c7b8ff;--acc2-rgb:199,184,255;--acc-dim:#6246d6;--acc-solid:#8b72f0;--acc-fg:#ffffff}
 html[data-theme="roz"]{--acc:#f07aa5;--acc-rgb:240,122,165;--acc2:#ffb3ce;--acc2-rgb:255,179,206;--acc-dim:#c2386c;--acc-solid:#e86a98;--acc-fg:#ffffff}
 html[data-theme="foc"]{--acc:#f0b232;--acc-rgb:240,178,50;--acc2:#ffd67a;--acc2-rgb:255,214,122;--acc-dim:#9a6a0a;--acc-solid:#e8a622;--acc-fg:#1f1704}
-html[data-theme="verde"]{--acc:#7bc98a;--acc-rgb:123,201,138;--acc2:#a9e6b4;--acc2-rgb:169,230,180;--acc-dim:#2e8b4a;--acc-solid:#62b873;--acc-fg:#0f2015}
+html[data-theme="verde"]{--acc:#7bc98a;--acc-rgb:123,201,138;--acc2:#a9e6b4;--acc2-rgb:169,230,180;--acc-dim:#26773f;--acc-solid:#62b873;--acc-fg:#0f2015}
 html[data-mode="light"]{
   --bg:#f5f1ea; --s1:#fffdf9; --s2:#efe9df; --s3:#e4ddd0; --bd:#ddd5c8; --bd2:#c9c0b1;
   --text:#1e1b16; --muted:#6e675c; --muted2:#9a927f;
@@ -997,7 +997,7 @@ body.in-session .ss-dock:has(>.show){display:flex}
 .nt-head{display:flex;align-items:center;justify-content:space-between;gap:10px;margin:0 0 6px}
 .nt-sub{font-size:13.5px;color:var(--muted);min-width:0}
 .nt-sub b{color:var(--text);font-weight:600}
-.nt-ring-wrap{display:flex;align-items:center;gap:18px;margin:8px 0 6px}
+.nt-ring-wrap{display:flex;flex-wrap:wrap;align-items:center;gap:14px 18px;margin:8px 0 6px}
 .nt-ring{width:132px;height:132px;position:relative;flex-shrink:0}
 .nt-ring svg{width:132px;height:132px;transform:rotate(-90deg);display:block}
 .nt-track{fill:none;stroke:var(--s3);stroke-width:12}
@@ -1006,7 +1006,7 @@ body.in-session .ss-dock:has(>.show){display:flex}
 .nt-c{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center}
 .nt-c b{font-family:var(--fd);font-weight:700;font-size:30px;line-height:1;font-variant-numeric:tabular-nums}
 .nt-c small{font-size:11.5px;color:var(--muted);margin-top:3px}
-.nt-leg{flex:1;min-width:0;display:flex;flex-direction:column;gap:9px}
+.nt-leg{flex:1;min-width:160px;display:flex;flex-direction:column;gap:9px}
 .nt-leg div{display:flex;align-items:center;gap:8px;font-size:13.5px}
 .nt-leg i{width:9px;height:9px;border-radius:3px;flex-shrink:0}
 .nt-leg i.p{background:var(--acc)}.nt-leg i.c{background:var(--amber)}.nt-leg i.f{background:var(--orange)}
@@ -7109,7 +7109,7 @@ function renderActivityCalendar(){
   };
   var start=getWeekBounds(-(WEEKS-1)).monday;
   var todayRo=today(),now=new Date();
-  var months=['ian','feb','mar','apr','mai','iun','iul','aug','sep','oct','noi','dec'];
+  var months=I18N.on?['jan','feb','mar','apr','may','jun','jul','aug','sep','oct','nov','dec']:['ian','feb','mar','apr','mai','iun','iul','aug','sep','oct','noi','dec'];
   var monthRow='',cols='',lastMonth=-1,trainDays={};
   for(var w=0;w<WEEKS;w++){
     var monday=new Date(start);monday.setDate(start.getDate()+w*7);
