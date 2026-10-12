@@ -1052,6 +1052,23 @@ body.in-session .ss-dock:has(>.show){display:flex}
 .dp-prev-row.w b{color:var(--c,var(--acc2))}
 .btn.is-off{opacity:.45}
 #sgProgram .notif-row{margin-bottom:14px}
+/* v114: nimic nu mai poate lăți pagina (pe Android lățirea mărea tot și tăia navul) */
+#app{overflow-x:hidden;overflow-x:clip}
+.btn-row .btn{min-width:0}
+.note-btns{margin:12px 0 0}
+.note-btns .btn{padding:11px 14px;font-size:14px}
+.note-btns .btn-ghost{flex:0 0 auto;width:auto}
+.rir-x{flex:0 0 auto;padding:8px 11px;opacity:.55}
+.ag-wk-nav{display:flex;align-items:center;justify-content:space-between;gap:8px;margin:0 0 10px}
+.ag-wk-btn{width:34px;height:34px;border-radius:50%;background:var(--s2);border:0;color:var(--text);display:grid;place-items:center;flex-shrink:0;box-shadow:0 1px 0 var(--hi) inset}
+.ag-wk-btn:disabled{opacity:.3}
+.ag-wk-btn .svi{width:18px;height:18px}
+.ag-wk-ttl{flex:1;min-width:0;text-align:center;display:flex;flex-direction:column;line-height:1.25}
+.ag-wk-ttl b{font-size:14px;font-weight:600}
+.ag-wk-ttl span{font-size:12px;color:var(--muted)}
+.ag-wd.plan b{border-color:var(--c);border-color:color-mix(in srgb,var(--c) 65%,var(--bd2))}
+.pv-row{cursor:default;min-height:54px}
+.sh-acts{margin:14px 0 0}
 
 /* Rezumatul săptămânii (digest) */
 .dg-tiles{margin:10px 0 4px}
@@ -1798,7 +1815,7 @@ body.in-session .ss-dock:has(>.show){display:flex}
     <button class="rest-timer-btn" onclick="saveRIR('easy')">🥱 Ușor</button>
     <button class="rest-timer-btn" onclick="saveRIR('ok')">💪 OK</button>
     <button class="rest-timer-btn" onclick="saveRIR('hard')">😮‍💨 Limită</button>
-    <button class="rest-timer-btn" style="flex:0 0 auto;padding:8px 11px;opacity:.55" onclick="dismissRIR()" title="Sar peste" aria-label="Sar peste"></button>
+    <button class="rest-timer-btn rir-x" onclick="dismissRIR()" title="Sar peste" aria-label="Sar peste">✕</button>
   </div>
 </div>
 
@@ -2934,19 +2951,42 @@ function aziRowValue(name,rows){
   return '<span class="ag-rv"><b>'+v+'<small>'+(useKg?'kg':'rep')+'</small></b><small>'+lbl+'</small></span>';
 }
 
-// Atingere pe o zi din banda săptămânii: trecut = înregistrezi pentru acea dată, viitor = faci azi acel antrenament
+// Banda săptămânii se poate răsfoi: ‹ › sau glisare (săptămâna trecută ... peste 4 săptămâni)
+var agWeekOff=0;
+function agWeek(d){agWeekOff=Math.max(-8,Math.min(4,agWeekOff+d));renderToday();}
+// Atingere pe o zi din bandă: trecut = înregistrezi pentru acea dată; azi = revii la azi;
+// viitor = vezi ce ai de făcut în ziua aceea (cu opțiunea de a-l face azi)
 function pickWeekDay(di){
-  var real=todayIdx();
-  if(di===real){if(currentWorkoutDate||currentWorkoutDay!==null)resetWorkoutDay();return;}
-  if(di<real){
-    var d=new Date();d.setHours(0,0,0,0);d.setDate(d.getDate()-(real-di));
+  var real=todayIdx(),delta=agWeekOff*7+di-real;
+  if(delta===0){if(currentWorkoutDate||currentWorkoutDay!==null)resetWorkoutDay();return;}
+  if(delta<0){
+    var d=new Date();d.setHours(0,0,0,0);d.setDate(d.getDate()+delta);
     setWorkoutDate(d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'));
-  }else{
-    if(currentWorkoutDate){currentWorkoutDate=null;preloadToday();}
-    currentWorkoutDay=di;
-    renderToday();
-    showToast('Faci azi antrenamentul de '+DP_LONG[di].toLowerCase());
+    return;
   }
+  previewDay(di,delta);
+}
+function previewDay(di,delta){
+  var sch=schedule[di],ex=exercises[sch.exDay];if(!ex)return;
+  var d=new Date();d.setHours(0,0,0,0);d.setDate(d.getDate()+delta);
+  var rows=loadStore().rows,dur=String(ex.duration||'').replace('~','circa ');
+  var h='<p class="sh-help">'+escHtml(ex.label)+(/\d/.test(dur)?' · '+escHtml(dur):'')+' · săptămâna '+getProgramWeek(d)+' din 8</p><div class="ag-rows">';
+  ex.list.forEach(function(e){
+    var tgt=String(e.target==null?'':e.target).trim();
+    var tg=/^[\d]+([–—-][\d]+)?$/.test(tgt)?' × '+tgt:((tgt&&tgt!=='—')?' · '+escHtml(tgt):'');
+    h+='<div class="ag-row pv-row g-'+groupOf(e.name)+'"><span class="ag-mus"></span><span class="ag-rm"><span class="ag-rt">'+escHtml(e.name)+'</span><span class="ag-rs">'+roCount(e.sets,'set','seturi')+tg+(e.star?' · progresie':'')+'</span></span>'+(isRIRRelevant(e.name)?aziRowValue(e.name,rows):'')+'</div>';
+  });
+  h+='</div>';
+  h+='<button class="btn btn-acc sh-acts" onclick="closeAziSheet(true);doDayToday('+di+')">Fă antrenamentul ăsta azi</button>';
+  openAziSheet(DP_LONG[di]+', '+d.toLocaleDateString('ro-RO',{day:'numeric',month:'long'}),h);
+}
+function doDayToday(di){
+  agWeekOff=0;
+  if(currentWorkoutDate){currentWorkoutDate=null;preloadToday();}
+  currentWorkoutDay=(di===todayIdx())?null:di;
+  renderToday();
+  window.scrollTo(0,0);
+  if(currentWorkoutDay!==null)showToast('Faci azi antrenamentul de '+DP_LONG[di].toLowerCase());
 }
 function roCount(n,sg,pl){var r=n%100;return n+' '+(n===1?sg:((r>=20||(r===0&&n>0))?'de '+pl:pl));}
 function renderToday(){
@@ -2962,13 +3002,14 @@ function renderToday(){
   var cont=document.getElementById('azi-content'),html='';
   var allRows=loadStore().rows;
 
-  // Banda săptămânii: ce ai făcut (bulină plină în culoarea grupei), azi (inel), ce urmează, pauzele (punctat)
-  var mon=new Date();mon.setHours(0,0,0,0);mon.setDate(mon.getDate()-realIdx);
+  // Banda săptămânii: ce ai făcut (bulină plină în culoarea grupei), azi (inel), ce urmează (contur în culoarea grupei), pauzele (punctat)
+  var mon=new Date();mon.setHours(0,0,0,0);mon.setDate(mon.getDate()-realIdx+agWeekOff*7);
+  var sun=new Date(mon);sun.setDate(mon.getDate()+6);
   var selDi=null;
   if(currentWorkoutDate){
     var cwd=parseRoDate(currentWorkoutDate);
     if(cwd){var cwOff=Math.round((cwd-mon)/86400000);if(cwOff>=0&&cwOff<7)selDi=cwOff;}
-  }else if(currentWorkoutDay!==null){selDi=currentWorkoutDay;}
+  }else if(currentWorkoutDay!==null&&agWeekOff===0){selDi=currentWorkoutDay;}
   var wkIdx={},wkFlag=[];
   for(var wd=0;wd<7;wd++){
     var wdd=new Date(mon);wdd.setDate(mon.getDate()+wd);
@@ -2980,11 +3021,17 @@ function renderToday(){
     if(r.type==='antrenament')wkFlag[w].tr=true;
     else if((r.type==='checklist'||r.type==='dimineata')&&r.note==='DA')wkFlag[w].other=true;
   });
-  html+='<div class="ag-week" role="group" aria-label="Săptămâna">';
+  var wkTtl=agWeekOff===0?'Săptămâna asta':(agWeekOff===1?'Săptămâna viitoare':(agWeekOff===-1?'Săptămâna trecută':''));
+  var wkRng=mon.getDate()+(mon.getMonth()!==sun.getMonth()?' '+mon.toLocaleDateString('ro-RO',{month:'short'}):'')+' – '+sun.toLocaleDateString('ro-RO',{day:'numeric',month:'long'});
+  html+='<div class="ag-wk-nav"><button class="ag-wk-btn" onclick="agWeek(-1)" aria-label="Săptămâna anterioară"'+(agWeekOff<=-8?' disabled':'')+'>'+svi('chl')+'</button>';
+  html+='<div class="ag-wk-ttl"><b>'+(wkTtl||wkRng)+'</b>'+(wkTtl?'<span>'+wkRng+'</span>':'')+'</div>';
+  html+='<button class="ag-wk-btn" onclick="agWeek(1)" aria-label="Săptămâna următoare"'+(agWeekOff>=4?' disabled':'')+'>'+svi('chr')+'</button></div>';
+  html+='<div class="ag-week" role="group" aria-label="Zilele săptămânii">';
   for(var wi=0;wi<7;wi++){
     var wTrain=isTrainingExDay(schedule[wi].exDay);
     var wDone=wkFlag[wi].tr||(!wTrain&&wkFlag[wi].other);
-    var wc='ag-wd'+(wTrain?' g-'+dayGroup(schedule[wi].exDay):' rest')+(wDone?' done':'')+(wi===realIdx?' today':'')+(wi===selDi&&wi!==realIdx?' sel':'');
+    var isT=agWeekOff===0&&wi===realIdx,isSel=wi===selDi&&!isT;
+    var wc='ag-wd'+(wTrain?' g-'+dayGroup(schedule[wi].exDay):' rest')+(wDone?' done':'')+(isT?' today':'')+(isSel?' sel':'')+(wTrain&&!wDone&&!isT&&!isSel?' plan':'');
     html+='<button class="'+wc+'" onclick="pickWeekDay('+wi+')" aria-label="'+DP_LONG[wi]+' '+wkFlag[wi].day+(wDone?', făcut':'')+'"><b>'+(wDone?svi('check'):wkFlag[wi].day)+'</b>'+DP_SHORT[wi]+'</button>';
   }
   html+='</div>';
@@ -3081,7 +3128,7 @@ function renderToday(){
   var deloadSuggest=checkAutoDeloadSuggest();
   if(deloadSuggest){
     html+='<div class="note"><strong>Corpul cere o pauză.</strong> Stagnezi la '+deloadSuggest.stagnant+' exerciții de progresie'+(deloadSuggest.energy!==null?', iar energia ta medie e '+deloadSuggest.energy.toFixed(1)+' din 10':'')+'. O săptămână ușoară acum înseamnă progres mai rapid după.';
-    html+='<div class="btn-row" style="margin:10px 0 0"><button class="btn btn-acc" onclick="acceptManualDeload()">Accept o săptămână ușoară</button><button class="btn btn-ghost" style="flex:0 0 auto" onclick="dismissDeloadSuggest()">Nu acum</button></div></div>';
+    html+='<div class="btn-row note-btns"><button class="btn btn-acc" onclick="acceptManualDeload()">Da, o săptămână ușoară</button><button class="btn btn-ghost" onclick="dismissDeloadSuggest()">Nu acum</button></div></div>';
   }
   // Săptămâna 8 sau deload acceptat
   if(coachWeek===8||isManualDeload()){
@@ -3633,6 +3680,22 @@ function aziChip(kind){
     renderChecklist();
   }
 }
+// Glisare pe banda săptămânii (Azi): stânga = săptămâna următoare, dreapta = cea dinainte
+(function(){
+  var sec=document.getElementById('tab-azi');if(!sec)return;
+  var x0=null,y0=0;
+  sec.addEventListener('touchstart',function(ev){
+    var t=ev.target.closest&&ev.target.closest('.ag-week,.ag-wk-nav');
+    if(!t||ev.touches.length!==1){x0=null;return;}
+    x0=ev.touches[0].clientX;y0=ev.touches[0].clientY;
+  },{passive:true});
+  sec.addEventListener('touchend',function(ev){
+    if(x0===null)return;
+    var t=ev.changedTouches[0],dx=t.clientX-x0,dy=t.clientY-y0;x0=null;
+    if(Math.abs(dx)<50||Math.abs(dx)<Math.abs(dy)*1.5)return;
+    agWeek(dx<0?1:-1);
+  },{passive:true});
+})();
 // Glisare stânga/dreapta între exerciții
 (function(){
   var sec=document.getElementById('tab-sesiune');if(!sec)return;
