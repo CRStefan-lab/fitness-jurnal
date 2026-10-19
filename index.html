@@ -1053,6 +1053,19 @@ body.in-session .ss-dock:has(>.show),body.in-session .ss-dock.on{display:flex}
 .dp-prev-row.w b{color:var(--c,var(--acc2))}
 .btn.is-off{opacity:.45}
 #sgProgram .notif-row{margin-bottom:14px}
+/* v118: butonul de actualizare, plutitor deasupra barei de jos, pe orice ecran (și în antrenament, deasupra docului) */
+.upd-pill{position:fixed;left:12px;right:12px;margin:0 auto;max-width:calc(var(--appw) - 24px);bottom:calc(80px + env(safe-area-inset-bottom));z-index:960;display:none;align-items:center;gap:12px;padding:10px 10px 10px 16px;border:0;border-radius:18px;background:var(--acc-solid);color:var(--acc-fg);font:inherit;text-align:left;box-shadow:0 1px 0 rgba(255,255,255,.2) inset,0 16px 34px -12px rgba(var(--acc-rgb),.8),0 6px 18px rgba(0,0,0,.35)}
+.upd-pill.show{display:flex;animation:updIn .4s cubic-bezier(.2,.9,.3,1)}
+.upd-pill .svi{width:24px;height:24px;flex-shrink:0;stroke-width:2.2}
+.upd-pill span{flex:1;min-width:0;font-weight:700;font-size:15.5px;line-height:1.2}
+.upd-pill small{display:block;font-weight:500;font-size:12.5px;opacity:.85;margin-top:1px}
+.upd-pill b{flex-shrink:0;background:#fff;color:var(--acc-dim);border-radius:12px;padding:10px 14px;font-size:14.5px;font-weight:700}
+.upd-pill:active{transform:scale(.985)}
+@keyframes updIn{from{transform:translateY(24px);opacity:0}to{transform:none;opacity:1}}
+body.in-session .upd-pill{bottom:calc(80px + var(--dockh,0px) + env(safe-area-inset-bottom))}
+body.has-upd>.toast,body.has-upd>.rest-timer{margin-bottom:72px}
+body.has-upd:not(.in-session){padding-bottom:calc(156px + env(safe-area-inset-bottom))}
+body.has-upd.in-session{padding-bottom:calc(156px + var(--dockh,0px) + env(safe-area-inset-bottom))}
 .hdr-title,.ss-ttl,.modal-ttl,.ag-rt,.ag-big,.hist-ttl{overflow-wrap:anywhere}
 /* v114: nimic nu mai poate lăți pagina (pe Android lățirea mărea tot și tăia navul) */
 #app{overflow-x:hidden;overflow-x:clip}
@@ -1136,9 +1149,11 @@ body.in-session .ss-dock:has(>.show),body.in-session .ss-dock.on{display:flex}
   <strong>Adaugă pe telefon:</strong> Share → "Add to Home Screen" (iOS) sau meniu → "Install app" (Android)
 </div>
 
-<div class="install-hint acc" id="updateBanner">
-  <strong>Versiune nouă disponibilă!</strong> <button onclick="applyUpdate()">Actualizează →</button>
-</div>
+<button class="upd-pill" id="updateBanner" onclick="applyUpdate()" aria-label="Versiune nouă disponibilă. Actualizează aplicația">
+  <svg class="svi" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 11a8 8 0 1 0-2.3 5.7M20 4v7h-7"/></svg>
+  <span>Versiune nouă<small>Atinge ca s-o încarci</small></span>
+  <b>Actualizează</b>
+</button>
 
 <div class="install-hint warn" id="fsaReconnectBanner">
   <strong>Sync fișier întrerupt</strong> (permisiune pierdută după update).
@@ -3520,6 +3535,8 @@ function sessKeepSaveVisible(){
     var b=document.querySelector('#sesiune-content .ss-save'),d=document.getElementById('ssDock');
     if(!b||!sessionOpen)return;
     var limit=(d&&d.offsetHeight?d.getBoundingClientRect().top:window.innerHeight-80)-12;
+    // butonul de actualizare (poziția finală, nu cea din animația de intrare)
+    var up=document.getElementById('updateBanner');if(up&&up.classList.contains('show'))limit=Math.min(limit,window.innerHeight-parseFloat(getComputedStyle(up).bottom)-up.offsetHeight-12);
     var over=b.getBoundingClientRect().bottom-limit;
     if(over>0)window.scrollBy({top:over,behavior:'smooth'});
   },80);
@@ -3763,7 +3780,8 @@ function aziChip(kind){
     new ResizeObserver(function(){document.body.style.setProperty('--dockh',dock.offsetHeight+'px');}).observe(dock);
   }
   if(dock&&window.MutationObserver){
-    var syncDock=function(){dock.classList.toggle('on',!!dock.querySelector('.show'));};
+    // și înălțimea docului, calculată aici (ResizeObserver nu rulează cât pagina nu se desenează)
+    var syncDock=function(){dock.classList.toggle('on',!!dock.querySelector('.show'));document.body.style.setProperty('--dockh',dock.offsetHeight+'px');};
     new MutationObserver(syncDock).observe(dock,{subtree:true,childList:true,attributes:true,attributeFilter:['class']});
   }
 })();
@@ -9232,9 +9250,21 @@ function restoreSnapshot(dateIso){
 var _pendingSW=null,_hadSWController=false,_userWantsUpdate=false,_swActivated=false;
 function showUpdateBanner(sw){
   if(sw)_pendingSW=sw;
-  document.getElementById('updateBanner').classList.add('show');
-  showToast('Versiune nouă disponibilă 🚀');
+  var b=document.getElementById('updateBanner');
+  if(b.classList.contains('show'))return;
+  b.classList.add('show');
+  document.body.classList.add('has-upd');
 }
+// Mulți nu observă butonul: dacă o versiune nouă așteaptă și revii în aplicație după cel puțin un minut,
+// fără un antrenament deschis și fără o fereastră deschisă, o încărcăm singuri (seturile sunt deja salvate).
+var _hiddenAt=0;
+document.addEventListener('visibilitychange',function(){
+  if(document.visibilityState==='hidden'){_hiddenAt=Date.now();return;}
+  var b=document.getElementById('updateBanner');
+  if(!b||!b.classList.contains('show')||sessionOpen)return;
+  if(document.querySelector('.modal.show,.onboarding.show'))return;
+  if(_hiddenAt&&Date.now()-_hiddenAt>60000)applyUpdate();
+});
 document.addEventListener('keydown',function(ev){
   if(ev.key==='Escape'){var ms=document.querySelectorAll('.modal.show');if(ms.length)ms[ms.length-1].click();}
   else if((ev.key==='Enter'||ev.key===' ')&&ev.target&&ev.target.getAttribute&&ev.target.getAttribute('role')==='button'){ev.preventDefault();ev.target.click();}
@@ -9287,6 +9317,7 @@ function a11yModalWatch(){
 }
 function applyUpdate(){
   document.getElementById('updateBanner').classList.remove('show');
+  document.body.classList.remove('has-upd');
   if(_pendingSW&&!_swActivated){
     _userWantsUpdate=true;
     _pendingSW.postMessage({type:'SKIP_WAITING'});
