@@ -835,7 +835,7 @@ body.in-session .toast{bottom:calc(80px + var(--dockh,0px) + env(safe-area-inset
 
 /* Docul: Anulează + „cât de greu" + pauza, într-un singur loc, deasupra navului */
 .ss-dock{position:fixed;left:0;right:0;margin:0 auto;max-width:var(--appw);bottom:calc(64px + env(safe-area-inset-bottom));z-index:190;display:none;flex-direction:column;background:var(--s1);border-top:1px solid var(--bd);border-radius:22px 22px 0 0;padding:2px 18px 6px;box-shadow:0 1px 0 var(--hi) inset,0 -16px 40px -18px rgba(0,0,0,.6)}
-body.in-session .ss-dock:has(>.show){display:flex}
+body.in-session .ss-dock:has(>.show),body.in-session .ss-dock.on{display:flex}
 #ssDock>*{display:none}
 #ssDock>.show{display:flex}
 #ssDock>.show~.show{border-top:1px solid var(--bd)}
@@ -2841,7 +2841,9 @@ function initHeader(){
   // Salut personal în locul zilei scrise mare; ziua + data urcă în rândul mic de sus
   var pName=getProfile().name;
   var hr=now.getHours();
-  document.getElementById('hdrTitle').textContent=pName?'Salut, '+pName:(hr<11?'Bună dimineața':(hr<18?'Bună ziua':'Bună seara'));
+  var hT=document.getElementById('hdrTitle');
+  if(pName)hT.innerHTML='Salut, <span data-noi18n>'+escHtml(pName)+'</span>';
+  else hT.textContent=hr<11?'Bună dimineața':(hr<18?'Bună ziua':'Bună seara');
   var lblT=document.getElementById('hdrLblText');
   if(lblT)lblT.textContent=days[now.getDay()]+', '+now.toLocaleDateString('ro-RO',{day:'numeric',month:'long'});
   var streak=getActivityStreak();
@@ -3328,8 +3330,8 @@ function renderToday(){
     }
     if(rateNoteData.energy||rateNoteData.sleep){
       html+='<p class="hint">';
-      if(rateNoteData.energy)html+='Energie: '+escHtml(rateNoteData.energy)+'<br>';
-      if(rateNoteData.sleep)html+='Somn: '+escHtml(rateNoteData.sleep);
+      if(rateNoteData.energy)html+='Energie: <span data-noi18n>'+escHtml(rateNoteData.energy)+'</span><br>';
+      if(rateNoteData.sleep)html+='Somn: <span data-noi18n>'+escHtml(rateNoteData.sleep)+'</span>';
       html+='</p>';
     }
     if(skippedList.length){
@@ -3595,7 +3597,7 @@ function renderSession(ei){
   var kgc=kgConventionFor(e);
   if(kgc)more+='<p class="hint">'+kgc+'</p>';
   if(more)html+='<details class="ss-more"'+(openMore?' open':'')+'><summary>Mai mult</summary>'+more+'</details>';
-  if(exNoteData[key])html+='<div class="ss-note"><b>Notă:</b> '+escHtml(exNoteData[key])+'</div>';
+  if(exNoteData[key])html+='<div class="ss-note"><b>Notă:</b> <span data-noi18n>'+escHtml(exNoteData[key])+'</span></div>';
 
   // Pastilele de seturi: salvate (atinge ca să corectezi), acum, următoarele
   var act=sessionEdit?sessionEdit.n:firstOpenSetOf(e,ei);
@@ -3759,6 +3761,10 @@ function aziChip(kind){
   var dock=document.getElementById('ssDock');
   if(dock&&window.ResizeObserver){
     new ResizeObserver(function(){document.body.style.setProperty('--dockh',dock.offsetHeight+'px');}).observe(dock);
+  }
+  if(dock&&window.MutationObserver){
+    var syncDock=function(){dock.classList.toggle('on',!!dock.querySelector('.show'));};
+    new MutationObserver(syncDock).observe(dock,{subtree:true,childList:true,attributes:true,attributeFilter:['class']});
   }
 })();
 
@@ -5397,7 +5403,7 @@ function renderMeasurements(){
   var visible=measShowAll?history:history.slice(0,6);
   visible.forEach(function(r,i){
     var next=history[i+1]; // următoarea = mai veche
-    html+='<div class="meas-hist-row"><div class="meas-hist-date">'+escHtml(r.date)+(r.note?' · <span style="color:var(--muted);font-weight:400">'+escHtml(r.note)+'</span>':'')+'</div>';
+    html+='<div class="meas-hist-row"><div class="meas-hist-date">'+escHtml(r.date)+(r.note?' · <span class="muted" data-noi18n>'+escHtml(r.note)+'</span>':'')+'</div>';
     html+='<div class="meas-hist-vals">';
     MEAS_FIELDS.forEach(function(f){
       if(r[f.id]==null) return;
@@ -6939,6 +6945,8 @@ function getCycleStartDate(){
 function getCycleInfo(refDate){
   var start=getCycleStartDate();
   if(!start) return {week:1,cycle:1,absWeek:1};
+  var sdow=(start.getDay()+6)%7; // 0 = luni
+  start=new Date(start.getFullYear(),start.getMonth(),start.getDate()+(sdow<=2?-sdow:7-sdow));
   var rf=refDate||new Date();
   var daysSince=(Date.UTC(rf.getFullYear(),rf.getMonth(),rf.getDate())-Date.UTC(start.getFullYear(),start.getMonth(),start.getDate()))/86400000;
   var absWeek=Math.floor(daysSince/7)+1; // săptămâna absolută de la start
@@ -8491,8 +8499,8 @@ function showWeeklyDigest(offset){
     html+='<div class="ag-st">Notele tale</div><div class="ag-rows">';
     d.stateNotes.forEach(function(n){
       var pz=[];
-      if(n.energy)pz.push('energie: '+escHtml(n.energy));
-      if(n.sleep)pz.push('somn: '+escHtml(n.sleep));
+      if(n.energy)pz.push('energie: <span data-noi18n>'+escHtml(n.energy)+'</span>');
+      if(n.sleep)pz.push('somn: <span data-noi18n>'+escHtml(n.sleep)+'</span>');
       html+='<div class="ag-row dg-row"><span class="ag-rm"><span class="ag-rt">'+escHtml(dayNice(n.day||n.date))+'</span><span class="ag-rs">'+pz.join(' · ')+'</span></span></div>';
     });
     html+='</div>';
@@ -9241,7 +9249,7 @@ function a11yEnhance(root){
   if(root.matches&&root.matches(SEL)&&!root.hasAttribute('role')){root.setAttribute('role','button');root.tabIndex=0;}
 }
 // Modal deschis → restul aplicației devine inert (nu primește focus/clic), focusul intră în dialog și revine după
-var _modalFocusStack=[];
+var _modalFocusStack=[],_modalCarry=null;
 function a11yModalWatch(){
   var app=document.getElementById('app');
   var mods=document.querySelectorAll('.modal,.onboarding');
@@ -9255,7 +9263,7 @@ function a11yModalWatch(){
     recs.forEach(function(r){
       var m=r.target,isOpen=m.classList.contains('show'),was=(' '+(r.oldValue||'')+' ').indexOf(' show ')>=0;
       if(isOpen&&!was){
-        _modalFocusStack.push(document.activeElement);
+        _modalFocusStack.push(_modalCarry||document.activeElement);_modalCarry=null;
         setTimeout(function(){
           var box=m.querySelector('.modal-content,.onboarding-card');
           // pe telefon nu deschidem tastatura singuri: focus pe dialog, nu pe primul câmp
@@ -9265,6 +9273,8 @@ function a11yModalWatch(){
         },40);
       }else if(!isOpen&&was){
         var prev=_modalFocusStack.pop();
+        // altă foaie se deschide chiar acum: focusul de întoarcere trece la ea
+        if([].some.call(mods,function(x){return x.classList.contains('show');})){_modalCarry=prev;return;}
         if(prev&&prev.focus&&document.contains(prev))try{prev.focus({preventScroll:true});}catch(e){}
       }
     });
