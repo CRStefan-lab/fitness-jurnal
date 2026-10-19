@@ -1,6 +1,6 @@
-// Service Worker — network-first pentru HTML (updates vizibile imediat)
-// cache-first pentru restul (viteză)
-const CACHE = 'fitness-v115-tinta-azi';
+// Service Worker — rețea-întâi pentru HTML și pentru scripturile proprii (index.html, generator.js și i18n-en.js
+// rămân mereu din aceeași versiune), cu limită de 3 s pe semnal slab; cache-first pentru fonturi și imagini.
+const CACHE = 'fitness-v116-audit';
 const PRECACHE = ['./', './index.html', './manifest.json', './generator.js', './privacy.html', './i18n-en.js',
   './fonts/barlow-400-latin-ext.woff2',
   './fonts/barlow-400-latin.woff2',
@@ -35,6 +35,25 @@ self.addEventListener('message', e => {
   if (e.data && e.data.type === 'SKIP_WAITING') self.skipWaiting();
 });
 
+// Rețea întâi; dacă rețeaua nu răspunde în 3 s, copia din cache (dacă există). Răspunsurile bune se pun în cache.
+function netFirst(req, cacheMode, fallbackUrl) {
+  return new Promise(resolve => {
+    let done = false;
+    const fromCache = () => caches.match(req).then(r => r || (fallbackUrl ? caches.match(fallbackUrl) : undefined));
+    const timer = setTimeout(() => { fromCache().then(r => { if (r && !done) { done = true; resolve(r); } }); }, 3000);
+    fetch(req, { cache: cacheMode })
+      .then(resp => {
+        // cache doar răspunsuri bune (nu 404/5xx sau pagina unui portal WiFi)
+        if (resp.ok && resp.type === 'basic') {
+          const copy = resp.clone();
+          caches.open(CACHE).then(c => c.put(req, copy)).catch(() => {});
+        }
+        if (!done) { done = true; clearTimeout(timer); resolve(resp); }
+      })
+      .catch(() => fromCache().then(r => { if (!done) { done = true; clearTimeout(timer); resolve(r || Response.error()); } }));
+  });
+}
+
 self.addEventListener('fetch', e => {
   if (e.request.method !== 'GET') return;
   const url = new URL(e.request.url);
@@ -47,23 +66,10 @@ self.addEventListener('fetch', e => {
     || url.pathname.endsWith('.html')
     || e.request.headers.get('accept')?.includes('text/html');
 
-  if (isHtml) {
-    e.respondWith(
-      fetch(e.request, { cache: 'no-store' })
-        .then(resp => {
-          // cache doar răspunsuri bune (nu 404/5xx sau pagina unui portal WiFi)
-          if (resp.ok && resp.type === 'basic') {
-            const copy = resp.clone();
-            caches.open(CACHE).then(c => c.put(e.request, copy)).catch(() => {});
-          }
-          return resp;
-        })
-        .catch(() => caches.match(e.request).then(r => r || caches.match('./index.html')))
-    );
-    return;
-  }
+  if (isHtml) { e.respondWith(netFirst(e.request, 'no-store', './index.html')); return; }
+  if (url.pathname.endsWith('.js')) { e.respondWith(netFirst(e.request, 'no-cache', null)); return; }
 
-  // Cache-first pentru manifest, JS, CSS, imagini
+  // Cache-first pentru manifest, fonturi, imagini
   e.respondWith(
     caches.match(e.request).then(r => r || fetch(e.request).then(resp => {
       if (resp.ok && resp.type === 'basic') {
