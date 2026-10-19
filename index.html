@@ -2932,23 +2932,50 @@ function sessionBest(rows){
   rows.forEach(function(r){var k=parseFloat(r.kg)||0,p=parseFloat(r.reps)||0;if(k>kg||(k===kg&&p>reps)){kg=k;reps=p;}});
   return {kg:kg,reps:reps};
 }
-// Coloana din dreapta a rândului din agendă: greutatea de lucru + tendința față de ședința anterioară
-function aziRowValue(name,rows){
+// Coloana din dreapta a rândului din agendă. Înainte de antrenament = ținta de AZI, aceeași ca a antrenorului
+// din modul antrenament (greutatea + ce faci: consolidezi / +2 rep / +1 kg ...). După ce ai salvat seturi azi =
+// ce ai făcut, comparat cu data trecută. Fără recomandare (exerciții noi sau personalizate) = ultima ședință.
+var AZI_TAG={BASELINE:'consolidezi',CONSOLIDARE:'repeți','MENȚINE':'menții',DELOAD:'deload',START:'prima dată','+1 SET':'+1 set','VARIANTĂ ↑':'variantă mai grea'};
+function aziTarget(e,ei,week){
+  var m,r,lbl,up;
+  if(e.star){
+    var rec=getRecommendation(e.name,week,e.sets,ei===aziAddSetIdx);
+    if(!rec||rec.action==='start')return null;
+    m=String(rec.target).match(/([\d.]+)\s*kg/);r=String(rec.target).match(/(\d+)\s*rep/);
+    var base=String(rec.tag||'').replace(/\s*⚡/,'').trim();
+    lbl=AZI_TAG[base]||base.toLowerCase();
+    up=/^add_/.test(rec.action);
+  }else{
+    var a=getAccessoryRec(e.name,e);if(!a)return null;
+    m=a.targetStr.match(/([\d.]+)\s*kg/);r=a.targetStr.match(/(\d+)\s*rep/);
+    var lm=a.lastStr.match(/(\d+)×([\d.]+)/);
+    lbl={deload:'deload',hold:'repeți',below_min:'atinge minimul'}[a.type];
+    if(!lbl&&lm&&m&&r)lbl=a.type==='at_max'?'+'+Math.round((parseFloat(m[1])-parseFloat(lm[2]))*100)/100+' kg':'+'+(parseInt(r[1],10)-parseInt(lm[1],10))+' rep';
+    if(!lbl)lbl='ca data trecută';
+    up=a.type==='at_max'||a.type==='in_range';
+  }
+  if(!m&&!r)return null;
+  return {v:m?parseFloat(m[1]):r[1],u:m?'kg':'rep',lbl:'azi: '+(up?'<em class="ag-up">'+lbl+'</em>':lbl)};
+}
+function aziRowValue(name,rows,e,ei,week){
   var todayRo=getEffectiveDateRo(),ref=parseRoDate(todayRo),byDate={};
   rows.forEach(function(r){if(r.type==='antrenament'&&r.exercise===name)(byDate[r.date]=byDate[r.date]||[]).push(r);});
   var past=Object.keys(byDate).filter(function(d){if(d===todayRo)return false;var x=parseRoDate(d);return !ref||!x||x<ref;})
     .sort(function(a,b){return parseRoDate(b)-parseRoDate(a);});
-  var cur=null,prev=null,isToday=false;
-  if(byDate[todayRo]){cur=sessionBest(byDate[todayRo]);isToday=true;prev=past[0]?sessionBest(byDate[past[0]]):null;}
-  else if(past[0]){cur=sessionBest(byDate[past[0]]);prev=past[1]?sessionBest(byDate[past[1]]):null;}
-  if(!cur)return '<span class="ag-rv"><b>—</b><small>prima dată</small></span>';
-  var useKg=cur.kg>0,v=useKg?cur.kg:cur.reps,lbl;
-  if(!prev){lbl=isToday?'azi, prima dată':'ultima dată';}
-  else{
-    var d=Math.round((v-(useKg?prev.kg:prev.reps))*100)/100;
-    lbl=d>0?'<em class="ag-up">+'+d+' față de ultima</em>':(d<0?'<em class="ag-dn">−'+Math.abs(d)+' față de ultima</em>':(isToday?'azi, ca ultima dată':'ca ultima dată'));
+  var cell=function(v,u,lbl){return '<span class="ag-rv"><b>'+v+'<small>'+u+'</small></b><small>'+lbl+'</small></span>';};
+  if(byDate[todayRo]){
+    var cur=sessionBest(byDate[todayRo]),prev=past[0]?sessionBest(byDate[past[0]]):null;
+    var useKg=cur.kg>0,v=useKg?cur.kg:cur.reps,lbl='azi';
+    if(prev){
+      var d=Math.round((v-(useKg?prev.kg:prev.reps))*100)/100;
+      lbl=d>0?'<em class="ag-up">azi, +'+d+' față de data trecută</em>':(d<0?'<em class="ag-dn">azi, −'+Math.abs(d)+' față de data trecută</em>':'azi, ca data trecută');
+    }
+    return cell(v,useKg?'kg':'rep',lbl);
   }
-  return '<span class="ag-rv"><b>'+v+'<small>'+(useKg?'kg':'rep')+'</small></b><small>'+lbl+'</small></span>';
+  var t=e?aziTarget(e,ei,week):null;
+  if(t)return cell(t.v,t.u,t.lbl);
+  if(past[0]){var c=sessionBest(byDate[past[0]]);return cell(c.kg>0?c.kg:c.reps,c.kg>0?'kg':'rep','ultima dată');}
+  return cell('—','','prima dată');
 }
 
 // Banda săptămânii se poate răsfoi: ‹ › sau glisare (săptămâna trecută ... peste 4 săptămâni)
@@ -2974,7 +3001,7 @@ function previewDay(di,delta){
   ex.list.forEach(function(e){
     var tgt=String(e.target==null?'':e.target).trim();
     var tg=/^[\d]+([–—-][\d]+)?$/.test(tgt)?' × '+tgt:((tgt&&tgt!=='—')?' · '+escHtml(tgt):'');
-    h+='<div class="ag-row pv-row g-'+groupOf(e.name)+'"><span class="ag-mus"></span><span class="ag-rm"><span class="ag-rt">'+escHtml(e.name)+'</span><span class="ag-rs">'+roCount(e.sets,'set','seturi')+tg+(e.star?' · progresie':'')+'</span></span>'+(isRIRRelevant(e.name)?aziRowValue(e.name,rows):'')+'</div>';
+    h+='<div class="ag-row pv-row g-'+groupOf(e.name)+'"><span class="ag-mus"></span><span class="ag-rm"><span class="ag-rt">'+escHtml(e.name)+'</span><span class="ag-rs">'+roCount(e.sets,'set','seturi')+tg+(e.star?' · progresie':'')+'</span></span>'+(isRIRRelevant(e.name)?aziRowValue(e.name,rows,e,-1,getProgramWeek(d)):'')+'</div>';
   });
   h+='</div>';
   h+='<button class="btn btn-acc sh-acts" onclick="closeAziSheet(true);doDayToday('+di+')">Fă antrenamentul ăsta azi</button>';
@@ -3196,7 +3223,7 @@ function renderToday(){
     var nowPill=(ei===curIdx)?'<span class="ag-now">Acum</span>':'';
     html+='<button class="ag-row g-'+groupOf(key)+(isSk?' skipped':'')+(comp?' done':'')+(ei===curIdx?' now':'')+'" onclick="openSession('+ei+')">';
     html+='<span class="ag-mus"></span>'+no+'<span class="ag-rm"><span class="ag-rt">'+escHtml(key)+'</span><span class="ag-rs">'+nowPill+sub+'</span></span>';
-    html+=(isRIRRelevant(key)?aziRowValue(key,allRows):'')+'</button>';
+    html+=(isRIRRelevant(key)?aziRowValue(key,allRows,e,ei,coachWeek):'')+'</button>';
   });
   html+='<button class="ag-row add" onclick="addCustomExerciseDialog()"><span class="ag-mus"></span><span class="ag-no">'+svi('plus')+'</span><span class="ag-rm"><span class="ag-rt">Adaugă un exercițiu în plus</span><span class="ag-rs">Doar pentru azi, pe lângă program</span></span></button>';
   html+='</div>';

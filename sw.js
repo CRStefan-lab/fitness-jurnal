@@ -1,6 +1,6 @@
 // Service Worker — network-first pentru HTML (updates vizibile imediat)
 // cache-first pentru restul (viteză)
-const CACHE = 'fitness-v114-saptamana';
+const CACHE = 'fitness-v115-tinta-azi';
 const PRECACHE = ['./', './index.html', './manifest.json', './generator.js', './privacy.html', './i18n-en.js',
   './fonts/barlow-400-latin-ext.woff2',
   './fonts/barlow-400-latin.woff2',
