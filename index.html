@@ -1562,6 +1562,13 @@ body.has-upd.in-session{padding-bottom:calc(156px + var(--dockh,0px) + env(safe-
           <option value="melodie">Alertă (sală zgomotoasă)</option>
         </select>
       </div>
+      <div class="notif-row" id="keepScreenRow">
+        <div style="flex:1">
+          <div class="notif-lbl">Ține ecranul aprins în antrenament</div>
+          <div class="notif-sub">Ecranul nu se stinge singur în pauză, așa că alarma sună și muzica ta nu se oprește</div>
+        </div>
+        <label class="sw"><input type="checkbox" id="keepScreen" aria-label="Ține ecranul aprins în antrenament" onchange="toggleKeepScreen()"><span class="slider"></span></label>
+      </div>
       <div class="notif-row" id="restTimerBgRow">
         <div style="flex:1">
           <div class="notif-lbl">Sună și cu ecranul stins</div>
@@ -2797,6 +2804,7 @@ function showTab(name,btn){
   sessionOpen=(name==='sesiune');
   if(wasSession&&!sessionOpen){sessionEdit=null;aziDirty=true;}
   document.body.classList.toggle('in-session',sessionOpen);
+  if(sessionOpen)wakeAcquire();else wakeRelease();
   sessDockMount(sessionOpen);
   if(name==='azi'&&aziDirty){aziDirty=false;renderToday();}
   setHeaderForTab(name);
@@ -4341,6 +4349,26 @@ document.addEventListener('visibilitychange',function(){
   // dacă telefonul a oprit pista cât erai plecat, melodia se programează din nou pentru timpul rămas
   if(!document.hidden&&rem>0.3&&(!bgTrack||bgTrack.paused)&&!restSched)scheduleRestBeep(rem);
 });
+// ECRAN APRINS ÎN ANTRENAMENT (v122). Cât e deschis modul antrenament, ecranul nu se stinge singur
+// (Screen Wake Lock). Aplicația rămâne vizibilă, deci pauza sună normal și muzica din alte aplicații nu e
+// atinsă. Butonul de pornire stinge ecranul în continuare; sistemul eliberează blocarea când aplicația nu
+// se vede, iar la revenire o cerem din nou. Comutator: keep_screen ('0' = oprit; implicit pornit).
+var wakeLock=null;
+function wakeWanted(){try{return localStorage.getItem('keep_screen')!=='0';}catch(e){return true;}}
+function wakeAcquire(){
+  if(!wakeWanted()||!sessionOpen||document.hidden||wakeLock||!('wakeLock' in navigator))return;
+  navigator.wakeLock.request('screen').then(function(l){
+    if(!sessionOpen){try{l.release();}catch(e){}return;}
+    wakeLock=l;l.addEventListener('release',function(){if(wakeLock===l)wakeLock=null;});
+  }).catch(function(){});
+}
+function wakeRelease(){if(wakeLock){var l=wakeLock;wakeLock=null;try{l.release();}catch(e){}}}
+document.addEventListener('visibilitychange',function(){if(!document.hidden)wakeAcquire();});
+function toggleKeepScreen(){
+  var on=document.getElementById('keepScreen').checked;
+  localStorage.setItem('keep_screen',on?'1':'0');
+  if(on)wakeAcquire();else wakeRelease();
+}
 function testRestAlarm(){
   var cfg=getRestTimerCfg();
   if(!cfg.sound){showToast('Pornește întâi „Sunet la final".','var(--amber)');return;}
@@ -4593,6 +4621,8 @@ function initRestTimerUI(){
   if(melSel)melSel.value=getMelodyId();
   var bgRow=document.getElementById('restTimerBgRow');if(bgRow)bgRow.style.display=(cfg.enabled&&cfg.sound)?'':'none';
   var bgChk=document.getElementById('restTimerBg');if(bgChk)bgChk.checked=cfg.bg;
+  var ks=document.getElementById('keepScreen');if(ks)ks.checked=wakeWanted();
+  var ksRow=document.getElementById('keepScreenRow');if(ksRow)ksRow.style.display=('wakeLock' in navigator)?'':'none';
   var tb=document.getElementById('restTestBtn');if(tb)tb.style.display=cfg.sound?'':'none';
   renderRestDiag();
   document.getElementById('restTimerStatus').textContent=cfg.enabled?('Activ · '+(cfg.auto?'auto 90s/150s⭐':cfg.seconds+'s')+(cfg.sound?' · 🔊':'')):'Dezactivat';
