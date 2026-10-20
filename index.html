@@ -1565,7 +1565,7 @@ body.has-upd.in-session{padding-bottom:calc(156px + var(--dockh,0px) + env(safe-
       <div class="notif-row" id="restTimerBgRow">
         <div style="flex:1">
           <div class="notif-lbl">Sună și cu ecranul stins</div>
-          <div class="notif-sub">Cât e ecranul stins în pauză, telefonul poate pune pe pauză muzica din altă aplicație</div>
+          <div class="notif-sub">Atenție: pe durata pauzei, telefonul oprește muzica din altă aplicație (altfel nu lasă alarma să sune cu ecranul stins)</div>
         </div>
         <label class="sw"><input type="checkbox" id="restTimerBg" aria-label="Sună și cu ecranul stins" onchange="toggleRestTimerBg()"><span class="slider"></span></label>
       </div>
@@ -4171,7 +4171,7 @@ function getRestTimerCfg(){
     auto:auto,
     seconds:auto?90:(v?parseInt(v):90),
     sound:localStorage.getItem('rest_timer_sound')!=='0',
-    bg:localStorage.getItem('rest_timer_bg')!=='0'
+    bg:localStorage.getItem('rest_timer_bg')==='1' // implicit OPRIT: nu oprim muzica nimănui fără să fi ales
   };
 }
 
@@ -4282,12 +4282,13 @@ function cancelRestBeep(){
   [r.src,r.keep].forEach(function(n){try{n.stop();}catch(e){}try{n.disconnect();}catch(e){}});
   try{r.gain.disconnect();}catch(e){}
 }
-// PISTA DE FUNDAL (v120). Pe Android, Chrome oprește motorul Web Audio cu ecranul stins, dar lasă să meargă
-// redarea media (ca la un player de muzică). La pornirea pauzei (în gestul de salvare) pornește, MUTĂ, o pistă =
-// liniște cât durează pauza + melodia. Cât ești în aplicație rămâne mută: sună melodia programată ca înainte și
-// muzica ta nu e atinsă. Când stingi ecranul sau ieși din aplicație, pista devine audibilă și cântă melodia la
-// final chiar dacă aplicația e adormită. Cât e audibilă, Android poate pune pe pauză muzica altei aplicații —
-// de-asta e un comutator în Setări → Rest timer („Sună și cu ecranul stins").
+// PISTA DE PAUZĂ (v120–v121). Pe Android, Chrome oprește motorul Web Audio cu ecranul stins, dar lasă să meargă
+// o redare media activă (ca la un player de muzică). La pornirea pauzei (în gestul de salvare) pornește o pistă =
+// liniște cât durează pauza + melodia, și ea e sursa melodiei (programarea Web Audio rămâne doar rezervă).
+// IMPORTANT (v121): pista trebuie să fie audibilă DIN PRIMA SECUNDĂ. În v120 pornea mută și devenea audibilă abia
+// la stingerea ecranului; Android 12+ nu mai lasă browserul să-și pornească „serviciul media" din fundal, așa că
+// muzica altei aplicații se oprea, dar pagina adormea înainte de melodie. Prețul: pe durata pauzei telefonul
+// oprește muzica din altă aplicație — de-asta comutatorul din Setări → Rest timer („Sună și cu ecranul stins").
 var bgTrack=null,bgTrackUrl=null;
 function restDiag(msg){
   try{
@@ -4311,11 +4312,15 @@ function startBgTrack(secs){
     var data=new Float32Array(lead+mel.length);data.set(mel,lead);
     bgTrackUrl=wavUrl(data,sr);
     var a=new Audio(bgTrackUrl);
-    a.muted=!document.hidden;
     a.onended=function(){restDiag('pista s-a terminat (melodia a cântat)');stopBgTrack();};
+    a.onpause=function(){if(!a._ours)restDiag('pista OPRITĂ de telefon');};
     bgTrack=a;
     var p=a.play();
-    if(p&&p.then)p.then(function(){restDiag('pista pornită ('+Math.round(secs)+' s, mută cât ești în aplicație)');}).catch(function(err){restDiag('pista NU a pornit: '+(err&&err.name||err));if(bgTrack===a)stopBgTrack();});
+    if(p&&p.then)p.then(function(){
+      restDiag('pista pornită ('+Math.round(secs)+' s)');
+      if(bgTrack===a)cancelRestBeep(); // pista cântă melodia; fără dublură din Web Audio
+      try{if(navigator.mediaSession&&navigator.mediaSession.setPositionState)navigator.mediaSession.setPositionState({duration:a.duration||secs+3.5,playbackRate:1,position:0});}catch(e){}
+    }).catch(function(err){restDiag('pista NU a pornit: '+(err&&err.name||err));if(bgTrack===a)stopBgTrack();});
     if('mediaSession' in navigator){
       try{
         navigator.mediaSession.metadata=new MediaMetadata({title:'Pauză între seturi',artist:'Fitness Jurnal'});
@@ -4325,21 +4330,16 @@ function startBgTrack(secs){
   }catch(e){bgTrack=null;restDiag('pista: eroare '+e.message);}
 }
 function stopBgTrack(){
-  if(bgTrack){try{bgTrack.pause();}catch(e){}bgTrack.onended=null;bgTrack=null;}
+  if(bgTrack){bgTrack._ours=true;try{bgTrack.pause();}catch(e){}bgTrack.onended=null;bgTrack.onpause=null;bgTrack=null;}
   if(bgTrackUrl){try{URL.revokeObjectURL(bgTrackUrl);}catch(e){}bgTrackUrl=null;}
 }
-// Ecran stins / altă aplicație → pista devine audibilă (și oprim melodia programată, să nu sune de două ori).
-// Revii în aplicație → pista redevine mută și melodia se reprogramează pentru timpul rămas.
+// Doar jurnalul: ce face telefonul cu pista când stingi ecranul și când revii
 document.addEventListener('visibilitychange',function(){
   if(!restTimerState.deadline)return;
   var rem=(restTimerState.deadline-Date.now())/1000;
-  if(document.hidden){
-    if(bgTrack){bgTrack.muted=false;cancelRestBeep();}
-    restDiag('ecran stins / altă aplicație, mai sunt '+Math.max(0,Math.round(rem))+' s · pistă '+(bgTrack?(bgTrack.paused?'OPRITĂ':'audibilă'):'lipsă')+' · motor audio '+(audioCtx?audioCtx.state:'—'));
-  }else{
-    restDiag('înapoi în aplicație, mai sunt '+Math.max(0,Math.round(rem))+' s');
-    if(bgTrack){bgTrack.muted=true;if(rem>0.3)scheduleRestBeep(rem);}
-  }
+  restDiag((document.hidden?'ecran stins / altă aplicație':'înapoi în aplicație')+', mai sunt '+Math.max(0,Math.round(rem))+' s · pistă '+(bgTrack?(bgTrack.paused?'OPRITĂ':'cântă'):'lipsă'));
+  // dacă telefonul a oprit pista cât erai plecat, melodia se programează din nou pentru timpul rămas
+  if(!document.hidden&&rem>0.3&&(!bgTrack||bgTrack.paused)&&!restSched)scheduleRestBeep(rem);
 });
 function testRestAlarm(){
   var cfg=getRestTimerCfg();
@@ -4543,7 +4543,7 @@ function restTimerDone(){
   // Melodia programată sună singură; cu ecranul stins cântă pista de fundal. playBeep = doar fallback
   var lateMs=restTimerState.deadline?Date.now()-restTimerState.deadline:0;
   restDiag('final de pauză'+(document.hidden?' (aplicația în fundal)':'')+', întârziere '+(lateMs/1000).toFixed(1)+' s');
-  if(!(restSched&&audioCtx&&audioCtx.state==='running')&&!(bgTrack&&!bgTrack.muted))playBeep();
+  if(!(restSched&&audioCtx&&audioCtx.state==='running')&&!(bgTrack&&!bgTrack.paused))playBeep();
   restSched=null;
   setTimeout(stopKeepAlive,4500); // după ce melodia s-a terminat
   if(navigator.vibrate)navigator.vibrate([300,100,300,100,500]);
