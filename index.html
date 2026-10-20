@@ -4346,7 +4346,10 @@ document.addEventListener('visibilitychange',function(){
   if(!restTimerState.deadline)return;
   var rem=(restTimerState.deadline-Date.now())/1000;
   restDiag((document.hidden?'ecran stins / altă aplicație':'înapoi în aplicație')+', mai sunt '+Math.max(0,Math.round(rem))+' s · pistă '+(bgTrack?(bgTrack.paused?'OPRITĂ':'cântă'):'lipsă'));
-  // dacă telefonul a oprit pista cât erai plecat, melodia se programează din nou pentru timpul rămas
+  // Ecran stins fără pistă: Chrome tace motorul Web Audio în fundal, deci renunțăm la melodia programată acolo;
+  // dacă telefonul lasă aplicația trează, finalul pauzei cântă melodia clasică (playBeep), ca înainte de v119.
+  if(document.hidden&&(!bgTrack||bgTrack.paused))cancelRestBeep();
+  // la revenire, melodia se programează din nou pentru timpul rămas
   if(!document.hidden&&rem>0.3&&(!bgTrack||bgTrack.paused)&&!restSched)scheduleRestBeep(rem);
 });
 // ECRAN APRINS ÎN ANTRENAMENT (v122). Cât e deschis modul antrenament, ecranul nu se stinge singur
