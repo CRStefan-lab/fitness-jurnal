@@ -122,8 +122,8 @@ budget" — adâncime, atmosferă, momente wow; Pro HUD e baza, se împinge mai 
 
 1. **Nume aplicație** — brainstorm cu owner-ul; verifică disponibilitatea pe Play Store; apoi: title în index.html/manifest, iconiță nouă (SVG inline în manifest, actual e 🏋️ pe gradient teal), eventual splash
 2. **Privacy policy** — pagină simplă `privacy.html` în repo (GitHub Pages o servește); conținut: toate datele stau local pe device (localStorage/IndexedDB), zero colectare/server/tracking, backup-ul e responsabilitatea userului; necesară pentru Play Console
-3. **TWA packaging** — PWABuilder.com pe URL-ul live → generează AAB semnat; necesită `assetlinks.json` în repo la `.well-known/`; manifest-ul actual e valid PWA
+3. **Aplicația hibridă (Capacitor), NU TWA** — decizia ownerului din 20 octombrie 2026, după ce s-a stabilit cauza alarmei mute (Android 17 audio hardening, vezi nota v124). Planul complet, pe loturi N0–N5, pentru Opus: `../PLAN-aplicatie-nativa.md` (folderul părinte). Pe scurt: aceleași fișiere web împachetate în `native/` (Capacitor, `webDir: www`, package id `com.crstefanlab.fitnessjurnal`), alarma pauzei = notificare locală exactă cu canal per melodie, export/partajare prin Filesystem+Share, memento-uri prin sistem. `assetlinks.json` nu mai e necesar. Tot ce e nativ stă după `NATIVE.on`; PWA-ul rămâne neschimbat.
 4. **Play Console** — cont developer 25$ o dată; listing (screenshots din preview 375px, descriere RO), data safety = "no data collected", content rating questionnaire (fitness, fără user content), disclaimer medical există deja în wizard
 5. **Post-lansare**: AdMob în rest timer (DOAR în wrapper TWA, nu în PWA), eventual engleză (i18n), teste cu utilizatori noi
 
-Avantaj TWA: app-ul din Play e înveliș peste PWA — push pe main = update instant la toți, fără review Google per update.
+Notă: TWA ar fi avut avantajul actualizărilor instant (push pe main), dar rulează tot în Chrome, deci tot sub regula Android 17: alarma n-ar fi sunat. Cu Capacitor, fiecare release nativ trece prin Play Console (procedura se scrie la lotul N5); PWA-ul de pe Pages se actualizează în continuare instant.
