@@ -94,7 +94,7 @@ Aplicația e **feature-complete** ca "antrenor în buzunar", construită integra
 - **Onboarding wizard**: `openWizard(prefill)` — 7 pași → `ProgramGenerator.generateProgram(profile)` → salvare + reload. X de închidere doar în reconfigure mode.
 - **Nutriție**: legacy = mesele hardcodate (TON/PUI/OMAD); custom = calculator (Mifflin-St Jeor, afișat de `renderNutritionAuto`).
 - **BF% Navy**: `calcBFNavy(waist,neck,height,sex,hip)` — femeile au formulă cu șolduri.
-- **Rest timer**: deadline-based (merge în fundal), beep WebAudio, mod 'auto' = 90s izolări/150s ⭐.
+- **Rest timer**: deadline-based (merge în fundal), beep WebAudio, mod 'auto' = 90s izolări/150s ⭐. **v119:** melodia se PROGRAMEAZĂ în AudioContext la ora de final când pornește pauza (`scheduleRestBeep`/`cancelRestBeep`, `restSched`), plus un semnal inaudibil (30 Hz, −60 dB) cât durează pauza, ca ieșirea audio să rămână activă: sună și cu ecranul stins / din altă aplicație (One UI 9 adoarme JS-ul în fundal). `restTimerDone` cheamă `playBeep` doar ca fallback (context nepornit). Web Audio se amestecă cu muzica (un <audio> lung ar opri Spotify). Sunetul merge pe volumul MEDIA.
 - **Ghid**: modal `openGuideByName`/`openMorningGuide` + link YouTube; `MORNING_GUIDES` pentru cele 22 exerciții matinale.
 - Backup: Share (Android PWA blochează file-share → fallback download `fitness-data dd.mm.yyyy.json`), import JSON, FSA sync doar desktop.
 

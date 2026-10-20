@@ -4204,11 +4204,8 @@ function wavUrl(data,sr){
 }
 
 var beepCache={};
-function buildBeepAudio(id){
-  id=id||getMelodyId();
-  if(beepCache[id])return beepCache[id];
-  try{
-    var m=MELODIES[id],sr=22050,len=Math.ceil(sr*m.len),data=new Float32Array(len);
+function melodySamples(id,sr){
+  var m=MELODIES[id]||MELODIES.marimba,len=Math.ceil(sr*m.len),data=new Float32Array(len);
     m.notes.forEach(function(n){
       var s0=Math.floor(n.t*sr),s1=Math.min(len,Math.floor((n.t+n.d)*sr));
       for(var i=s0;i<s1;i++){
@@ -4234,12 +4231,48 @@ function buildBeepAudio(id){
         data[i]+=v*env*(m.wave==='bell'?0.5:0.42);
       }
     });
+  return data;
+}
+function buildBeepAudio(id){
+  id=id||getMelodyId();
+  if(beepCache[id])return beepCache[id];
+  try{
+    var sr=22050,data=melodySamples(id,sr);
     var a=new Audio(wavUrl(data,sr));a.preload='auto';
     beepCache[id]=a;
     return a;
   }catch(e){return null;}
 }
 
+// PAUZA CU ECRANUL STINS (v119). Sistemele noi (ex. One UI 9) adorm aplicațiile web cu ecranul stins sau
+// când ești în altă aplicație: cronometrul JS nu mai ajunge la final, deci nu suna nimic. Acum melodia se
+// programează direct în motorul audio (AudioContext) la ora de final, chiar când pornește pauza: firul audio
+// rulează separat de JS și cântă la timp și dacă pagina e adormită. Un semnal practic inaudibil (30 Hz,
+// −60 dB) ține ieșirea audio activă cât durează pauza, ca sistemul să nu suspende pagina. Web Audio se
+// amestecă cu muzica ta (nu o oprește), spre deosebire de un fișier audio lung.
+var restSched=null,melodyBufCache={};
+function scheduleRestBeep(secs){
+  cancelRestBeep();
+  if(!audioCtx||!getRestTimerCfg().sound)return false;
+  try{
+    if(audioCtx.state==='suspended')audioCtx.resume().catch(function(){});
+    var id=getMelodyId(),sr=audioCtx.sampleRate,key=id+'@'+sr,buf=melodyBufCache[key];
+    if(!buf){var data=melodySamples(id,sr);buf=audioCtx.createBuffer(1,data.length,sr);buf.getChannelData(0).set(data);melodyBufCache[key]=buf;}
+    var now=audioCtx.currentTime,t0=now+Math.max(0.05,secs);
+    var src=audioCtx.createBufferSource();src.buffer=buf;src.connect(audioCtx.destination);src.start(t0);
+    var ko=audioCtx.createOscillator(),kg=audioCtx.createGain();
+    ko.frequency.value=30;kg.gain.setValueAtTime(0,now);kg.gain.linearRampToValueAtTime(0.001,now+0.2);
+    ko.connect(kg);kg.connect(audioCtx.destination);ko.start(now);ko.stop(t0+buf.duration+0.3);
+    restSched={src:src,keep:ko,gain:kg,at:t0};
+    return true;
+  }catch(e){restSched=null;return false;}
+}
+function cancelRestBeep(){
+  if(!restSched)return;
+  var r=restSched;restSched=null;
+  [r.src,r.keep].forEach(function(n){try{n.stop();}catch(e){}try{n.disconnect();}catch(e){}});
+  try{r.gain.disconnect();}catch(e){}
+}
 // iOS suspendă JS-ul cu ecranul blocat → melodia n-ar mai suna. O sesiune audio
 // silențioasă ținută în loop cât durează pauza păstrează pagina activă.
 var IS_IOS=/iP(hone|ad|od)/.test(navigator.userAgent)||(navigator.platform==='MacIntel'&&navigator.maxTouchPoints>1);
@@ -4384,7 +4417,7 @@ function startRestTimer(isStar){
   restTimerState.total=secs;
   restTimerState.deadline=Date.now()+secs*1000;
   restTimerState.finished=false;
-  if(cfg.sound)startKeepAlive(); // iOS: ține pagina activă cu ecranul blocat, ca melodia să sune
+  if(cfg.sound){scheduleRestBeep(secs);startKeepAlive();} // melodia programată în motorul audio; iOS: ține pagina activă
   var el=document.getElementById('restTimer');
   el.classList.remove('done');
   el.classList.add('show');
@@ -4426,7 +4459,9 @@ function restTimerDone(){
   document.getElementById('restTimerIcon').textContent='✅';
   document.getElementById('restTimerTime').textContent='Gata!';
   document.getElementById('restTimerLbl').textContent='Următorul set';
-  playBeep();
+  // Melodia programată în motorul audio sună singură (și cu ecranul stins); fallback dacă motorul nu rulează
+  if(!(restSched&&audioCtx&&audioCtx.state==='running'))playBeep();
+  restSched=null;
   setTimeout(stopKeepAlive,4500); // după ce melodia s-a terminat
   if(navigator.vibrate)navigator.vibrate([300,100,300,100,500]);
   // Dacă app-ul e minimizat → notificare (necesită permisiunea de notificări activată)
@@ -4443,12 +4478,14 @@ function restTimerAdjust(delta){
   if(!restTimerState.deadline)return;
   restTimerState.deadline+=delta*1000;
   restTimerState.total=Math.max(1,restTimerState.total+delta);
+  if(restSched)scheduleRestBeep((restTimerState.deadline-Date.now())/1000);
   tickRestTimer();
 }
 
 function stopRestTimer(){
   clearInterval(restTimerState.interval);
   restTimerState.deadline=null;
+  cancelRestBeep();
   stopKeepAlive();
   document.getElementById('restTimer').classList.remove('show');
 }
