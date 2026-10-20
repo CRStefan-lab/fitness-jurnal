@@ -1053,6 +1053,8 @@ body.in-session .ss-dock:has(>.show),body.in-session .ss-dock.on{display:flex}
 .dp-prev-row.w b{color:var(--c,var(--acc2))}
 .btn.is-off{opacity:.45}
 #sgProgram .notif-row{margin-bottom:14px}
+.rest-test{margin:12px 0 4px}
+.rest-diag{white-space:pre-wrap;font:12px/1.5 ui-monospace,Menlo,Consolas,monospace;color:var(--muted);background:var(--s2);border-radius:10px;padding:10px 12px;margin:6px 0 0}
 /* v118: butonul de actualizare, plutitor deasupra barei de jos, pe orice ecran (și în antrenament, deasupra docului) */
 .upd-pill{position:fixed;left:12px;right:12px;margin:0 auto;max-width:calc(var(--appw) - 24px);bottom:calc(80px + env(safe-area-inset-bottom));z-index:960;display:none;align-items:center;gap:12px;padding:10px 10px 10px 16px;border:0;border-radius:18px;background:var(--acc-solid);color:var(--acc-fg);font:inherit;text-align:left;box-shadow:0 1px 0 rgba(255,255,255,.2) inset,0 16px 34px -12px rgba(var(--acc-rgb),.8),0 6px 18px rgba(0,0,0,.35)}
 .upd-pill.show{display:flex;animation:updIn .4s cubic-bezier(.2,.9,.3,1)}
@@ -1560,10 +1562,16 @@ body.has-upd.in-session{padding-bottom:calc(156px + var(--dockh,0px) + env(safe-
           <option value="melodie">Alertă (sală zgomotoasă)</option>
         </select>
       </div>
-      <p class="help">
-        💡 Timerul merge și când minimizezi app-ul (calculează pe ceas, nu pe cronometru). Dacă ai notificările activate, primești și notificare cu vibrație când expiră în fundal.<br>
-        🔊 <strong style="color:var(--acc2)">Sunetul folosește volumul MEDIA al telefonului</strong> — dă volumul media mai tare la sală (nu cel de sonerie). Testează cu toggle-ul de mai sus.
-      </p>
+      <div class="notif-row" id="restTimerBgRow">
+        <div style="flex:1">
+          <div class="notif-lbl">Sună și cu ecranul stins</div>
+          <div class="notif-sub">Cât e ecranul stins în pauză, telefonul poate pune pe pauză muzica din altă aplicație</div>
+        </div>
+        <label class="sw"><input type="checkbox" id="restTimerBg" aria-label="Sună și cu ecranul stins" onchange="toggleRestTimerBg()"><span class="slider"></span></label>
+      </div>
+      <button class="btn btn-ghost rest-test" id="restTestBtn" onclick="testRestAlarm()">Testează 10 s cu ecranul stins</button>
+      <details class="ss-more"><summary>Jurnalul alarmei</summary><pre class="rest-diag" id="restDiag" data-noi18n></pre></details>
+      <p class="help">Sunetul folosește <strong>volumul media</strong> al telefonului (nu pe cel de sonerie). Dacă la test nu sună cu ecranul stins, fă o captură a jurnalului de mai sus.</p>
     </div>
   </div>
 
@@ -4162,7 +4170,8 @@ function getRestTimerCfg(){
     enabled:localStorage.getItem('rest_timer_enabled')!=='0',
     auto:auto,
     seconds:auto?90:(v?parseInt(v):90),
-    sound:localStorage.getItem('rest_timer_sound')!=='0'
+    sound:localStorage.getItem('rest_timer_sound')!=='0',
+    bg:localStorage.getItem('rest_timer_bg')!=='0'
   };
 }
 
@@ -4272,6 +4281,78 @@ function cancelRestBeep(){
   var r=restSched;restSched=null;
   [r.src,r.keep].forEach(function(n){try{n.stop();}catch(e){}try{n.disconnect();}catch(e){}});
   try{r.gain.disconnect();}catch(e){}
+}
+// PISTA DE FUNDAL (v120). Pe Android, Chrome oprește motorul Web Audio cu ecranul stins, dar lasă să meargă
+// redarea media (ca la un player de muzică). La pornirea pauzei (în gestul de salvare) pornește, MUTĂ, o pistă =
+// liniște cât durează pauza + melodia. Cât ești în aplicație rămâne mută: sună melodia programată ca înainte și
+// muzica ta nu e atinsă. Când stingi ecranul sau ieși din aplicație, pista devine audibilă și cântă melodia la
+// final chiar dacă aplicația e adormită. Cât e audibilă, Android poate pune pe pauză muzica altei aplicații —
+// de-asta e un comutator în Setări → Rest timer („Sună și cu ecranul stins").
+var bgTrack=null,bgTrackUrl=null;
+function restDiag(msg){
+  try{
+    var L=JSON.parse(localStorage.getItem('rest_diag')||'[]');
+    var d=new Date();L.push(String(d.getHours()).padStart(2,'0')+':'+String(d.getMinutes()).padStart(2,'0')+':'+String(d.getSeconds()).padStart(2,'0')+'  '+msg);
+    localStorage.setItem('rest_diag',JSON.stringify(L.slice(-14)));
+    var el=document.getElementById('restDiag');if(el)renderRestDiag();
+  }catch(e){}
+}
+function renderRestDiag(){
+  var el=document.getElementById('restDiag');if(!el)return;
+  var L=[];try{L=JSON.parse(localStorage.getItem('rest_diag')||'[]');}catch(e){}
+  el.textContent=L.length?L.join('\n'):'Încă nimic. Apasă „Testează 10 s", apoi stinge ecranul.';
+}
+function startBgTrack(secs){
+  stopBgTrack();
+  var cfg=getRestTimerCfg();
+  if(!cfg.sound||!cfg.bg)return;
+  try{
+    var sr=16000,mel=melodySamples(getMelodyId(),sr),lead=Math.max(0,Math.round(secs*sr));
+    var data=new Float32Array(lead+mel.length);data.set(mel,lead);
+    bgTrackUrl=wavUrl(data,sr);
+    var a=new Audio(bgTrackUrl);
+    a.muted=!document.hidden;
+    a.onended=function(){restDiag('pista s-a terminat (melodia a cântat)');stopBgTrack();};
+    bgTrack=a;
+    var p=a.play();
+    if(p&&p.then)p.then(function(){restDiag('pista pornită ('+Math.round(secs)+' s, mută cât ești în aplicație)');}).catch(function(err){restDiag('pista NU a pornit: '+(err&&err.name||err));if(bgTrack===a)stopBgTrack();});
+    if('mediaSession' in navigator){
+      try{
+        navigator.mediaSession.metadata=new MediaMetadata({title:'Pauză între seturi',artist:'Fitness Jurnal'});
+        ['pause','stop'].forEach(function(k){try{navigator.mediaSession.setActionHandler(k,function(){stopRestTimer();});}catch(e){}});
+      }catch(e){}
+    }
+  }catch(e){bgTrack=null;restDiag('pista: eroare '+e.message);}
+}
+function stopBgTrack(){
+  if(bgTrack){try{bgTrack.pause();}catch(e){}bgTrack.onended=null;bgTrack=null;}
+  if(bgTrackUrl){try{URL.revokeObjectURL(bgTrackUrl);}catch(e){}bgTrackUrl=null;}
+}
+// Ecran stins / altă aplicație → pista devine audibilă (și oprim melodia programată, să nu sune de două ori).
+// Revii în aplicație → pista redevine mută și melodia se reprogramează pentru timpul rămas.
+document.addEventListener('visibilitychange',function(){
+  if(!restTimerState.deadline)return;
+  var rem=(restTimerState.deadline-Date.now())/1000;
+  if(document.hidden){
+    if(bgTrack){bgTrack.muted=false;cancelRestBeep();}
+    restDiag('ecran stins / altă aplicație, mai sunt '+Math.max(0,Math.round(rem))+' s · pistă '+(bgTrack?(bgTrack.paused?'OPRITĂ':'audibilă'):'lipsă')+' · motor audio '+(audioCtx?audioCtx.state:'—'));
+  }else{
+    restDiag('înapoi în aplicație, mai sunt '+Math.max(0,Math.round(rem))+' s');
+    if(bgTrack){bgTrack.muted=true;if(rem>0.3)scheduleRestBeep(rem);}
+  }
+});
+function testRestAlarm(){
+  var cfg=getRestTimerCfg();
+  if(!cfg.sound){showToast('Pornește întâi „Sunet la final".','var(--amber)');return;}
+  try{localStorage.setItem('rest_diag','[]');}catch(e){}
+  restDiag('test pornit');
+  startRestTimer(false,10);
+  showToast('Stinge ecranul acum. Ar trebui să sune în 10 secunde.',null);
+}
+function toggleRestTimerBg(){
+  var on=document.getElementById('restTimerBg').checked;
+  localStorage.setItem('rest_timer_bg',on?'1':'0');
+  initRestTimerUI();
 }
 // iOS suspendă JS-ul cu ecranul blocat → melodia n-ar mai suna. O sesiune audio
 // silențioasă ținută în loop cât durează pauza păstrează pagina activă.
@@ -4406,18 +4487,18 @@ function playBeepOsc(){
   }catch(e){}
 }
 
-function startRestTimer(isStar){
+function startRestTimer(isStar,forceSecs){
   var cfg=getRestTimerCfg();
-  if(!cfg.enabled)return;
+  if(!cfg.enabled&&!forceSecs)return;
   clearTimeout(restTimerState.hideT);
   ensureAudio(); // suntem într-un tap (Save) — momentul potrivit
   // Mod auto: 90s izolări · 150s compound ⭐ (Singer 2024: beneficiul pauzei
   // se aplatizează ~90s la izolări; compound-urile cer 2-3 min)
-  var secs=cfg.auto?(isStar?150:90):cfg.seconds;
+  var secs=forceSecs||(cfg.auto?(isStar?150:90):cfg.seconds);
   restTimerState.total=secs;
   restTimerState.deadline=Date.now()+secs*1000;
   restTimerState.finished=false;
-  if(cfg.sound){scheduleRestBeep(secs);startKeepAlive();} // melodia programată în motorul audio; iOS: ține pagina activă
+  if(cfg.sound){scheduleRestBeep(secs);startBgTrack(secs);startKeepAlive();} // melodia programată + pista de fundal (ecran stins); iOS: pagina activă
   var el=document.getElementById('restTimer');
   el.classList.remove('done');
   el.classList.add('show');
@@ -4459,8 +4540,10 @@ function restTimerDone(){
   document.getElementById('restTimerIcon').textContent='✅';
   document.getElementById('restTimerTime').textContent='Gata!';
   document.getElementById('restTimerLbl').textContent='Următorul set';
-  // Melodia programată în motorul audio sună singură (și cu ecranul stins); fallback dacă motorul nu rulează
-  if(!(restSched&&audioCtx&&audioCtx.state==='running'))playBeep();
+  // Melodia programată sună singură; cu ecranul stins cântă pista de fundal. playBeep = doar fallback
+  var lateMs=restTimerState.deadline?Date.now()-restTimerState.deadline:0;
+  restDiag('final de pauză'+(document.hidden?' (aplicația în fundal)':'')+', întârziere '+(lateMs/1000).toFixed(1)+' s');
+  if(!(restSched&&audioCtx&&audioCtx.state==='running')&&!(bgTrack&&!bgTrack.muted))playBeep();
   restSched=null;
   setTimeout(stopKeepAlive,4500); // după ce melodia s-a terminat
   if(navigator.vibrate)navigator.vibrate([300,100,300,100,500]);
@@ -4478,7 +4561,9 @@ function restTimerAdjust(delta){
   if(!restTimerState.deadline)return;
   restTimerState.deadline+=delta*1000;
   restTimerState.total=Math.max(1,restTimerState.total+delta);
-  if(restSched)scheduleRestBeep((restTimerState.deadline-Date.now())/1000);
+  var remA=(restTimerState.deadline-Date.now())/1000;
+  if(restSched)scheduleRestBeep(remA);
+  if(bgTrack)startBgTrack(remA);
   tickRestTimer();
 }
 
@@ -4486,6 +4571,7 @@ function stopRestTimer(){
   clearInterval(restTimerState.interval);
   restTimerState.deadline=null;
   cancelRestBeep();
+  stopBgTrack();
   stopKeepAlive();
   document.getElementById('restTimer').classList.remove('show');
 }
@@ -4505,6 +4591,10 @@ function initRestTimerUI(){
   if(melRow)melRow.style.display=(cfg.enabled&&cfg.sound)?'':'none';
   var melSel=document.getElementById('restTimerMelody');
   if(melSel)melSel.value=getMelodyId();
+  var bgRow=document.getElementById('restTimerBgRow');if(bgRow)bgRow.style.display=(cfg.enabled&&cfg.sound)?'':'none';
+  var bgChk=document.getElementById('restTimerBg');if(bgChk)bgChk.checked=cfg.bg;
+  var tb=document.getElementById('restTestBtn');if(tb)tb.style.display=cfg.sound?'':'none';
+  renderRestDiag();
   document.getElementById('restTimerStatus').textContent=cfg.enabled?('Activ · '+(cfg.auto?'auto 90s/150s⭐':cfg.seconds+'s')+(cfg.sound?' · 🔊':'')):'Dezactivat';
 }
 
