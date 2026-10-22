@@ -510,6 +510,7 @@ input:checked + .slider:before{transform:translateX(20px);background:#fff}
 .g-lbl{font-weight:700;color:var(--muted);font-size:12px;width:56px;flex-shrink:0;padding-top:2px}
 .ex-thumb{width:36px;height:38px;border-radius:10px;background:var(--s2);display:flex;align-items:center;justify-content:center;flex-shrink:0}
 .video-btn{display:block;width:100%;background:transparent;border:1px solid var(--bd2);color:var(--text);border-radius:12px;padding:12px;font-size:14px;font-weight:700;text-align:center;text-decoration:none;margin-top:10px}
+.video-note{font-size:12px;line-height:1.5;color:var(--muted);margin:8px 2px 0}
 
 /* ── Zilele mele (modal plan) ── */
 .dpl-day{flex:1;background:var(--s2);border:1px solid transparent;border-radius:10px;color:var(--muted);font-weight:700;font-size:14px;padding:11px 0}
@@ -1836,6 +1837,7 @@ body.has-upd.in-session{padding-bottom:calc(156px + var(--dockh,0px) + env(safe-
     <div class="modal-sub" id="guideTag"></div>
     <div id="guideBody" style="font-size:13px;line-height:1.6"></div>
     <a class="video-btn" id="guideVideoBtn" target="_blank" rel="noopener">Vezi demonstrație video (YouTube)</a>
+    <p class="video-note">Clipurile de pe YouTube diferă între ele (unghiuri, variante, păreri). Reperul e ce scrie mai sus: dacă un clip arată altfel, urmează pașii din aplicație.</p>
     <button class="btn btn-ghost" style="margin-top:10px;margin-bottom:0" onclick="closeGuide()">Închide</button>
   </div>
 </div>
@@ -4743,34 +4745,34 @@ function toggleCheck(id,el){
 // GHID EXERCIȚII — modal accesibil de peste tot + video demo
 // ═══════════════════════════════════════════════════════════════
 var MORNING_GUIDES={
-  morn_flotari_lente:{name:'Flotări lente',how:'Flotare clasică dar cu tempo foarte lent: 3 sec coborâre, 1 sec pauză jos, 1 sec urcare. Corpul drept ca o scândură.',tip:'Scopul e ÎNVĂȚAREA mișcării, nu oboseala. Oprește-te cu 2-3 repetări înainte de eșec.',easier:'Scara: la perete → pe blat/masă → pe genunchi → complete. Coboară o treaptă când nu-ți ies repetările cu formă curată; urci înapoi când le faci pe toate lejer.'},
-  morn_pike_pushup:{name:'Pike push-up',how:'Din poziția V inversat (fese sus), cobori capul spre podea îndoind coatele, apoi împingi înapoi.',tip:'Pregătește umerii pentru împinsul de seară.',easier:'Pe genunchi (fesele mai jos, pași mai mici) sau doar ține poziția V 20 sec — pattern-ul contează, nu adâncimea.'},
-  morn_mob_umeri:{name:'Mobilitate umeri',how:'Cercuri ample cu brațele (10 înainte + 10 înapoi), apoi brațele pe perete și aluneci în sus/jos (wall slides), apoi întinderi ușoare ale pieptului în cadru de ușă.',tip:'Lent și fără durere — cauți mobilitate, nu forțare.'},
-  morn_kegel:{name:'Kegel',how:'Contractă mușchii planșeului pelvin (cei cu care ai opri urinarea) 3-5 sec, relaxează 3 sec. Repetă 10-15 ori.',tip:'Nu contracta fesierii sau abdomenul. Nimeni nu vede că îl faci — poți oriunde.'},
-  morn_kegel_rapid:{name:'Kegel rapid (quick flicks)',how:'Contracții SCURTE și puternice: strângi 1 sec, relaxezi complet 2 sec. 15 repetări. Antrenează fibrele rapide — cele care intervin la tuse, strănut, ridicat greutăți.',tip:'Complementar Kegel-ului clasic: acela lucrează rezistența, acesta reacția rapidă. Relaxarea completă între repetări e obligatorie.',easier:'Începe cu 8 repetări și crește treptat.'},
-  morn_kegel_respiratie:{name:'Kegel cu respirație diafragmatică',how:'Culcat sau șezând: inspiri adânc în burtă (planșeul coboară, se relaxează) → expiri lent și contracți planșeul spre final. 10 respirații complete.',tip:'Cea mai funcțională variantă — planșeul lucrează sincronizat cu diafragma, exact ca în viața reală. Dacă ținei respirația, ai greșit.',easier:'5 respirații, doar coordonarea — fără forță în contracție.'},
-  morn_relax_pelvin:{name:'Relaxare planșeu pelvin',how:'Poziția copilului sau happy baby (culcat pe spate, genunchii la piept, prinzi tălpile), respiri adânc 5 minute lăsând planșeul să se DESTINDĂ la fiecare inspir. Fără nicio contracție.',tip:'Pentru planșeu hiperton (tensionat): mai multe contracții înrăutățesc situația — relaxarea e antrenamentul. Semne: disconfort pelvin, urinare frecventă în ciuda Kegel-urilor.',easier:'Doar 2-3 min de respirație adâncă, culcat cu genunchii îndoiți.'},
-  morn_fandari:{name:'Fandări în loc',how:'Pas mare în spate, cobori genunchiul spre podea, revii împingând în călcâiul din față. Alternezi picioarele.',tip:'Trunchiul drept, mișcare controlată.',easier:'Ține-te de perete sau de un scaun pentru echilibru și coboară doar cât e confortabil — adâncimea vine cu timpul.'},
-  morn_glute_bridge:{name:'Glute bridge',how:'Pe spate, genunchii îndoiți, împingi șoldurile sus strângând fesierii, ții 1 sec, cobori lent.',tip:'Activează fesierii pentru antrenamentul de seară.'},
-  morn_plank:{name:'Plank',how:'Pe coate, corpul drept de la cap la călcâie. Menții poziția respirând normal.',tip:'Fesierii și abdomenul contractate — nu lăsa șoldurile să cadă.',easier:'Pe genunchi (linie dreaptă de la genunchi la cap) sau intervale scurte: 3×15 sec cu pauză.'},
-  morn_dead_bug:{name:'Dead bug',how:'Pe spate, brațele spre tavan, genunchii la 90°. Cobori simultan brațul drept și piciorul stâng, revii, alternezi.',tip:'Lomba lipită de podea TOT timpul.'},
-  morn_plank_leg_raise:{name:'Plank + ridicări picioare',how:'Din plank, ridici un picior 10-15 cm, ții 2 sec, alternezi. Sau: plank 30 sec + 10 ridicări de picioare culcat.',tip:'Șoldurile stabile, nu se rotesc.',easier:'Fă doar plank simplu (pe genunchi dacă e nevoie) — ridicările de picioare vin când ții plank-ul stabil 30 sec.'},
-  morn_mob_general:{name:'Mobilitate full body',how:'Cat-cow (spate rotund/arcuit în 4 labe) ×10, rotiri de șolduri ×10, cercuri brațe ×10.',tip:'Trezește toate articulațiile în 3 minute.'},
-  morn_ramat_usor:{name:'Ramat ușor sprijinit',how:'Pieptul pe bancă înclinată, gantere UȘOARE (jumătate din greutatea de seară), tragi spre șolduri strângând omoplații.',tip:'Pattern, nu efort — înveți mișcarea pentru seară.',easier:'Cele mai mici gantere pe care le ai — sau chiar fără greutate, doar mișcarea cu omoplații. Aici contează pattern-ul.'},
-  morn_reverse_fly:{name:'Reverse fly ușor',how:'Aplecat cu trunchiul cât mai aproape de paralel cu podeaua (minim 45°), gantere ușoare, coatele ușor îndoite și fixe — deschizi brațele lateral strângând omoplații.',tip:'Cu cât ești mai orizontal, cu atât lucrează umărul posterior (la 45° preia trapezul). Degetele mari în sus. Greutate mică, formă perfectă.',easier:'Fără gantere: doar deschide brațele cu omoplații strânși — activarea e aceeași.'},
-  morn_dead_hang:{name:'Dead hang',how:'Atârnat de bară (sau cadru ușă solid) cu brațele întinse, corpul relaxat, 20-30 sec.',tip:'Decompresie pentru coloană + mobilitate umeri. Excelent după somn.',easier:'Ține vârfurile picioarelor pe sol sau pe un scaun și lasă în brațe doar o parte din greutate.'},
-  morn_hip_hinge:{name:'Hip hinge (fără greutate)',how:'Mâinile pe coapse, împingi șoldurile înapoi cu spatele drept până simți întindere în spatele picioarelor, revii strângând fesierii.',tip:'Pattern-ul pentru îndreptări — mișcarea vine din șolduri, nu din genunchi.'},
-  morn_flotari_inguste:{name:'Flotări înguste',how:'Flotare cu mâinile apropiate sub piept, coatele lipite de corp.',tip:'Coatele lipite de corp — tricepsul face treaba.',easier:'Scara: la perete → pe blat → pe genunchi → complete.'},
-  morn_plank_lateral:{name:'Plank lateral',how:'Lateral pe un cot, corpul drept, șoldurile sus. 30 sec pe fiecare parte.',tip:'Corpul ca o linie dreaptă — nu lăsa șoldul să cadă.',easier:'Pe genunchi (genunchiul de jos pe podea) sau 2×15 sec pe parte.'},
-  morn_stretch_full:{name:'Stretching full body',how:'Întinderi statice 20-30 sec fiecare: coapse față/spate, fesieri, piept, umeri, spate. Fără arcuire, respiri adânc.',tip:'Ziua de recovery = investiție în următoarea săptămână.'},
-  morn_mob_articulatii:{name:'Mobilitate umeri/șolduri',how:'90/90 pentru șolduri (șezut, ambele picioare la 90°, rotești), cercuri ample brațe, wall slides.',tip:'Zonele care înțepenesc cel mai repede la birou.'},
-  morn_plimbare:{name:'Plimbare exterior',how:'Mers în ritm moderat 20-30 min, ideal dimineața pentru lumină naturală.',tip:'Lumina de dimineață reglează somnul + arzi calorii fără efort.'},
-  morn_superman:{name:'Superman',how:'Pe burtă, ridici simultan brațele și picioarele, ții 2 sec, cobori lent.',tip:'Privirea în podea, gâtul neutru.',easier:'Ridică doar brațele (picioarele rămân jos), sau alternativ: braț drept + picior stâng, apoi invers.'},
-  morn_scapular:{name:'Scapular push-ups',how:'În poziție de flotare cu brațele ÎNTINSE, doar strângi și depărtezi omoplații (mișcare mică).',tip:'Trezește mușchii dintre omoplați pentru ziua de spate.'},
-  morn_bicicleta:{name:'Bicicletă / eliptică ușoară',how:'Pedalezi 20–30 min în ritm conversațional — poți vorbi fără să gâfâi. Rezistență mică, cadență constantă.',tip:'Cardio ușor = circulație și recuperare, nu antrenament. Dacă transpiri abundent, ai mers prea tare.',easier:'10–15 min e suficient la început.'},
-  morn_yoga:{name:'Yoga / mobilitate ghidată',how:'15–20 min de flow lent (salut la soare, pisică-vacă, porumbel, câine cu fața în jos). Respiri adânc pe fiecare poziție.',tip:'Caută „yoga for recovery 15 min” pe YouTube. Fără poziții dureroase — mobilitate, nu performanță.',easier:'Doar 5 poziții ținute câte 60 sec.'},
-  morn_foam_roll:{name:'Foam rolling',how:'Rulezi lent (2-3 cm/sec) pe rolă: coapse față/spate, fesieri, gambe, spate superior. 45–60 sec pe zonă, insiști pe punctele sensibile.',tip:'NU rula pe lombari sau articulații. Disconfort da, durere ascuțită nu — atunci treci mai departe.',easier:'Fără rolă: minge de tenis pe talpă și fesieri.'},
-  morn_mob_toracic:{name:'Mobilitate toracică',how:'În 4 labe, o mână la ceafă, rotești cotul spre tavan și înapoi ×8/parte. Apoi cat-cow ×10.',tip:'Rotația toracică bună = ramat sigur.'}
+  morn_flotari_lente:{name:'Flotări lente',yt:'slow tempo push up form',how:'Flotare clasică dar cu tempo foarte lent: 3 sec coborâre, 1 sec pauză jos, 1 sec urcare. Corpul drept ca o scândură.',tip:'Scopul e ÎNVĂȚAREA mișcării, nu oboseala. Oprește-te cu 2-3 repetări înainte de eșec.',easier:'Scara: la perete → pe blat/masă → pe genunchi → complete. Coboară o treaptă când nu-ți ies repetările cu formă curată; urci înapoi când le faci pe toate lejer.'},
+  morn_pike_pushup:{name:'Pike push-up',yt:'pike push up form',how:'Din poziția V inversat (fese sus), cobori capul spre podea îndoind coatele, apoi împingi înapoi.',tip:'Pregătește umerii pentru împinsul de seară.',easier:'Pe genunchi (fesele mai jos, pași mai mici) sau doar ține poziția V 20 sec — pattern-ul contează, nu adâncimea.'},
+  morn_mob_umeri:{name:'Mobilitate umeri',yt:'shoulder mobility routine arm circles wall slides',how:'Cercuri ample cu brațele (10 înainte + 10 înapoi), apoi brațele pe perete și aluneci în sus/jos (wall slides), apoi întinderi ușoare ale pieptului în cadru de ușă.',tip:'Lent și fără durere — cauți mobilitate, nu forțare.'},
+  morn_kegel:{name:'Kegel',yt:'kegel exercise how to do correctly',how:'Contractă mușchii planșeului pelvin (cei cu care ai opri urinarea) 3-5 sec, relaxează 3 sec. Repetă 10-15 ori.',tip:'Nu contracta fesierii sau abdomenul. Nimeni nu vede că îl faci — poți oriunde.'},
+  morn_kegel_rapid:{name:'Kegel rapid (quick flicks)',yt:'kegel quick flicks exercise',how:'Contracții SCURTE și puternice: strângi 1 sec, relaxezi complet 2 sec. 15 repetări. Antrenează fibrele rapide — cele care intervin la tuse, strănut, ridicat greutăți.',tip:'Complementar Kegel-ului clasic: acela lucrează rezistența, acesta reacția rapidă. Relaxarea completă între repetări e obligatorie.',easier:'Începe cu 8 repetări și crește treptat.'},
+  morn_kegel_respiratie:{name:'Kegel cu respirație diafragmatică',yt:'diaphragmatic breathing pelvic floor exercise',how:'Culcat sau șezând: inspiri adânc în burtă (planșeul coboară, se relaxează) → expiri lent și contracți planșeul spre final. 10 respirații complete.',tip:'Cea mai funcțională variantă — planșeul lucrează sincronizat cu diafragma, exact ca în viața reală. Dacă ținei respirația, ai greșit.',easier:'5 respirații, doar coordonarea — fără forță în contracție.'},
+  morn_relax_pelvin:{name:'Relaxare planșeu pelvin',yt:'pelvic floor relaxation happy baby child pose',how:'Poziția copilului sau happy baby (culcat pe spate, genunchii la piept, prinzi tălpile), respiri adânc 5 minute lăsând planșeul să se DESTINDĂ la fiecare inspir. Fără nicio contracție.',tip:'Pentru planșeu hiperton (tensionat): mai multe contracții înrăutățesc situația — relaxarea e antrenamentul. Semne: disconfort pelvin, urinare frecventă în ciuda Kegel-urilor.',easier:'Doar 2-3 min de respirație adâncă, culcat cu genunchii îndoiți.'},
+  morn_fandari:{name:'Fandări în loc',yt:'reverse lunge bodyweight form',how:'Pas mare în spate, cobori genunchiul spre podea, revii împingând în călcâiul din față. Alternezi picioarele.',tip:'Trunchiul drept, mișcare controlată.',easier:'Ține-te de perete sau de un scaun pentru echilibru și coboară doar cât e confortabil — adâncimea vine cu timpul.'},
+  morn_glute_bridge:{name:'Glute bridge',yt:'glute bridge form',how:'Pe spate, genunchii îndoiți, împingi șoldurile sus strângând fesierii, ții 1 sec, cobori lent.',tip:'Activează fesierii pentru antrenamentul de seară.'},
+  morn_plank:{name:'Plank',yt:'plank proper form',how:'Pe coate, corpul drept de la cap la călcâie. Menții poziția respirând normal.',tip:'Fesierii și abdomenul contractate — nu lăsa șoldurile să cadă.',easier:'Pe genunchi (linie dreaptă de la genunchi la cap) sau intervale scurte: 3×15 sec cu pauză.'},
+  morn_dead_bug:{name:'Dead bug',yt:'dead bug exercise form',how:'Pe spate, brațele spre tavan, genunchii la 90°. Cobori simultan brațul drept și piciorul stâng, revii, alternezi.',tip:'Lomba lipită de podea TOT timpul.'},
+  morn_plank_leg_raise:{name:'Plank + ridicări picioare',yt:'plank leg lift form',how:'Din plank, ridici un picior 10-15 cm, ții 2 sec, alternezi. Sau: plank 30 sec + 10 ridicări de picioare culcat.',tip:'Șoldurile stabile, nu se rotesc.',easier:'Fă doar plank simplu (pe genunchi dacă e nevoie) — ridicările de picioare vin când ții plank-ul stabil 30 sec.'},
+  morn_mob_general:{name:'Mobilitate full body',yt:'morning mobility routine cat cow hip circles',how:'Cat-cow (spate rotund/arcuit în 4 labe) ×10, rotiri de șolduri ×10, cercuri brațe ×10.',tip:'Trezește toate articulațiile în 3 minute.'},
+  morn_ramat_usor:{name:'Ramat ușor sprijinit',yt:'chest supported dumbbell row incline bench form',how:'Pieptul pe bancă înclinată, gantere UȘOARE (jumătate din greutatea de seară), tragi spre șolduri strângând omoplații.',tip:'Pattern, nu efort — înveți mișcarea pentru seară.',easier:'Cele mai mici gantere pe care le ai — sau chiar fără greutate, doar mișcarea cu omoplații. Aici contează pattern-ul.'},
+  morn_reverse_fly:{name:'Reverse fly ușor',yt:'bent over dumbbell reverse fly torso parallel to floor rear delt',how:'Aplecat cu trunchiul cât mai aproape de paralel cu podeaua (minim 45°), gantere ușoare, coatele ușor îndoite și fixe — deschizi brațele lateral strângând omoplații.',tip:'Cu cât ești mai orizontal, cu atât lucrează umărul posterior (la 45° preia trapezul). Degetele mari în sus. Greutate mică, formă perfectă.',easier:'Fără gantere: doar deschide brațele cu omoplații strânși — activarea e aceeași.'},
+  morn_dead_hang:{name:'Dead hang',yt:'dead hang pull up bar how to',how:'Atârnat de bară (sau cadru ușă solid) cu brațele întinse, corpul relaxat, 20-30 sec.',tip:'Decompresie pentru coloană + mobilitate umeri. Excelent după somn.',easier:'Ține vârfurile picioarelor pe sol sau pe un scaun și lasă în brațe doar o parte din greutate.'},
+  morn_hip_hinge:{name:'Hip hinge (fără greutate)',yt:'hip hinge drill bodyweight',how:'Mâinile pe coapse, împingi șoldurile înapoi cu spatele drept până simți întindere în spatele picioarelor, revii strângând fesierii.',tip:'Pattern-ul pentru îndreptări — mișcarea vine din șolduri, nu din genunchi.'},
+  morn_flotari_inguste:{name:'Flotări înguste',yt:'close grip push up form',how:'Flotare cu mâinile apropiate sub piept, coatele lipite de corp.',tip:'Coatele lipite de corp — tricepsul face treaba.',easier:'Scara: la perete → pe blat → pe genunchi → complete.'},
+  morn_plank_lateral:{name:'Plank lateral',yt:'side plank form',how:'Lateral pe un cot, corpul drept, șoldurile sus. 30 sec pe fiecare parte.',tip:'Corpul ca o linie dreaptă — nu lăsa șoldul să cadă.',easier:'Pe genunchi (genunchiul de jos pe podea) sau 2×15 sec pe parte.'},
+  morn_stretch_full:{name:'Stretching full body',yt:'full body static stretching routine 10 minutes',how:'Întinderi statice 20-30 sec fiecare: coapse față/spate, fesieri, piept, umeri, spate. Fără arcuire, respiri adânc.',tip:'Ziua de recovery = investiție în următoarea săptămână.'},
+  morn_mob_articulatii:{name:'Mobilitate umeri/șolduri',yt:'90 90 hip mobility wall slides',how:'90/90 pentru șolduri (șezut, ambele picioare la 90°, rotești), cercuri ample brațe, wall slides.',tip:'Zonele care înțepenesc cel mai repede la birou.'},
+  morn_plimbare:{name:'Plimbare exterior',yt:'brisk walking technique',how:'Mers în ritm moderat 20-30 min, ideal dimineața pentru lumină naturală.',tip:'Lumina de dimineață reglează somnul + arzi calorii fără efort.'},
+  morn_superman:{name:'Superman',yt:'superman exercise form',how:'Pe burtă, ridici simultan brațele și picioarele, ții 2 sec, cobori lent.',tip:'Privirea în podea, gâtul neutru.',easier:'Ridică doar brațele (picioarele rămân jos), sau alternativ: braț drept + picior stâng, apoi invers.'},
+  morn_scapular:{name:'Scapular push-ups',yt:'scapular push up form',how:'În poziție de flotare cu brațele ÎNTINSE, doar strângi și depărtezi omoplații (mișcare mică).',tip:'Trezește mușchii dintre omoplați pentru ziua de spate.'},
+  morn_bicicleta:{name:'Bicicletă / eliptică ușoară',yt:'zone 2 easy cycling stationary bike',how:'Pedalezi 20–30 min în ritm conversațional — poți vorbi fără să gâfâi. Rezistență mică, cadență constantă.',tip:'Cardio ușor = circulație și recuperare, nu antrenament. Dacă transpiri abundent, ai mers prea tare.',easier:'10–15 min e suficient la început.'},
+  morn_yoga:{name:'Yoga / mobilitate ghidată',yt:'yoga for recovery 15 minutes',how:'15–20 min de flow lent (salut la soare, pisică-vacă, porumbel, câine cu fața în jos). Respiri adânc pe fiecare poziție.',tip:'Caută „yoga for recovery 15 min” pe YouTube. Fără poziții dureroase — mobilitate, nu performanță.',easier:'Doar 5 poziții ținute câte 60 sec.'},
+  morn_foam_roll:{name:'Foam rolling',yt:'foam rolling full body routine',how:'Rulezi lent (2-3 cm/sec) pe rolă: coapse față/spate, fesieri, gambe, spate superior. 45–60 sec pe zonă, insiști pe punctele sensibile.',tip:'NU rula pe lombari sau articulații. Disconfort da, durere ascuțită nu — atunci treci mai departe.',easier:'Fără rolă: minge de tenis pe talpă și fesieri.'},
+  morn_mob_toracic:{name:'Mobilitate toracică',yt:'thoracic rotation quadruped cat cow',how:'În 4 labe, o mână la ceafă, rotești cotul spre tavan și înapoi ×8/parte. Apoi cat-cow ×10.',tip:'Rotația toracică bună = ramat sigur.'}
 };
 
 // ─── Înlocuire exerciții de dimineață (ex. "n-am bară pentru dead hang") ───
@@ -5007,7 +5009,7 @@ function openGuideByName(nameEnc){
     var dbg=ProgramGenerator.EXERCISE_DB.find(function(x){return x.name===name;});
     if(dbg&&dbg.ghid){
       var eqLbl=dbg.equipment.length===0?'bodyweight':(dbg.equipment.indexOf('bara')>=0||dbg.equipment.indexOf('tractiuni')>=0?'bară':(dbg.equipment.indexOf('cablu')>=0||dbg.equipment.indexOf('aparate')>=0?'aparat':'gantere'));
-      g={name:dbg.name,tag:eqLbl,start:dbg.ghid.start,move:dbg.ghid.move,err:dbg.ghid.err,tip:dbg.ghid.tip};
+      g={name:dbg.name,tag:eqLbl,start:dbg.ghid.start,move:dbg.ghid.move,err:dbg.ghid.err,tip:dbg.ghid.tip,yt:dbg.yt};
     }
   }
   if(!g)g=ghidEx.find(function(x){return x.name===name;});
@@ -5027,7 +5029,7 @@ function openGuideByName(nameEnc){
     tag.textContent='';
     body.innerHTML='<p style="color:var(--muted)">Descrie mișcarea controlat, tempo 2-1-2, fără durere. Vezi video-ul pentru demonstrație completă.</p>'+kgConventionRow(name)+unilateralHintRow(name)+swapAlternativesHtml(name);
   }
-  document.getElementById('guideVideoBtn').href='https://www.youtube.com/results?search_query='+encodeURIComponent(name+' tutorial forma corecta');
+  setGuideVideo(g&&g.yt?g.yt:name+' exercise form');
   document.getElementById('guideModal').classList.add('show');
 }
 
@@ -5044,16 +5046,23 @@ function openMorningGuide(id){
       '<div class="g-row"><div class="g-lbl" style="color:var(--green)">✅</div><div style="color:var(--green);font-style:italic">'+g.tip+'</div></div>'+
       (g.easier?'<div class="g-row"><div class="g-lbl" style="color:var(--acc2)">🪜</div><div style="color:var(--acc2)"><strong>Prea greu?</strong> '+g.easier+'</div></div>':'')+
       morningSwapHtml(id);
-    document.getElementById('guideVideoBtn').href='https://www.youtube.com/results?search_query='+encodeURIComponent(g.name+' exercise tutorial');
+    setGuideVideo(g.yt||g.name+' exercise form');
   }else{
     title.textContent='Exercițiu dimineață';
     tag.textContent='';
     body.innerHTML='<p style="color:var(--muted)">Execută controlat, fără durere.</p>';
-    document.getElementById('guideVideoBtn').href='https://www.youtube.com/results?search_query='+encodeURIComponent(id.replace('morn_','')+' exercise');
+    setGuideVideo(id.replace('morn_','').replace(/_/g,' ')+' exercise form');
   }
   document.getElementById('guideModal').classList.add('show');
 }
 
+// VIDEO (v126). Căutarea pe YouTube e în engleză și conține varianta pe care o predăm (ex. „torso parallel to floor"
+// la reverse fly), filtrată la clipuri scurte (sp=EgIYBA = „Under 3 minutes", parametrul pe care îl folosește YouTube însuși). Clipurile tot diferă între ele:
+// nota de sub buton spune clar că pașii din aplicație au prioritate.
+function setGuideVideo(q){
+  var a=document.getElementById('guideVideoBtn');
+  a.href='https://www.youtube.com/results?search_query='+encodeURIComponent(q)+'&sp=EgIYBA%3D%3D';
+}
 function closeGuide(){
   document.getElementById('guideModal').classList.remove('show');
 }
