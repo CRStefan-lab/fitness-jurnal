@@ -827,6 +827,8 @@ body.in-session .toast{bottom:calc(80px + var(--dockh,0px) + env(safe-area-inset
 .ss-save .svi{width:20px;height:20px}
 .ss-save.edit{background:var(--amber);color:#1f1704;box-shadow:0 14px 28px -14px rgba(232,184,74,.7)}
 .ss-save.done{background:var(--green);color:#0f2015;box-shadow:0 14px 28px -14px rgba(var(--green-rgb),.7)}
+.ss-editrow{display:flex;gap:8px}.ss-editrow .ss-save{flex:1 1 auto;width:auto;min-width:0}
+.ss-cancel{flex:0 0 auto;height:56px;padding:0 18px;border-radius:16px;border:1px solid var(--bd);background:var(--s2);color:var(--text);font-weight:600;font-size:15px}.ss-cancel:active{transform:scale(.985)}
 .ss-alt{margin:10px 0 0}
 .ss-allset{font-size:13.5px;color:var(--muted);margin:0 0 12px}
 .ss-skip{border:1px dashed var(--amber);border-radius:14px;padding:12px 14px;margin:16px 0 14px;color:var(--amber);font-size:14px;line-height:1.45}
@@ -3653,7 +3655,8 @@ function renderSession(ei){
     html+='<div class="ss-step"><label for="ssKg">Greutate</label><input id="ssKg" type="number" inputmode="decimal" step="0.5" min="0" placeholder="0" value="'+kgV+'" oninput="sessInput(\'kg\',this.value)"><div class="bt"><button onclick="sessStep(\'kg\',-1)" aria-label="Mai puține kilograme">−</button><button onclick="sessStep(\'kg\',1)" aria-label="Mai multe kilograme">+</button></div><div class="u">'+kgUnitShort(e)+'</div></div>';
     html+='<div class="ss-step"><label for="ssReps">Repetări</label><input id="ssReps" type="number" inputmode="numeric" min="0" placeholder="0" value="'+repV+'" oninput="sessInput(\'reps\',this.value)"><div class="bt"><button onclick="sessStep(\'reps\',-1)" aria-label="Minus o repetare">−</button><button onclick="sessStep(\'reps\',1)" aria-label="Plus o repetare">+</button></div><div class="u">țintă '+escHtml(String(e.target))+'</div></div>';
     html+='</div>';
-    html+='<button class="ss-save'+(sessionEdit?' edit':'')+'" onclick="sessSave()">'+svi('check')+'<span>'+(sessionEdit?'Salvează din nou S'+sessionEdit.n:'Salvează setul '+act)+'</span></button>';
+    if(sessionEdit)html+='<div class="ss-editrow"><button class="ss-save edit" onclick="sessSave()">'+svi('check')+'<span>Salvează din nou S'+sessionEdit.n+'</span></button><button class="ss-cancel" onclick="sessPickSet('+sessionEdit.n+')">Renunță</button></div>';
+    else html+='<button class="ss-save" onclick="sessSave()">'+svi('check')+'<span>Salvează setul '+act+'</span></button>';
   }else{
     var nxi=nextOpenEx(list,ei);
     html+='<p class="ss-allset">Toate seturile sunt salvate. Atinge un set ca să-l corectezi.</p>';
