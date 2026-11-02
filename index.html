@@ -511,6 +511,7 @@ input:checked + .slider:before{transform:translateX(20px);background:#fff}
 .ex-thumb{width:36px;height:38px;border-radius:10px;background:var(--s2);display:flex;align-items:center;justify-content:center;flex-shrink:0}
 .video-btn{display:block;width:100%;background:transparent;border:1px solid var(--bd2);color:var(--text);border-radius:12px;padding:12px;font-size:14px;font-weight:700;text-align:center;text-decoration:none;margin-top:10px}
 .video-note{font-size:12px;line-height:1.5;color:var(--muted);margin:8px 2px 0}
+.swap-days{display:block;margin-top:6px;font-size:12px;color:var(--muted)}.swap-day{border:1px solid var(--bd);background:var(--s2);color:var(--text);border-radius:999px;padding:4px 10px;font-size:12px;margin:2px 4px 2px 0}
 
 /* ── Zilele mele (modal plan) ── */
 .dpl-day{flex:1;background:var(--s2);border:1px solid transparent;border-radius:10px;color:var(--muted);font-weight:700;font-size:14px;padding:11px 0}
@@ -2180,11 +2181,14 @@ var customMeta=null;
 
 // ═══════════════════════════════════════════════════════════════
 // ÎNLOCUIRE EXERCIȚII — "nu-mi place X, vreau altceva" (persistent)
-// exercise_swaps = { "Nume original din program": "id din EXERCISE_DB" }
+// exercise_swaps = { "exDay|Nume original din program": "id din EXERCISE_DB" }  (v127: PE ZI)
+//   Cheile vechi, fără zi ("Nume original": id), rămân valabile pentru toate zilele (compatibilitate);
+//   la prima înlocuire pe o zi, cheia veche se desface pe zilele care o foloseau (vezi swapExercise).
 // Aplicat peste program la fiecare load; istoricul vechiului rămâne intact.
 // ═══════════════════════════════════════════════════════════════
-var swapOriginalByName={}; // numele curent (afișat) → numele original al slotului
+var swapOriginalByDay={}; // exDay → { numele curent (afișat) → numele original al slotului }
 function getSwaps(){try{return JSON.parse(localStorage.getItem('exercise_swaps')||'{}');}catch(e){return {};}}
+function swapForSlot(swaps,dk,origName){var k=dk+'|'+origName;if(Object.prototype.hasOwnProperty.call(swaps,k))return swaps[k]||null;return swaps[origName]||null;}
 (function applyExerciseSwaps(){
   try{
     var swaps=getSwaps();
@@ -2192,11 +2196,11 @@ function getSwaps(){try{return JSON.parse(localStorage.getItem('exercise_swaps')
     var DB=ProgramGenerator.EXERCISE_DB;
     Object.keys(exercises).forEach(function(dk){
       (exercises[dk].list||[]).forEach(function(item){
-        var newId=swaps[item.name];
+        var newId=swapForSlot(swaps,dk,item.name);
         if(!newId)return;
         var db=DB.find(function(x){return x.id===newId;});
         if(!db)return;
-        swapOriginalByName[db.name]=item.name;
+        (swapOriginalByDay[dk]=swapOriginalByDay[dk]||{})[db.name]=item.name;
         item.exId=db.id;
         item.name=db.name;
         if(ghidEx&&!ghidEx.some(function(g){return g.name===db.name;})){
@@ -3665,7 +3669,7 @@ function renderSession(ei){
     if(nxi>=0)html+='<button class="ss-save" onclick="openSession('+nxi+')"><span>Exercițiul următor</span>'+svi('arr')+'</button>';
     else html+='<button class="ss-save done" onclick="closeSession()">'+svi('check')+'<span>Vezi rezumatul zilei</span></button>';
   }
-  html+='<div class="ss-ghosts"><button onclick="openGuideByName(\''+sk+'\')">'+svi('book')+'Cum se face</button>';
+  html+='<div class="ss-ghosts"><button onclick="openGuideByName(\''+sk+'\',todayExDay())">'+svi('book')+'Cum se face</button>';
   if(act&&!sessionEdit)html+='<button onclick="sessSkipMenu()">'+svi('skip')+(done?'Sari restul':'Sari exercițiul')+'</button>';
   html+='</div>';
   cont.innerHTML=html;
@@ -3700,7 +3704,7 @@ function sessMenu(){
   h+=shItem('edit','Notă',exNoteData[e.name]?escHtml(exNoteData[e.name]):'Umăr ok, ușor azi…','closeAziSheet(true);sessNoteSheet()');
   if(swapAlternativesHtml(e.name))h+=shItem('swap','Înlocuiește','Alternative cu aceeași mișcare','closeAziSheet(true);sessSwap(\''+sk+'\')');
   if(isBarbellEx(e))h+=shItem('bar','Calculator de discuri','Ce discuri pui pe bară','closeAziSheet(true);sessPlateSheet()');
-  h+=shItem('book','Cum se face','Pașii, greșelile, video','closeAziSheet(true);openGuideByName(\''+sk+'\')');
+  h+=shItem('book','Cum se face','Pașii, greșelile, video','closeAziSheet(true);openGuideByName(\''+sk+'\',todayExDay())');
   h+='</div>';
   openAziSheet(e.name,h);
 }
@@ -3729,7 +3733,7 @@ function sessNoteSheet(){
     function(){var ni=document.getElementById('ssNoteIn');if(ni&&ni.value!==(exNoteData[e.name]||''))saveExNote(sk,ni.value);});
 }
 function sessSwap(sk){
-  openGuideByName(sk);
+  openGuideByName(sk,todayExDay());
   setTimeout(function(){var mc=document.querySelector('#guideModal .modal-content');if(mc)mc.scrollTop=mc.scrollHeight;},80);
 }
 function sessPlateSheet(){
@@ -4918,15 +4922,13 @@ function swapAlternativesHtml(name){
   var DB=ProgramGenerator.EXERCISE_DB;
   var cur=DB.find(function(x){return x.name===name;});
   if(!cur||!cur.ghid)return ''; // exercițiu în afara bibliotecii (legacy custom) → fără alternative
-  var origName=swapOriginalByName[name]||name;
   // e în programul activ? (nu oferim swap pentru exerciții doar din ghid)
-  var itemStar=null,inProgram=false;
-  Object.keys(exercises).forEach(function(dk){
-    (exercises[dk].list||[]).forEach(function(it){
-      if(it.name===name){inProgram=true;itemStar=!!it.star;}
-    });
-  });
-  if(!inProgram)return '';
+  var days=daysWithExercise(name);
+  if(!days.length)return '';
+  var day=(guideDay&&days.indexOf(guideDay)>=0)?guideDay:(days.indexOf(todayExDay())>=0?todayExDay():days[0]);
+  var origName=(swapOriginalByDay[day]||{})[name]||name;
+  var itemStar=false;
+  (exercises[day].list||[]).forEach(function(it){if(it.name===name)itemStar=!!it.star;});
   var prof=getProfile();
   var eqProfile=prof.equipment;
   var avail;
@@ -4948,13 +4950,19 @@ function swapAlternativesHtml(name){
     if(itemStar&&!x.starEligible)return false;
     return true;
   }).sort(function(a,b){return a.prio-b.prio;}).slice(0,3);
-  if(!alts.length&&!swapOriginalByName[name])return '';
-  var h='<div class="g-row"><div class="g-lbl" style="color:var(--amber)">↔</div><div><strong>Nu-ți place?</strong> Înlocuiește-l permanent (istoricul lui rămâne salvat):<br>';
+  var isSwapped=!!(swapOriginalByDay[day]||{})[name];
+  if(!alts.length&&!isSwapped)return '';
+  var h='<div class="g-row"><div class="g-lbl" style="color:var(--amber)">↔</div><div><strong>Nu-ți place?</strong> Înlocuiește-l doar pentru <b>'+escHtml(exDayLabel(day))+'</b> (istoricul lui rămâne salvat):<br>';
+  if(days.length>1){
+    h+='<span class="swap-days">Altă zi: ';
+    days.forEach(function(dk){if(dk!==day)h+='<button class="swap-day" onclick="openGuideByName(\''+encKey(name)+'\',\''+dk+'\')">'+escHtml(exDayLabel(dk))+'</button>';});
+    h+='</span>';
+  }
   alts.forEach(function(a){
-    h+='<button class="btn btn-ghost" style="font-size:12px;padding:8px;margin:6px 0 0" onclick="swapExercise(\''+encKey(origName)+'\',\''+a.id+'\')">↔ '+a.name+'</button>';
+    h+='<button class="btn btn-ghost" style="font-size:12px;padding:8px;margin:6px 0 0" onclick="swapExercise(\''+encKey(origName)+'\',\''+a.id+'\',\''+day+'\')">↔ '+a.name+'</button>';
   });
-  if(swapOriginalByName[name]){
-    h+='<button class="btn btn-ghost" style="font-size:12px;padding:8px;margin:6px 0 0;color:var(--muted)" onclick="swapExercise(\''+encKey(origName)+'\',null)">↩ Revino la: '+origName+'</button>';
+  if(isSwapped){
+    h+='<button class="btn btn-ghost" style="font-size:12px;padding:8px;margin:6px 0 0;color:var(--muted)" onclick="swapExercise(\''+encKey(origName)+'\',null,\''+day+'\')">↩ Revino la: '+origName+'</button>';
   }
   h+='</div></div>';
   return h;
@@ -4982,25 +4990,49 @@ function toggleLib(){
   }
 }
 
-function swapExercise(origEnc,newId){
+function swapExercise(origEnc,newId,exDay){
   var orig=decodeURIComponent(origEnc);
-  var msg;
+  var msg,where=exDay?' pentru '+exDayLabel(exDay):'';
   if(newId){
     var db=ProgramGenerator.EXERCISE_DB.find(function(x){return x.id===newId;});
     if(!db)return;
-    msg='Înlocuiești „'+orig+'" cu „'+db.name+'"?\n\nSchimbarea e permanentă (până revii), pe acest device. Istoricul vechiului exercițiu rămâne salvat.';
+    msg='Înlocuiești „'+orig+'" cu „'+db.name+'"'+where+'?\n\n'+(exDay?'Doar în ziua asta; celelalte zile rămân cum sunt. ':'Schimbarea e permanentă (până revii), pe acest device. ')+'Istoricul vechiului exercițiu rămâne salvat.';
   }else{
-    msg='Revii la exercițiul original „'+orig+'"?';
+    msg='Revii la exercițiul original „'+orig+'"'+where+'?';
   }
   if(!confirm(msg))return;
   var s=getSwaps();
-  if(newId)s[orig]=newId;else delete s[orig];
+  if(exDay){
+    // cheia veche, globală, se desface pe zilele care o foloseau, ca celelalte zile să rămână cum erau
+    if(s[orig]){
+      Object.keys(exercises).forEach(function(dk){
+        var uses=(exercises[dk].list||[]).some(function(it){return it.name===orig||(swapOriginalByDay[dk]||{})[it.name]===orig;});
+        if(uses&&dk!==exDay&&!Object.prototype.hasOwnProperty.call(s,dk+'|'+orig))s[dk+'|'+orig]=s[orig];
+      });
+      delete s[orig];
+    }
+    if(newId)s[exDay+'|'+orig]=newId;else delete s[exDay+'|'+orig];
+  }else{
+    if(newId)s[orig]=newId;else delete s[orig];
+  }
   localStorage.setItem('exercise_swaps',JSON.stringify(s));
   showToast(newId?'Exercițiu înlocuit ✓':'Revenit la original ✓');
   setTimeout(function(){location.reload();},700);
 }
 
-function openGuideByName(nameEnc){
+var guideDay=null; // ziua (exDay) pentru care s-a deschis ghidul — înlocuirea se face doar pe ea
+function todayExDay(){try{return schedule[getEffectiveDayIdx()].exDay;}catch(e){return null;}}
+// Zilele din program în care apare exercițiul (după numele afișat)
+function daysWithExercise(name){
+  return Object.keys(exercises).filter(function(dk){return (exercises[dk].list||[]).some(function(it){return it.name===name;});});
+}
+function exDayLabel(dk){
+  var cal=[];schedule.forEach(function(sc,i){if(sc.exDay===dk)cal.push(DP_LONG[i]);});
+  var lbl=exercises[dk]&&exercises[dk].label?exercises[dk].label:dk;
+  return (cal.length?cal.join('/')+' · ':'')+lbl;
+}
+function openGuideByName(nameEnc,exDay){
+  guideDay=exDay||null;
   var name=decodeURIComponent(nameEnc);
   // Ghidul vine LIVE din biblioteca de exerciții (texte mereu actuale, chiar dacă
   // programul stocat are un snapshot vechi); ghidEx rămâne fallback pt legacy/custom
@@ -5390,7 +5422,7 @@ function initProgram(sel){
         rv='<span class="ag-rv pl-rv">'+trendBarsHtml(t.vals)+'<span><b>'+l+'<small>'+(t.useKg?'kg':'rep')+'</small></b><small>'+w+'</small></span></span>';
       }
     }
-    html+='<button class="ag-row g-'+groupOf(e.name)+'" onclick="openGuideByName(\''+encKey(e.name)+'\')"><span class="ag-mus"></span><span class="ag-rm"><span class="ag-rt">'+escHtml(e.name)+'</span><span class="ag-rs">'+(tg.indexOf(' × ')===0?e.sets+tg:roCount(e.sets,'set','seturi')+tg)+(e.star?' · progresie':'')+'</span></span>'+rv+'</button>';
+    html+='<button class="ag-row g-'+groupOf(e.name)+'" onclick="openGuideByName(\''+encKey(e.name)+'\',\''+schedule[selDi].exDay+'\')"><span class="ag-mus"></span><span class="ag-rm"><span class="ag-rt">'+escHtml(e.name)+'</span><span class="ag-rs">'+(tg.indexOf(' × ')===0?e.sets+tg:roCount(e.sets,'set','seturi')+tg)+(e.star?' · progresie':'')+'</span></span>'+rv+'</button>';
   });
   html+='</div>';
   html+='<button class="btn btn-ghost pl-btn" onclick="openDayPlan()">'+svi('cal')+'Schimbă zilele de antrenament</button>';
