@@ -2,7 +2,7 @@
 <html lang="ro">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
 <meta name="theme-color" content="#0b0d10">
 <meta name="description" content="Jurnal de antrenament cu antrenor inteligent: program personalizat, progresie săptămânală, nutriție și progres — totul pe telefonul tău.">
 <meta name="mobile-web-app-capable" content="yes">
@@ -1075,6 +1075,8 @@ body.has-upd.in-session{padding-bottom:calc(156px + var(--dockh,0px) + env(safe-
 .hdr-title,.ss-ttl,.modal-ttl,.ag-rt,.ag-big,.hist-ttl{overflow-wrap:anywhere}
 /* v114: nimic nu mai poate lăți pagina (pe Android lățirea mărea tot și tăia navul) */
 #app{overflow-x:hidden;overflow-x:clip}
+/* v129: fără zoom cu două degete (ca într-o aplicație nativă): după zoom, docul fix și bara de jos rămâneau decalate față de ecran */
+html{touch-action:pan-x pan-y}
 .btn-row .btn{min-width:0}
 .note-btns{margin:12px 0 0}
 .note-btns .btn{padding:11px 14px;font-size:14px}

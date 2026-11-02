@@ -25,7 +25,7 @@
 var EXERCISE_DB=[
   // ── PUSH ORIZONTAL (piept) ──
   {id:'db_impins_inclinat',name:'Împins gantere bancă înclinată 30–45°',muscle:'Piept',pattern:'push_h',equipment:['gantere','banca'],level:1,compound:true,starEligible:true,prio:1,
-   yt:'incline dumbbell press 30 degree bench form',ghid:{start:'Bancă la ~30°. Gantere la nivelul pieptului, coate la 45° față de corp.',move:'Împingi în sus ușor spre interior. Cobori lent 2 sec cu întindere completă.',err:'Coatele prea largi. Unghi peste 45° (preia umărul).',tip:'30° e unghiul optim pentru pieptul superior — nu mai sus (Rodríguez-Ridao 2020).'}},
+   yt:'incline dumbbell press 30 degree bench form',ghid:{start:'Bancă la 30° (ideal); dacă banca ta nu are treapta asta, 45° e acceptabil. Gantere la nivelul pieptului, coate la 45° față de corp.',move:'Împingi în sus ușor spre interior. Cobori lent 2 sec cu întindere completă.',err:'Coatele prea largi. Unghi peste 45° (preia umărul).',tip:'30° e unghiul optim pentru pieptul superior; la 45° lucrează mai mult umărul, peste 45° nu are rost (Rodríguez-Ridao 2020).'}},
   {id:'db_impins_orizontal',name:'Împins gantere bancă orizontală 0°',muscle:'Piept',pattern:'push_h',equipment:['gantere','banca'],level:1,compound:true,starEligible:true,prio:2,
    yt:'flat dumbbell bench press form',ghid:{start:'Bancă plată. Gantere deasupra pieptului, brațe întinse.',move:'Cobori controlat la piept, împingi înapoi sus.',err:'Ganterele se ating sus cu impact. Cobori prea rapid.',tip:'Picioarele ferme pe podea, omoplații strânși.'}},
   {id:'gym_bench_bara',name:'Împins cu bara la bancă (bench press)',muscle:'Piept',pattern:'push_h',equipment:['bara','banca'],level:2,compound:true,starEligible:true,prio:1,gymOnly:true,
