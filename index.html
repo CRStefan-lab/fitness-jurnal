@@ -3702,6 +3702,7 @@ function sessMenu(){
   if(!skipped&&!complete)h+=shItem('skip','Sari exercițiul','Cu motiv; se reia data viitoare','closeAziSheet(true);sessSkipMenu()');
   if(!skipped)h+=shItem('plus','Adaugă un set','Un set în plus, doar azi','sessAddSet()');
   h+=shItem('edit','Notă',exNoteData[e.name]?escHtml(exNoteData[e.name]):'Umăr ok, ușor azi…','closeAziSheet(true);sessNoteSheet()');
+  guideDay=todayExDay();
   if(swapAlternativesHtml(e.name))h+=shItem('swap','Înlocuiește','Alternative cu aceeași mișcare','closeAziSheet(true);sessSwap(\''+sk+'\')');
   if(isBarbellEx(e))h+=shItem('bar','Calculator de discuri','Ce discuri pui pe bară','closeAziSheet(true);sessPlateSheet()');
   h+=shItem('book','Cum se face','Pașii, greșelile, video','closeAziSheet(true);openGuideByName(\''+sk+'\',todayExDay())');
@@ -4938,8 +4939,9 @@ function swapAlternativesHtml(name){
   }else{
     avail=['gantere','banca','bara']; // programul legacy standard
   }
+  // nu oferim ce e deja în ziua asta (în alte zile poate exista: programul însuși repetă exerciții între zile)
   var usedNames={};
-  Object.keys(exercises).forEach(function(dk){(exercises[dk].list||[]).forEach(function(it){usedNames[it.name]=1;});});
+  (exercises[day].list||[]).forEach(function(it){usedNames[it.name]=1;});
   var isBeginner=prof.experience==='incepator';
   var alts=DB.filter(function(x){
     if(x.pattern!==cur.pattern||x.id===cur.id)return false;
@@ -5024,7 +5026,7 @@ var guideDay=null; // ziua (exDay) pentru care s-a deschis ghidul — înlocuire
 function todayExDay(){try{return schedule[getEffectiveDayIdx()].exDay;}catch(e){return null;}}
 // Zilele din program în care apare exercițiul (după numele afișat)
 function daysWithExercise(name){
-  return Object.keys(exercises).filter(function(dk){return (exercises[dk].list||[]).some(function(it){return it.name===name;});});
+  return Object.keys(exercises).filter(function(dk){return !!exercises[dk]&&(exercises[dk].list||[]).some(function(it){return it.name===name;});});
 }
 function exDayLabel(dk){
   var cal=[];schedule.forEach(function(sc,i){if(sc.exDay===dk)cal.push(DP_LONG[i]);});
@@ -5096,6 +5098,7 @@ function setGuideVideo(q){
   a.href='https://www.youtube.com/results?search_query='+encodeURIComponent(q)+'&sp=EgIYBA%3D%3D';
 }
 function closeGuide(){
+  guideDay=null;
   document.getElementById('guideModal').classList.remove('show');
 }
 
