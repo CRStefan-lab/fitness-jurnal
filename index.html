@@ -511,6 +511,7 @@ input:checked + .slider:before{transform:translateX(20px);background:#fff}
 .ex-thumb{width:36px;height:38px;border-radius:10px;background:var(--s2);display:flex;align-items:center;justify-content:center;flex-shrink:0}
 .video-btn{display:block;width:100%;background:transparent;border:1px solid var(--bd2);color:var(--text);border-radius:12px;padding:12px;font-size:14px;font-weight:700;text-align:center;text-decoration:none;margin-top:10px}
 .video-note{font-size:12px;line-height:1.5;color:var(--muted);margin:8px 2px 0}
+.meas-v.meas-need{color:var(--amber);border-style:dashed}
 .swap-days{display:block;margin-top:6px;font-size:12px;color:var(--muted)}.swap-day{border:1px solid var(--bd);background:var(--s2);color:var(--text);border-radius:999px;padding:4px 10px;font-size:12px;margin:2px 4px 2px 0}
 
 /* ── Zilele mele (modal plan) ── */
@@ -1902,6 +1903,7 @@ html{touch-action:pan-x pan-y}
 
 <script>if(window.APP_LANG==='en')document.write('<script src="./i18n-en.js"><\/script>');</script>
 <script src="./generator.js"></script>
+<script src="./analytics.js"></script>
 <script>
 // ═══════════════════════════════════════════════════════════════
 // i18n — traducere la AFIȘARE (DOM). Datele (jurnal, chei, nume de exerciții
@@ -5663,6 +5665,8 @@ function renderMeasurements(){
         var leanMass=r.weight*(1-bf/100);
         html+='<span class="meas-v"><strong>Masă slabă:</strong> '+leanMass.toFixed(1)+' kg</span>';
       }
+    }else if(r.waist&&!r.neck){
+      html+='<span class="meas-v meas-need">Grăsime și masă slabă: adaugă și gâtul</span>';
     }
     html+='</div></div>';
   });
@@ -6120,6 +6124,26 @@ function buildAdherenceStats(){
   return out;
 }
 
+// BUG 5 (v130): tabelul greutate · talie · % grăsime · masă slabă · talie/înălțime, vechi → nou.
+// Fără gât nu există procent de grăsime: exportul spune clar ce lipsește, în loc să tacă.
+function buildBodyCompTable(measurements,profile){
+  var h=parseFloat(profile.height)||0;
+  var t=Analytics.bodyCompTable(measurements.filter(function(m){return m.weight||m.waist;}),h,profile.sex);
+  if(!t.length)return '';
+  var out='\n📊 COMPOZIȚIE CORPORALĂ — EVOLUȚIE (US Navy'+(h?', înălțime '+h+' cm':'')+')\n';
+  if(!h)out+='  NECESAR: înălțimea în profil (Setări → Profil) — fără ea nu se pot calcula procentul de grăsime și talie/înălțime\n';
+  out+='  Data       | Greutate | Talie   | Grăsime | Masă slabă | Talie/înălțime\n';
+  var missingNeck=0;
+  t.forEach(function(r){
+    var bfTxt=r.bf!=null?(r.bf.toFixed(1)+'%'):(r.need.indexOf('gât')>=0?'NECESAR: circumferința gâtului':(r.need.length?'NECESAR: '+r.need.join(', '):'—'));
+    if(r.need.indexOf('gât')>=0)missingNeck++;
+    out+='  '+r.date+' | '+(r.weight?r.weight+' kg':'—')+' | '+(r.waist?r.waist+' cm':'—')+' | '+bfTxt+' | '+(r.lean!=null?r.lean.toFixed(1)+' kg':'—')+' | '+(r.whtr!=null?r.whtr.toFixed(2):'—')+'\n';
+  });
+  if(missingNeck)out+='  NECESAR: circumferința gâtului la '+missingNeck+(missingNeck===1?' măsurătoare':' măsurători')+' (Progres → Măsurători). Fără ea nu se pot calcula procentul de grăsime și masa slabă.\n';
+  out+='  Talie/înălțime: sub 0,50 = risc mic · 0,50–0,59 = risc crescut · 0,60+ = risc mare (Ashwell 2012)\n';
+  return out;
+}
+
 function buildActiveStagnations(){
   var stars=getStarExercises();
   var alerts=[];
@@ -6172,6 +6196,7 @@ function buildWeekSummary(){
         out+='\n';
       }
     });
+    out+=buildBodyCompTable(measurements,profile);
     if(measurements.length>=2){
       var latest=measurements[0];
       var oldest=measurements[measurements.length-1];
@@ -6549,7 +6574,9 @@ function filterSetari(q){
 
 // Navy method BF% (SI / cm-kg) — formule diferite pe sex
 // Femei: necesită și circumferința șoldurilor
+// Formula stă în analytics.js (testată în test-analytics.js); aici rămâne doar numele vechi
 function calcBFNavy(waistCm,neckCm,heightCm,sex,hipCm){
+  if(window.Analytics)return Analytics.navyBF(waistCm,neckCm,heightCm,sex,hipCm);
   if(!waistCm||!neckCm||!heightCm) return null;
   var bf;
   if(sex==='F'){
