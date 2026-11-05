@@ -512,6 +512,19 @@ input:checked + .slider:before{transform:translateX(20px);background:#fff}
 .video-btn{display:block;width:100%;background:transparent;border:1px solid var(--bd2);color:var(--text);border-radius:12px;padding:12px;font-size:14px;font-weight:700;text-align:center;text-decoration:none;margin-top:10px}
 .video-note{font-size:12px;line-height:1.5;color:var(--muted);margin:8px 2px 0}
 .meas-v.meas-need{color:var(--amber);border-style:dashed}
+.qr-card{background:var(--s1);border:1px solid var(--bd);border-radius:16px;padding:12px 14px;margin:10px 0 4px;box-shadow:var(--shadow)}
+.qr-hd{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}.qr-hd b{font-size:15px}
+.qr-skip{background:none;border:0;color:var(--muted);font-size:13px;padding:6px 2px}
+.qr-row{display:flex;align-items:center;gap:10px;margin:6px 0}.qr-lbl{width:64px;flex:0 0 auto;font-size:13px;color:var(--muted)}
+.qr-btns{display:flex;gap:6px;flex:1}.qr-btns button{flex:1;min-width:0;height:44px;border-radius:12px;border:1px solid var(--bd);background:var(--s2);color:var(--text);font-family:var(--fd);font-weight:700;font-size:17px}
+.qr-btns button:active{background:var(--acc-soft)}
+.qr-scale{display:flex;justify-content:space-between;margin-left:74px;font-size:11px;color:var(--muted2)}
+.nt-form{margin:14px 0;padding:12px 0;border-top:1px solid var(--bd);border-bottom:1px solid var(--bd)}
+.nt-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px 10px;margin:10px 0}
+.nt-grid label{display:flex;flex-direction:column;gap:4px;font-size:12px;color:var(--muted);min-width:0}
+.nt-grid .meas-in,.nt-grid .select-box{width:100%;margin:0}
+.nt-edit,.nt-old{margin-top:10px}
+.vol-note.vol-warn{color:var(--amber)}
 .pain-box{margin-top:10px;padding-top:12px;border-top:1px solid var(--bd)}.pain-hd{font-size:14px;font-weight:600;margin-bottom:8px}.pain-hd small{color:var(--muted);font-weight:500;margin-left:6px}
 .swap-days{display:block;margin-top:6px;font-size:12px;color:var(--muted)}.swap-day{border:1px solid var(--bd);background:var(--s2);color:var(--text);border-radius:999px;padding:4px 10px;font-size:12px;margin:2px 4px 2px 0}
 
@@ -1513,6 +1526,20 @@ html{touch-action:pan-x pan-y}
       <div class="notif-row">
         <div><div class="notif-lbl">Rutina de dimineață</div><div class="notif-sub">Apare pe Azi. Dacă o ascunzi, programul, istoricul și seria rămân neschimbate.</div></div>
         <label class="sw"><input type="checkbox" id="morningToggle" aria-label="Arată rutina de dimineață" onchange="toggleMorningShown(this.checked)"><span class="slider"></span></label>
+      </div>
+      <div class="nt-form" id="nutTargetsBox">
+        <div class="notif-lbl">Nutriție — țintele tale</div>
+        <div class="notif-sub" id="nutTargetsState">—</div>
+        <div class="nt-grid">
+          <label>Calorii minim<input class="meas-in" type="number" inputmode="numeric" id="nt_kcalMin" aria-label="Calorii minim pe zi"></label>
+          <label>Calorii maxim<input class="meas-in" type="number" inputmode="numeric" id="nt_kcalMax" aria-label="Calorii maxim pe zi"></label>
+          <label>Proteine minim (g)<input class="meas-in" type="number" inputmode="numeric" id="nt_protMin" aria-label="Proteine minim pe zi"></label>
+          <label>Proteine maxim (g)<input class="meas-in" type="number" inputmode="numeric" id="nt_protMax" aria-label="Proteine maxim pe zi"></label>
+          <label>Mese pe zi<select class="select-box" id="nt_meals" aria-label="Mese pe zi"><option>1</option><option>2</option><option>3</option><option selected>4</option><option>5</option><option>6</option></select></label>
+          <label>Regim<select class="select-box" id="nt_regime" aria-label="Regim alimentar"><option value="none">Fără post</option><option value="if16">Post 16:8</option><option value="if19">Post 19:6</option><option value="omad">OMAD</option></select></label>
+        </div>
+        <div class="btn-row"><button class="btn btn-acc" onclick="saveNutTargets()">Salvează țintele</button><button class="btn btn-ghost" onclick="resetNutTargets()">Revino</button></div>
+        <p class="help">Apar în Nutriție, în obiectivul zilnic de proteine și în exportul pentru analiză.</p>
       </div>
       <button class="btn btn-acc" onclick="openDayPlan()">Schimbă zilele de antrenament</button>
       <p class="help">Nu poți lunea? Mută antrenamentele pe orice zile — sau pune o excepție temporară (o săptămână, o lună) după care revii singur la program.</p>
@@ -2851,6 +2878,7 @@ function showTab(name,btn){
     renderPRList();
   }
   if(name==='setari'){
+    initNutTargetsUI();
     updateFsaUI();
     initNotifUI();
     initBackupReminderUI();
@@ -3268,6 +3296,7 @@ function renderToday(){
   if(morningTotal>0)chip('rutina','sun','Rutina',morningDone+'/'+morningTotal,morningDone>=morningTotal?'ok':'');
   chip('cantar','scale','Cântar',tw?escHtml(String(tw))+' kg':'',tw?'ok':'todo');
   chip('stare','smile',hasRate?'Energie':'Stare',hasRate?(ratingData.energy||5)+'/10':'',hasRate?'ok':'todo');
+  if(!dateOverride&&!dayOverride)html+=quickRateHtml();
   if(checkItems.length)chip('obiective','list','Obiective',checkDone+'/'+checkItems.length,checkDone>=checkItems.length?'ok':'');
   html+='<div class="ag-st">Ziua ta<span>'+chipsOk+' din '+chipsN+'</span></div><div class="ag-chips">'+chipsHtml+'</div>';
 
@@ -3756,6 +3785,25 @@ function sessPlateSheet(){
   openAziSheet('Calculator de discuri','<div class="plc-row"><input class="set-in" type="number" inputmode="decimal" step="0.5" min="0" id="plcKg_'+ei+'" value="'+kg+'" placeholder="kg" aria-label="Greutatea totală" oninput="renderPlateCalc('+ei+')"><span>kg în total, bara:</span><span id="plcBars_'+ei+'" class="plc-bars"></span></div><div id="plcOut_'+ei+'" class="plc-out"></div>');
   renderPlateCalc(ei);
 }
+// ÎMBUNĂTĂȚIREA 1 (v130): somnul și energia dintr-o atingere, la prima deschidere a zilei. Lipseau tocmai în
+// săptămânile slabe, când deschiderea foii era prea mult. Valoarea exactă se poate corecta apoi în foaie.
+var QR_VALS=[2,4,6,8,10];
+function quickRateHtml(){
+  var needS=ratingData.sleep===undefined,needE=ratingData.energy===undefined;
+  if(!needS&&!needE)return '';
+  try{if(localStorage.getItem('rate_prompt_skip')===today())return '';}catch(e){}
+  var h='<div class="qr-card"><div class="qr-hd"><b>Cum te simți azi?</b><button class="qr-skip" onclick="quickRateSkip()">Mai târziu</button></div>';
+  [['sleep','Somnul',needS],['energy','Energia',needE]].forEach(function(k){
+    if(!k[2])return;
+    h+='<div class="qr-row"><span class="qr-lbl">'+k[1]+'</span><div class="qr-btns">';
+    QR_VALS.forEach(function(v){h+='<button onclick="quickRate(\''+k[0]+'\','+v+')" aria-label="'+k[1]+' '+v+' din 10">'+v+'</button>';});
+    h+='</div></div>';
+  });
+  h+='<div class="qr-scale"><span>rău</span><span>excelent</span></div></div>';
+  return h;
+}
+function quickRate(kind,v){updateRating(kind,v);renderToday();}
+function quickRateSkip(){try{localStorage.setItem('rate_prompt_skip',today());}catch(e){}renderToday();}
 // Chip-urile din „Ziua ta"
 function aziChip(kind){
   var idx=getEffectiveDayIdx();
@@ -5285,8 +5333,12 @@ function nutWeightChip(){
   return '<button class="ag-chip'+(l?'':' todo')+'" onclick="goMeasure()">'+svi('scale')+(l?parseFloat(l.weight)+' kg':'Cântar')+'</button>';
 }
 // Plăcuța greutății: ultimele 5 măsurători ca bare + diferența pe ~30 de zile
+// ÎMBUNĂTĂȚIREA 3 (v130): cu ≥ 4 cântăriri în 14 zile, plăcuța arată media pe 7 zile și trendul pe săptămână
+function trendTxt(t){return (t>0?'+':(t<0?'−':''))+String(Math.abs(t).toFixed(2)).replace('.',',')+' kg/săpt.';}
 function nutWeightTile(){
   var ms=nutWeights();if(ms.length<2)return '';
+  var wtr=Analytics.weightTrend(ms,new Date());
+  if(wtr.enough)return '<button class="pg-tile nt-tile" onclick="goMeasure()"><span>Greutatea ta, media pe 7 zile</span><b>'+String(wtr.ma7).replace('.',',')+'<small>kg</small></b><span class="nt-tr">'+trendBarsHtml(ms.slice(-5).map(function(m){return parseFloat(m.weight);}))+(wtr.trendPerWeek!=null?'<em class="'+(wtr.trendPerWeek<=0?'ag-up':'ag-dn')+'">'+trendTxt(wtr.trendPerWeek)+'</em>':'')+'</span></button>';
   var last=ms[ms.length-1],ld=parseRoDate(last.date),ref=null;
   for(var i=ms.length-2;i>=0;i--){if((ld-parseRoDate(ms[i].date))/86400000>=28){ref=ms[i];break;}}
   if(!ref)ref=ms[0];
@@ -5343,8 +5395,82 @@ function refreshNutritionFromWeight(){
   });
 }
 
+// ÎMBUNĂTĂȚIREA 2 (v130): țintele de nutriție se setează din Setări → Programul meu (cheia nutrition_targets).
+// Programul standard (owner) primește implicit valorile cerute în noiembrie 2026; programele generate rămân pe
+// calculator până când utilizatorul își pune propriile ținte.
+var NUT_REGIMES={none:'fără post intermitent',if16:'post intermitent 16:8',if19:'post intermitent 19:6',omad:'o masă pe zi (OMAD)'};
+var NUT_LEGACY_DEFAULT={kcalMin:2200,kcalMax:2400,meals:4,regime:'none',protMin:140,protMax:160};
+var nutShowOldMeals=false;
+function getNutTargets(){
+  try{var t=JSON.parse(localStorage.getItem('nutrition_targets')||'null');if(t&&t.kcalMin)return t;}catch(e){}
+  return isCustomProgram?null:NUT_LEGACY_DEFAULT;
+}
+function nutTargetsText(t){
+  return t.kcalMin.toLocaleString('ro-RO')+'–'+t.kcalMax.toLocaleString('ro-RO')+' kcal/zi · '+t.meals+' mese · '+(NUT_REGIMES[t.regime]||t.regime)+' · proteină '+t.protMin+'–'+t.protMax+' g';
+}
+function applyNutTargetsToChecklist(){
+  var t=getNutTargets();if(!t||(isCustomProgram&&!localStorage.getItem('nutrition_targets')))return;
+  (checkItems||[]).forEach(function(c){if(c.id==='proteine')c.lbl='🥩 '+t.protMin+'–'+t.protMax+'g proteine';});
+}
+function nutTargetsCardHtml(t,fromUser){
+  var perMeal=Math.round(t.protMin/t.meals)+'–'+Math.round(t.protMax/t.meals);
+  var html='<div class="ag-st">Țintele tale<span>'+(fromUser?'setate de tine':'implicite')+'</span></div><div class="ag-rows">';
+  html+='<div class="ag-row nt-row"><span class="gl-ico">'+svi('flame')+'</span><span class="ag-rm"><span class="ag-rt">Calorii</span><span class="ag-rs">pe zi, în medie pe săptămână</span></span><span class="nt-kc">'+t.kcalMin.toLocaleString('ro-RO')+'–'+t.kcalMax.toLocaleString('ro-RO')+'</span></div>';
+  html+='<div class="ag-row nt-row"><span class="gl-ico">'+svi('egg')+'</span><span class="ag-rm"><span class="ag-rt">Proteine</span><span class="ag-rs">~'+perMeal+' g pe masă</span></span><span class="nt-kc">'+t.protMin+'–'+t.protMax+' g</span></div>';
+  html+='<div class="ag-row nt-row"><span class="gl-ico">'+svi('list')+'</span><span class="ag-rm"><span class="ag-rt">Mese</span><span class="ag-rs">'+escHtml(NUT_REGIMES[t.regime]||'')+'</span></span><span class="nt-kc">'+t.meals+'</span></div>';
+  html+='</div><button class="btn btn-ghost nt-edit" onclick="goNutTargets()">Modifică țintele</button>';
+  return html;
+}
+function goNutTargets(){showTab('setari');setTimeout(function(){var g=document.getElementById('sgProgram');if(g){g.classList.add('open');var c=document.getElementById('nutTargetsBox');if(c)c.scrollIntoView({block:'center'});}},120);}
+function renderNutTargetsOnly(t){
+  document.getElementById('nutDays').style.display='none';
+  var vw=document.getElementById('nutVariationWrap');if(vw)vw.style.display='none';
+  document.getElementById('nutDayHdr').innerHTML='<div class="nt-head"><div class="nt-sub"><b>'+escHtml(nutTargetsText(t))+'</b></div>'+nutWeightChip()+'</div>';
+  document.getElementById('nutMacros').innerHTML='';
+  var html=nutTargetsCardHtml(t,!!localStorage.getItem('nutrition_targets'));
+  html+=nutWeightTile();
+  html+='<button class="btn btn-ghost nt-old" onclick="nutShowOldMeals=true;initNutritie()">Vezi mesele vechi (19:6 / OMAD, arhivă)</button>';
+  document.getElementById('nutMeals').innerHTML=html;
+  document.getElementById('nutNote').innerHTML='';
+}
+function initNutTargetsUI(){
+  var box=document.getElementById('nutTargetsBox');if(!box)return;
+  var t=getNutTargets()||{kcalMin:'',kcalMax:'',meals:4,regime:'none',protMin:'',protMax:''};
+  if(isCustomProgram&&customNutrition&&!localStorage.getItem('nutrition_targets')){
+    var n=customNutrition;t={kcalMin:n.kcal,kcalMax:n.kcal,meals:4,regime:'none',protMin:n.protein,protMax:n.protein};
+  }
+  ['kcalMin','kcalMax','protMin','protMax'].forEach(function(k){var el=document.getElementById('nt_'+k);if(el)el.value=t[k];});
+  var m=document.getElementById('nt_meals');if(m)m.value=String(t.meals);
+  var r=document.getElementById('nt_regime');if(r)r.value=t.regime;
+  var st=document.getElementById('nutTargetsState');
+  if(st)st.textContent=localStorage.getItem('nutrition_targets')?'Setate de tine: '+nutTargetsText(getNutTargets()):(isCustomProgram?'Acum: planul calculat de aplicație. Completează ca să-l înlocuiești.':'Acum: valorile implicite.');
+}
+function saveNutTargets(){
+  function v(k){return parseFloat(document.getElementById('nt_'+k).value);}
+  var t={kcalMin:v('kcalMin'),kcalMax:v('kcalMax'),meals:parseInt(document.getElementById('nt_meals').value,10),regime:document.getElementById('nt_regime').value,protMin:v('protMin'),protMax:v('protMax')};
+  if(!(t.kcalMin>=1000&&t.kcalMax<=5000&&t.kcalMin<=t.kcalMax)){showToast('Caloriile: între 1.000 și 5.000, minimul ≤ maximul','var(--amber)');return;}
+  if(!(t.protMin>=40&&t.protMax<=400&&t.protMin<=t.protMax)){showToast('Proteinele: între 40 și 400 g, minimul ≤ maximul','var(--amber)');return;}
+  if(!(t.meals>=1&&t.meals<=8)){showToast('Numărul de mese: între 1 și 8','var(--amber)');return;}
+  t.kcalMin=Math.round(t.kcalMin);t.kcalMax=Math.round(t.kcalMax);t.protMin=Math.round(t.protMin);t.protMax=Math.round(t.protMax);
+  localStorage.setItem('nutrition_targets',JSON.stringify(t));
+  applyNutTargetsToChecklist();initNutTargetsUI();
+  showToast('Țintele de nutriție salvate','var(--green)');
+}
+function resetNutTargets(){
+  localStorage.removeItem('nutrition_targets');
+  if(!isCustomProgram)checkItems.forEach(function(c){if(c.id==='proteine')c.lbl='🥩 '+NUT_LEGACY_DEFAULT.protMin+'–'+NUT_LEGACY_DEFAULT.protMax+'g proteine';});
+  else if(customNutrition)checkItems.forEach(function(c){if(c.id==='proteine')c.lbl='🥩 '+customNutrition.protein+'g proteine';});
+  initNutTargetsUI();
+  showToast(isCustomProgram?'Revenit la planul calculat':'Revenit la valorile implicite');
+}
 function initNutritie(){
-  if(isCustomProgram&&customNutrition){refreshNutritionFromWeight();renderNutritionAuto();return;}
+  if(isCustomProgram&&customNutrition){
+    refreshNutritionFromWeight();renderNutritionAuto();
+    var ut=localStorage.getItem('nutrition_targets')&&getNutTargets();
+    if(ut){var nm=document.getElementById('nutMeals');nm.innerHTML=nutTargetsCardHtml(ut,true)+'<p class="help">Țintele de mai sus sunt ale tale; dedesubt rămâne planul calculat de aplicație, ca referință.</p>'+nm.innerHTML;}
+    return;
+  }
+  if(!isCustomProgram&&!nutShowOldMeals){var lt=getNutTargets();if(lt){renderNutTargetsOnly(lt);return;}}
   if(isCustomProgram){ // program generat fără nutriție (vechi/corupt) — nu cădem pe mesele legacy
     document.getElementById('nutDays').style.display='none';
     document.getElementById('nutDayHdr').innerHTML='<div class="chart-empty">Planul caloric lipsește din programul tău. Reia wizard-ul din Setări → Programul meu.</div>';
@@ -5373,6 +5499,7 @@ function renderNutDay(){
     html+='<div class="meal-card'+(mi===0?' open':'')+'"><div class="meal-hd" onclick="this.parentElement.classList.toggle(\'open\')"><span class="nt-time">'+escHtml(meal.time)+'</span><div class="ag-rm"><div class="meal-nm">'+escHtml(meal.name)+'</div><div class="meal-tm">~'+meal.protein+' g proteine</div></div><div class="meal-kc">'+meal.kcal+'<small>kcal</small></div><span class="meal-chev" aria-hidden="true"></span></div><div class="meal-items">'+itemsHtml+'</div></div>';
   });
   html+=nutWeightTile();
+  if(nutShowOldMeals)html+='<button class="btn btn-ghost nt-old" onclick="nutShowOldMeals=false;initNutritie()">Înapoi la țintele tale</button>';
   document.getElementById('nutMeals').innerHTML=html;
   document.getElementById('nutNote').innerHTML=p.note?'<div class="note-box">'+p.note+'</div>':'';
 }
@@ -5546,7 +5673,11 @@ function renderProgHero(){
   });
   var ms=all.filter(function(r){return r.type==='masuratoare'&&parseFloat(r.weight)>0;}).sort(function(a,b){return parseRoDate(a.date)-parseRoDate(b.date);});
   var wTxt='—',wSub='adaugă greutatea';
-  if(ms.length){
+  var wtr=Analytics.weightTrend(ms,new Date());
+  if(wtr.enough){
+    wTxt=String(wtr.ma7).replace('.',',')+'<small>kg</small>';
+    wSub='media pe 7 zile'+(wtr.trendPerWeek!=null?' · <em class="'+(wtr.trendPerWeek<=0?'ag-up':'ag-dn')+'">'+trendTxt(wtr.trendPerWeek)+'</em>':'');
+  }else if(ms.length){
     var lw=ms[ms.length-1],ld=parseRoDate(lw.date),ref=null;
     for(var mi=ms.length-2;mi>=0;mi--){var dd=parseRoDate(ms[mi].date);if(ld&&dd&&(ld-dd)/86400000>=28){ref=ms[mi];break;}}
     if(!ref&&ms.length>1)ref=ms[0];
@@ -6075,6 +6206,8 @@ function renderVolumePanel(){
   });
   if(data.zeros.length)html+='<p class="vol-note">'+(data.inProgress?'Fără volum nici planificat săptămâna asta: ':'Fără volum săptămâna asta: ')+data.zeros.join(' · ')+'</p>';
   html+='<div class="vol-hint">'+volumeHint(data)+'</div>';
+  var ppw=weekPullPush(currentWeekOffset,data.inProgress);
+  if(ppw.pull||ppw.push)html+='<p class="vol-note'+(ppw.low?' vol-warn':'')+'"><b>Tras / împins:</b> '+ppFmt(ppw).replace(' ⚠️ sub 1:1','')+(data.inProgress?' (proiecție)':'')+(ppw.low?'. Tragi mai puțin decât împingi: umerii au nevoie de cel puțin 1:1. Adaugă ramat sau reverse fly.':'.')+'</p>';
   if(data.inProgress)html+='<p class="vol-note">Săptămâna nu s-a terminat: bara plină = seturile făcute, conturul = proiecția (făcute + ce mai ai programat până duminică). Verdictul e dat pe proiecție.</p>';
   html+='<p class="vol-note">10–20 seturi pe mușchi pe săptămână = zona de creștere maximă (Pelland 2025, 67 de studii). Exercițiile compuse numără ½ set pentru mușchii secundari (împinsul → ½ triceps). Banda verde de pe fiecare bară e ținta.</p>';
   html+='</div>';
@@ -6085,6 +6218,31 @@ function renderVolumePanel(){
   });});
 }
 
+// ÎMBUNĂTĂȚIREA 4 (v130): seturi de tras (spate + umăr posterior) față de împins (piept + împins deasupra capului).
+// Ridicările laterale și tricepsul nu intră: nu sunt împins pentru umăr. Alertă sub 1:1.
+function pullPushClass(name){
+  var i=volumeInfoFor(name),p=i.pattern;
+  if(p==='pull'||p==='spate_post')return 'pull';
+  if(p==='push_h'||p==='push_v'||p==='izo_piept')return 'push';
+  if(!p){if(i.group==='spate')return 'pull';if(i.group==='piept')return 'push';}
+  return null;
+}
+function weekPullPush(weekOffset,withProjection){
+  var e=getRowsForWeek(weekOffset).filter(function(r){return r.type==='antrenament';}).map(function(r){return {name:r.exercise,sets:1};});
+  if(withProjection)e=e.concat(plannedRemainingEntries());
+  return Analytics.pullPush(e,pullPushClass);
+}
+function ppRatioTxt(pp){return pp.ratio!=null?String(pp.ratio).replace('.',','):(pp.pull>0?'doar tras':'—');}
+function ppFmt(pp){return pp.pull+' / '+pp.push+' seturi'+(pp.ratio!=null?' = '+ppRatioTxt(pp)+' : 1':(pp.pull>0?' (doar tras)':''))+(pp.low?' ⚠️ sub 1:1':'');}
+function buildPullPushExport(){
+  var out='';
+  var cur=weekPullPush(0,false),proj=weekPullPush(0,true);
+  out+='  Săptămâna în curs: '+ppFmt(cur)+' · proiecție până duminică: '+ppFmt(proj)+'\n';
+  var hist=[];
+  for(var off=-1;off>=-7;off--){var pp=weekPullPush(off,false);if(pp.pull||pp.push)hist.push(formatRoDate(getWeekBounds(off).monday).slice(0,5)+' '+ppRatioTxt(pp)+(pp.low?'⚠️':''));}
+  out+='  Săptămânile încheiate (luni · tras/împins): '+(hist.length?hist.reverse().join(' · '):'—')+'\n';
+  return out;
+}
 function buildVolumePerGroup(weekOffset){
   // Exportul AI folosește același motor ca panoul vizual (grupe + bandă)
   var data=buildWeeklyVolume(weekOffset);
@@ -6309,6 +6467,15 @@ function buildWeekSummary(){
   out+='Săptămâna program: '+curWeek+'/8'+(cycleInfo.cycle>1?' (Ciclul '+cycleInfo.cycle+')':'')+' — Focus oficial: '+(WEEK_FOCUS[curWeek-1]||WEEK_FOCUS[7]).label+'\n';
   out+='='.repeat(50)+'\n\n';
 
+  // === GREUTATE: media pe 7 zile + trend ===
+  var wtrE=Analytics.weightTrend(measurements.filter(function(m){return parseFloat(m.weight)>0;}),new Date());
+  if(wtrE.last){
+    out+='⚖️ GREUTATE (media mobilă + trend)\n';
+    if(wtrE.enough)out+='  Media pe 7 zile: '+wtrE.ma7+' kg ('+wtrE.count7+' cântăriri)'+(wtrE.trendPerWeek!=null?' · trend '+(wtrE.trendPerWeek>0?'+':'')+wtrE.trendPerWeek+' kg/săpt. (regresie pe 28 de zile)':'')+'\n';
+    else out+='  Prea puține cântăriri pentru medie și trend: '+wtrE.count14+' în ultimele 14 zile (minim 4). Ultima: '+wtrE.last.w+' kg.\n';
+    out+='\n';
+  }
+
   // === MĂSURĂTORI COMPLETE ===
   if(measurements.length){
     out+='📏 MĂSURĂTORI CORP — TOATE ('+measurements.length+' înregistrări)\n';
@@ -6458,6 +6625,10 @@ function buildWeekSummary(){
   out+='\n💪 VOLUM PE GRUP (săpt. anterioară pt. comparație)\n';
   out+=buildVolumePerGroup(currentWeekOffset-1);
 
+  // === TRACȚIUNE / ÎMPINGERE ===
+  out+='\n↔️ TRACȚIUNE / ÎMPINGERE (seturi de tras vs piept + împins deasupra capului; ținta ≥ 1:1)\n';
+  out+=buildPullPushExport();
+
   // === STAGNĂRI ===
   out+='\n⚠️ STAGNĂRI ȘI ⭐ NEEXECUTATE\n';
   out+=buildActiveStagnations();
@@ -6483,15 +6654,17 @@ function buildWeekSummary(){
     out+='  Echipament: '+eqL+' · '+(profile.days||'?')+' zile antrenament/săpt · nivel '+(profile.experience||'?')+'\n';
     out+='  Tempo: 2-1-2 strict pe toate exercițiile\n';
     out+='  Progresie ⭐: săpt 1-2 baseline · 3-4 +rep · 5-6 +kg · 7 +set · 8 deload\n';
-    out+='  Nutriție: '+customNutrition.kcal+' kcal/zi (TDEE '+customNutrition.tdee+') · P'+customNutrition.protein+' C'+customNutrition.carbs+' F'+customNutrition.fat+'\n';
+    out+='  Nutriție calculată: '+customNutrition.kcal+' kcal/zi (TDEE '+customNutrition.tdee+') · P'+customNutrition.protein+' C'+customNutrition.carbs+' F'+customNutrition.fat+'\n';
+    if(localStorage.getItem('nutrition_targets'))out+='  Nutriție setată de utilizator (are prioritate): '+nutTargetsText(getNutTargets())+'\n';
     if(customMeta&&customMeta.goalNotes)out+='  Notă obiectiv: '+customMeta.goalNotes+'\n';
   }else{
     out+='  Obiectiv: hipertrofie + recompoziție (92→85 kg)\n';
     out+='  Echipament: bancă înclinabilă, gantere rotunde, bară, bloc friendly\n';
     out+='  Tempo: 2-1-2 strict pe toate exercițiile\n';
     out+='  Progresie ⭐ săptămânală: săpt 1-2 baseline · 3-4 +rep · 5-6 +kg · 7 +set · 8 deload\n';
-    out+='  Frecvență: 4 zile active (L/Ma/J/V) + 1 recovery (Mi) + 2 mobilitate (S/D)\n';
-    out+='  Nutriție: 19:6 IF pe zile antrenament (1717-1769 kcal) · OMAD pe recovery (1007 kcal)\n';
+    out+='  Zile de antrenament: '+dayPlanSummaryText()+'\n';
+    var ntL=getNutTargets();
+    out+='  Nutriție'+(localStorage.getItem('nutrition_targets')?' (setată de utilizator)':'')+': '+(ntL?nutTargetsText(ntL):'—')+'\n';
   }
 
   // === CERERE ANALIZĂ ===
@@ -6546,7 +6719,7 @@ function todayDateForFile(){
 }
 
 // Backup complet: jurnalul + ce face programul utilizabil pe alt telefon (program, profil, zile, înlocuiri, ciclu)
-var BACKUP_KEYS=['custom_program','user_profile','legacy_program','training_days','training_days_temp','exercise_swaps','morning_swaps','program_cycle_start','cycles_completed','first_cycle_done','manual_deload_until','bar_weight','show_morning','app_theme','app_mode','app_lang'];
+var BACKUP_KEYS=['nutrition_targets','custom_program','user_profile','legacy_program','training_days','training_days_temp','exercise_swaps','morning_swaps','program_cycle_start','cycles_completed','first_cycle_done','manual_deload_until','bar_weight','show_morning','app_theme','app_mode','app_lang'];
 function buildBackup(){
   var s=loadStore(),set={};
   BACKUP_KEYS.forEach(function(k){var v=localStorage.getItem(k);if(v!==null)set[k]=v;});
@@ -9752,6 +9925,7 @@ window.addEventListener('load',function(){
   safeRun(initHeader);
   currentNutDay=todayIdx();
   lastDetectedDay=todayIdx();
+  safeRun(applyNutTargetsToChecklist);
   safeRun(migrateDayNotesStore); // v130: durerea scrisă în nota de energie → rândul de durere (o dată)
   safeRun(preloadToday);
   safeRun(renderToday);
