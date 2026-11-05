@@ -2251,6 +2251,22 @@ function swapForSlot(swaps,dk,origName){var k=dk+'|'+origName;if(Object.prototyp
     });
   }catch(e){console.error('applyExerciseSwaps failed',e);}
 })();
+// v131: INTERVAL TEMPORAR DE REPETĂRI (soluția la stagnare). target_overrides = {"exDay|nume": {target, orig, until:'yyyy-mm-dd'}}.
+// Antrenorul citește intervalul din item.target, deci progresia se recalculează singură; la expirare revine la orig.
+function getTargetOverrides(){try{return JSON.parse(localStorage.getItem('target_overrides')||'{}');}catch(e){return {};}}
+(function applyTargetOverrides(){
+  try{
+    var ov=getTargetOverrides(),t=todayISO(),changed=false;
+    Object.keys(ov).forEach(function(k){if(!ov[k]||ov[k].until<t){delete ov[k];changed=true;}});
+    Object.keys(exercises).forEach(function(dk){
+      (exercises[dk].list||[]).forEach(function(item){
+        var o=ov[dk+'|'+item.name];
+        if(o){item.origTarget=item.target;item.target=o.target;item.rangeUntil=o.until;}
+      });
+    });
+    if(changed)localStorage.setItem('target_overrides',JSON.stringify(ov));
+  }catch(e){console.error('applyTargetOverrides failed',e);}
+})();
 
 // ═══════════════════════════════════════════════════════════════
 // ZILELE MELE DE ANTRENAMENT — remapare peste programul generat
@@ -5333,9 +5349,59 @@ function painFollow(zone,ans){
   showToast(ans==='gone'?'Bine. Antrenorul revine la progresia normală.':(ans==='worse'?'Notat. Azi ușor cu zona asta.':'Notat.'),null,true);
   renderToday();
 }
+// v131: STAGNAREA VINE CU O SOLUȚIE. Pe un ⭐ de azi plat de 6 săptămâni: o recomandare (Analytics.stagnationAdvice)
+// și alternativele ei. „Nu acum" ascunde cardul 14 zile (stag_dismiss = {nume: 'yyyy-mm-dd'}).
+function isoPlus(days){var d=new Date();d.setDate(d.getDate()+days);return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');}
+function stagDismissed(name){try{var m=JSON.parse(localStorage.getItem('stag_dismiss')||'{}');return !!(m[name]&&m[name]>=todayISO());}catch(e){return false;}}
+function stagnantStarCount(){return uniqueStars().filter(function(s){var ls=longStagFor(s.name);return ls&&ls.stagnant;}).length;}
+function stagCandidate(){
+  if(isManualDeload()||getProgramWeek()>=8)return null;
+  var dk=schedule[getEffectiveDayIdx()].exDay,list=(exercises[dk]&&exercises[dk].list)||[];
+  for(var i=0;i<list.length;i++){
+    var e=list[i];if(!e.star||e.rangeUntil||stagDismissed(e.name)||skipData[e.name]!==undefined)continue;
+    var ls=longStagFor(e.name);
+    if(ls&&ls.stagnant&&!ls.idle)return {e:e,dk:dk,ls:ls,adv:Analytics.stagnationAdvice(stagnantStarCount(),e.target)};
+  }
+  return null;
+}
+function stagCardHtml(c){
+  var e=c.e,ls=c.ls,adv=c.adv,sk=encKey(e.name);
+  var lvl=ls.weighted?'1RM estimat ~'+Math.round(ls.recent.score)+' kg':'cel mult '+ls.recent.reps+' repetări';
+  var h='<div class="note coach-card"><strong>'+escHtml(e.name)+' stă pe loc de 6 săptămâni</strong> ('+lvl+'). ';
+  var bRange='<button class="btn '+(adv.primary==='range'?'btn-acc':'btn-ghost')+'" onclick="stagRange(\''+c.dk+'\',\''+sk+'\',\''+adv.newRange+'\')">Interval '+adv.newRange+' · '+adv.weeks+' săpt.</button>';
+  var bDeload='<button class="btn '+(adv.primary==='deload'?'btn-acc':'btn-ghost')+'" onclick="stagDeload()">Săptămână ușoară</button>';
+  var bSwap='<button class="btn btn-ghost" onclick="stagSwap(\''+sk+'\',\''+c.dk+'\')">Altă variantă</button>';
+  var bNo='<button class="btn btn-ghost" onclick="stagDismiss(\''+sk+'\')">Nu acum</button>';
+  if(adv.primary==='deload'){
+    h+='Stagnezi la '+stagnantStarCount()+' exerciții ⭐ deodată: cel mai probabil e oboseală. Recomandat: o săptămână ușoară.';
+    h+='<div class="btn-row note-btns">'+bDeload+bRange+bSwap+bNo+'</div></div>';
+  }else{
+    h+='Recomandat: '+adv.weeks+' săptămâni pe '+adv.newRange+' repetări (acum '+escHtml(String(e.target))+'). Antrenorul calculează singur greutatea, apoi revine la intervalul tău.';
+    h+='<div class="btn-row note-btns">'+bRange+bDeload+bSwap+bNo+'</div></div>';
+  }
+  return h;
+}
+function stagRange(dk,nameEnc,range){
+  var name=decodeURIComponent(nameEnc),item=(exercises[dk].list||[]).filter(function(x){return x.name===name;})[0];if(!item)return;
+  var ov=getTargetOverrides(),until=isoPlus(21);
+  ov[dk+'|'+name]={target:range,orig:item.origTarget||item.target,until:until};
+  localStorage.setItem('target_overrides',JSON.stringify(ov));
+  item.origTarget=item.origTarget||item.target;item.target=range;item.rangeUntil=until;
+  showToast('Interval '+range+' până pe '+isoToRo(until).slice(0,5)+'. Antrenorul recalculează greutatea.','var(--green)');
+  renderToday();
+}
+function stagDeload(){acceptManualDeload();renderToday();}
+function stagSwap(nameEnc,dk){openGuideByName(nameEnc,dk);setTimeout(function(){var mc=document.querySelector('#guideModal .modal-content');if(mc)mc.scrollTop=mc.scrollHeight;},80);}
+function stagDismiss(nameEnc){
+  var name=decodeURIComponent(nameEnc),m={};try{m=JSON.parse(localStorage.getItem('stag_dismiss')||'{}');}catch(e){}
+  m[name]=isoPlus(14);localStorage.setItem('stag_dismiss',JSON.stringify(m));
+  showToast('Ascuns 2 săptămâni',null,true);renderToday();
+}
 // Cardul antrenorului de pe Azi: unul singur, în ordinea durere → zi ratată → stagnare
 function aziCoachCardHtml(deloadShown){
-  return painFollowCardHtml();
+  var h=painFollowCardHtml();if(h)return h;
+  if(!deloadShown&&!currentWorkoutDate&&currentWorkoutDay===null){var c=stagCandidate();if(c)return stagCardHtml(c);}
+  return '';
 }
 function painLineHtml(){
   var act=Analytics.activePains(loadStore().rows,parseRoDate(getEffectiveDateRo())||new Date());
@@ -5707,6 +5773,8 @@ function initProgram(sel){
 }
 
 function planStarFlag(name){
+  var it=null;Object.keys(exercises).forEach(function(dk){(exercises[dk].list||[]).forEach(function(x){if(x.name===name&&x.rangeUntil)it=x;});});
+  if(it)return ' · <em class="ag-up">interval '+escHtml(it.target)+' până '+isoToRo(it.rangeUntil).slice(0,5)+'</em>';
   var ls=longStagFor(name);if(!ls)return '';
   if(ls.idle)return ' · <em class="ag-dn">neexecutat de '+ls.daysSince+' zile</em>';
   if(ls.stagnant)return ' · <em class="ag-dn">plat de 6 săpt.</em>';
@@ -6634,6 +6702,8 @@ function buildWeekSummary(){
     var ls=longStagFor(s.name);
     if(ls&&ls.stagnant) out+='  ⚠️ Stagnare pe termen lung: '+lsScore(ls.recent,ls.weighted)+' în ultimele 6 săpt. vs '+lsScore(ls.prior,ls.weighted)+' anterior ('+(ls.changePct>0?'+':'')+ls.changePct+'%)\n';
     if(ls&&ls.idle) out+='  ⏸️ Neexecutat de '+ls.daysSince+' zile\n';
+    var itO=null;(exercises[s.dayKey].list||[]).forEach(function(x){if(x.name===s.name&&x.rangeUntil)itO=x;});
+    if(itO)out+='  🔁 Interval temporar '+itO.target+' (în loc de '+itO.origTarget+') până pe '+isoToRo(itO.rangeUntil)+', soluție la stagnare\n';
     if(rec.pain)out+='  🩹 Durere activă la '+painZoneLow(rec.pain)+(rec.pain.intensity!=null?' ('+rec.pain.intensity+'/10)':'')+(rec.action==='pain_hold'?': fără progresie':'')+'\n';
   });
   out+='\n';
@@ -6820,7 +6890,7 @@ function todayDateForFile(){
 }
 
 // Backup complet: jurnalul + ce face programul utilizabil pe alt telefon (program, profil, zile, înlocuiri, ciclu)
-var BACKUP_KEYS=['nutrition_targets','custom_program','user_profile','legacy_program','training_days','training_days_temp','exercise_swaps','morning_swaps','program_cycle_start','cycles_completed','first_cycle_done','manual_deload_until','bar_weight','show_morning','app_theme','app_mode','app_lang'];
+var BACKUP_KEYS=['target_overrides','stag_dismiss','nutrition_targets','custom_program','user_profile','legacy_program','training_days','training_days_temp','exercise_swaps','morning_swaps','program_cycle_start','cycles_completed','first_cycle_done','manual_deload_until','bar_weight','show_morning','app_theme','app_mode','app_lang'];
 function buildBackup(){
   var s=loadStore(),set={};
   BACKUP_KEYS.forEach(function(k){var v=localStorage.getItem(k);if(v!==null)set[k]=v;});
