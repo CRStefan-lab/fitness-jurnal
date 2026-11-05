@@ -1,6 +1,6 @@
 // Service Worker — rețea-întâi pentru HTML și pentru scripturile proprii (index.html, generator.js, analytics.js și i18n-en.js
 // rămân mereu din aceeași versiune), cu limită de 3 s pe semnal slab; cache-first pentru fonturi și imagini.
-const CACHE = 'fitness-v137-de-ce';
+const CACHE = 'fitness-v138-audit-v136';
 const PRECACHE = ['./', './index.html', './manifest.json', './generator.js', './analytics.js', './privacy.html', './i18n-en.js',
   './fonts/barlow-400-latin-ext.woff2',
   './fonts/barlow-400-latin.woff2',

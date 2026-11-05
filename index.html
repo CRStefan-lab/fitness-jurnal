@@ -2762,7 +2762,20 @@ function roToIso(ro){
 // STATE
 // ═══════════════════════════════════════════════════════════════
 var setData={},checkData={},morningData={},ratingData={},rateNoteData={},exNoteData={},skipData={},painToday={},currentNutDay=0,currentWeekOffset=0;
-var customExercises={}; // {'dd.mm.yyyy|dayIdx': [{name,sets,target,custom:true}]} — per sesiune, nu persistent
+var customExercises={}; // {'dd.mm.yyyy|dayIdx': [{name,sets,target,custom:true}]} — v138: păstrate în custom_extras (2 zile)
+function saveCustomExtras(){
+  try{
+    var lim=Date.now()-2*86400000,out={};
+    Object.keys(customExercises).forEach(function(k){var d=parseRoDate(k.split('|')[0]);if(d&&d.getTime()>=lim&&customExercises[k].length)out[k]=customExercises[k];});
+    localStorage.setItem('custom_extras',JSON.stringify(out));
+  }catch(e){}
+}
+function loadCustomExtras(){
+  try{
+    var m=JSON.parse(localStorage.getItem('custom_extras')||'{}'),lim=Date.now()-2*86400000;
+    Object.keys(m).forEach(function(k){var d=parseRoDate(k.split('|')[0]);if(d&&d.getTime()>=lim&&Array.isArray(m[k]))customExercises[k]=m[k].filter(function(x){return x&&x.name;}).map(function(x){return {name:String(x.name).replace(/[<>"`]/g,''),sets:parseInt(x.sets)||3,target:String(x.target||''),star:false,custom:true};});});
+  }catch(e){}
+}
 function customFor(){return customExercises[getEffectiveDateRo()+'|'+getEffectiveDayIdx()]||[];}
 var currentWorkoutDay=null;  // null = folosește ziua derivată din dată. altfel = index zi override
 var currentWorkoutDate=null; // null = data de azi. altfel = ISO "yyyy-mm-dd"
@@ -3333,7 +3346,7 @@ function renderToday(){
   var hasRate=ratingData.energy!==undefined||ratingData.sleep!==undefined;
   var chipsHtml='',chipsOk=0,chipsN=0;
   function chip(kind,icon,label,val,state){
-    chipsN++;if(state==='ok')chipsOk++;
+    if(kind!=='masuratori'){chipsN++;if(state==='ok')chipsOk++;}
     chipsHtml+='<button class="ag-chip'+(state?' '+state:'')+'" onclick="aziChip(\''+kind+'\')">'+svi(state==='ok'?'check':icon)+label+(val!==''?' <b>'+val+'</b>':'')+'</button>';
   }
   if(morningTotal>0)chip('rutina','sun','Rutina',morningDone+'/'+morningTotal,morningDone>=morningTotal?'ok':'');
@@ -5413,7 +5426,8 @@ function stagCandidate(){
 // v136: cauzele probabile ale stagnării (Analytics.stagnationCauses)
 function stagCauses(name){
   var k=kcalAdviceNow(true);
-  return Analytics.stagnationCauses({rows:loadStore().rows,ref:new Date(),kcalDir:k?k.dir:0,goal:nutGoal(),pain:painForExercise(name)});
+  var pn=painForExercise(name);
+  return Analytics.stagnationCauses({rows:loadStore().rows,ref:new Date(),kcalDir:k?k.dir:0,goal:nutGoal(),pain:(pn&&pn.level!=='ok')?pn:null});
 }
 function stagCausesText(cs){
   return cs.map(function(c){
@@ -5537,12 +5551,13 @@ function pickPullAccessory(list){
   for(var i=0;i<order.length;i++){
     var x=DB.filter(function(d){return d.id===order[i];})[0];
     if(!x||used[x.name]||(x.gymOnly&&eqP!=='gym'))continue;
+    var pz=painForExercise(x.name);if(pz&&pz.level!=='ok')continue; // nu propunem un exercițiu care încarcă o zonă dureroasă
     if(x.equipment.every(function(q){return avail.indexOf(q)>=0;}))return x;
   }
   return null;
 }
 function ppFixCandidate(){
-  if(currentWorkoutDate||currentWorkoutDay!==null)return null;
+  if(currentWorkoutDate||currentWorkoutDay!==null||deloadNow())return null;
   try{if(localStorage.getItem('pp_dismiss')===today())return null;}catch(e){}
   var sc=schedule[getEffectiveDayIdx()];if(!sc||!isTrainingExDay(sc.exDay))return null;
   var list=exercises[sc.exDay].list.concat(customFor());
@@ -5560,6 +5575,7 @@ function ppAdd(nameEnc,sets){
   var name=decodeURIComponent(nameEnc),ck=getEffectiveDateRo()+'|'+getEffectiveDayIdx();
   customExercises[ck]=customExercises[ck]||[];
   if(!customExercises[ck].some(function(x){return x.name===name;}))customExercises[ck].push({name:name,sets:sets,target:'12–15',star:false,custom:true});
+  saveCustomExtras();
   try{localStorage.setItem('pp_dismiss',today());}catch(e){}
   showToast('Adăugat azi: '+sets+' seturi de '+name,'var(--green)');
   renderToday();
@@ -6488,7 +6504,7 @@ function plannedRemainingEntries(){
       if(r.type==='antrenament')doneBy[r.exercise]=(doneBy[r.exercise]||0)+1;
       else if(r.type==='skip')skipped[r.exercise]=1;
     });
-    (exercises[sc.exDay].list||[]).forEach(function(e){
+    ((exercises[sc.exDay].list||[]).concat(n===todayN?customFor():[])).forEach(function(e){
       if(skipped[e.name])return;
       var pl=(deload&&e.sets>1)?Math.max(1,Math.round(e.sets*0.7)):e.sets;
       pl=Math.max(0,pl-(doneBy[e.name]||0));
@@ -6903,8 +6919,7 @@ function buildWeekSummary(){
   var stars=getStarExercises();
   stars.forEach(function(s){
     _recOtherDay=(s.dayKey!==todayExDay());
-    var rec=getRecommendation(s.name,curWeek,s.sets,s.firstStar);
-    _recOtherDay=false;
+    var rec;try{rec=getRecommendation(s.name,curWeek,s.sets,s.firstStar);}finally{_recOtherDay=false;}
     if(!rec)return;
     out+='⭐ '+s.name+' ['+s.dayLabel+']\n';
     if(rec.last) out+='  Ultima: '+rec.last.reps+' rep × '+rec.last.kg+' kg ('+rec.last.date+')\n';
@@ -9592,7 +9607,9 @@ function buildDigestStats(offset){
 function digestBilantHtml(off){
   var b=getWeekBounds(off),end=new Date(b.sunday.getTime()-86400000),now=new Date(),ref=end<now?end:now;
   var rows=loadStore().rows,str=rows.filter(function(r){return r.type==='antrenament'&&isRIRRelevant(r.exercise);});
-  var adh=Analytics.adherence(str,{active:activeWeekdays(),ref:ref}),cw=adh?adh.currentWeek:null;
+  // săptămână încheiată: referința e lunea următoare, iar săptămâna e penultima din listă (altfel duminica ratată nu s-ar număra)
+  var past=end<now,adh=Analytics.adherence(str,{active:activeWeekdays(),ref:past?b.sunday:ref});
+  var cw=adh?(past?adh.weeks[6]:adh.currentWeek):null;
   var vol=buildWeeklyVolume(off),sub=[];if(vol)vol.groups.forEach(function(g){if(volJudged(g)<VOL_BAND_LO)sub.push(g);});
   var pp=weekPullPush(off,off===0),wt=Analytics.weightTrend(getMeasurements(),ref),pains=activePainsNow();
   var v=Analytics.weeklyVerdict({pain:pains[0]||null,adherence:cw,pullPush:pp,subBand:sub.map(function(g){return g.id;})});
@@ -10270,6 +10287,7 @@ function addCustomExerciseDialog(){
   var ck=getEffectiveDateRo()+'|'+getEffectiveDayIdx();
   customExercises[ck]=customExercises[ck]||[];
   customExercises[ck].push({name:name,sets:sets,target:reps,star:false,custom:true});
+  saveCustomExtras();
   renderToday();
   showToast('Exercițiu adăugat ✓');
 }
@@ -10505,6 +10523,7 @@ window.addEventListener('load',function(){
   safeRun(initHeader);
   currentNutDay=todayIdx();
   lastDetectedDay=todayIdx();
+  safeRun(loadCustomExtras);
   safeRun(applyNutTargetsToChecklist);
   safeRun(pauseOverridesInDeload);
   safeRun(migrateDayNotesStore); // v130: durerea scrisă în nota de energie → rândul de durere (o dată)
