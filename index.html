@@ -536,6 +536,11 @@ input:checked + .slider:before{transform:translateX(20px);background:#fff}
 .ag-pain{font-style:normal;font-weight:600;color:var(--amber)}
 .coach-card .note-btns .btn{flex:1 1 auto}
 .evt-v{font-size:14px;white-space:nowrap}
+.why-btn{margin-left:6px;padding:2px 9px;font-size:12px;border-color:var(--bd2)}
+.why-list{display:flex;flex-direction:column;gap:10px;margin-top:4px}
+.why-row{display:flex;gap:10px;align-items:flex-start;font-size:14px;line-height:1.45}
+.why-row>b{flex:0 0 22px;height:22px;border-radius:50%;background:var(--s2);display:flex;align-items:center;justify-content:center;font-size:12px}
+.why-row>div{flex:1;min-width:0}.why-row .ss-inl{display:inline-block;margin:6px 0 0}
 .energy-line{display:flex;align-items:center;gap:8px;margin:8px 0 2px;padding:9px 12px;border-radius:12px;background:var(--acc-soft);font-size:13px;line-height:1.4}
 .energy-line .svi{width:16px;height:16px;flex:0 0 auto;color:var(--acc2)}.energy-line span{flex:1;min-width:0}
 .energy-line button{flex:0 0 auto;border:1px solid var(--bd2);background:var(--s1);color:var(--text);border-radius:999px;padding:6px 10px;font-size:12.5px;font-weight:600}
@@ -1539,6 +1544,10 @@ html{touch-action:pan-x pan-y}
       <div class="notif-row">
         <div><div class="notif-lbl">Rutina de dimineață</div><div class="notif-sub">Apare pe Azi. Dacă o ascunzi, programul, istoricul și seria rămân neschimbate.</div></div>
         <label class="sw"><input type="checkbox" id="morningToggle" aria-label="Arată rutina de dimineață" onchange="toggleMorningShown(this.checked)"><span class="slider"></span></label>
+      </div>
+      <div class="notif-row">
+        <div><div class="notif-lbl">Sfaturile antrenorului</div><div class="notif-sub">Cardurile de pe Azi (zi ratată, stagnare, tras/împins, calorii), săptămâna ușoară propusă și memento-urile. Oprite, rămân jurnalul, țintele și durerea notată de tine.</div></div>
+        <label class="sw"><input type="checkbox" id="coachTipsToggle" aria-label="Sfaturile antrenorului" onchange="toggleCoachTips(this.checked)"><span class="slider"></span></label>
       </div>
       <div class="nt-form" id="nutTargetsBox">
         <div class="notif-lbl">Nutriție — țintele tale</div>
@@ -2910,6 +2919,7 @@ function showTab(name,btn){
   }
   if(name==='setari'){
     initNutTargetsUI();
+    var ctt=document.getElementById('coachTipsToggle');if(ctt)ctt.checked=coachTipsOn();
     updateFsaUI();
     initNotifUI();
     initBackupReminderUI();
@@ -3283,7 +3293,7 @@ function renderToday(){
   for(var k in checkData){if(checkData[k])checkDone++;}
 
   // Sugestie auto-deload (stagnare multiplă + energie scăzută)
-  var deloadSuggest=checkAutoDeloadSuggest();
+  var deloadSuggest=coachTipsOn()?checkAutoDeloadSuggest():null;
   if(deloadSuggest){
     html+='<div class="note"><strong>Corpul cere o pauză.</strong> Stagnezi la '+deloadSuggest.stagnant+' exerciții de progresie'+(deloadSuggest.energy!==null?', iar energia ta medie e '+deloadSuggest.energy.toFixed(1)+' din 10':'')+'. O săptămână ușoară acum înseamnă progres mai rapid după.';
     html+='<div class="btn-row note-btns"><button class="btn btn-acc" onclick="acceptManualDeload()">Da, o săptămână ușoară</button><button class="btn btn-ghost" onclick="dismissDeloadSuggest()">Nu acum</button></div></div>';
@@ -3328,7 +3338,7 @@ function renderToday(){
   }
   if(morningTotal>0)chip('rutina','sun','Rutina',morningDone+'/'+morningTotal,morningDone>=morningTotal?'ok':'');
   chip('cantar','scale','Cântar',tw?escHtml(String(tw))+' kg':'',tw?'ok':'todo');
-  if(!dateOverride&&!dayOverride&&measReminderDue())chip('masuratori','cal','Măsurători lunare','','todo');
+  if(!dateOverride&&!dayOverride&&coachTipsOn()&&measReminderDue())chip('masuratori','cal','Măsurători lunare','','todo');
   var rateLbl=[];if(ratingData.sleep!==undefined)rateLbl.push('Somn <b>'+ratingData.sleep+'</b>');if(ratingData.energy!==undefined)rateLbl.push('Energie <b>'+ratingData.energy+'</b>');
   chip('stare','smile',hasRate?rateLbl.join(' · '):'Stare','',hasRate?'ok':'todo');
   if(!dateOverride&&!dayOverride)html+=quickRateHtml();
@@ -3693,7 +3703,7 @@ function renderSession(ei){
 
   var pn=painForExercise(key);
   if(pn)html+=painCoachHtml(pn,key);
-  if((!pn||pn.level==='ok'||pn.level==='watch')&&isRIRRelevant(key)&&energyLowToday()&&!deloadNow()&&getLastPerformance(key,getEffectiveDateRo()))html+='<div class="ss-coach quiet">'+svi('smile')+'<div>Energie sau somn mic azi: menții greutățile de data trecută. <button class="ss-inl" onclick="energyOk()">Mă simt bine azi</button></div></div>';
+  if(coachTipsOn()&&(!pn||pn.level==='ok'||pn.level==='watch')&&isRIRRelevant(key)&&energyLowToday()&&!deloadNow()&&getLastPerformance(key,getEffectiveDateRo()))html+='<div class="ss-coach quiet">'+svi('smile')+'<div>Energie sau somn mic azi: menții greutățile de data trecută. <button class="ss-inl" onclick="energyOk()">Mă simt bine azi</button></div></div>';
   // Antrenorul: o propoziție; restul sub „Mai mult"
   var coachWeek=getProgramWeek(currentWorkoutDate?parseRoDate(currentWorkoutDate):null);
   var more='',openMore=false;
@@ -3702,7 +3712,7 @@ function renderSession(ei){
     if(rec){
       var lastTxt=rec.last?'Ultima dată '+rec.last.reps+(parseFloat(rec.last.kg)>0?' × '+rec.last.kg+' kg':' rep')+'. ':'';
       var trend=getTrend(key);
-      html+='<div class="ss-coach">'+svi('bulb')+'<div>'+lastTxt+'<b>Azi: '+escHtml(rec.target)+'</b>'+(trend?' <span class="trend" style="color:'+trend.color+'" title="Tendința ultimelor 3 sesiuni">'+trend.arrow+'</span>':'')+rirHistoryBadge(key)+'</div></div>';
+      html+='<div class="ss-coach">'+svi('bulb')+'<div>'+lastTxt+'<b>Azi: '+escHtml(rec.target)+'</b>'+whyBtn(rec.whyList)+(trend?' <span class="trend" style="color:'+trend.color+'" title="Tendința ultimelor 3 sesiuni">'+trend.arrow+'</span>':'')+rirHistoryBadge(key)+'</div></div>';
       if(rec.tip&&rec.action!=='start')more+='<p class="hint">'+rec.tip+'</p>';
       if(rec.action==='start'){
         openMore=(done===0);
@@ -3710,11 +3720,11 @@ function renderSession(ei){
       }
     }
     var stag=detectStagnation(key);
-    if(stag)html+='<div class="ss-coach warn">'+svi('alert')+'<div><b>Stagnare 2 săptămâni:</b> '+stag.prevReps+'×'+stag.prevKg+' → '+stag.lastReps+'×'+stag.lastKg+'. Verifică somnul, caloriile sau ia o mini-pauză.</div></div>';
+    if(stag&&coachTipsOn())html+='<div class="ss-coach warn">'+svi('alert')+'<div><b>Stagnare 2 săptămâni:</b> '+stag.prevReps+'×'+stag.prevKg+' → '+stag.lastReps+'×'+stag.lastKg+'. Verifică somnul, caloriile sau ia o mini-pauză.</div></div>';
     if(!pn||pn.level==='ok')more+=buildWarmupHint(key); // cu durere, încălzirea stă în cutia de durere
   }else{
     var acc=getAccessoryRec(key,e);
-    if(acc)html+='<div class="ss-coach quiet">'+svi('bulb')+'<div>Ultima dată '+acc.lastStr+'. <b>Opțional azi: '+acc.targetStr+'</b> <span class="coach-why">('+acc.why+')</span>'+rirHistoryBadge(key)+'</div></div>';
+    if(acc)html+='<div class="ss-coach quiet">'+svi('bulb')+'<div>Ultima dată '+acc.lastStr+'. <b>Opțional azi: '+acc.targetStr+'</b> <span class="coach-why">('+acc.why+')</span>'+whyBtn(acc.whyList)+rirHistoryBadge(key)+'</div></div>';
   }
   var kgc=kgConventionFor(e);
   if(kgc)more+='<p class="hint">'+kgc+'</p>';
@@ -5496,7 +5506,7 @@ function kcalAdviceNow(ignorePause){
 }
 function fmtKg2(v){return (v>0?'+':(v<0?'−':''))+String(Math.abs(v).toFixed(2)).replace('.',',');}
 function kcalCardHtml(a){
-  if(!a||!a.dir)return '';
+  if(!a||!a.dir||!coachTipsOn())return ''; // v137: cu sfaturile oprite, nici în Nutriție
   var g=nutGoal(),gl={slabit:'slăbit',recomp:'recompoziție',masa:'masă musculară'}[g]||g;
   var why=a.dir>0?(g==='masa'?'Nu crești în greutate cât trebuie.':'Slăbești mai repede decât e bine pentru mușchi.'):(g==='masa'?'Crești mai repede decât e nevoie: se adună și grăsime.':'Greutatea nu scade cât ar trebui.');
   var h='<div class="note coach-card"><strong>Greutatea: '+fmtKg2(a.perWeek)+' kg/săpt.</strong> în ultimele 3 săptămâni ('+fmtKg2(a.ratePct)+' % pe săptămână). '+why+' Pentru '+gl+', zona bună e '+fmtKg2(a.zoneKg[0])+' … '+fmtKg2(a.zoneKg[1])+' kg/săpt.';
@@ -5558,6 +5568,7 @@ function ppLater(){try{localStorage.setItem('pp_dismiss',today());}catch(e){}ren
 // Cardul antrenorului de pe Azi: unul singur, în ordinea durere → zi ratată → stagnare → tras/împins → calorii
 function aziCoachCardHtml(deloadShown){
   var h=painFollowCardHtml();if(h)return h;
+  if(!coachTipsOn())return '';
   var mc=missedCandidate();if(mc)return missedCardHtml(mc);
   if(!deloadShown&&!currentWorkoutDate&&currentWorkoutDay===null){var c=stagCandidate();if(c)return stagCardHtml(c);}
   var pf=ppFixCandidate();if(pf)return ppFixCardHtml(pf);
@@ -7091,7 +7102,7 @@ function todayDateForFile(){
 }
 
 // Backup complet: jurnalul + ce face programul utilizabil pe alt telefon (program, profil, zile, înlocuiri, ciclu)
-var BACKUP_KEYS=['kcal_advice_until','target_overrides','stag_dismiss','nutrition_targets','custom_program','user_profile','legacy_program','training_days','training_days_temp','exercise_swaps','morning_swaps','program_cycle_start','cycles_completed','first_cycle_done','manual_deload_until','bar_weight','show_morning','app_theme','app_mode','app_lang'];
+var BACKUP_KEYS=['coach_tips','kcal_advice_until','target_overrides','stag_dismiss','nutrition_targets','custom_program','user_profile','legacy_program','training_days','training_days_temp','exercise_swaps','morning_swaps','program_cycle_start','cycles_completed','first_cycle_done','manual_deload_until','bar_weight','show_morning','app_theme','app_mode','app_lang'];
 function buildBackup(){
   var s=loadStore(),set={};
   BACKUP_KEYS.forEach(function(k){var v=localStorage.getItem(k);if(v!==null)set[k]=v;});
@@ -8060,11 +8071,84 @@ function getLastRIR(exerciseName){
 
 // v131: durerea se aplică peste orice recomandare (Azi, antrenament, export)
 var _getRecBase=getRecommendation,_getAccBase=getAccessoryRec;
-getRecommendation=function(n,w,p,f){return energyAdjustRec(painAdjustRec(_getRecBase(n,w,p,f),n));};
-getAccessoryRec=function(n,m){return energyAdjustAcc(painAdjustAcc(_getAccBase(n,m),n));};
+getRecommendation=function(n,w,p,f){
+  var r0=_getRecBase(n,w,p,f);if(!r0)return r0;
+  var why=[baseWhyRec(r0,w)],it=rangeItemFor(n);
+  if(it)why.push(rangeWhy(it));
+  var r1=painAdjustRec(r0,n);if(r1.action==='pain_hold')why.push(painWhy(r1.pain));
+  var r2=energyAdjustRec(r1);if(r2.action==='energy_hold')why.push(energyWhy());
+  r2.whyList=why;return r2;
+};
+getAccessoryRec=function(n,m){
+  var a0=_getAccBase(n,m);if(!a0)return a0;
+  var why=[{text:a0.type==='deload'?'Săptămână de descărcare: greutăți mai mici, mai puține seturi.':'Progresie dublă: '+a0.why+'.'}],it=rangeItemFor(n);
+  if(it)why.push(rangeWhy(it));
+  var a1=painAdjustAcc(a0,n);if(a1!==a0&&a1.pain)why.push(painWhy(a1.pain));
+  var a2=energyAdjustAcc(a1);if(a2!==a1)why.push(energyWhy());
+  a2.whyList=why;return a2;
+};
+// v137: „DE CE?" — motivele țintei, în ordinea în care au acționat, fiecare cu anularea lui (dacă are una)
+function stripEmo(t){return String(t||'').replace(EMO_EDGE_RE,'').replace(/[\u{1F300}-\u{1FAFF}\u2600-\u27BF]\uFE0F?/gu,'').replace(/\s{2,}/g,' ').trim();}
+function baseWhyRec(r,week){
+  if(r.action==='deload'){
+    if(isManualDeload())return {text:'Săptămână ușoară până pe '+isoToRo(localStorage.getItem('manual_deload_until')||'').slice(0,5)+': greutăți la ~80%, mai puține seturi.',undo:{label:'Oprește săptămâna ușoară',fn:'deloadStop()'}};
+    return {text:'Săptămâna 8 din 8: descărcarea programată, greutăți la ~80% și mai puține seturi.'};
+  }
+  if(r.action==='start')return {text:'Prima dată la acest exercițiu: găsești greutatea de lucru.'};
+  return {text:'Programul, săptămâna '+week+' din 8: '+stripEmo(r.tip||r.tag).replace(/^Săpt\.\s*\d+\s*:\s*/,'')};
+}
+function rangeItemFor(name){
+  var dk=todayExDay(),it=null;
+  ((exercises[dk]&&exercises[dk].list)||[]).forEach(function(x){if(x.name===name&&x.rangeUntil)it=x;});
+  if(it)it._dk=dk;
+  return it;
+}
+function rangeWhy(it){
+  return {text:'Interval temporar '+it.target+' (în loc de '+it.origTarget+') până pe '+isoToRo(it.rangeUntil).slice(0,5)+(deloadNow()?', pe pauză în deload':'')+': soluția aleasă la stagnare.',
+    undo:{label:'Revino acum la '+it.origTarget,fn:"overrideStop('"+it._dk+"','"+encKey(it.name)+"')"}};
+}
+function painWhy(p){
+  return {text:'Durere la '+painZoneArt(p)+(p.intensity!=null?' ('+p.intensity+'/10)':'')+': '+(p.level==='swap'?'fără progresie și recomandarea de înlocuire.':'fără progresie până se liniștește.'),
+    undo:{label:'Actualizează durerea',fn:"closeAziSheet(true);openPainSheet('"+p.zone+"','')"}};
+}
+function energyWhy(){
+  var p=[];if(ratingData.energy!=null&&ratingData.energy<=4)p.push('energie '+ratingData.energy);if(ratingData.sleep!=null&&ratingData.sleep<=4)p.push('somn '+ratingData.sleep);
+  return {text:'Azi '+p.join(' și ')+': menții greutățile, fără progresie forțată.',undo:{label:'Mă simt bine azi',fn:'closeAziSheet(true);energyOk()'}};
+}
+var _whyList=[];
+function whyBtn(list){_whyList=list||[];return list&&list.length?' <button class="ss-inl why-btn" onclick="openWhySheet()">de ce?</button>':'';}
+function openWhySheet(){
+  var h='<p class="sh-help">Regulile se aplică în ordinea de mai jos; ultima care schimbă ceva decide ținta.</p><div class="why-list">';
+  _whyList.forEach(function(w,i){
+    h+='<div class="why-row"><b>'+(i+1)+'</b><div><span>'+escHtml(w.text)+'</span>'+(w.undo?'<button class="ss-inl" onclick="'+w.undo.fn+'">'+escHtml(w.undo.label)+'</button>':'')+'</div></div>';
+  });
+  openAziSheet('De ce această țintă',h+'</div>');
+}
+function overrideStop(dk,nameEnc){
+  var name=decodeURIComponent(nameEnc),ov=getTargetOverrides();delete ov[dk+'|'+name];
+  localStorage.setItem('target_overrides',JSON.stringify(ov));
+  ((exercises[dk]&&exercises[dk].list)||[]).forEach(function(x){if(x.name===name&&x.origTarget){x.target=x.origTarget;delete x.rangeUntil;delete x.origTarget;}});
+  var m={};try{m=JSON.parse(localStorage.getItem('stag_dismiss')||'{}');}catch(e){}m[name]=isoPlus(14);localStorage.setItem('stag_dismiss',JSON.stringify(m));
+  closeAziSheet(true);showToast('Revenit la intervalul tău',null,true);
+  renderToday();if(sessionOpen)renderSession(sessionExIdx);
+}
+function deloadStop(){
+  if(!confirm('Oprești săptămâna ușoară? Antrenorul revine la progresia programului.'))return;
+  localStorage.removeItem('manual_deload_until');
+  localStorage.setItem('deload_dismissed_until',isoPlus(7));
+  closeAziSheet(true);showToast('Săptămâna ușoară oprită',null,true);
+  renderToday();if(sessionOpen)renderSession(sessionExIdx);
+}
 // v135: ENERGIA DE AZI. Cu energie ≤ 4 sau somn ≤ 4 notate azi, antrenorul nu forțează progresia (menții greutatea și
 // repetările de data trecută). „Mă simt bine azi" (energy_ok = data) anulează regula pentru ziua respectivă. Durerea are prioritate.
 var _recOtherDay=false; // true cât calculăm recomandări pentru altă zi decât azi
+// v137: cu sfaturile oprite dispar cardurile și propunerile; regulile din spatele țintelor și durerea rămân
+function coachTipsOn(){try{return localStorage.getItem('coach_tips')!=='0';}catch(e){return true;}}
+function toggleCoachTips(on){
+  try{localStorage.setItem('coach_tips',on?'1':'0');}catch(e){}
+  showToast(on?'Sfaturile antrenorului sunt pornite':'Sfaturile antrenorului sunt oprite. Țintele și durerea rămân.',null,true);
+  renderToday();
+}
 function energyLowToday(){
   if(_recOtherDay)return false;
   try{if(localStorage.getItem('energy_ok')===getEffectiveDateRo())return false;}catch(e){}
@@ -8087,7 +8171,7 @@ function energyOk(){
   renderToday();if(sessionOpen)renderSession(sessionExIdx);
 }
 function energyLineHtml(){
-  if(!energyLowToday())return '';
+  if(!coachTipsOn()||!energyLowToday())return '';
   var lowE=ratingData.energy!=null&&ratingData.energy<=4,lowS=ratingData.sleep!=null&&ratingData.sleep<=4;
   var lead=currentWorkoutDate?'În ziua asta':'Azi';
   var what=lowE&&lowS?'energie '+ratingData.energy+' și somn '+ratingData.sleep:(lowE?'energie '+ratingData.energy:'somn '+ratingData.sleep);
