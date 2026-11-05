@@ -525,7 +525,10 @@ input:checked + .slider:before{transform:translateX(20px);background:#fff}
 .nt-grid .meas-in,.nt-grid .select-box{width:100%;margin:0}
 .nt-edit,.nt-old{margin-top:10px}
 .vol-note.vol-warn{color:var(--amber)}
-.pain-box{margin-top:10px;padding-top:12px;border-top:1px solid var(--bd)}.pain-hd{font-size:14px;font-weight:600;margin-bottom:8px}.pain-hd small{color:var(--muted);font-weight:500;margin-left:6px}
+.pain-line{display:flex;align-items:center;gap:8px;width:100%;margin:8px 0 2px;padding:9px 12px;border-radius:12px;border:1px dashed var(--bd2);background:transparent;color:var(--muted);font-size:13.5px;text-align:left}
+.pain-line .svi{width:16px;height:16px;flex:0 0 auto}.pain-line span{flex:1;min-width:0}.pain-line em{font-style:normal;font-weight:600;color:var(--acc2)}
+.pain-line.on{border-style:solid;border-color:rgba(232,184,74,.45);background:rgba(232,184,74,.08);color:var(--amber)}.pain-line.on b{color:var(--text)}
+.pain-scale{font-size:12px;margin:-2px 0 8px}
 .swap-days{display:block;margin-top:6px;font-size:12px;color:var(--muted)}.swap-day{border:1px solid var(--bd);background:var(--s2);color:var(--text);border-radius:999px;padding:4px 10px;font-size:12px;margin:2px 4px 2px 0}
 
 /* ── Zilele mele (modal plan) ── */
@@ -2635,9 +2638,9 @@ function addRow(row){
     });
   }
   if(row.type==='durere'){
-    // o notă de durere per zi (zonă în exercise, intensitate 0–10 în reps, text în note)
+    // o notă de durere pe zonă și zi (zonă în exercise, intensitate 0–10 în reps, text în note, exercițiul în ex)
     s.rows=s.rows.filter(function(r){
-      return !(r.type==='durere' && r.date===row.date);
+      return !(r.type==='durere' && r.date===row.date && r.exercise===row.exercise);
     });
   }
   if(row.type==='masuratoare'){
@@ -2722,7 +2725,7 @@ function roToIso(ro){
 // ═══════════════════════════════════════════════════════════════
 // STATE
 // ═══════════════════════════════════════════════════════════════
-var setData={},checkData={},morningData={},ratingData={},rateNoteData={},exNoteData={},skipData={},painData={},currentNutDay=0,currentWeekOffset=0;
+var setData={},checkData={},morningData={},ratingData={},rateNoteData={},exNoteData={},skipData={},painToday={},currentNutDay=0,currentWeekOffset=0;
 var customExercises={}; // {'dd.mm.yyyy|dayIdx': [{name,sets,target,custom:true}]} — per sesiune, nu persistent
 function customFor(){return customExercises[getEffectiveDateRo()+'|'+getEffectiveDayIdx()]||[];}
 var currentWorkoutDay=null;  // null = folosește ziua derivată din dată. altfel = index zi override
@@ -3295,10 +3298,11 @@ function renderToday(){
   }
   if(morningTotal>0)chip('rutina','sun','Rutina',morningDone+'/'+morningTotal,morningDone>=morningTotal?'ok':'');
   chip('cantar','scale','Cântar',tw?escHtml(String(tw))+' kg':'',tw?'ok':'todo');
-  chip('stare','smile',hasRate?'Energie':'Stare',hasRate?(ratingData.energy||5)+'/10':'',hasRate?'ok':'todo');
+  var rateLbl=[];if(ratingData.sleep!==undefined)rateLbl.push('Somn <b>'+ratingData.sleep+'</b>');if(ratingData.energy!==undefined)rateLbl.push('Energie <b>'+ratingData.energy+'</b>');
+  chip('stare','smile',hasRate?rateLbl.join(' · '):'Stare','',hasRate?'ok':'todo');
   if(!dateOverride&&!dayOverride)html+=quickRateHtml();
   if(checkItems.length)chip('obiective','list','Obiective',checkDone+'/'+checkItems.length,checkDone>=checkItems.length?'ok':'');
-  html+='<div class="ag-st">Ziua ta<span>'+chipsOk+' din '+chipsN+'</span></div><div class="ag-chips">'+chipsHtml+'</div>';
+  html+='<div class="ag-st">Ziua ta<span>'+chipsOk+' din '+chipsN+'</span></div><div class="ag-chips">'+chipsHtml+'</div>'+painLineHtml();
 
   // Exercițiile de azi: o agendă, fără câmpuri; atingi un rând și intri în modul antrenament
   var doneEx=0;
@@ -3742,6 +3746,7 @@ function sessMenu(){
   var h='<div class="sh-list">';
   if(!skipped&&!complete)h+=shItem('skip','Sari exercițiul','Cu motiv; se reia data viitoare','closeAziSheet(true);sessSkipMenu()');
   if(!skipped)h+=shItem('plus','Adaugă un set','Un set în plus, doar azi','sessAddSet()');
+  h+=shItem('alert','Simt durere aici','Zona, cât de tare; antrenorul ține cont','closeAziSheet(true);openPainSheet(\''+zoneForExercise(e.name)+'\',\''+sk+'\')');
   h+=shItem('edit','Notă',exNoteData[e.name]?escHtml(exNoteData[e.name]):'Umăr ok, ușor azi…','closeAziSheet(true);sessNoteSheet()');
   guideDay=todayExDay();
   if(swapAlternativesHtml(e.name))h+=shItem('swap','Înlocuiește','Alternative cu aceeași mișcare','closeAziSheet(true);sessSwap(\''+sk+'\')');
@@ -3755,7 +3760,8 @@ function sessSkipMenu(){
   var sk=encKey(e.name);
   var h='<p class="sh-help">Exercițiul se reia data viitoare. Seturile deja salvate rămân în jurnal.</p><div class="sh-pills">';
   ['Durere sau disconfort','Fără energie','Fără timp','Fără echipament'].forEach(function(rp){
-    h+='<button class="skip-pill" onclick="closeAziSheet(true);skipExercise(\''+sk+'\',\''+rp+'\')">'+rp+'</button>';
+    var then=rp==='Durere sau disconfort'?';setTimeout(function(){openPainSheet(\''+zoneForExercise(e.name)+'\',\''+sk+'\');},60)':'';
+    h+='<button class="skip-pill" onclick="closeAziSheet(true);skipExercise(\''+sk+'\',\''+rp+'\')'+then+'">'+rp+'</button>';
   });
   h+='<button class="skip-pill" onclick="closeAziSheet(true);skipExerciseCustom(\''+sk+'\')">Alt motiv</button></div>';
   openAziSheet('Sari exercițiul',h);
@@ -3820,18 +3826,11 @@ function aziChip(kind){
     h+='<input class="rate-note-input" type="text" id="noteEnergy" aria-label="Notă la energie" placeholder="De ce? (somn prost, zi grea, cafea târziu)" value="'+escHtml(rateNoteData.energy||'')+'" onchange="saveRateNote(\'energy\',this.value)">';
     h+='<div class="rating-row"><div class="rating-label">Somn</div><input type="range" min="1" max="10" value="'+sl+'" class="rating-slider" id="ratSleep" aria-label="Calitate somn" oninput="updateRating(\'sleep\',this.value)"><div class="rating-value" id="ratSleepVal">'+sl+'/10</div></div>';
     h+='<input class="rate-note-input" type="text" id="noteSleep" aria-label="Notă la somn" placeholder="Notă somn (5 ore, trezit de 3 ori)" value="'+escHtml(rateNoteData.sleep||'')+'" onchange="saveRateNote(\'sleep\',this.value)">';
-    var pz=painData.zone||'',pi=painData.intensity==null?0:painData.intensity;
-    h+='<div class="pain-box"><div class="pain-hd">Durere sau disconfort <small>opțional</small></div>';
-    h+='<select class="select-box" id="painZone" aria-label="Zona durerii" onchange="savePain()"><option value="">Fără durere</option>';
-    Analytics.PAIN_ZONES.forEach(function(z){h+='<option value="'+z.id+'"'+(z.id===pz?' selected':'')+'>'+z.label+'</option>';});
-    h+='</select>';
-    h+='<div class="rating-row"><div class="rating-label">Intensitate</div><input type="range" min="0" max="10" value="'+pi+'" class="rating-slider" id="painInt" aria-label="Intensitatea durerii" oninput="painIntShow(this.value)" onchange="savePain()"><div class="rating-value" id="painIntVal">'+pi+'/10</div></div>';
-    h+='<input class="rate-note-input" type="text" id="painText" aria-label="Notă la durere" placeholder="Ce simți și când (ex. umăr drept la împins)" value="'+escHtml(painData.text||'')+'" onchange="savePain()"></div>';
+    h+='<p class="sh-help">Te doare ceva? Notează din rândul „Te doare ceva?" de pe Azi sau, în antrenament, din meniul exercițiului.</p>';
     openAziSheet('Cum te simți azi',h,function(){
       var ne=document.getElementById('noteEnergy'),ns=document.getElementById('noteSleep');
       if(ne&&ne.value.trim()!==(rateNoteData.energy||''))saveRateNote('energy',ne.value);
       if(ns&&ns.value.trim()!==(rateNoteData.sleep||''))saveRateNote('sleep',ns.value);
-      savePain();
     });
   }else if(kind==='obiective'){
     openAziSheet('Obiective zilnice','<div class="gl-bar"><div id="chkBar"></div></div><div id="chkList"></div>');
@@ -5233,24 +5232,70 @@ function updateRating(id,val){
   ratingData[id]=v;
   var disp=document.getElementById('rat'+(id.charAt(0).toUpperCase()+id.slice(1))+'Val');
   if(disp)disp.textContent=ratingData[id]+'/10';
-  var rm=document.getElementById('ratingMeta');if(rm)rm.textContent='Energie '+(ratingData.energy||5)+', somn '+(ratingData.sleep||5);
+  var rm=document.getElementById('ratingMeta');if(rm)rm.textContent='Somn '+(ratingData.sleep||5)+' · energie '+(ratingData.energy||5);
   var idx=getEffectiveDayIdx();
   addRow({date:getEffectiveDateRo(),day:schedule[idx].day,type:'rating',exercise:id,set:'',reps:'',kg:'',note:String(ratingData[id])});
 }
 
 // BUG 4 (v130): durerea nu mai ajunge în nota de energie. Un rând „durere" pe zi: zonă, intensitate 0–10, text.
+// v131: durerea se notează în foaia ei — din meniul exercițiului (zona propusă după exercițiu) sau din rândul de pe Azi.
+// O notă pe zonă și zi; exercițiul la care a apărut stă în câmpul ex.
 function painIntShow(v){var el=document.getElementById('painIntVal');if(el)el.textContent=v+'/10';}
-function savePain(){
-  var z=document.getElementById('painZone'),it=document.getElementById('painInt'),tx=document.getElementById('painText');
-  if(!z)return;
-  var zone=z.value,text=(tx&&tx.value||'').trim(),inten=it?parseInt(it.value,10):0;
-  var has=!!(zone||text);
-  var next={zone:zone,intensity:has?inten:null,text:text};
-  if(next.zone===(painData.zone||'')&&next.text===(painData.text||'')&&next.intensity===(painData.intensity==null?null:painData.intensity))return;
-  painData=next;
+function zoneForExercise(name){
+  var c=Analytics.zonesFor(volumeInfoFor(name),name);if(!c.length)return '';
+  // dacă una dintre zone a mai fost notată, o propunem pe aceea (partea corectă a corpului)
+  var rows=loadStore().rows.filter(function(r){return r.type==='durere'&&c.indexOf(r.exercise)>=0;}).sort(function(a,b){return (parseRoDate(b.date)||0)-(parseRoDate(a.date)||0);});
+  return rows.length?rows[0].exercise:c[0];
+}
+function openPainSheet(zone,exEnc){
+  var exName=exEnc?decodeURIComponent(exEnc):'';
+  zone=zone||Object.keys(painToday)[0]||'';
+  var cur=painToday[zone]||{},pi=cur.intensity==null?3:cur.intensity;
+  var h=exName?'<p class="sh-help">La <b data-noi18n>'+escHtml(exName)+'</b>. Antrenorul ține cont de ea la exercițiile care încarcă zona.</p>':'<p class="sh-help">Antrenorul ține cont de ea la exercițiile care încarcă zona.</p>';
+  h+='<select class="select-box" id="painZone" aria-label="Zona durerii" onchange="painZoneChange()">';
+  if(!zone)h+='<option value="" selected disabled>Alege zona</option>';
+  Analytics.PAIN_ZONES.forEach(function(z){h+='<option value="'+z.id+'"'+(z.id===zone?' selected':'')+'>'+z.label+'</option>';});
+  h+='</select>';
+  h+='<div class="rating-row"><div class="rating-label">Intensitate</div><input type="range" min="0" max="10" value="'+pi+'" class="rating-slider" id="painInt" aria-label="Intensitatea durerii" oninput="painIntShow(this.value)"><div class="rating-value" id="painIntVal">'+pi+'/10</div></div>';
+  h+='<p class="sh-help pain-scale">0–3: continui normal · 4–6: fără progresie · 7–10: înlocuiești sau sari</p>';
+  h+='<input class="rate-note-input" type="text" id="painText" aria-label="Notă la durere" placeholder="Ce simți și când (ex. la coborâre, la ultimele repetări)" value="'+escHtml(cur.text||'')+'">';
+  h+='<div class="btn-row"><button class="btn btn-acc" onclick="savePainSheet(\''+(exEnc||'')+'\')">Salvează</button>'+(painToday[zone]?'<button class="btn btn-ghost" onclick="deletePainToday()">Șterge nota</button>':'')+'</div>';
+  openAziSheet('Durere sau disconfort',h);
+}
+function painZoneChange(){
+  var z=document.getElementById('painZone').value,cur=painToday[z]||{};
+  var it=document.getElementById('painInt'),tx=document.getElementById('painText');
+  if(it){it.value=cur.intensity==null?3:cur.intensity;painIntShow(it.value);}
+  if(tx)tx.value=cur.text||'';
+}
+function savePainSheet(exEnc){
+  var zone=document.getElementById('painZone').value;
+  if(!zone){showToast('Alege zona','var(--amber)');return;}
+  var inten=parseInt(document.getElementById('painInt').value,10)||0,text=(document.getElementById('painText').value||'').trim();
+  var exName=exEnc?decodeURIComponent(exEnc):((painToday[zone]||{}).ex||'');
   var idx=getEffectiveDayIdx();
-  addRow({date:getEffectiveDateRo(),day:schedule[idx].day,type:'durere',exercise:zone,set:'',reps:has?String(inten):'',kg:'',note:text});
-  if(has)showToast('Notă de durere salvată',null,true);
+  addRow({date:getEffectiveDateRo(),day:schedule[idx].day,type:'durere',exercise:zone,set:'',reps:String(inten),kg:'',note:text,ex:exName});
+  painToday[zone]={intensity:inten,text:text,ex:exName};
+  var lv=Analytics.painLevel(inten),zl=(Analytics.painZoneLabel(zone)||'').toLowerCase();
+  showToast(lv==='swap'?'Notat. La exercițiile care încarcă '+zl+' îți propun înlocuirea.':(lv==='hold'?'Notat. La exercițiile care încarcă '+zl+': fără progresie până se liniștește.':'Notat.'),null,true);
+  closeAziSheet();
+  if(sessionOpen)renderSession(sessionExIdx);
+}
+function deletePainToday(){
+  var zone=document.getElementById('painZone').value,dRo=getEffectiveDateRo(),s=loadStore();
+  s.rows=s.rows.filter(function(r){var m=(r.type==='durere'&&r.date===dRo&&r.exercise===zone);if(m)markDeleted(s,r);return !m;});
+  saveStore(s);scheduleDriveSync();
+  delete painToday[zone];
+  showToast('Nota de durere ștearsă',null,true);
+  closeAziSheet();
+  if(sessionOpen)renderSession(sessionExIdx);
+}
+// Rândul de pe Azi: durerile active (cu modifică) sau „Te doare ceva?"
+function painLineHtml(){
+  var act=Analytics.activePains(loadStore().rows,parseRoDate(getEffectiveDateRo())||new Date());
+  if(!act.length)return '<button class="pain-line" onclick="openPainSheet()">'+svi('plus')+'Te doare ceva? Notează</button>';
+  var p=act[0];
+  return '<button class="pain-line on" onclick="openPainSheet(\''+p.zone+'\')">'+svi('alert')+'<span>Durere: <b>'+escHtml(Analytics.painZoneLabel(p.zone))+'</b>'+(p.intensity!=null?' '+p.intensity+'/10':'')+(act.length>1?' · încă '+(act.length-1):'')+'</span><em>modifică</em></button>';
 }
 // Migrarea (o dată, apoi idempotentă): notele de energie care descriu durere → rândul „durere"; textul din rating → notă
 function migrateDayNotesStore(){
@@ -6408,7 +6453,7 @@ function buildPainSection(){
   if(!pains.length)return '  (nicio notă de durere)\n';
   var out='';
   pains.forEach(function(p){
-    out+='▸ '+p.date+' · '+painLine({zone:p.exercise,intensity:p.reps,text:p.note})+'\n';
+    out+='▸ '+p.date+' · '+painLine({zone:p.exercise,intensity:p.reps,text:p.note})+(p.ex?' (a apărut la '+p.ex+')':'')+'\n';
     var best={};
     rows.forEach(function(r){
       if(r.type!=='antrenament'||r.date!==p.date)return;
@@ -6567,7 +6612,7 @@ function buildWeekSummary(){
       }else if(r.type==='rating'){
         if(Analytics.validRating(r.note)!==null)byDay[r.day].ratings[r.exercise]=r.note;
       }else if(r.type==='durere'){
-        if(r.exercise||r.note)byDay[r.day].pain={zone:r.exercise,intensity:r.reps,text:r.note};
+        if(r.exercise||r.note)(byDay[r.day].pains=byDay[r.day].pains||[]).push({zone:r.exercise,intensity:r.reps,text:r.note,ex:r.ex});
       }else if(r.type==='ratenote'){
         if(!byDay[r.day].rateNotes)byDay[r.day].rateNotes={};
         byDay[r.day].rateNotes[r.exercise]=r.note;
@@ -6601,7 +6646,7 @@ function buildWeekSummary(){
         if(rn.energy)out+='    notă la energie: '+rn.energy+'\n';
         if(rn.sleep)out+='    notă la somn: '+rn.sleep+'\n';
       }
-      if(byDay[d].pain)out+='  🩹 Durere: '+painLine(byDay[d].pain)+'\n';
+      (byDay[d].pains||[]).forEach(function(p){out+='  🩹 Durere: '+painLine(p)+(p.ex?' (la '+p.ex+')':'')+'\n';});
       Object.keys(byDay[d].exercises).forEach(function(ex){
         var sets=byDay[d].exercises[ex].sort(function(a,b){return a.set-b.set;});
         out+='  '+ex+'\n';
@@ -7216,7 +7261,7 @@ function rowKey(r){
     if(r.type==='rir') return r.date+'|q|'+r.exercise;
     if(r.type==='skip') return r.date+'|s|'+r.exercise;
     if(r.type==='masuratoare') return r.date+'|m';
-    if(r.type==='durere') return r.date+'|p';
+    if(r.type==='durere') return r.date+'|p|'+(r.exercise||'');
     return r.date+'|x|'+(r.exercise||'');
 }
 // Ștergere marcată (tombstone) — altfel, la sync, celălalt device ar aduce rândul înapoi
@@ -7235,6 +7280,7 @@ function sanitizeRows(rows){
     if(r.type==='antrenament'){r.set=parseInt(r.set)||1;r.reps=parseFloat(r.reps)||0;r.kg=parseFloat(r.kg)||0;r.exercise=String(r.exercise||'');}
     else if(r.type==='masuratoare'){MEAS_FIELDS.forEach(function(f){var v=parseFloat(r[f.id]);r[f.id]=isFinite(v)?v:null;});r.note=r.note==null?'':String(r.note);}
     else if(r.exercise!=null)r.exercise=String(r.exercise);
+    if(r.type==='durere')r.ex=String(r.ex||'');
     if(r.day!=null)r.day=String(r.day);
     if(r.note!=null)r.note=String(r.note);
     return r;
@@ -7457,7 +7503,7 @@ function thumbForExercise(name){
 // PRELOAD DATE PENTRU DATA SELECTATĂ (azi sau backdated)
 // ═══════════════════════════════════════════════════════════════
 function preloadToday(){
-  setData={};checkData={};morningData={};ratingData={};rateNoteData={};exNoteData={};skipData={};painData={};
+  setData={};checkData={};morningData={};ratingData={};rateNoteData={};exNoteData={};skipData={};painToday={};
   var rows=getRowsForDate(getEffectiveDateRo());
   rows.forEach(function(r){
     if(r.type==='antrenament'&&r.exercise&&r.set){
@@ -7473,8 +7519,8 @@ function preloadToday(){
     if(r.type==='rating'&&r.exercise){
       var rv=Analytics.validRating(r.note);if(rv!==null)ratingData[r.exercise]=rv; // doar 1–10; textul vechi a fost mutat de migrare
     }
-    if(r.type==='durere'){
-      painData={zone:r.exercise||'',intensity:(r.reps===''||r.reps==null)?null:(parseInt(r.reps,10)),text:r.note||''};
+    if(r.type==='durere'&&r.exercise){
+      painToday[r.exercise]={intensity:(r.reps===''||r.reps==null)?null:parseInt(r.reps,10),text:r.note||'',ex:r.ex||''};
     }
     if(r.type==='ratenote'&&r.exercise){
       rateNoteData[r.exercise]=r.note||'';
@@ -8996,7 +9042,7 @@ function buildDigestStats(offset){
   });
   rows.filter(function(r){return r.type==='durere'&&(r.exercise||r.note);}).forEach(function(r){
     if(!notesByDate[r.date])notesByDate[r.date]={date:r.date,day:r.day||''};
-    notesByDate[r.date].pain=painLine({zone:r.exercise,intensity:r.reps,text:r.note});
+    var pl=painLine({zone:r.exercise,intensity:r.reps,text:r.note});notesByDate[r.date].pain=notesByDate[r.date].pain?notesByDate[r.date].pain+'; '+pl:pl;
   });
   var stateNotes=Object.keys(notesByDate).sort(function(a,b){return parseRoDate(a)-parseRoDate(b);}).map(function(k){return notesByDate[k];});
   var morningDone=rows.filter(function(r){return r.type==='dimineata'&&r.note==='DA';}).length;

@@ -169,9 +169,9 @@ function migrateDayNotes(rows,now){
   var changed=0,moved=[];
   function find(type,date,ex){for(var i=0;i<rows.length;i++){var r=rows[i];if(r.type===type&&r.date===date&&(ex==null||r.exercise===ex))return r;}return null;}
   function putPain(src,text){
-    var p=painFromText(text),d=find('durere',src.date,null);
-    if(!d){rows.push({date:src.date,day:src.day||'',type:'durere',exercise:p.zone||'altul',set:'',reps:'',kg:'',note:text,ts:now});}
-    else if(String(d.note||'').indexOf(text)<0){d.note=d.note?d.note+'; '+text:text;if(!d.exercise)d.exercise=p.zone||'altul';d.ts=now;}
+    var p=painFromText(text),zone=p.zone||'altul',d=find('durere',src.date,zone); // v131: o notă pe zonă și zi
+    if(!d){rows.push({date:src.date,day:src.day||'',type:'durere',exercise:zone,set:'',reps:'',kg:'',note:text,ex:'',ts:now});}
+    else if(String(d.note||'').indexOf(text)<0){d.note=d.note?d.note+'; '+text:text;d.ts=now;}
   }
   rows.slice().forEach(function(r){
     if(!r)return;
@@ -190,6 +190,104 @@ function migrateDayNotes(rows,now){
     }
   });
   return {rows:rows,changed:changed,dates:moved};
+}
+
+// ═══ v131 — ANTRENORUL ȚINE CONT DE DURERE ═══
+// Ce încarcă fiecare zonă: pattern-uri din biblioteca de exerciții + nume (fără diacritice) + grupe, ca rezervă
+var PAIN_LOAD={
+  umar:{patterns:['push_h','push_v','izo_umeri','izo_piept','triceps'],rx:/dips|tractiuni|pullover/,groups:['piept','umeri','triceps']},
+  cot:{patterns:['triceps','biceps','pull'],rx:null,groups:['biceps','triceps']},
+  incheietura:{patterns:['push_h','push_v','biceps','triceps'],rx:/flotari/,groups:[]},
+  gat:{patterns:['push_v'],rx:/deadlift|indreptari/,groups:[]},
+  spate_sus:{patterns:['pull','spate_post','push_v'],rx:null,groups:['spate']},
+  lombar:{patterns:['hinge'],rx:/bent-over|aplecat|deadlift|indreptari|squat cu bara|back squat|superman/,groups:[]},
+  sold:{patterns:['squat','lunge','hinge','glute'],rx:null,groups:['fesieri']},
+  genunchi:{patterns:['squat','lunge'],rx:/extensii cvadriceps|leg extension/,groups:['cvadriceps']},
+  glezna:{patterns:['squat','lunge','gambe'],rx:null,groups:['gambe']}
+};
+function zoneBase(z){return String(z||'').replace(/_(st|dr)$/,'');}
+// info = {pattern, group} (din volumeInfoFor)
+function painAffects(zone,info,name){
+  var L=PAIN_LOAD[zoneBase(zone)];if(!L)return false;
+  info=info||{};
+  if(info.pattern&&L.patterns.indexOf(info.pattern)>=0)return true;
+  if(L.rx&&L.rx.test(norm(name)))return true;
+  return !info.pattern&&!!info.group&&L.groups.indexOf(info.group)>=0;
+}
+// Zonele pe care le poate încărca un exercițiu, partea dreaptă propusă prima
+function zonesFor(info,name){
+  var out=[];
+  PAIN_ZONES.forEach(function(z){if(z.id!=='altul'&&painAffects(z.id,info,name))out.push(z.id);});
+  out.sort(function(a,b){return (/_dr$/.test(b)?1:0)-(/_dr$/.test(a)?1:0);});
+  return out;
+}
+// 0–3 = continui normal · 4–6 = fără progresie · 7–10 = înlocuiește sau sari azi · nenotată = doar atenție
+function painLevel(i){if(i===null||i===''||i===undefined||isNaN(+i))return 'watch';i=+i;return i>=7?'swap':(i>=4?'hold':'ok');}
+function intOf(v){return (v===''||v==null||isNaN(parseInt(v,10)))?null:parseInt(v,10);}
+// Durerile active: ultima notă pe zonă, cu intensitate > 0 (sau nenotată) și la cel mult 7 zile de azi.
+// sinceDays = de cât timp ține lanțul de note fără pauză mai lungă de 7 zile (pentru „mergi la medic")
+function activePains(rows,ref,windowDays){
+  windowDays=windowDays||7;
+  var refN=dayNum(ref||new Date()),byZone={};
+  (rows||[]).forEach(function(r){
+    if(!r||r.type!=='durere'||!r.exercise)return;
+    var n=dayNum(r.date);if(n==null||n>refN)return;
+    (byZone[r.exercise]=byZone[r.exercise]||[]).push({n:n,i:intOf(r.reps),text:r.note||'',ex:r.ex||'',date:roDate(n)});
+  });
+  var out=[];
+  Object.keys(byZone).forEach(function(z){
+    var L=byZone[z].sort(function(a,b){return a.n-b.n;}),last=L[L.length-1];
+    if(last.i===0||refN-last.n>windowDays)return;
+    var k=L.length-1;
+    while(k>0&&L[k-1].i!==0&&(L[k].n-L[k-1].n)<=windowDays)k--;
+    out.push({zone:z,intensity:last.i,level:painLevel(last.i),date:last.date,text:last.text,ex:last.ex,
+      daysSince:refN-last.n,askedToday:last.n===refN,sinceDays:refN-L[k].n,since:L[k].date});
+  });
+  return out.sort(function(a,b){return (b.intensity||0)-(a.intensity||0);});
+}
+// Durerea cea mai puternică dintre cele active care încarcă exercițiul (sau null)
+function painFor(pains,info,name){
+  for(var i=0;i<(pains||[]).length;i++){if(painAffects(pains[i].zone,info,name))return pains[i];}
+  return null;
+}
+
+// ═══ v131 — STAGNAREA VINE CU O SOLUȚIE ═══
+// 2+ ⭐ plate deodată = oboseală → săptămână ușoară; altfel interval nou de repetări pentru 3 săptămâni
+function stagnationAdvice(stagnantStars,target){
+  var m=/(\d+)\s*[-–—]\s*(\d+)/.exec(String(target||''));
+  var max=m?+m[2]:12;
+  return {primary:stagnantStars>=2?'deload':'range',newRange:max<=8?'10–12':'6–8',weeks:3};
+}
+
+// ═══ v131 — ZIUA RATATĂ ═══
+// opts: {active:[7 × bool], exDayOf:[7 × exDay], lists:{exDay:[nume]}, ref}
+// Ratată = zi activă din săptămâna curentă, înainte de azi, fără niciun set și fără „sar azi", al cărei antrenament
+// nu a fost făcut în altă zi a săptămânii. Ziua făcută se recunoaște după exercițiile salvate.
+function missedDays(rows,opts){
+  var refN=dayNum(opts.ref||new Date()),mon=mondayOf(refN),active=opts.active||[],exDayOf=opts.exDayOf||[],lists=opts.lists||{};
+  var names={},skipped={};
+  (rows||[]).forEach(function(r){
+    if(!r)return;var n=dayNum(r.date);if(n==null||n<mon||n>mon+6)return;
+    if(r.type==='antrenament'){(names[n]=names[n]||{})[r.exercise]=1;}
+    else if(r.type==='skip')skipped[n]=1;
+  });
+  function doneExDay(n){
+    var best=null,bc=0;
+    Object.keys(lists).forEach(function(dk){var c=0;(lists[dk]||[]).forEach(function(nm){if(names[n][nm])c++;});if(c>bc){bc=c;best=dk;}});
+    return best;
+  }
+  var doneBy={};
+  Object.keys(names).forEach(function(k){var d=doneExDay(+k);if(d)(doneBy[d]=doneBy[d]||[]).push(+k);});
+  var missed=[];
+  for(var n=mon;n<refN;n++){
+    var wd=weekdayOf(n);
+    if(!active[wd]||names[n]||skipped[n])continue;
+    var dk=exDayOf[wd],rec=(doneBy[dk]||[]).length>0; // același antrenament făcut în altă zi a săptămânii = recuperat
+    if(!rec)missed.push({date:roDate(n),n:n,weekday:wd,exDay:dk});
+  }
+  var nextFree=null;
+  for(var f=refN+1;f<=mon+6;f++){if(!active[weekdayOf(f)]){nextFree={date:roDate(f),weekday:weekdayOf(f)};break;}}
+  return {missed:missed,todayTrained:!!names[refN],todayActive:!!active[weekdayOf(refN)],nextFree:nextFree};
 }
 
 // ═══ BUG 5 — COMPOZIȚIA CORPORALĂ ═══
@@ -259,6 +357,8 @@ var API={
   addVolume:addVolume,volVerdict:volVerdict,projectVolume:projectVolume,
   e1rm:e1rm,bestPerSession:bestPerSession,longStagnation:longStagnation,
   PAIN_ZONES:PAIN_ZONES,painZoneLabel:painZoneLabel,painFromText:painFromText,validRating:validRating,migrateDayNotes:migrateDayNotes,
+  painAffects:painAffects,zonesFor:zonesFor,painLevel:painLevel,activePains:activePains,painFor:painFor,
+  stagnationAdvice:stagnationAdvice,missedDays:missedDays,
   navyBF:navyBF,bodyCompTable:bodyCompTable,
   weightTrend:weightTrend,pullPush:pullPush
 };

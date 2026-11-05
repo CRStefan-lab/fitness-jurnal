@@ -163,6 +163,64 @@ console.log('▸ Reproducere — logica veche dă rezultatul greșit');
   eq(A.volVerdict(pv.done.spate,10,20),'sub','vechi: spatele marcat SUB marți seara');
 })();
 
+// ── v131.1 Antrenorul ține cont de durere
+console.log('▸ v131 — durerea și exercițiile afectate');
+eq(A.painAffects('umar_dr',{pattern:'push_v'},'Împins gantere deasupra capului'),true,'umăr → împins deasupra capului');
+eq(A.painAffects('umar_dr',{pattern:'pull'},'Bent-over row cu bara'),false,'umăr ↛ ramat aplecat');
+eq(A.painAffects('lombar',{pattern:'pull'},'Bent-over row cu bara'),true,'lombar → ramat aplecat cu bara (după nume)');
+eq(A.painAffects('lombar',{pattern:'hinge'},'Îndreptări românești cu gantere'),true,'lombar → îndreptări');
+eq(A.painAffects('genunchi_st',{pattern:'squat'},'Goblet squat'),true,'genunchi → squat');
+eq(A.painAffects('genunchi_st',{pattern:'pull'},'Lat pulldown'),false,'genunchi ↛ tracțiuni');
+eq(A.painAffects('cot',{pattern:'biceps'},'Hammer curl'),true,'cot → flexii');
+eq(A.painAffects('umar_st',{group:'piept'},'Exercițiu vechi de piept'),true,'fără pattern: după grupă');
+eq(A.painAffects('altul',{pattern:'push_h'},'Împins'),false,'„altă zonă" nu blochează nimic');
+eq(A.zonesFor({pattern:'push_h'},'Împins înclinat')[0],'umar_dr','zona propusă la împins: umăr drept');
+eq(A.painLevel(2),'ok','2/10 → continui');eq(A.painLevel(4),'hold','4/10 → fără progresie');eq(A.painLevel(6),'hold','6/10 → fără progresie');
+eq(A.painLevel(7),'swap','7/10 → înlocuiește');eq(A.painLevel(null),'watch','nenotată → atenție');
+var pr=[
+  {date:'20.10.2026',type:'durere',exercise:'umar_dr',reps:'4',note:'la împins'},
+  {date:'27.10.2026',type:'durere',exercise:'umar_dr',reps:'5',note:'la fel'},
+  {date:'03.11.2026',type:'durere',exercise:'umar_dr',reps:'5',note:'la fel',ex:'Împins înclinat'},
+  {date:'25.10.2026',type:'durere',exercise:'lombar',reps:'6',note:''},
+  {date:'01.11.2026',type:'durere',exercise:'genunchi_st',reps:'5',note:''},
+  {date:'04.11.2026',type:'durere',exercise:'genunchi_st',reps:'0',note:'nu mai doare'},
+  {date:'05.11.2026',type:'durere',exercise:'cot',reps:'',note:'ușor'}
+];
+var ap=A.activePains(pr,REF);
+eq(ap.map(function(p){return p.zone;}).join(','),'umar_dr,cot','active: umărul și cotul (lombarul a expirat, genunchiul s-a rezolvat)');
+eq(ap[0].level,'hold','umăr 5/10 → fără progresie');eq(ap[0].daysSince,2,'umăr: ultima notă acum 2 zile');eq(ap[0].askedToday,false,'umăr: neîntrebat azi');
+eq(ap[0].since,'20.10.2026','umăr: ține din 20.10 (lanț fără pauze > 7 zile)');eq(ap[0].sinceDays,16,'umăr: 16 zile → se recomandă medicul');
+eq(ap[1].level,'watch','cot nenotat → atenție');eq(ap[1].askedToday,true,'cot: notat azi');
+eq(A.painFor(ap,{pattern:'push_v'},'Împins deasupra').zone,'umar_dr','împinsul deasupra capului e afectat de umăr');
+eq(A.painFor(ap,{pattern:'squat'},'Goblet squat'),null,'squatul nu e afectat (genunchiul s-a rezolvat)');
+eq(A.painFor(ap,{pattern:'biceps'},'Hammer curl').zone,'cot','flexiile sunt afectate de cot');
+
+// ── v131.2 Stagnarea vine cu o soluție
+console.log('▸ v131 — soluția la stagnare');
+var sa=A.stagnationAdvice(1,'8–12');eq(sa.primary,'range','un singur ⭐ plat → interval nou');eq(sa.newRange,'6–8','8–12 → 6–8');eq(sa.weeks,3,'pentru 3 săptămâni');
+eq(A.stagnationAdvice(2,'8–12').primary,'deload','două ⭐ plate deodată → săptămână ușoară');
+eq(A.stagnationAdvice(1,'6–8').newRange,'10–12','6–8 → 10–12');
+
+// ── v131.3 Ziua ratată
+console.log('▸ v131 — ziua ratată');
+var MOPT={active:LMJV,exDayOf:['luni','marti','miercuri','joi','vineri','sambata','sambata'],lists:{luni:['A1','A2'],marti:['B1'],joi:['C1','C2'],vineri:['D1','D2']}};
+function wk(list){return list.map(function(x){return set(x[0],x[1],10,10);});}
+var base=wk([['02.11.2026','A1'],['02.11.2026','A2'],['03.11.2026','B1'],['06.11.2026','D1'],['06.11.2026','D2']]);
+var md=A.missedDays(base,Object.assign({ref:A.parseRo('07.11.2026')},MOPT));
+eq(md.missed.map(function(m){return m.date+' '+m.exDay;}).join(','),'05.11.2026 joi','sâmbătă: joia (Spate) e ratată');
+eq(md.todayActive,false,'sâmbăta e zi liberă');eq(md.todayTrained,false,'sâmbătă: încă neantrenat');
+eq(md.nextFree&&md.nextFree.date,'08.11.2026','următoarea zi liberă: duminică');
+var rec=wk([['02.11.2026','A1'],['03.11.2026','B1'],['06.11.2026','C1'],['06.11.2026','C2']]);
+eq(A.missedDays(rec,Object.assign({ref:A.parseRo('07.11.2026')},MOPT)).missed.length,0,'joia făcută vineri: joia e recuperată (vinerea are seturi, deci nu e ratată)');
+var gap=[{date:'20.10.2026',type:'durere',exercise:'lombar',reps:'4'},{date:'28.10.2026',type:'durere',exercise:'lombar',reps:'4'}];
+eq(A.activePains(gap,A.parseRo('30.10.2026'))[0].since,'28.10.2026','o pauză de 8 zile între note începe un lanț nou');
+var sk=base.filter(function(r){return r.date!=='06.11.2026';}).concat([{date:'05.11.2026',type:'skip',exercise:'C1',note:'Fără timp'}]);
+var md2=A.missedDays(sk,Object.assign({ref:A.parseRo('06.11.2026')},MOPT));
+eq(md2.missed.length,0,'joia cu „sar azi" nu e ratată');eq(md2.todayActive,true,'vineri e zi de antrenament');
+eq(md2.nextFree&&md2.nextFree.date,'07.11.2026','vineri: următoarea zi liberă e sâmbătă');
+eq(A.missedDays(base.concat(wk([['07.11.2026','C1']])),Object.assign({ref:A.parseRo('07.11.2026')},MOPT)).todayTrained,true,'sâmbătă după antrenament: azi antrenat');
+eq(A.missedDays(base,Object.assign({ref:A.parseRo('09.11.2026')},MOPT)).missed.length,0,'luni: săptămâna trecută nu se mai propune');
+
 // ── Îmbunătățiri
 console.log('▸ Îmbunătățiri — greutate și tracțiune/împingere');
 var ws=[];for(var i=0;i<10;i++){var n=A.dayNum('08.10.2026')+i*3;ws.push({date:A.roDate(n),type:'masuratoare',weight:Math.round((92-i*3*0.5/7)*100)/100});}
