@@ -5430,7 +5430,7 @@ function initProgram(sel){
         rv='<span class="ag-rv pl-rv">'+trendBarsHtml(t.vals)+'<span><b>'+l+'<small>'+(t.useKg?'kg':'rep')+'</small></b><small>'+w+'</small></span></span>';
       }
     }
-    html+='<button class="ag-row g-'+groupOf(e.name)+'" onclick="openGuideByName(\''+encKey(e.name)+'\',\''+schedule[selDi].exDay+'\')"><span class="ag-mus"></span><span class="ag-rm"><span class="ag-rt">'+escHtml(e.name)+'</span><span class="ag-rs">'+(tg.indexOf(' × ')===0?e.sets+tg:roCount(e.sets,'set','seturi')+tg)+(e.star?' · progresie':'')+'</span></span>'+rv+'</button>';
+    html+='<button class="ag-row g-'+groupOf(e.name)+'" onclick="openGuideByName(\''+encKey(e.name)+'\',\''+schedule[selDi].exDay+'\')"><span class="ag-mus"></span><span class="ag-rm"><span class="ag-rt">'+escHtml(e.name)+'</span><span class="ag-rs">'+(tg.indexOf(' × ')===0?e.sets+tg:roCount(e.sets,'set','seturi')+tg)+(e.star?' · progresie':'')+(e.star?planStarFlag(e.name):'')+'</span></span>'+rv+'</button>';
   });
   html+='</div>';
   html+='<button class="btn btn-ghost pl-btn" onclick="openDayPlan()">'+svi('cal')+'Schimbă zilele de antrenament</button>';
@@ -5444,6 +5444,12 @@ function initProgram(sel){
   cont.innerHTML=html;
 }
 
+function planStarFlag(name){
+  var ls=longStagFor(name);if(!ls)return '';
+  if(ls.idle)return ' · <em class="ag-dn">neexecutat de '+ls.daysSince+' zile</em>';
+  if(ls.stagnant)return ' · <em class="ag-dn">plat de 6 săpt.</em>';
+  return '';
+}
 // Ghidul: rânduri cu silueta mușchiului; atingerea deschide foaia cu pașii, greșelile și video
 function initGhid(){
   var cont=document.getElementById('ghid-content');if(!cont)return;
@@ -6186,16 +6192,31 @@ function buildBodyCompTable(measurements,profile){
   return out;
 }
 
+// BUG 3 (v130): detectorul vechi (detectStagnation) compară doar ultimele 2 ședințe, kg apoi repetări; rămâne pentru
+// antrenor și deload („pe termen scurt"). Pentru alerte: 1RM estimat (Epley) pe 6 săptămâni față de tot ce a fost
+// înainte (+2% toleranță), plus „⭐ neexecutat de ≥ 2 săptămâni". Motorul: Analytics.longStagnation.
+function uniqueStars(){var seen={},out=[];getStarExercises().forEach(function(s){if(!seen[s.name]){seen[s.name]=1;out.push(s);}});return out;}
+function longStagFor(name){return Analytics.longStagnation(loadStore().rows,name,new Date());}
+function lsSet(x,weighted){return weighted?x.kg+' kg × '+x.reps+' ('+x.date+')':x.reps+' rep ('+x.date+')';}
+function lsScore(x,weighted){return weighted?x.score.toFixed(1)+' kg':x.reps+' rep';}
 function buildActiveStagnations(){
-  var stars=getStarExercises();
-  var alerts=[];
-  stars.forEach(function(s){
-    var stag=detectStagnation(s.name);
-    if(stag){
-      alerts.push('  ⚠️ '+s.name+': '+stag.prevReps+'×'+stag.prevKg+' → '+stag.lastReps+'×'+stag.lastKg+' (2 săpt.)');
+  var longL=[],idleL=[],shortL=[];
+  uniqueStars().forEach(function(s){
+    var ls=longStagFor(s.name);
+    if(ls&&ls.stagnant){
+      longL.push('  ⚠️ '+s.name+': '+(ls.weighted?'1RM estimat':'repetări maxime')+' în ultimele 6 săpt. '+lsScore(ls.recent,ls.weighted)+' ['+lsSet(ls.recent,ls.weighted)+'] vs cel mai bun anterior '+lsScore(ls.prior,ls.weighted)+' ['+lsSet(ls.prior,ls.weighted)+'] · '+(ls.changePct>0?'+':'')+ls.changePct+'%');
     }
+    if(ls&&ls.idle)idleL.push('  ⏸️ '+s.name+': neexecutat de '+ls.daysSince+' zile (ultima: '+ls.last.date+')');
+    var stag=detectStagnation(s.name);
+    if(stag)shortL.push('  · '+s.name+': '+stag.prevReps+'×'+stag.prevKg+' → '+stag.lastReps+'×'+stag.lastKg+' (ultimele 2 ședințe)');
   });
-  return alerts.length?alerts.join('\n')+'\n':'  (niciuna activă — bun)\n';
+  var out='  Stagnare pe termen lung (1RM estimat Epley, ultimele 6 săpt. ≤ cel mai bun anterior + 2%):\n';
+  out+=longL.length?longL.join('\n')+'\n':'  (niciuna)\n';
+  out+='  ⭐ neexecutate de ≥ 2 săptămâni:\n';
+  out+=idleL.length?idleL.join('\n')+'\n':'  (niciunul)\n';
+  out+='  Stagnare pe termen scurt (ultimele 2 ședințe, kg și repetări):\n';
+  out+=shortL.length?shortL.join('\n')+'\n':'  (niciuna)\n';
+  return out;
 }
 
 function buildWeekSummary(){
@@ -6277,7 +6298,10 @@ function buildWeekSummary(){
     if(rec.last) out+='  Ultima: '+rec.last.reps+' rep × '+rec.last.kg+' kg ('+rec.last.date+')\n';
     out+='  Țintă: '+rec.target+'\n';
     var stag=detectStagnation(s.name);
-    if(stag) out+='  ⚠️ STAGNARE 2 săpt.: '+stag.prevReps+'×'+stag.prevKg+' → '+stag.lastReps+'×'+stag.lastKg+'\n';
+    if(stag) out+='  ⚠️ Stagnare pe termen scurt: '+stag.prevReps+'×'+stag.prevKg+' → '+stag.lastReps+'×'+stag.lastKg+'\n';
+    var ls=longStagFor(s.name);
+    if(ls&&ls.stagnant) out+='  ⚠️ Stagnare pe termen lung: '+lsScore(ls.recent,ls.weighted)+' în ultimele 6 săpt. vs '+lsScore(ls.prior,ls.weighted)+' anterior ('+(ls.changePct>0?'+':'')+ls.changePct+'%)\n';
+    if(ls&&ls.idle) out+='  ⏸️ Neexecutat de '+ls.daysSince+' zile\n';
   });
   out+='\n';
 
@@ -6367,7 +6391,7 @@ function buildWeekSummary(){
   out+=buildVolumePerGroup(currentWeekOffset-1);
 
   // === STAGNĂRI ===
-  out+='\n⚠️ STAGNĂRI ACTIVE (⭐ care nu progresează 2 săpt.)\n';
+  out+='\n⚠️ STAGNĂRI ȘI ⭐ NEEXECUTATE\n';
   out+=buildActiveStagnations();
 
   // === TOP PR-uri ===
