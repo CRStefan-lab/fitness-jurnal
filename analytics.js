@@ -139,23 +139,24 @@ var PAIN_ZONES=[
 ];
 function painZoneLabel(id){for(var i=0;i<PAIN_ZONES.length;i++)if(PAIN_ZONES[i].id===id)return PAIN_ZONES[i].label;return '';}
 function norm(t){return String(t||'').toLowerCase().replace(/[ăâ]/g,'a').replace(/î/g,'i').replace(/[șş]/g,'s').replace(/[țţ]/g,'t');}
-var PAIN_RX=/\b(dure|durer|dureri|doare|dor\b|durut|disconfort|jena|intep|tendin|entors|contractur|luxat|crampe|febra musculara|inflamat|umflat)/;
-var ZONE_RX=/\b(umar|umeri|cot|coate|incheietur|pumn|gat|cervical|lombar|sale|sold|genunch|glezn)/;
+// v135: doar cuvinte întregi („Gata devreme" nu e gât, „durează" nu e durere, „cotidian" nu e cot)
+var PAIN_RX=/\b(durere[a-z]*|dureri[a-z]*|doare|durut|disconfort|jena|intep[a-z]*|tendin[a-z]*|entors[a-z]*|contractur[a-z]*|luxat[a-z]*|crampe?|febra musculara|inflamat[a-z]*|umflat[a-z]*)\b/;
+var ZONE_RX=/\b(umar|umarul|umeri|umerii|cot|cotul|coate|coatele|incheietur[a-z]*|pumnul|gat|gatul|cervical[a-z]*|lombar[a-z]*|salele|sold|soldul|soldurile|genunch[a-z]*|glezn[a-z]*)\b/;
 function painFromText(text){
   var t=norm(text);
   if(!t.trim())return {isPain:false,zone:''};
   var isPain=PAIN_RX.test(t)||ZONE_RX.test(t);
   var zone='';
   var side=/\bdrept/.test(t)?'dr':(/\bstang/.test(t)?'st':'');
-  if(/\bumar|\bumeri/.test(t))zone=side==='st'?'umar_st':'umar_dr';
-  else if(/\bgenunch/.test(t))zone=side==='st'?'genunchi_st':'genunchi_dr';
-  else if(/\bcot|\bcoate/.test(t))zone='cot';
-  else if(/\bincheietur|\bpumn/.test(t))zone='incheietura';
-  else if(/\blombar|\bsale|spate(le)? jos/.test(t))zone='lombar';
-  else if(/\bspate/.test(t))zone='spate_sus';
-  else if(/\bgat|\bcervical/.test(t))zone='gat';
-  else if(/\bsold/.test(t))zone='sold';
-  else if(/\bglezn/.test(t))zone='glezna';
+  if(/\b(umar|umarul|umeri|umerii)\b/.test(t))zone=side==='st'?'umar_st':'umar_dr';
+  else if(/\bgenunch[a-z]*\b/.test(t))zone=side==='st'?'genunchi_st':'genunchi_dr';
+  else if(/\b(cot|cotul|coate|coatele)\b/.test(t))zone='cot';
+  else if(/\b(incheietur[a-z]*|pumnul)\b/.test(t))zone='incheietura';
+  else if(/\b(lombar[a-z]*|salele)\b|\bspate(le)? jos\b/.test(t))zone='lombar';
+  else if(/\bspate(le)?\b/.test(t))zone='spate_sus';
+  else if(/\b(gat|gatul|cervical[a-z]*)\b/.test(t))zone='gat';
+  else if(/\b(sold|soldul|soldurile)\b/.test(t))zone='sold';
+  else if(/\bglezn[a-z]*\b/.test(t))zone='glezna';
   if(isPain&&!zone)zone='altul';
   // fără parte precizată, umărul și genunchiul trec pe dreapta; se corectează din foaia zilei
   return {isPain:isPain,zone:zone};
@@ -164,8 +165,9 @@ function validRating(v){var m=/^\s*(10|[1-9])\s*$/.exec(String(v==null?'':v));re
 // Migrarea (idempotentă): notele de energie care vorbesc despre durere → rândul „durere" al zilei;
 // ratingurile de energie cu text în loc de cifră → nota zilei (durere dacă e durere, altfel nota de energie).
 // Rândurile mutate rămân cu textul gol și ts nou, ca sincronizarea să nu le aducă înapoi.
-function migrateDayNotes(rows,now){
+function migrateDayNotes(rows,now,before){
   now=now||Date.now();
+  var beforeN=before?dayNum(before):null; // v135: doar notele scrise înainte de câmpul de durere (05.11.2026)
   var changed=0,moved=[];
   function find(type,date,ex){for(var i=0;i<rows.length;i++){var r=rows[i];if(r.type===type&&r.date===date&&(ex==null||r.exercise===ex))return r;}return null;}
   function putPain(src,text){
@@ -175,18 +177,21 @@ function migrateDayNotes(rows,now){
   }
   rows.slice().forEach(function(r){
     if(!r)return;
+    if(beforeN!==null){var rn=dayNum(r.date);if(rn===null||rn>=beforeN)return;}
     if(r.type==='ratenote'&&r.exercise==='energy'&&String(r.note||'').trim()){
       var t=String(r.note).trim();
       if(painFromText(t).isPain){putPain(r,t);r.note='';r.ts=now;changed++;moved.push(r.date);}
     }else if(r.type==='rating'&&r.exercise==='energy'&&String(r.note||'').trim()&&validRating(r.note)===null){
-      var tx=String(r.note).trim();
+      var tx=String(r.note).trim(),keep='';
+      var lead=/^(10|[1-9])\b\s*[-–—:,.]?\s*(.+)$/.exec(tx); // „7 – umăr": cifra rămâne rating, textul se mută
+      if(lead){keep=lead[1];tx=lead[2].trim();}
       if(painFromText(tx).isPain)putPain(r,tx);
       else{
         var en=find('ratenote',r.date,'energy');
         if(!en)rows.push({date:r.date,day:r.day||'',type:'ratenote',exercise:'energy',set:'',reps:'',kg:'',note:tx,ts:now});
         else if(String(en.note||'').indexOf(tx)<0){en.note=en.note?en.note+'; '+tx:tx;en.ts=now;}
       }
-      r.note='';r.ts=now;changed++;moved.push(r.date);
+      r.note=keep;r.ts=now;changed++;moved.push(r.date);
     }
   });
   return {rows:rows,changed:changed,dates:moved};
@@ -290,6 +295,41 @@ function missedDays(rows,opts){
   return {missed:missed,todayTrained:!!names[refN],todayActive:!!active[weekdayOf(refN)],nextFree:nextFree};
 }
 
+// ═══ v135 — SĂPTĂMÂNA UȘOARĂ, PAUZA INTERVALULUI, ENERGIA, CALORIILE ═══
+// Săptămâna ușoară acceptată luni–miercuri ține până duminică; joi–duminică, până duminica următoare
+function deloadEnd(ref){var n=dayNum(ref||new Date()),wd=weekdayOf(n);return fromDayNum(mondayOf(n)+6+(wd>=3?7:0));}
+function isoOf(d){return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');}
+// Intervalul temporar se prelungește cu fiecare zi de deload (o dată pe zi), ca să rămână 3 săptămâni efective
+function extendOverride(o,todayIso,isDeload){
+  if(!o||!isDeload||o.ext===todayIso||o.until<todayIso)return false;
+  var d=parseRo(o.until);d.setDate(d.getDate()+1);
+  o.until=isoOf(d);o.ext=todayIso;return true;
+}
+// Energie ≤ 4 sau somn ≤ 4 azi → antrenorul nu forțează progresia
+function lowEnergy(energy,sleep){return (energy!=null&&energy<=4)||(sleep!=null&&sleep<=4);}
+// Trendul pe 21 de zile față de zona bună a obiectivului (% din greutate pe săptămână) → ±150 kcal.
+// opts: {points:[{date,weight}], ref, goal:'slabit'|'recomp'|'masa', sex, kcalMin, kcalMax}
+var KCAL_ZONES={slabit:[-1.0,-0.5],recomp:[-0.5,-0.2],masa:[0.1,0.3]};
+function kcalAdvice(opts){
+  var refN=dayNum(opts.ref||new Date()),zone=KCAL_ZONES[opts.goal];if(!zone)return null;
+  var pts=(opts.points||[]).map(function(m){return {n:dayNum(m.date),w:+m.weight||0};})
+    .filter(function(p){return p.n!=null&&p.w>0&&p.n<=refN&&p.n>refN-21;}).sort(function(a,b){return a.n-b.n;});
+  if(pts.length<6||(pts[pts.length-1].n-pts[0].n)<14)return null;
+  var mx=0,my=0;pts.forEach(function(p){mx+=p.n;my+=p.w;});mx/=pts.length;my/=pts.length;
+  var num=0,den=0;pts.forEach(function(p){num+=(p.n-mx)*(p.w-my);den+=(p.n-mx)*(p.n-mx);});
+  if(!den)return null;
+  var perWeek=num/den*7,w=pts[pts.length-1].w,rate=perWeek/w*100;
+  var dir=rate<zone[0]?1:(rate>zone[1]?-1:0);
+  var out={perWeek:Math.round(perWeek*100)/100,ratePct:Math.round(rate*100)/100,zone:zone,
+    zoneKg:[Math.round(zone[0]*w)/100,Math.round(zone[1]*w)/100],dir:dir,delta:0,kcalMin:opts.kcalMin,kcalMax:opts.kcalMax};
+  if(!dir)return out;
+  var floor=opts.sex==='F'?1200:1500,lo=opts.kcalMin+150*dir,hi=opts.kcalMax+150*dir;
+  if(lo<floor){var sh=floor-lo;lo+=sh;hi+=sh;}
+  if(lo===opts.kcalMin&&hi===opts.kcalMax){out.dir=0;out.atFloor=true;return out;}
+  out.delta=lo-opts.kcalMin;out.kcalMin=lo;out.kcalMax=hi;
+  return out;
+}
+
 // ═══ BUG 5 — COMPOZIȚIA CORPORALĂ ═══
 // US Navy, în cm. Bărbat: 495 / (1,0324 − 0,19077·log10(talie − gât) + 0,15456·log10(înălțime)) − 450
 function navyBF(waist,neck,height,sex,hip){
@@ -341,7 +381,7 @@ function weightTrend(measurements,ref){
     var num=0,den=0;w28.forEach(function(p){num+=(p.n-mx)*(p.w-my);den+=(p.n-mx)*(p.n-mx);});
     if(den>0)trend=Math.round(num/den*7*100)/100;
   }
-  return {ma7:ma7,count7:w7.length,count14:last14,trendPerWeek:trend,enough:last14>=4,last:pts.length?pts[pts.length-1]:null};
+  return {ma7:ma7,count7:w7.length,count14:last14,trendPerWeek:trend,enough:last14>=4&&w7.length>=1,last:pts.length?pts[pts.length-1]:null};
 }
 // Tracțiune / împingere: seturi directe; classify(name) → 'pull' | 'push' | null
 function pullPush(entries,classify){
@@ -359,6 +399,7 @@ var API={
   PAIN_ZONES:PAIN_ZONES,painZoneLabel:painZoneLabel,painFromText:painFromText,validRating:validRating,migrateDayNotes:migrateDayNotes,
   painAffects:painAffects,zonesFor:zonesFor,painLevel:painLevel,activePains:activePains,painFor:painFor,
   stagnationAdvice:stagnationAdvice,missedDays:missedDays,
+  deloadEnd:deloadEnd,isoOf:isoOf,extendOverride:extendOverride,lowEnergy:lowEnergy,kcalAdvice:kcalAdvice,KCAL_ZONES:KCAL_ZONES,
   navyBF:navyBF,bodyCompTable:bodyCompTable,
   weightTrend:weightTrend,pullPush:pullPush
 };

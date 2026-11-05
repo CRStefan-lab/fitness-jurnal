@@ -221,6 +221,49 @@ eq(md2.nextFree&&md2.nextFree.date,'07.11.2026','vineri: următoarea zi liberă 
 eq(A.missedDays(base.concat(wk([['07.11.2026','C1']])),Object.assign({ref:A.parseRo('07.11.2026')},MOPT)).todayTrained,true,'sâmbătă după antrenament: azi antrenat');
 eq(A.missedDays(base,Object.assign({ref:A.parseRo('09.11.2026')},MOPT)).missed.length,0,'luni: săptămâna trecută nu se mai propune');
 
+// ── v135 — reparațiile din audit
+console.log('▸ v135 — reparații');
+['Gata devreme','Am gătit seara','Somnul durează puțin','cotidian obosit','notele sale','zi de spate grea'].forEach(function(t){
+  eq(A.painFromText(t).isPain,false,'„'+t+'" nu e durere');
+});
+eq(A.painFromText('mă dor umerii').zone,'umar_dr','„mă dor umerii" → umăr (fără parte → dreapta)');
+eq(A.painFromText('durere de gât').zone,'gat','„durere de gât" → gât');
+eq(A.painFromText('mă doare cotul stâng').zone,'cot','„mă doare cotul" → cot');
+var cut=[{date:'06.11.2026',type:'ratenote',exercise:'energy',note:'Durere umăr drept',ts:1},
+         {date:'01.11.2026',type:'rating',exercise:'energy',note:'7 – umăr drept',ts:1}];
+var mc=A.migrateDayNotes(cut,5,'05.11.2026');
+eq(mc.changed,1,'migrarea atinge doar notele dinainte de 05.11.2026');
+eq(cut[0].note,'Durere umăr drept','nota din 06.11 rămâne la energie');
+eq(cut[1].note,'7','„7 – umăr drept": cifra rămâne rating');
+eq(cut.filter(function(r){return r.type==='durere';})[0].note,'umăr drept','… iar textul se mută la durere');
+var wg=A.weightTrend([{date:'24.10.2026',weight:90},{date:'25.10.2026',weight:90},{date:'27.10.2026',weight:90},{date:'28.10.2026',weight:90}],REF);
+eq(wg.enough,false,'4 cântăriri, dar niciuna în ultimele 7 zile: fără medie');
+
+// ── v135 — planul
+console.log('▸ v135 — săptămâna ușoară, pauza intervalului, energia, caloriile');
+eq(A.roDate(A.dayNum(A.deloadEnd(A.parseRo('03.11.2026')))),'08.11.2026','acceptată marți → până duminică');
+eq(A.roDate(A.dayNum(A.deloadEnd(A.parseRo('05.11.2026')))),'15.11.2026','acceptată joi → până duminica următoare');
+eq(A.roDate(A.dayNum(A.deloadEnd(A.parseRo('08.11.2026')))),'15.11.2026','acceptată duminică → până duminica următoare');
+var ov={target:'6–8',until:'2026-11-26'};
+eq(A.extendOverride(ov,'2026-11-10',true),true,'în deload intervalul se prelungește');eq(ov.until,'2026-11-27','… cu o zi');
+eq(A.extendOverride(ov,'2026-11-10',true),false,'… o singură dată pe zi');
+eq(A.extendOverride(ov,'2026-11-11',false),false,'în afara deload-ului nu se prelungește');
+eq(A.lowEnergy(4,8),true,'energie 4 → nu forța');eq(A.lowEnergy(7,4),true,'somn 4 → nu forța');
+eq(A.lowEnergy(5,5),false,'5 și 5 → normal');eq(A.lowEnergy(undefined,undefined),false,'nenotat → normal');
+function wpts(start,perDay,n,step){var o=[];for(var i=0;i<n;i++){var d=A.dayNum('16.10.2026')+i*step;o.push({date:A.roDate(d),weight:Math.round((start+perDay*i*step)*100)/100});}return o;}
+var fast=A.kcalAdvice({points:wpts(92,-0.13,8,3),ref:REF,goal:'recomp',sex:'M',kcalMin:2200,kcalMax:2400});
+assert(fast&&fast.dir===1,'scazi ~0,9 kg/săpt. la recompoziție → mai multe calorii ('+(fast&&fast.ratePct)+'%)');
+eq(fast&&fast.kcalMin+'–'+fast.kcalMax,'2350–2550','+150 kcal');
+var flat=A.kcalAdvice({points:wpts(90,0,8,3),ref:REF,goal:'recomp',sex:'M',kcalMin:2200,kcalMax:2400});
+eq(flat&&flat.dir,-1,'greutate plată la recompoziție → mai puține calorii');eq(flat&&flat.kcalMin,2050,'−150 kcal');
+var ok=A.kcalAdvice({points:wpts(90,-0.04,8,3),ref:REF,goal:'recomp',sex:'M',kcalMin:2200,kcalMax:2400});
+eq(ok&&ok.dir,0,'−0,28 kg/săpt. la recompoziție = în zonă');
+eq(A.kcalAdvice({points:wpts(90,0,4,3),ref:REF,goal:'recomp',sex:'M',kcalMin:2200,kcalMax:2400}),null,'prea puține cântăriri → fără propunere');
+var fl=A.kcalAdvice({points:wpts(70,0,8,3),ref:REF,goal:'slabit',sex:'F',kcalMin:1250,kcalMax:1350});
+eq(fl&&fl.kcalMin,1200,'nu coboară sub 1.200 kcal (femei)');
+var fl2=A.kcalAdvice({points:wpts(70,0,8,3),ref:REF,goal:'slabit',sex:'F',kcalMin:1200,kcalMax:1300});
+eq(fl2&&fl2.atFloor,true,'deja la limita de jos: fără propunere de scădere');
+
 // ── Îmbunătățiri
 console.log('▸ Îmbunătățiri — greutate și tracțiune/împingere');
 var ws=[];for(var i=0;i<10;i++){var n=A.dayNum('08.10.2026')+i*3;ws.push({date:A.roDate(n),type:'masuratoare',weight:Math.round((92-i*3*0.5/7)*100)/100});}
