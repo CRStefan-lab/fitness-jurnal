@@ -983,6 +983,7 @@ body.in-session .ss-dock:has(>.show),body.in-session .ss-dock.on{display:flex}
 .vol-axis span:first-child{transform:none}
 .vol-axis .b{color:var(--green)}
 .vol-row .vol-fill.low,.vol-row .vol-fill.ok,.vol-row .vol-fill.high{background:var(--c,var(--acc))}
+.vol-proj{position:absolute;top:0;bottom:0;left:0;border-radius:4px;border:1.5px dashed var(--c,var(--acc));opacity:.75}
 .vol-name::before{content:'';display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--c,var(--muted));margin-right:7px;vertical-align:1px}
 .vol-hint{background:var(--acc-soft);border-radius:12px;padding:10px 12px;margin-top:8px;font-size:13.5px;line-height:1.5}
 .vol-hint b{font-weight:700}
@@ -5930,9 +5931,36 @@ function volumeInfoFor(exerciseName){
   _volCache[exerciseName]=info;
   return info;
 }
+// BUG 2 (v130): săptămâna în curs nu mai primește verdict pe jumătate de săptămână. Seturile planificate în
+// zilele active rămase (azi: doar ce n-ai făcut încă, fără exercițiile sărite) se adaugă la cele făcute = proiecția.
+function plannedRemainingEntries(){
+  var b=getWeekBounds(0),todayN=Analytics.dayNum(new Date()),out=[];
+  var deload=(getProgramWeek()>=8||isManualDeload());
+  var weekRows=getRowsForWeek(0);
+  for(var i=0;i<7;i++){
+    var d=new Date(b.monday.getFullYear(),b.monday.getMonth(),b.monday.getDate()+i);
+    var n=Analytics.dayNum(d);if(n<todayN)continue;
+    var sc=schedule[i];if(!sc||!isTrainingExDay(sc.exDay))continue;
+    var dRo=Analytics.roDate(n),doneBy={},skipped={};
+    if(n===todayN)weekRows.forEach(function(r){
+      if(r.date!==dRo)return;
+      if(r.type==='antrenament')doneBy[r.exercise]=(doneBy[r.exercise]||0)+1;
+      else if(r.type==='skip')skipped[r.exercise]=1;
+    });
+    (exercises[sc.exDay].list||[]).forEach(function(e){
+      if(skipped[e.name])return;
+      var pl=(deload&&e.sets>1)?Math.max(1,Math.round(e.sets*0.7)):e.sets;
+      pl=Math.max(0,pl-(doneBy[e.name]||0));
+      if(pl>0)out.push({name:e.name,sets:pl});
+    });
+  }
+  return out;
+}
 function buildWeeklyVolume(weekOffset){
   var rows=getRowsForWeek(weekOffset).filter(function(r){return r.type==='antrenament';});
   if(!rows.length)return null;
+  var inProgress=(weekOffset===0);
+  var proj=inProgress?Analytics.projectVolume(rows.map(function(r){return {name:r.exercise,sets:1};}),plannedRemainingEntries(),volumeInfoFor,PATTERN_SECONDARY).projected:null;
   var vol={},ton={},days={},counted=0;
   rows.forEach(function(r){
     var info=volumeInfoFor(r.exercise);
@@ -5948,27 +5976,31 @@ function buildWeeklyVolume(weekOffset){
   });
   var groups=[],zeros=[];
   VOLUME_GROUPS.forEach(function(g){
-    var v=vol[g.id]||0;
-    if(v>0)groups.push({id:g.id,label:g.label,val:v,tonnage:ton[g.id]||0});
+    var v=vol[g.id]||0,pv=proj?Math.round((proj[g.id]||0)*10)/10:null;
+    if(v>0||(pv&&pv>0))groups.push({id:g.id,label:g.label,val:v,proj:pv,tonnage:ton[g.id]||0});
     else zeros.push(g.label);
   });
-  return groups.length?{groups:groups,zeros:zeros,sessions:Object.keys(days).length,counted:counted}:null;
+  return groups.length?{groups:groups,zeros:zeros,sessions:Object.keys(days).length,counted:counted,inProgress:inProgress}:null;
 }
+// Valoarea pe care se dă verdictul: proiecția în săptămâna în curs, seturile făcute în rest
+function volJudged(g){return g.proj!=null?g.proj:g.val;}
 // Hint automat: cel mai mare gol față de bandă → sugestie concretă
 var VOL_SUGGEST={piept:'împins sau fluturări',spate:'ramat sau tracțiuni',umeri:'ridicări laterale',biceps:'flexii biceps',triceps:'extensii triceps',cvadriceps:'squat sau fandări',fesieri:'hip thrust sau RDL',gambe:'ridicări pe vârfuri',core:'plank sau abdomene'};
 
 function volumeHint(data){
-  var worst=null;
+  var worst=null,pr=data.inProgress;
   data.groups.forEach(function(g){
-    if(g.val<VOL_BAND_LO){var gap=VOL_BAND_LO-g.val;if(!worst||gap>worst.gap)worst={g:g,gap:gap};}
+    var v=volJudged(g);
+    if(v<VOL_BAND_LO){var gap=VOL_BAND_LO-v;if(!worst||gap>worst.gap)worst={g:g,gap:gap,v:v};}
   });
   if(worst){
-    return '<b>'+worst.g.label+'</b> e la '+volFmt(worst.g.val)+' seturi, sub bandă. <b>Încă '+Math.ceil(worst.gap)+' seturi de '+(VOL_SUGGEST[worst.g.id]||'lucru direct')+'</b> ar închide golul.';
+    if(pr)return '<b>'+worst.g.label+'</b> ajunge la '+volFmt(worst.v)+' seturi până duminică, cu ce mai ai programat. <b>Încă '+Math.ceil(worst.gap)+' seturi de '+(VOL_SUGGEST[worst.g.id]||'lucru direct')+'</b> ar închide golul.';
+    return '<b>'+worst.g.label+'</b> e la '+volFmt(worst.v)+' seturi, sub bandă. <b>Încă '+Math.ceil(worst.gap)+' seturi de '+(VOL_SUGGEST[worst.g.id]||'lucru direct')+'</b> ar închide golul.';
   }
   var over=null;
-  data.groups.forEach(function(g){if(g.val>VOL_BAND_HI&&(!over||g.val>over.val))over=g;});
-  if(over)return '<b>'+over.label+'</b> e la '+volFmt(over.val)+' seturi. Peste 20 nu mai crește, doar obosește: taie sau mută volumul spre o grupă rămasă în urmă.';
-  return 'Toate grupele lucrate sunt în banda 10–20, exact unde se construiește mușchiul. Ține-o așa.';
+  data.groups.forEach(function(g){if(volJudged(g)>VOL_BAND_HI&&(!over||volJudged(g)>volJudged(over)))over=g;});
+  if(over)return '<b>'+over.label+'</b> '+(pr?'ajunge la ':'e la ')+volFmt(volJudged(over))+' seturi. Peste 20 nu mai crește, doar obosește: taie sau mută volumul spre o grupă rămasă în urmă.';
+  return pr?'Cu ce mai ai programat săptămâna asta, toate grupele ajung în banda 10–20. Ține-o așa.':'Toate grupele lucrate sunt în banda 10–20, exact unde se construiește mușchiul. Ține-o așa.';
 }
 function volFmt(v){return v%1===0?String(v):v.toFixed(1);}
 function renderVolumePanel(){
@@ -5976,21 +6008,24 @@ function renderVolumePanel(){
   var data=buildWeeklyVolume(currentWeekOffset);
   if(!data){el.innerHTML='';return;}
   var scale=25;
-  data.groups.forEach(function(g){if(g.val+2>scale)scale=Math.ceil(g.val)+2;});
+  data.groups.forEach(function(g){var m=Math.max(g.val,g.proj||0);if(m+2>scale)scale=Math.ceil(m)+2;});
   var bandL=VOL_BAND_LO/scale*100,bandW=(VOL_BAND_HI-VOL_BAND_LO)/scale*100;
-  var html='<div class="vol-panel"><div class="ag-st">Volum pe mușchi<span>'+roCount(data.counted,'set','seturi')+'</span></div>';
+  var html='<div class="vol-panel"><div class="ag-st">Volum pe mușchi<span>'+roCount(data.counted,'set','seturi')+(data.inProgress?' · săptămâna în curs':'')+'</span></div>';
   html+='<div class="vol-axis"><span>0</span><span class="b" style="left:'+bandL.toFixed(1)+'%">10</span><span class="b" style="left:'+(bandL+bandW).toFixed(1)+'%">20</span></div>';
   data.groups.forEach(function(g){
-    var st=g.val<VOL_BAND_LO?'low':(g.val<=VOL_BAND_HI?'ok':'high');
+    var jv=volJudged(g);
+    var st=jv<VOL_BAND_LO?'low':(jv<=VOL_BAND_HI?'ok':'high');
     var stLbl={low:'sub țintă',ok:'optim',high:'peste'}[st];
+    if(data.inProgress)stLbl='proiecție: '+stLbl;
     var w=Math.min(100,g.val/scale*100);
     html+='<div class="vol-row g-'+(VG_GROUP[g.id]||'core')+'">';
-    html+='<div class="vol-hd"><span class="vol-name">'+g.label+'</span><span class="vol-status '+st+'">'+stLbl+'</span><span class="vol-val">'+volFmt(g.val)+' <small>seturi</small></span></div>';
-    html+='<div class="vol-track"><div class="vol-band" style="left:'+bandL.toFixed(1)+'%;width:'+bandW.toFixed(1)+'%"></div><div class="vol-fill '+st+'" data-w="'+w.toFixed(1)+'"></div></div>';
+    html+='<div class="vol-hd"><span class="vol-name">'+g.label+'</span><span class="vol-status '+st+'">'+stLbl+'</span><span class="vol-val">'+volFmt(g.val)+(data.inProgress&&g.proj!=null&&g.proj!==g.val?' <small>→ '+volFmt(g.proj)+'</small>':'')+' <small>seturi</small></span></div>';
+    html+='<div class="vol-track"><div class="vol-band" style="left:'+bandL.toFixed(1)+'%;width:'+bandW.toFixed(1)+'%"></div>'+(data.inProgress&&g.proj!=null?'<div class="vol-proj" style="width:'+Math.min(100,g.proj/scale*100).toFixed(1)+'%"></div>':'')+'<div class="vol-fill '+st+'" data-w="'+w.toFixed(1)+'"></div></div>';
     html+='</div>';
   });
-  if(data.zeros.length)html+='<p class="vol-note">Fără volum săptămâna asta: '+data.zeros.join(' · ')+'</p>';
+  if(data.zeros.length)html+='<p class="vol-note">'+(data.inProgress?'Fără volum nici planificat săptămâna asta: ':'Fără volum săptămâna asta: ')+data.zeros.join(' · ')+'</p>';
   html+='<div class="vol-hint">'+volumeHint(data)+'</div>';
+  if(data.inProgress)html+='<p class="vol-note">Săptămâna nu s-a terminat: bara plină = seturile făcute, conturul = proiecția (făcute + ce mai ai programat până duminică). Verdictul e dat pe proiecție.</p>';
   html+='<p class="vol-note">10–20 seturi pe mușchi pe săptămână = zona de creștere maximă (Pelland 2025, 67 de studii). Exercițiile compuse numără ½ set pentru mușchii secundari (împinsul → ½ triceps). Banda verde de pe fiecare bară e ținta.</p>';
   html+='</div>';
   el.innerHTML=html;
@@ -6005,11 +6040,14 @@ function buildVolumePerGroup(weekOffset){
   var data=buildWeeklyVolume(weekOffset);
   if(!data)return '  (fără antrenamente în săpt.)\n';
   var out='';
+  if(data.inProgress)out+='  (săptămâna în curs: verdictul e dat pe PROIECȚIE = seturi făcute + seturi planificate în zilele active rămase)\n';
   data.groups.forEach(function(g){
-    var st=g.val<VOL_BAND_LO?'SUB banda 10–20':(g.val<=VOL_BAND_HI?'ÎN banda 10–20 ✓':'PESTE banda 10–20');
-    out+='  '+g.label+': '+volFmt(g.val)+' sets ['+st+']'+(g.tonnage>0?' · '+g.tonnage.toFixed(0)+' kg':'')+'\n';
+    var jv=volJudged(g);
+    var st=jv<VOL_BAND_LO?'SUB banda 10–20':(jv<=VOL_BAND_HI?'ÎN banda 10–20 ✓':'PESTE banda 10–20');
+    if(data.inProgress)out+='  '+g.label+': '+volFmt(g.val)+' sets făcute, în curs → proiecție '+volFmt(jv)+' ['+st+' (proiecție)]'+(g.tonnage>0?' · '+g.tonnage.toFixed(0)+' kg':'')+'\n';
+    else out+='  '+g.label+': '+volFmt(g.val)+' sets ['+st+']'+(g.tonnage>0?' · '+g.tonnage.toFixed(0)+' kg':'')+'\n';
   });
-  if(data.zeros.length)out+='  Fără volum: '+data.zeros.join(', ')+'\n';
+  if(data.zeros.length)out+='  Fără volum'+(data.inProgress?' (nici planificat)':'')+': '+data.zeros.join(', ')+'\n';
   return out;
 }
 
