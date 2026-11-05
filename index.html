@@ -529,6 +529,10 @@ input:checked + .slider:before{transform:translateX(20px);background:#fff}
 .pain-line .svi{width:16px;height:16px;flex:0 0 auto}.pain-line span{flex:1;min-width:0}.pain-line em{font-style:normal;font-weight:600;color:var(--acc2)}
 .pain-line.on{border-style:solid;border-color:rgba(232,184,74,.45);background:rgba(232,184,74,.08);color:var(--amber)}.pain-line.on b{color:var(--text)}
 .pain-scale{font-size:12px;margin:-2px 0 8px}
+.ss-pain-btns{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}.ss-pain-btns button,.ss-inl{border:1px solid rgba(232,184,74,.5);background:transparent;color:var(--text);border-radius:999px;padding:6px 12px;font-size:13px;font-weight:600}
+.ss-inl{padding:3px 10px;margin-left:4px}
+.ag-pain{font-style:normal;font-weight:600;color:var(--amber)}
+.coach-card .note-btns .btn{flex:1 1 auto}
 .swap-days{display:block;margin-top:6px;font-size:12px;color:var(--muted)}.swap-day{border:1px solid var(--bd);background:var(--s2);color:var(--text);border-radius:999px;padding:4px 10px;font-size:12px;margin:2px 4px 2px 0}
 
 /* ── Zilele mele (modal plan) ── */
@@ -3259,6 +3263,7 @@ function renderToday(){
     html+='<div class="note"><strong>Corpul cere o pauză.</strong> Stagnezi la '+deloadSuggest.stagnant+' exerciții de progresie'+(deloadSuggest.energy!==null?', iar energia ta medie e '+deloadSuggest.energy.toFixed(1)+' din 10':'')+'. O săptămână ușoară acum înseamnă progres mai rapid după.';
     html+='<div class="btn-row note-btns"><button class="btn btn-acc" onclick="acceptManualDeload()">Da, o săptămână ușoară</button><button class="btn btn-ghost" onclick="dismissDeloadSuggest()">Nu acum</button></div></div>';
   }
+  html+=aziCoachCardHtml(!!deloadSuggest);
   // Săptămâna 8 sau deload acceptat
   if(coachWeek===8||isManualDeload()){
     html+='<div class="note"><strong>Săptămână de descărcare.</strong> Fă doar 3 din 4 seturi (sau 2 din 3), cu greutăți la ~80% și tempo curat, fără efort maxim. Scopul: recuperarea sistemului nervos și a articulațiilor înainte de ciclul nou.</div>';
@@ -3323,6 +3328,8 @@ function renderToday(){
       var tgt=String(e.target==null?'':e.target).trim();
       var tgtTxt=/^[\d]+([–—-][\d]+)?$/.test(tgt)?' × '+tgt:((tgt&&tgt!=='—')?' · '+escHtml(tgt):'');
       sub=(dn>0&&!comp?dn+' din '+setsTxt:setsTxt)+tgtTxt+(e.star?' · progresie':'');
+      var pz=painForExercise(key);
+      if(pz&&pz.level!=='ok')sub+=' · <em class="ag-pain">'+(pz.level==='swap'?'durere: înlocuiește':'durere: fără progresie')+'</em>';
     }
     var nowPill=(ei===curIdx)?'<span class="ag-now">Acum</span>':'';
     html+='<button class="ag-row g-'+groupOf(key)+(isSk?' skipped':'')+(comp?' done':'')+(ei===curIdx?' now':'')+'" onclick="openSession('+ei+')">';
@@ -3658,6 +3665,8 @@ function renderSession(ei){
     return;
   }
 
+  var pn=painForExercise(key);
+  if(pn)html+=painCoachHtml(pn,key);
   // Antrenorul: o propoziție; restul sub „Mai mult"
   var coachWeek=getProgramWeek(currentWorkoutDate?parseRoDate(currentWorkoutDate):null);
   var more='',openMore=false;
@@ -5291,6 +5300,43 @@ function deletePainToday(){
   if(sessionOpen)renderSession(sessionExIdx);
 }
 // Rândul de pe Azi: durerile active (cu modifică) sau „Te doare ceva?"
+function painCoachHtml(p,name){
+  var sk=encKey(name),zl=painZoneLow(p),h;
+  if(p.level==='ok')return '<div class="ss-coach quiet">'+svi('alert')+'<div>Ai notat o durere ușoară la '+zl+' ('+p.intensity+'/10). Continui normal; oprește dacă crește.</div></div>';
+  if(p.level==='watch')return '<div class="ss-coach warn">'+svi('alert')+'<div>Ai notat durere la '+zl+'. <button class="ss-inl" onclick="openPainSheet(\''+p.zone+'\',\''+sk+'\')">Cât de tare?</button></div></div>';
+  h='<div class="ss-coach warn">'+svi('alert')+'<div>'+escHtml(painTip(p));
+  h+='<div class="ss-pain-btns">';
+  guideDay=todayExDay();
+  if(swapAlternativesHtml(name))h+='<button onclick="sessSwap(\''+sk+'\')">Înlocuiește</button>';
+  if(skipData[name]===undefined)h+='<button onclick="skipExercise(\''+sk+'\',\'Durere sau disconfort\')">Sar azi</button>';
+  h+='<button onclick="openPainSheet(\''+p.zone+'\',\''+sk+'\')">Actualizează durerea</button></div></div></div>';
+  return h;
+}
+// Întrebarea zilnică cât ține o durere activă: „Mai doare?"
+function painFollowCardHtml(){
+  if(currentWorkoutDate||currentWorkoutDay!==null)return '';
+  var act=activePainsNow().filter(function(p){return !p.askedToday;});
+  if(!act.length)return '';
+  var p=act[0],zl=painZoneLow(p);
+  var h='<div class="note coach-card"><strong>Mai doare '+escHtml(zl)+'?</strong> Ultima notă: '+(p.intensity!=null?p.intensity+'/10, ':'')+p.date+'.';
+  if(p.sinceDays>=14)h+=' Ține de '+p.sinceDays+' de zile: dacă nu trece, mergi la un medic sau kinetoterapeut.';
+  h+='<div class="btn-row note-btns"><button class="btn btn-acc" onclick="painFollow(\''+p.zone+'\',\'gone\')">Nu mai doare</button><button class="btn btn-ghost" onclick="painFollow(\''+p.zone+'\',\'same\')">La fel</button><button class="btn btn-ghost" onclick="painFollow(\''+p.zone+'\',\'worse\')">Mai rău</button></div></div>';
+  return h;
+}
+function painFollow(zone,ans){
+  var p=activePainsNow().filter(function(x){return x.zone===zone;})[0];if(!p)return;
+  var i=p.intensity,note={gone:'nu mai doare',same:'la fel',worse:'mai rău'}[ans];
+  if(ans==='gone')i=0;else if(ans==='worse')i=Math.min(10,(i==null?4:i)+2);
+  var idx=getEffectiveDayIdx();
+  addRow({date:getEffectiveDateRo(),day:schedule[idx].day,type:'durere',exercise:zone,set:'',reps:i==null?'':String(i),kg:'',note:note,ex:p.ex||''});
+  painToday[zone]={intensity:i,text:note,ex:p.ex||''};
+  showToast(ans==='gone'?'Bine. Antrenorul revine la progresia normală.':(ans==='worse'?'Notat. Azi ușor cu zona asta.':'Notat.'),null,true);
+  renderToday();
+}
+// Cardul antrenorului de pe Azi: unul singur, în ordinea durere → zi ratată → stagnare
+function aziCoachCardHtml(deloadShown){
+  return painFollowCardHtml();
+}
 function painLineHtml(){
   var act=Analytics.activePains(loadStore().rows,parseRoDate(getEffectiveDateRo())||new Date());
   if(!act.length)return '<button class="pain-line" onclick="openPainSheet()">'+svi('plus')+'Te doare ceva? Notează</button>';
@@ -6448,10 +6494,19 @@ function lsSet(x,weighted){return weighted?x.kg+' kg × '+x.reps+' ('+x.date+')'
 function lsScore(x,weighted){return weighted?x.score.toFixed(1)+' kg':x.reps+' rep';}
 function buildPainSection(){
   var rows=loadStore().rows;
+  var act=Analytics.activePains(rows,new Date()),head='';
+  if(act.length){
+    head+='  Active acum:\n';
+    act.forEach(function(p){
+      var aff=[];Object.keys(exercises).forEach(function(dk){(exercises[dk].list||[]).forEach(function(e){if(Analytics.painAffects(p.zone,volumeInfoFor(e.name),e.name)&&aff.indexOf(e.name)<0)aff.push(e.name);});});
+      head+='  ⚠️ '+Analytics.painZoneLabel(p.zone)+(p.intensity!=null?' '+p.intensity+'/10':'')+' (din '+p.since+', ultima notă '+p.date+') → '+({hold:'fără progresie',swap:'înlocuire / sar azi',watch:'atenționare',ok:'continuă normal'})[p.level]+(aff.length?' la: '+aff.join(', '):'')+'\n';
+    });
+    head+='  Istoric:\n';
+  }
   var pains=rows.filter(function(r){return r.type==='durere'&&(r.exercise||String(r.note||'').trim());})
     .sort(function(a,b){return (parseRoDate(a.date)||0)-(parseRoDate(b.date)||0);});
-  if(!pains.length)return '  (nicio notă de durere)\n';
-  var out='';
+  if(!pains.length)return head+'  (nicio notă de durere)\n';
+  var out=head;
   pains.forEach(function(p){
     out+='▸ '+p.date+' · '+painLine({zone:p.exercise,intensity:p.reps,text:p.note})+(p.ex?' (a apărut la '+p.ex+')':'')+'\n';
     var best={};
@@ -6579,6 +6634,7 @@ function buildWeekSummary(){
     var ls=longStagFor(s.name);
     if(ls&&ls.stagnant) out+='  ⚠️ Stagnare pe termen lung: '+lsScore(ls.recent,ls.weighted)+' în ultimele 6 săpt. vs '+lsScore(ls.prior,ls.weighted)+' anterior ('+(ls.changePct>0?'+':'')+ls.changePct+'%)\n';
     if(ls&&ls.idle) out+='  ⏸️ Neexecutat de '+ls.daysSince+' zile\n';
+    if(rec.pain)out+='  🩹 Durere activă la '+painZoneLow(rec.pain)+(rec.pain.intensity!=null?' ('+rec.pain.intensity+'/10)':'')+(rec.action==='pain_hold'?': fără progresie':'')+'\n';
   });
   out+='\n';
 
@@ -7667,6 +7723,42 @@ function detectStagnation(exerciseName){
   return null;
 }
 
+// v131: DUREREA ÎN ANTRENOR. Cât timp o durere e activă (Analytics.activePains), exercițiile care încarcă zona
+// primesc: 4–6/10 → fără progresie (aceeași greutate și repetări ca data trecută); 7–10/10 → recomandarea de
+// înlocuire sau „sar azi"; nenotată → doar atenționare. Recomandările de bază rămân neschimbate; le ajustăm după.
+var _painCache={k:'',v:[]};
+function activePainsNow(){
+  var raw='';try{raw=localStorage.getItem(STORAGE_KEY)||'';}catch(e){}
+  var d=getEffectiveDateRo(),k=d+'|'+raw.length+'|'+raw.slice(-40);
+  if(_painCache.k!==k)_painCache={k:k,v:Analytics.activePains(loadStore().rows,parseRoDate(d)||new Date())};
+  return _painCache.v;
+}
+function painForExercise(name){return Analytics.painFor(activePainsNow(),volumeInfoFor(name),name);}
+function painZoneLow(p){return (Analytics.painZoneLabel(p.zone)||'').toLowerCase();}
+function painTip(p){
+  var zl=painZoneLow(p),t;
+  if(p.level==='swap')t='Durere puternică la '+zl+' ('+p.intensity+'/10). Înlocuiește exercițiul sau sari-l azi.';
+  else t='Durere la '+zl+' ('+p.intensity+'/10): aceeași greutate ca data trecută, fără progresie. Dacă în timpul setului trece de 5/10, oprește.';
+  if(p.sinceDays>=14)t+=' Ține de '+p.sinceDays+' de zile: dacă nu trece, mergi la un medic sau kinetoterapeut.';
+  return t;
+}
+function painAdjustRec(r,name){
+  if(!r)return r;
+  var p=painForExercise(name);if(!p)return r;
+  r.pain=p;
+  if(!r.last||r.action==='deload'||r.action==='start'||p.level==='ok'||p.level==='watch')return r;
+  var kg=parseFloat(r.last.kg)>0?r.last.kg+' kg × ':'';
+  return {action:'pain_hold',tag:'MENȚINE',last:r.last,pain:p,target:kg+r.last.reps+' rep (fără progresie)',tip:painTip(p)};
+}
+function painAdjustAcc(a,name){
+  if(!a)return a;
+  var p=painForExercise(name);if(!p)return a;
+  a.pain=p;
+  if(p.level!=='hold'&&p.level!=='swap'||a.type==='deload')return a;
+  var lm=String(a.lastStr||'').match(/(\d+)×([\d.]+)/);
+  if(!lm)return a;
+  return {type:'hold',lastStr:a.lastStr,targetStr:lm[1]+' rep × '+lm[2]+' kg',why:'durere la '+painZoneLow(p)+', fără progresie',pain:p};
+}
 function getKgIncrement(name){
   var lower=name.toLowerCase();
   // Bara → 2.5kg, gantere → 1kg per ganteră (2kg total bilateral pentru împins, dar afișăm pe ganteră)
@@ -7690,6 +7782,10 @@ function getLastRIR(exerciseName){
   return rirRows.length?rirRows[0].note:null; // 'easy' | 'ok' | 'hard'
 }
 
+// v131: durerea se aplică peste orice recomandare (Azi, antrenament, export)
+var _getRecBase=getRecommendation,_getAccBase=getAccessoryRec;
+getRecommendation=function(n,w,p,f){return painAdjustRec(_getRecBase(n,w,p,f),n);};
+getAccessoryRec=function(n,m){return painAdjustAcc(_getAccBase(n,m),n);};
 // ── Deload manual (acceptat din sugestia auto) ──
 function isManualDeload(){
   var until=localStorage.getItem('manual_deload_until');
