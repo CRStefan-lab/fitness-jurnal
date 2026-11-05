@@ -6085,18 +6085,17 @@ function buildTopPRs(limit){
   return out||'  (fără date încă)\n';
 }
 
+// BUG 1 (v130): înainte, numărătorul era tot istoricul, iar numitorul = săptămâna din ciclu × 4 (se reseta la ciclu nou),
+// plafonat la 100%. Acum ambele vin din aceeași perioadă (Analytics.adherence, testat în test-analytics.js).
+function activeWeekdays(){var a=[];for(var i=0;i<7;i++)a.push(!!(schedule[i]&&isTrainingExDay(schedule[i].exDay)));return a;}
+function adhFmt(c){return c.done+'/'+c.planned+(c.pct!=null?' ('+c.pct+'%)':'');}
 function buildAdherenceStats(){
   var store=loadStore();
   var trainingRows=store.rows.filter(function(r){return r.type==='antrenament';});
   if(!trainingRows.length) return '  (fără date încă)\n';
-  // Sesiuni complete = zile cu cel puțin 1 set salvat
-  var sessionDays={};
-  trainingRows.forEach(function(r){sessionDays[r.date]=true;});
-  // Zile așteptate: 5/săpt (LUNI,MARȚI,JOI,VINERI active + opt MIE recovery)
-  var weeks=Math.max(1,getProgramWeek());
-  var expectedSessions=weeks*(dayPlanCount()||4); // zilele active/săpt din program
-  var actualSessions=Object.keys(sessionDays).length;
-  var adherence=Math.min(100,Math.round((actualSessions/expectedSessions)*100));
+  var act=activeWeekdays(),cyc=getCurrentCycleStart();
+  var adh=Analytics.adherence(trainingRows,{active:act,ref:new Date(),cycleStart:cyc});
+  var dayNames=[];act.forEach(function(on,i){if(on)dayNames.push(DP_SHORT[i]);});
   // Streak morning — zile consecutive cu cel puțin 1 bifă matinală
   var morningRows=store.rows.filter(function(r){return r.type==='dimineata'&&r.note==='DA';});
   var morningDays={};
@@ -6118,7 +6117,12 @@ function buildAdherenceStats(){
   // Total all-time PRs
   var totalPRs=trainingRows.filter(function(r){return r.note&&r.note.indexOf('PR:')===0;}).length;
   var out='';
-  out+='  Sesiuni complete: '+actualSessions+'/'+expectedSessions+' ('+adherence+'%)\n';
+  out+='  Sesiuni efectuate / planificate (zile active: '+(dayNames.join(', ')||'—')+'):\n';
+  if(cyc)out+='    Ciclul curent (din '+formatRoDate(cyc)+'): '+adhFmt(adh.cycle)+'\n';
+  out+='    Ultimele 8 săptămâni: '+adhFmt(adh.last8)+' · doar săptămânile încheiate: '+adhFmt(adh.last8Complete)+' · săptămâna în curs: '+adh.currentWeek.done+'/'+adh.currentWeek.planned+' până azi\n';
+  out+='    Total (din '+adh.startDate+'): '+adhFmt(adh.total)+'\n';
+  out+='    Pe săptămâni, vechi → nou: '+adh.weeks.map(function(w){return w.done+'/'+w.planned;}).join(' · ')+'\n';
+  out+='    (planificate = zilele active de până azi; azi intră doar dacă ai antrenat. Antrenamentele făcute în zile libere se numără la efectuate, de-asta procentul poate trece de 100%.)\n';
   out+='  Morning streak curent: '+streak+' zile consecutive\n';
   out+='  Total PR-uri marcate: '+totalPRs+'\n';
   return out;
@@ -7197,11 +7201,22 @@ function getCycleStartDate(){
   return dates.length?dates[0]:null;
 }
 
-function getCycleInfo(refDate){
+// Începutul programului aliniat la luni (luni–miercuri → lunea aceea, joi–duminică → lunea următoare)
+function cycleAnchor(){
   var start=getCycleStartDate();
-  if(!start) return {week:1,cycle:1,absWeek:1};
+  if(!start)return null;
   var sdow=(start.getDay()+6)%7; // 0 = luni
-  start=new Date(start.getFullYear(),start.getMonth(),start.getDate()+(sdow<=2?-sdow:7-sdow));
+  return new Date(start.getFullYear(),start.getMonth(),start.getDate()+(sdow<=2?-sdow:7-sdow));
+}
+// Lunea în care a început ciclul curent de 8 săptămâni
+function getCurrentCycleStart(refDate){
+  var a=cycleAnchor();if(!a)return null;
+  var ci=getCycleInfo(refDate);
+  return new Date(a.getFullYear(),a.getMonth(),a.getDate()+(ci.cycle-1)*56);
+}
+function getCycleInfo(refDate){
+  var start=cycleAnchor();
+  if(!start) return {week:1,cycle:1,absWeek:1};
   var rf=refDate||new Date();
   var daysSince=(Date.UTC(rf.getFullYear(),rf.getMonth(),rf.getDate())-Date.UTC(start.getFullYear(),start.getMonth(),start.getDate()))/86400000;
   var absWeek=Math.floor(daysSince/7)+1; // săptămâna absolută de la start
