@@ -27,9 +27,9 @@ var EXERCISE_DB=[
   {id:'db_impins_inclinat',name:'Împins gantere bancă înclinată 30–45°',muscle:'Piept',pattern:'push_h',equipment:['gantere','banca'],level:1,compound:true,starEligible:true,prio:1,
    yt:'incline dumbbell press 30 degree bench form',ghid:{start:'Bancă la 30° (ideal); dacă banca ta nu are treapta asta, 45° e acceptabil. Gantere la nivelul pieptului, coate la 45° față de corp.',move:'Împingi în sus ușor spre interior. Cobori lent 2 sec cu întindere completă.',err:'Coatele prea largi. Unghi peste 45° (preia umărul).',tip:'30° e unghiul optim pentru pieptul superior; la 45° lucrează mai mult umărul, peste 45° nu are rost (Rodríguez-Ridao 2020).'}},
   {id:'db_impins_orizontal',name:'Împins gantere bancă orizontală 0°',muscle:'Piept',pattern:'push_h',equipment:['gantere','banca'],level:1,compound:true,starEligible:true,prio:2,
-   yt:'flat dumbbell bench press form',ghid:{start:'Bancă plată. Gantere deasupra pieptului, brațe întinse.',move:'Cobori controlat la piept, împingi înapoi sus.',err:'Ganterele se ating sus cu impact. Cobori prea rapid.',tip:'Picioarele ferme pe podea, omoplații strânși.'}},
+   yt:'flat dumbbell bench press form',ghid:{start:'Bancă plată (0°). Gantere deasupra pieptului, brațe întinse.',move:'Cobori controlat la piept, împingi înapoi sus.',err:'Ganterele se ating sus cu impact. Cobori prea rapid.',tip:'Picioarele ferme pe podea, omoplații strânși.'}},
   {id:'gym_bench_bara',name:'Împins cu bara la bancă (bench press)',muscle:'Piept',pattern:'push_h',equipment:['bara','banca'],level:2,compound:true,starEligible:true,prio:1,gymOnly:true,
-   yt:'barbell bench press form tutorial',ghid:{start:'Bancă plată în rack. Priza puțin mai lată decât umerii.',move:'Cobori bara la piept controlat, împingi exploziv.',err:'Bounce pe piept. Fesele se ridică de pe bancă.',tip:'La sală cere mereu spotter sau folosește siguranțele rack-ului.'}},
+   yt:'barbell bench press form tutorial',ghid:{start:'Bancă plată (0°) în rack. Priza puțin mai lată decât umerii.',move:'Cobori bara la piept controlat, împingi exploziv.',err:'Bounce pe piept. Fesele se ridică de pe bancă.',tip:'La sală cere mereu spotter sau folosește siguranțele rack-ului.'}},
   {id:'gym_chest_press',name:'Chest press la aparat',muscle:'Piept',pattern:'push_h',equipment:['aparate'],level:1,compound:true,starEligible:true,prio:3,
    yt:'machine chest press form',ghid:{start:'Reglează scaunul: mânerele la nivelul pieptului.',move:'Împingi înainte complet, revii controlat.',err:'Umerii se ridică spre urechi.',tip:'Bun pentru începători — traiectorie ghidată.'}},
   {id:'bw_flotari',name:'Flotări clasice',muscle:'Piept',pattern:'push_h',equipment:[],level:1,compound:true,starEligible:true,prio:4,
@@ -57,7 +57,7 @@ var EXERCISE_DB=[
 
   // ── IZOLĂRI PIEPT ──
   {id:'db_fluturari',name:'Fluturări gantere bancă înclinată',muscle:'Piept',pattern:'izo_piept',equipment:['gantere','banca'],level:1,compound:false,starEligible:false,prio:1,
-   yt:'incline dumbbell fly form',ghid:{start:'Bancă înclinată, gantere deasupra pieptului, coate ușor îndoite.',move:'Deschizi brațele în arc, revii strângând pieptul.',err:'Coatele se îndoaie prea mult (devine împins).',tip:'Mișcarea = îmbrățișare de copac.'}},
+   yt:'incline dumbbell fly form',ghid:{start:'Bancă la 30° (ca la împinsul înclinat; 45° dacă banca nu are treapta asta). Gantere deasupra pieptului, coate ușor îndoite.',move:'Deschizi brațele în arc, revii strângând pieptul.',err:'Coatele se îndoaie prea mult (devine împins).',tip:'Mișcarea = îmbrățișare de copac.'}},
   {id:'gym_pec_deck',name:'Fluturări la aparat (pec deck)',muscle:'Piept',pattern:'izo_piept',equipment:['aparate'],level:1,compound:false,starEligible:false,prio:2,
    yt:'pec deck machine fly form',ghid:{start:'Scaun reglat: mânerele la nivelul pieptului.',move:'Aduci brațele în față, strângi pieptul 1 sec.',err:'Umerii se rotesc în față.',tip:'Pieptul sus, omoplații strânși.'}},
 
@@ -69,13 +69,13 @@ var EXERCISE_DB=[
   {id:'db_extensii_triceps',name:'Extensii triceps cu ganteră (deasupra capului)',muscle:'Triceps (cap lung)',pattern:'triceps',equipment:['gantere'],level:1,compound:false,starEligible:false,prio:2,
    yt:'overhead dumbbell triceps extension two hands form',ghid:{start:'O ganteră ținută cu ambele mâini deasupra capului.',move:'Cobori lent în spatele capului (întindere completă), extinzi înapoi sus.',err:'Coatele se deschid lateral.',tip:'Poziția deasupra capului crește capul lung mult mai bine decât pushdown-ul (Maeo 2023). Coboară adânc.'}},
   {id:'db_skull_crusher',name:'Skull crusher cu gantere',muscle:'Triceps (cap lung)',pattern:'triceps',equipment:['gantere','banca'],level:2,compound:false,starEligible:false,prio:3,
-   yt:'dumbbell skull crusher form',ghid:{start:'Culcat pe bancă, ganterele deasupra pieptului, brațele ușor înclinate spre cap.',move:'Îndoi coatele coborând ganterele pe lângă tâmple/în spatele capului, extinzi înapoi.',err:'Coatele se evazează. Brațul superior perfect vertical (scoate tensiunea).',tip:'Brațele înclinate ~20° spre cap = tensiune continuă pe capul lung.'}},
+   yt:'dumbbell skull crusher form',ghid:{start:'Culcat pe bancă plată (0°), ganterele deasupra pieptului, brațele ușor înclinate spre cap.',move:'Îndoi coatele coborând ganterele pe lângă tâmple/în spatele capului, extinzi înapoi.',err:'Coatele se evazează. Brațul superior perfect vertical (scoate tensiunea).',tip:'Brațele înclinate ~20° spre cap = tensiune continuă pe capul lung.'}},
   {id:'cable_pushdown',name:'Extensii triceps la cablu (pushdown)',muscle:'Triceps',pattern:'triceps',equipment:['cablu'],level:1,compound:false,starEligible:false,prio:4,
    yt:'cable triceps pushdown form',ghid:{start:'Cablul sus, coatele lipite de corp.',move:'Extinzi complet în jos, revii controlat.',err:'Coatele se mișcă înainte.',tip:'Eficient, dar inferior variantelor deasupra capului pentru toate capetele (Maeo 2023).'}},
   {id:'bw_flotari_inguste',name:'Flotări înguste (diamond)',muscle:'Triceps',pattern:'triceps',equipment:[],level:2,compound:true,starEligible:false,prio:5,
    yt:'diamond push up form',ghid:{start:'Flotare cu mâinile apropiate sub piept.',move:'Cobori cu coatele lipite de corp, împingi sus.',err:'Coatele se evazează.',tip:'Prea greu? Pe genunchi.'}},
   {id:'bw_dips_banca',name:'Dips cu sprijin pe bancă/scaun',muscle:'Triceps',pattern:'triceps',equipment:[],level:1,compound:true,starEligible:false,prio:6,
-   yt:'bench dips form',ghid:{start:'Mâinile pe marginea băncii în spate, picioarele întinse în față.',move:'Cobori îndoind coatele la 90°, împingi sus.',err:'Umerii se ridică spre urechi la coborâre.',tip:'Cu cât picioarele-s mai departe, cu atât mai greu.'}},
+   yt:'bench dips form',ghid:{start:'Mâinile pe marginea unei bănci plate (0°) sau a unui scaun stabil, în spate; picioarele întinse în față.',move:'Cobori îndoind coatele la 90°, împingi sus.',err:'Umerii se ridică spre urechi la coborâre.',tip:'Cu cât picioarele-s mai departe, cu atât mai greu.'}},
 
   // ── SQUAT (cvadriceps dominant) ──
   {id:'db_goblet',name:'Goblet squat',muscle:'Cvadriceps',pattern:'squat',equipment:['gantere'],level:1,compound:true,starEligible:true,prio:2,
@@ -109,11 +109,11 @@ var EXERCISE_DB=[
 
   // ── GLUTE (hip thrust) ──
   {id:'bara_hip_thrust',name:'Hip thrust cu bara pe bancă plată',muscle:'Fesieri',pattern:'glute',equipment:['bara','banca'],level:1,compound:true,starEligible:true,prio:1,
-   yt:'barbell hip thrust form',ghid:{start:'Omoplații pe bancă, bara pe șolduri (cu prosop).',move:'Împingi șoldurile sus până corpul e drept. Strângi fesierii 1 sec.',err:'Arcuirea lombară. Șoldurile nu ajung sus.',tip:'Bărbia în piept — simți fesierii, nu spatele.'}},
+   yt:'barbell hip thrust form',ghid:{start:'Bancă plată (0°), lipită de perete să nu alunece. Marginea ei sub omoplați, bara pe șolduri (cu prosop).',move:'Împingi șoldurile sus până corpul e drept. Strângi fesierii 1 sec.',err:'Arcuirea lombară. Șoldurile nu ajung sus.',tip:'Bărbia în piept — simți fesierii, nu spatele.'}},
   {id:'db_hip_thrust',name:'Hip thrust cu ganteră',muscle:'Fesieri',pattern:'glute',equipment:['gantere','banca'],level:1,compound:true,starEligible:true,prio:2,
-   yt:'dumbbell hip thrust form',ghid:{start:'Omoplații pe bancă, gantera pe șolduri.',move:'Împingi șoldurile sus, strângi fesierii 1 sec.',err:'Șoldurile nu urcă complet.',tip:'Variantă accesibilă a hip thrust-ului cu bara.'}},
+   yt:'dumbbell hip thrust form',ghid:{start:'Bancă plată (0°), lipită de perete. Marginea ei sub omoplați, gantera pe șolduri.',move:'Împingi șoldurile sus, strângi fesierii 1 sec.',err:'Șoldurile nu urcă complet.',tip:'Variantă accesibilă a hip thrust-ului cu bara.'}},
   {id:'bw_hip_thrust',name:'Hip thrust bodyweight pe bancă',muscle:'Fesieri',pattern:'glute',equipment:[],level:1,compound:true,starEligible:true,prio:3,
-   yt:'bodyweight hip thrust bench form',ghid:{start:'Omoplații pe bancă/canapea, tălpile pe podea.',move:'Împingi șoldurile sus, ții 2 sec contracția.',err:'Prea rapid, fără contracție.',tip:'Progresezi prin tempo + un singur picior.'}},
+   yt:'bodyweight hip thrust bench form',ghid:{start:'Bancă plată (0°) sau canapea, marginea sub omoplați, tălpile pe podea.',move:'Împingi șoldurile sus, ții 2 sec contracția.',err:'Prea rapid, fără contracție.',tip:'Progresezi prin tempo + un singur picior.'}},
 
   // ── LUNGE / UNILATERAL ──
   {id:'db_step_back',unilateral:true,name:'Step-back lunges',muscle:'Cvadriceps + fesieri',pattern:'lunge',equipment:['gantere'],level:1,compound:true,starEligible:false,prio:1,
@@ -145,9 +145,9 @@ var EXERCISE_DB=[
   {id:'bw_tractiuni',name:'Tracțiuni la bară',muscle:'Spate',pattern:'pull',equipment:['tractiuni'],level:2,compound:true,starEligible:true,prio:2,
    yt:'pull up proper form',ghid:{start:'Atârnat de bară, priza puțin mai lată decât umerii.',move:'Tragi bărbia peste bară, cobori complet controlat.',err:'Jumătăți de repetări. Balans (kipping).',tip:'Nu poți încă? Sărituri + coborâre lentă (negative).'}},
   {id:'db_ramat_un_brat',unilateral:true,name:'Ramat un braț sprijinit pe bancă',muscle:'Spate',pattern:'pull',equipment:['gantere','banca'],level:1,compound:true,starEligible:false,prio:5.5,
-   yt:'one arm dumbbell row on bench form',ghid:{start:'Genunchiul și mâna pe bancă, gantera în cealaltă mână.',move:'Tragi gantera spre șold, strângi omoplatul.',err:'Rotirea trunchiului.',tip:'Spatele paralel cu podeaua.'}},
+   yt:'one arm dumbbell row on bench form',ghid:{start:'Bancă plată (0°). Genunchiul și mâna de aceeași parte pe bancă, gantera în cealaltă mână.',move:'Tragi gantera spre șold, strângi omoplatul.',err:'Rotirea trunchiului.',tip:'Spatele paralel cu podeaua.'}},
   {id:'db_pullover',name:'Pullover cu ganteră pe bancă plată',muscle:'Spate + piept',pattern:'pull',equipment:['gantere','banca'],level:1,compound:false,starEligible:false,prio:8,
-   yt:'dumbbell pullover flat bench form',ghid:{start:'Culcat pe bancă, gantera cu ambele mâini deasupra pieptului.',move:'Cobori în arc peste cap, revii.',err:'Coatele prea îndoite.',tip:'Coatele ușor îndoite pe tot parcursul.'}},
+   yt:'dumbbell pullover flat bench form',ghid:{start:'Culcat pe bancă plată (0°), gantera cu ambele mâini deasupra pieptului.',move:'Cobori în arc peste cap, revii.',err:'Coatele prea îndoite.',tip:'Coatele ușor îndoite pe tot parcursul.'}},
 
   // ── SPATE POSTERIOR (umăr posterior) ──
   // Dovezi: reverse fly are RCT longitudinal solid (+15-26% deltoid posterior,

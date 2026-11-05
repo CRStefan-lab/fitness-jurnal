@@ -529,6 +529,8 @@ input:checked + .slider:before{transform:translateX(20px);background:#fff}
 .pain-line .svi{width:16px;height:16px;flex:0 0 auto}.pain-line span{flex:1;min-width:0}.pain-line em{font-style:normal;font-weight:600;color:var(--acc2)}
 .pain-line.on{border-style:solid;border-color:rgba(232,184,74,.45);background:rgba(232,184,74,.08);color:var(--amber)}.pain-line.on b{color:var(--text)}
 .pain-scale{font-size:12px;margin:-2px 0 8px}
+.pain-lines .pain-line{margin:6px 0 0}.pain-lines .pain-line:first-child{margin-top:8px}
+.pain-other{color:var(--amber)}.pain-more{margin-top:8px}
 .ss-pain-btns{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}.ss-pain-btns button,.ss-inl{border:1px solid rgba(232,184,74,.5);background:transparent;color:var(--text);border-radius:999px;padding:6px 12px;font-size:13px;font-weight:600}
 .ss-inl{padding:3px 10px;margin-left:4px}
 .ag-pain{font-style:normal;font-weight:600;color:var(--amber)}
@@ -2107,15 +2109,15 @@ var nutPlans={
 };
 
 var ghidEx=[
-  {name:'Împins gantere bancă înclinată',tag:'gantere',start:'Bancă 30–45°. Gantere la nivelul pieptului, coate la 45° față de corp.',move:'Împingi în sus ușor spre interior. Cobori lent 2 sec până la piept.',err:'Coatele prea largi. Arcuirea spatelui.',tip:'Strânge omoplații de bancă tot timpul.'},
+  {name:'Împins gantere bancă înclinată',tag:'gantere',start:'Bancă la 30° (ideal); dacă banca ta nu are treapta asta, 45° e acceptabil. Gantere la nivelul pieptului, coate la 45° față de corp.',move:'Împingi în sus ușor spre interior. Cobori lent 2 sec până la piept.',err:'Coatele prea largi. Arcuirea spatelui.',tip:'Strânge omoplații de bancă tot timpul.'},
   {name:'Împins gantere deasupra capului',tag:'gantere',start:'Bancă 80–90°. Gantere la nivelul umerilor, palme față în față.',move:'Împingi în sus până brațele aproape întinse. Cobori la nivelul urechilor.',err:'Spatele se arcuiește. Gantere coboară sub umeri.',tip:'Abdomenul contractat tot timpul.'},
   {name:'Ridicări laterale cu gantere',tag:'gantere',start:'Stând, gantere pe lângă corp, coate ușor îndoite.',move:'Ridici brațele lateral până la nivelul umerilor. Cobori lent.',err:'Balansul corpului. Ridicarea prea sus (trapezul preia).',tip:'Imaginează-ți că torni apă dintr-un pahar. Greutate mică!'},
   {name:'Goblet Squat',tag:'gantere',start:'Picioare la lățimea umerilor, vârfuri ușor în afară. Gantera vertical la piept.',move:'Cobori ca pe scaun, genunchii urmează vârfurile, până coapsele paralele.',err:'Genunchii intră spre interior. Spatele rotunjit.',tip:'Împinge genunchii în afară cu coatele la coborâre.'},
   {name:'Sumo Squat cu ganteră',tag:'gantere',start:'Picioare mai late decât umerii, vârfuri la 45°. Gantera cu ambele mâini.',move:'Cobori drept în jos, genunchii urmează vârfurile. Revii strângând fesierii.',err:'Genunchii cad înăuntru. Trunchiul se apleacă prea mult.',tip:'Simți lucrul în interiorul coapsei.'},
   {name:'Îndreptări românești cu gantere',tag:'gantere',start:'Stând, gantere pe coapse, spatele drept, genunchi ușor îndoiți.',move:'Împingi șoldurile înapoi, cobori pe lângă picioare. Simți întindere în biceps femural.',err:'Spatele rotunjit. Genunchii se îndoaie prea mult.',tip:'Mișcarea vine din șolduri, nu din genunchi.'},
   {name:'Bent-over Row cu bara',tag:'bară',start:'Aplecat la ~45°, spatele drept, bara prinsă la lățimea umerilor.',move:'Tragi bara spre abdomen, coatele pe lângă corp. Strângi omoplații sus.',err:'Spatele rotunjit. Balansul corpului.',tip:'Bara atinge aproximativ buricul la fiecare repetare.'},
-  {name:'Pullover cu ganteră',tag:'gantere',start:'Culcat pe bancă plată, gantera cu ambele mâini deasupra pieptului.',move:'Cobori în arc peste cap, simți întindere. Revii în arc deasupra pieptului.',err:'Coatele prea îndoite. Mișcare prea rapidă.',tip:'Menține coatele ușor îndoite pe tot parcursul.'},
-  {name:'Hip Thrust cu bara',tag:'bară',start:'Spatele pe bancă (omoplați pe margine). Bara pe șolduri cu prosop. Picioare la lățimea șoldurilor.',move:'Împingi șoldurile în sus până corpul e drept. Strângi fesierii 1 sec. Cobori controlat.',err:'Șoldurile nu ajung sus. Spatele se arcuiește exagerat.',tip:'Bărbia ușor în piept. Simți în fesieri, nu în spate.'},
+  {name:'Pullover cu ganteră',tag:'gantere',start:'Culcat pe bancă plată (0°), gantera cu ambele mâini deasupra pieptului.',move:'Cobori în arc peste cap, simți întindere. Revii în arc deasupra pieptului.',err:'Coatele prea îndoite. Mișcare prea rapidă.',tip:'Menține coatele ușor îndoite pe tot parcursul.'},
+  {name:'Hip Thrust cu bara',tag:'bară',start:'Bancă plată (0°), lipită de perete. Omoplații pe margine, bara pe șolduri cu prosop, picioarele la lățimea șoldurilor.',move:'Împingi șoldurile în sus până corpul e drept. Strângi fesierii 1 sec. Cobori controlat.',err:'Șoldurile nu ajung sus. Spatele se arcuiește exagerat.',tip:'Bărbia ușor în piept. Simți în fesieri, nu în spate.'},
   {name:'Deadlift cu bara',tag:'bară',start:'Bara deasupra mijlocului piciorului. Picioare la lățimea șoldurilor. Spatele drept, pieptul sus.',move:'Împingi podeaua cu picioarele. Bara rămâne lipită de corp. Șolduri și umeri urcă simultan.',err:'SPATELE ROTUNJIT (pericol!). Bara departe de corp.',tip:'Respiră adânc, contractă abdomenul înainte. Începe cu greutate FOARTE mică!'},
   {name:'Flexii biceps alternante',tag:'gantere',start:'Stând sau șezut, gantere pe lângă corp, palme față în față.',move:'Ridici rotind palma în sus. Cobori lent. Alternezi brațele.',err:'Cotul se mișcă înainte. Balansul spatelui.',tip:'Cotul rămâne fix pe lângă corp tot timpul.'},
   {name:'Flotări lente (dimineață)',tag:'bodyweight',start:'Poziție plank cu brațele la lățimea umerilor, corp drept de la cap până la călcâie.',move:'Cobori controlat 3 sec până pieptul aproape atinge podeaua. Împingi 1 sec în sus.',err:'Șoldurile cad. Coatele evazate la 90° lateral.',tip:'Coatele la ~45° față de corp. Tempo: 3-1-1 (ai timp să înveți mișcarea).'},
@@ -5274,9 +5276,11 @@ function zoneForExercise(name){
 }
 function openPainSheet(zone,exEnc){
   var exName=exEnc?decodeURIComponent(exEnc):'';
-  zone=zone||Object.keys(painToday)[0]||'';
+  zone=zone||''; // fără zonă = o durere nouă (nu deschidem peste una existentă)
   var cur=painToday[zone]||{},pi=cur.intensity==null?3:cur.intensity;
   var h=exName?'<p class="sh-help">La <b data-noi18n>'+escHtml(exName)+'</b>. Antrenorul ține cont de ea la exercițiile care încarcă zona.</p>':'<p class="sh-help">Antrenorul ține cont de ea la exercițiile care încarcă zona.</p>';
+  var other=Object.keys(painToday).filter(function(z){return z!==zone;});
+  if(other.length)h+='<p class="sh-help pain-other">Notate deja azi: '+other.map(function(z){var p=painToday[z];return escHtml(Analytics.painZoneLabel(z))+(p.intensity!=null?' '+p.intensity+'/10':'');}).join(' · ')+'. Fiecare zonă are nota ei.</p>';
   h+='<select class="select-box" id="painZone" aria-label="Zona durerii" onchange="painZoneChange()">';
   if(!zone)h+='<option value="" selected disabled>Alege zona</option>';
   Analytics.PAIN_ZONES.forEach(function(z){h+='<option value="'+z.id+'"'+(z.id===zone?' selected':'')+'>'+z.label+'</option>';});
@@ -5285,6 +5289,7 @@ function openPainSheet(zone,exEnc){
   h+='<p class="sh-help pain-scale">0–3: continui normal · 4–6: fără progresie · 7–10: înlocuiești sau sari</p>';
   h+='<input class="rate-note-input" type="text" id="painText" aria-label="Notă la durere" placeholder="Ce simți și când (ex. la coborâre, la ultimele repetări)" value="'+escHtml(cur.text||'')+'">';
   h+='<div class="btn-row"><button class="btn btn-acc" onclick="savePainSheet(\''+(exEnc||'')+'\')">Salvează</button>'+(painToday[zone]?'<button class="btn btn-ghost" onclick="deletePainToday()">Șterge nota</button>':'')+'</div>';
+  h+='<button class="btn btn-ghost pain-more" onclick="savePainSheet(\''+(exEnc||'')+'\',true)">Salvează și notează altă zonă</button>';
   openAziSheet('Durere sau disconfort',h);
 }
 function painZoneChange(){
@@ -5293,7 +5298,7 @@ function painZoneChange(){
   if(it){it.value=cur.intensity==null?3:cur.intensity;painIntShow(it.value);}
   if(tx)tx.value=cur.text||'';
 }
-function savePainSheet(exEnc){
+function savePainSheet(exEnc,another){
   var zone=document.getElementById('painZone').value;
   if(!zone){showToast('Alege zona','var(--amber)');return;}
   var inten=parseInt(document.getElementById('painInt').value,10)||0,text=(document.getElementById('painText').value||'').trim();
@@ -5303,6 +5308,7 @@ function savePainSheet(exEnc){
   painToday[zone]={intensity:inten,text:text,ex:exName};
   var lv=Analytics.painLevel(inten),zl=painZoneArt({zone:zone});
   showToast(lv==='swap'?'Notat. La exercițiile care încarcă '+zl+' îți propun înlocuirea.':(lv==='hold'?'Notat. La exercițiile care încarcă '+zl+': fără progresie până se liniștește.':'Notat.'),null,true);
+  if(another){openPainSheet('',exEnc);return;} // foaia se redeschide goală pentru următoarea zonă
   closeAziSheet();
   if(sessionOpen)renderSession(sessionExIdx);
 }
@@ -5438,8 +5444,13 @@ function aziCoachCardHtml(deloadShown){
 function painLineHtml(){
   var act=Analytics.activePains(loadStore().rows,parseRoDate(getEffectiveDateRo())||new Date());
   if(!act.length)return '<button class="pain-line" onclick="openPainSheet()">'+svi('plus')+'Te doare ceva? Notează</button>';
-  var p=act[0];
-  return '<button class="pain-line on" onclick="openPainSheet(\''+p.zone+'\')">'+svi('alert')+'<span>Durere: <b>'+escHtml(Analytics.painZoneLabel(p.zone))+'</b>'+(p.intensity!=null?' '+p.intensity+'/10':'')+(act.length>1?' · încă '+(act.length-1):'')+'</span><em>modifică</em></button>';
+  // fiecare durere activă are rândul ei (modifici zona respectivă) + rândul pentru o zonă nouă
+  var h='<div class="pain-lines">';
+  act.forEach(function(p){
+    h+='<button class="pain-line on" onclick="openPainSheet(\''+p.zone+'\')">'+svi('alert')+'<span>Durere: <b>'+escHtml(Analytics.painZoneLabel(p.zone))+'</b>'+(p.intensity!=null?' '+p.intensity+'/10':'')+(p.daysSince?' · '+p.date.slice(0,5):'')+'</span><em>modifică</em></button>';
+  });
+  h+='<button class="pain-line" onclick="openPainSheet()">'+svi('plus')+'Altă durere</button></div>';
+  return h;
 }
 // Migrarea (o dată, apoi idempotentă): notele de energie care descriu durere → rândul „durere"; textul din rating → notă
 function migrateDayNotesStore(){
