@@ -325,9 +325,69 @@ function kcalAdvice(opts){
   if(!dir)return out;
   var floor=opts.sex==='F'?1200:1500,lo=opts.kcalMin+150*dir,hi=opts.kcalMax+150*dir;
   if(lo<floor){var sh=floor-lo;lo+=sh;hi+=sh;}
-  if(lo===opts.kcalMin&&hi===opts.kcalMax){out.dir=0;out.atFloor=true;return out;}
+  // v136: limita de jos nu are voie să inverseze propunerea (−150 devenea +100 la ținte sub limită)
+  if((lo-opts.kcalMin)*dir<=0){out.dir=0;out.atFloor=true;return out;}
   out.delta=lo-opts.kcalMin;out.kcalMin=lo;out.kcalMax=hi;
   return out;
+}
+
+// ═══ v136 — CAUZELE STAGNĂRII, MĂSURĂTORILE, ENERGIA FAȚĂ DE ANTRENAMENTE, BILANȚUL ═══
+// Media unei note (somn/energie) pe ultimele `days` zile; null sub `minN` note
+function ratingAvg(rows,kind,ref,days,minN){
+  var refN=dayNum(ref||new Date()),v=[];
+  (rows||[]).forEach(function(r){
+    if(!r||r.type!=='rating'||r.exercise!==kind)return;
+    var n=dayNum(r.date),x=validRating(r.note);
+    if(n!=null&&x!==null&&n<=refN&&n>refN-days)v.push(x);
+  });
+  if(v.length<(minN||1))return null;
+  return {avg:Math.round(v.reduce(function(a,b){return a+b;},0)/v.length*10)/10,n:v.length};
+}
+// Cauzele probabile ale unei stagnări: somn/energie mici (media < 5,5 din ≥ 4 note pe 14 zile),
+// slăbit prea repede (kcalDir = +1 la recompoziție/slăbit), o durere activă pe zonă
+function stagnationCauses(opts){
+  var out=[],s=ratingAvg(opts.rows,'sleep',opts.ref,14,4),e=ratingAvg(opts.rows,'energy',opts.ref,14,4);
+  if(s&&s.avg<5.5)out.push({kind:'sleep',avg:s.avg,n:s.n});
+  if(e&&e.avg<5.5)out.push({kind:'energy',avg:e.avg,n:e.n});
+  if(opts.kcalDir===1&&opts.goal!=='masa')out.push({kind:'kcal'});
+  if(opts.pain)out.push({kind:'pain',zone:opts.pain.zone,intensity:opts.pain.intensity});
+  return out;
+}
+// Măsurătoarea cu talie + gât e mai veche de `days` zile (sau lipsește)?
+function measurementDue(measurements,ref,days){
+  days=days||28;var refN=dayNum(ref||new Date()),last=null;
+  (measurements||[]).forEach(function(m){var n=dayNum(m.date);if(n!=null&&n<=refN&&+m.waist&&+m.neck&&(last===null||n>last))last=n;});
+  return {due:last===null||refN-last>=days,daysSince:last===null?null:refN-last,lastDate:last===null?null:roDate(last)};
+}
+// Energia și somnul în zilele antrenate față de zilele active ratate (ultimele `weeks` săptămâni, fără azi).
+// rows: rândurile de forță + rating + skip. null dacă oricare grup are sub 5 zile notate.
+function energyVsTraining(rows,opts){
+  var refN=dayNum(opts.ref||new Date()),from=refN-7*(opts.weeks||8),active=opts.active||[];
+  var trained={},skipped={},rate={};
+  (rows||[]).forEach(function(r){
+    if(!r)return;var n=dayNum(r.date);if(n==null||n<from||n>=refN)return;
+    if(r.type==='antrenament')trained[n]=1;
+    else if(r.type==='skip')skipped[n]=1;
+    else if(r.type==='rating'){var v=validRating(r.note);if(v!==null)(rate[n]=rate[n]||{})[r.exercise]=v;}
+  });
+  function group(test){
+    var e=[],s=[],days=0;
+    for(var n=from;n<refN;n++){if(!test(n)||!rate[n])continue;days++;if(rate[n].energy!=null)e.push(rate[n].energy);if(rate[n].sleep!=null)s.push(rate[n].sleep);}
+    function av(a){return a.length?Math.round(a.reduce(function(x,y){return x+y;},0)/a.length*10)/10:null;}
+    return {days:days,energy:av(e),sleep:av(s)};
+  }
+  var t=group(function(n){return !!trained[n];});
+  var m=group(function(n){return !trained[n]&&!skipped[n]&&!!active[weekdayOf(n)];});
+  if(t.days<5||m.days<5)return null;
+  return {trained:t,missed:m};
+}
+// O singură propunere pentru săptămâna care vine, în ordinea importanței
+function weeklyVerdict(o){
+  if(o.pain&&(o.pain.level==='hold'||o.pain.level==='swap'))return {kind:'pain',zone:o.pain.zone};
+  if(o.adherence&&o.adherence.planned>0&&o.adherence.pct!=null&&o.adherence.pct<75)return {kind:'adherence',done:o.adherence.done,planned:o.adherence.planned};
+  if(o.pullPush&&o.pullPush.low)return {kind:'pullpush',ratio:o.pullPush.ratio};
+  if(o.subBand&&o.subBand.length)return {kind:'volume',group:o.subBand[0]};
+  return {kind:'ok'};
 }
 
 // ═══ BUG 5 — COMPOZIȚIA CORPORALĂ ═══
@@ -399,6 +459,7 @@ var API={
   PAIN_ZONES:PAIN_ZONES,painZoneLabel:painZoneLabel,painFromText:painFromText,validRating:validRating,migrateDayNotes:migrateDayNotes,
   painAffects:painAffects,zonesFor:zonesFor,painLevel:painLevel,activePains:activePains,painFor:painFor,
   stagnationAdvice:stagnationAdvice,missedDays:missedDays,
+  ratingAvg:ratingAvg,stagnationCauses:stagnationCauses,measurementDue:measurementDue,energyVsTraining:energyVsTraining,weeklyVerdict:weeklyVerdict,
   deloadEnd:deloadEnd,isoOf:isoOf,extendOverride:extendOverride,lowEnergy:lowEnergy,kcalAdvice:kcalAdvice,KCAL_ZONES:KCAL_ZONES,
   navyBF:navyBF,bodyCompTable:bodyCompTable,
   weightTrend:weightTrend,pullPush:pullPush

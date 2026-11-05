@@ -264,6 +264,33 @@ eq(fl&&fl.kcalMin,1200,'nu coboară sub 1.200 kcal (femei)');
 var fl2=A.kcalAdvice({points:wpts(70,0,8,3),ref:REF,goal:'slabit',sex:'F',kcalMin:1200,kcalMax:1300});
 eq(fl2&&fl2.atFloor,true,'deja la limita de jos: fără propunere de scădere');
 
+// ── v136
+console.log('▸ v136 — limita de calorii, cauzele stagnării, măsurătorile, energia, bilanțul');
+var inv=A.kcalAdvice({points:wpts(80,0,8,3),ref:REF,goal:'slabit',sex:'M',kcalMin:1400,kcalMax:1600});
+eq(inv&&inv.dir,0,'ținte sub limită + greutate plată: fără propunere (nu „+100")');eq(inv&&inv.atFloor,true,'… marcată „la limita de jos"');
+function rt(d,k,v){return {date:d,type:'rating',exercise:k,note:String(v)};}
+var rr=[rt('25.10.2026','sleep',4),rt('27.10.2026','sleep',5),rt('29.10.2026','sleep',5),rt('01.11.2026','sleep',4),rt('03.11.2026','sleep',6),
+        rt('25.10.2026','energy',7),rt('27.10.2026','energy',6),rt('29.10.2026','energy',7),rt('01.11.2026','energy',6)];
+var sc=A.stagnationCauses({rows:rr,ref:REF,kcalDir:0,goal:'recomp',pain:null});
+eq(sc.map(function(c){return c.kind;}).join(','),'sleep','cauza: somnul (media 4,8 din 5 note)');eq(sc[0].avg,4.8,'media somnului 4,8');
+eq(A.stagnationCauses({rows:rr.slice(0,3),ref:REF}).length,0,'sub 4 note: fără concluzie');
+eq(A.stagnationCauses({rows:[],ref:REF,kcalDir:1,goal:'recomp'})[0].kind,'kcal','slăbești prea repede → cauza: caloriile');
+eq(A.stagnationCauses({rows:[],ref:REF,kcalDir:1,goal:'masa'}).length,0,'la masă, „+kcal" nu e cauză de stagnare');
+eq(A.measurementDue([{date:'01.10.2026',waist:112,neck:42},{date:'01.11.2026',waist:110}],REF).due,true,'ultima cu gât acum 35 de zile → e timpul');
+eq(A.measurementDue([{date:'20.10.2026',waist:112,neck:42}],REF).due,false,'acum 16 zile → încă nu');
+eq(A.measurementDue([],REF).due,true,'nicio măsurătoare → e timpul');
+var ev=[];
+['12.10.2026','13.10.2026','15.10.2026','19.10.2026','20.10.2026','22.10.2026'].forEach(function(d){ev.push(set(d,'X',10,10));ev.push(rt(d,'energy',7));ev.push(rt(d,'sleep',7));});
+['16.10.2026','23.10.2026','26.10.2026','27.10.2026','29.10.2026'].forEach(function(d){ev.push(rt(d,'energy',4));ev.push(rt(d,'sleep',5));});
+var evt=A.energyVsTraining(ev,{active:LMJV,ref:REF,weeks:8});
+eq(evt&&evt.trained.energy,7,'zilele antrenate: energie 7');eq(evt&&evt.missed.energy,4,'zilele ratate: energie 4');eq(evt&&evt.missed.days,5,'5 zile ratate notate');
+eq(A.energyVsTraining(ev.slice(0,6),{active:LMJV,ref:REF,weeks:8}),null,'prea puține zile notate → nimic');
+eq(A.weeklyVerdict({pain:{level:'hold',zone:'umar_dr'},adherence:{done:1,planned:4,pct:25}}).kind,'pain','bilanț: durerea are prioritate');
+eq(A.weeklyVerdict({adherence:{done:2,planned:4,pct:50},pullPush:{low:true}}).kind,'adherence','bilanț: apoi aderența');
+eq(A.weeklyVerdict({adherence:{done:4,planned:4,pct:100},pullPush:{low:true,ratio:0.7}}).kind,'pullpush','bilanț: apoi tras/împins');
+eq(A.weeklyVerdict({adherence:{done:4,planned:4,pct:100},subBand:['gambe']}).group,'gambe','bilanț: apoi grupa sub bandă');
+eq(A.weeklyVerdict({adherence:{done:4,planned:4,pct:100}}).kind,'ok','bilanț: săptămână echilibrată');
+
 // ── Îmbunătățiri
 console.log('▸ Îmbunătățiri — greutate și tracțiune/împingere');
 var ws=[];for(var i=0;i<10;i++){var n=A.dayNum('08.10.2026')+i*3;ws.push({date:A.roDate(n),type:'masuratoare',weight:Math.round((92-i*3*0.5/7)*100)/100});}
