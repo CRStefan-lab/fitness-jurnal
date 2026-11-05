@@ -131,7 +131,7 @@ var EXERCISE_DB=[
 
   // ── PULL (spate) ──
   {id:'db_ramat_sprijinit',name:'Ramat gantere sprijinit pe bancă înclinată',muscle:'Spate',pattern:'pull',equipment:['gantere','banca'],level:1,compound:true,starEligible:true,prio:3,
-   yt:'chest supported dumbbell row incline bench form',ghid:{start:'Pieptul pe bancă înclinată, gantere atârnând.',move:'Tragi ganterele spre șolduri, strângi omoplații sus.',err:'Balans, trunchiul se ridică de pe bancă.',tip:'Sigur pentru lombari — pieptul sprijinit.'}},
+   yt:'chest supported dumbbell row incline bench form',ghid:{start:'Bancă la 30–45°. Pieptul și burta lipite de spătar, bărbia trece de capătul băncii, gantere atârnând sub umeri.',move:'Tragi ganterele spre șolduri, strângi omoplații sus.',err:'Balans, trunchiul se ridică de pe bancă.',tip:'La 30° tragi mai orizontal (spatele de sus și umerii posteriori); la 45° e mai comod și lucrează mai mult dorsalii. Sigur pentru lombari: pieptul e sprijinit.'}},
   {id:'bara_bent_over_row',name:'Bent-over row cu bara',muscle:'Spate',pattern:'pull',equipment:['bara'],level:2,compound:true,starEligible:true,prio:5,risky:true,
    yt:'barbell bent over row form',ghid:{start:'Aplecat la ~45°, spatele drept, bara la lățimea umerilor.',move:'Tragi bara spre abdomen, coatele pe lângă corp.',err:'Spatele rotunjit. Balans.',tip:'Bara atinge buricul la fiecare repetare.'}},
   {id:'gym_lat_pulldown',name:'Tracțiuni la helcometru (lat pulldown)',muscle:'Spate',pattern:'pull',equipment:['cablu'],level:1,compound:true,starEligible:true,prio:1,
