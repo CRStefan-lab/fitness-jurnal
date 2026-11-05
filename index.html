@@ -4109,7 +4109,15 @@ function saveSet(keyEnc,setNum,ei,isEdit){
     showUndoToast('S'+setNum+' ✓ · '+valStr,false);
     if(navigator.vibrate)navigator.vibrate(30);
   }
-  if(isEdit)return;
+  if(isEdit){
+    // v134: corectezi setul salvat ULTIMUL (în ultimele 10 minute) → pauza pornește, dacă nu merge deja.
+    // Un set mai vechi sau corectat mai târziu nu pornește nimic.
+    if(prevRow&&!restTimerState.deadline&&Date.now()-(prevRow.ts||0)<=10*60000&&isLatestSavedSet(prevRow,dateRo)){
+      var exL=sessList(),exE=exL[ei]||{name:key,sets:1,star:false};
+      if(!(exComplete(exE,ei)&&nextOpenEx(exL,ei)<0))startRestTimer(!!exE.star);
+    }
+    return;
+  }
   var allExList=sessList();
   var exObj=allExList[ei]||{name:key,sets:1,star:false};
   if(exComplete(exObj,ei)){
@@ -4126,6 +4134,11 @@ function saveSet(keyEnc,setNum,ei,isEdit){
 }
 
 // ═══════════════════════════════════════════════════════════════
+// Setul corectat era cel salvat ultimul azi? (comparăm momentul salvării lui cu al tuturor celorlalte seturi ale zilei)
+function isLatestSavedSet(prevRow,dateRo){
+  var t=prevRow.ts||0;
+  return !loadStore().rows.some(function(r){return r.type==='antrenament'&&r.date===dateRo&&!(r.exercise===prevRow.exercise&&r.set===prevRow.set)&&(r.ts||0)>t;});
+}
 // MINI-ISTORIC RIR — ultimele 3 sesiuni ca emoji pe cardul exercițiului
 // ═══════════════════════════════════════════════════════════════
 function rirHistoryBadge(name){
